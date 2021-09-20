@@ -1,0 +1,33 @@
+{
+  "name": "octomock",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "tsc-watch --onSuccess 'node --inspect=0.0.0.0:5858 dist/index.js'",
+    "format": "prettier --write '**/*.{ts,js,css,json,md}'"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@koa/router": "^10.1.0",
+    "@types/ramda": "^0.27.44",
+    "koa": "^2.13.1",
+    "koa-bodyparser": "^4.3.0",
+    "ramda": "^0.27.1"
+  },
+  "devDependencies": {
+    "@types/koa": "^2.13.4",
+    "@types/koa__router": "^8.0.7",
+    "@types/koa-router": "^7.4.4",
+    "@types/node": "^16.6.1",
+    "@typescript-eslint/eslint-plugin": "^4.17.0",
+    "@typescript-eslint/parser": "^4.17.0",
+    "eslint": "^7.5.0",
+    "eslint-config-prettier": "^8.1.0",
+    "eslint-plugin-unused-imports": "^1.1.2",
+    "prettier": "^2.2.1",
+    "tsc-watch": "^4.4.0",
+    "typescript": "^4.3.5"
+  }
+}
