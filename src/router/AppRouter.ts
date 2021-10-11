@@ -11,7 +11,6 @@ const getCapabilities = (ctx: any): CapabilityId[] => {
 
 router.get("/products", (ctx, _) => {
   const capabilities = getCapabilities(ctx);
-
   const products = productController.getProducts(capabilities);
   ctx.body = products;
   ctx.toJSON();

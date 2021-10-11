@@ -6,7 +6,7 @@ import { CapabilityId } from "../types/Capability";
 import { Itinerary } from "../types/Option";
 
 export class OptionModel {
-  private id: string;
+  public id: string;
   private primary: boolean;
   private internalName: string;
   private reference: Nullable<string>;

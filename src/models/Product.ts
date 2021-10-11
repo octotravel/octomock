@@ -24,9 +24,9 @@ export class ProductModel {
   private instantDelivery: boolean;
   private availabilityRequired: boolean;
   private availabilityType: AvailabilityType;
-  private deliveryFormats: Array<DeliveryFormat>;
-  private deliveryMethods: Array<DeliveryMethod>;
-  private redemptionMethod: RedemptionMethod;
+  public deliveryFormats: Array<DeliveryFormat>;
+  public deliveryMethods: Array<DeliveryMethod>;
+  public redemptionMethod: RedemptionMethod;
   private options: OptionModel[];
   private productContentModel?: ProductContentModel;
   private productPickupModel?: ProductPickupModel;

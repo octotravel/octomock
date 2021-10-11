@@ -97,6 +97,7 @@ interface ProductPricing {
   availableCurrencies?: Array<string>;
   pricingPer?: PricingPer;
   pricingFrom?: Pricing;
+  pricing?: Pricing;
 }
 
 interface ProductPickup {

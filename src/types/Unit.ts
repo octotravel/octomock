@@ -37,4 +37,5 @@ interface UnitContent {
 
 interface UnitPricing {
   pricingFrom?: Array<Pricing>;
+  pricing?: Array<Pricing>;
 }
