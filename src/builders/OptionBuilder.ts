@@ -1,19 +1,16 @@
-import { Currency } from "./../types/Currency";
 import { UnitBuilder } from "./UnitBuilder";
 import { UnitModel } from "./../models/Unit";
 import { OptionModel } from "./../models/Option";
-import { UnitId } from "../types/Unit";
 import { PricingPer } from "../types/Pricing";
 import { CapabilityId } from "../types/Capability";
+import { OptionConfigModel } from "../models/OptionConfig";
+import { UnitConfigModel } from "../models/UnitConfig";
 
 interface OptionBuilderData {
-  id: string;
-  name: string;
-  primary;
-  units: UnitId[];
+  primary: boolean;
   capabilities: CapabilityId[];
   pricingPer?: PricingPer;
-  currency?: Currency;
+  optionConfig: OptionConfigModel;
 }
 
 export class OptionBuilder {
@@ -21,22 +18,33 @@ export class OptionBuilder {
   private option: OptionModel;
 
   build(data: OptionBuilderData): OptionModel {
-    const { id, name, units, capabilities, currency, primary } = data;
+    const { optionConfig, capabilities, primary, pricingPer } = data;
 
     this.option = new OptionModel({
-      id,
-      internalName: name,
+      id: optionConfig.id,
+      internalName: optionConfig.name,
       primary,
-      availabilityLocalStartTimes: ["00:00"],
+      availabilityLocalStartTimes: optionConfig.localStartTimes,
       restrictions: {
-        minUnits: null,
-        maxUnits: null,
+        minUnits: optionConfig.minUnits,
+        maxUnits: optionConfig.maxUnits,
       },
-      units: this.generateUnitModels(units, capabilities, currency),
+      units: this.generateUnitModels(
+        optionConfig.unitConfigModels,
+        capabilities
+      ),
+      durationAmount: optionConfig.durationAmount,
+      durationUnit: optionConfig.durationUnit,
     });
 
     if (capabilities.includes(CapabilityId.Content)) {
       this.option = this.option.addContent();
+    }
+
+    if (capabilities.includes(CapabilityId.Pricing)) {
+      if (pricingPer === PricingPer.BOOKING) {
+        this.option = this.option.addPricing(optionConfig.pricingFrom);
+      }
     }
 
     if (capabilities.includes(CapabilityId.Pickups)) {
@@ -47,12 +55,11 @@ export class OptionBuilder {
   }
 
   private generateUnitModels = (
-    units: UnitId[],
-    capabilities: CapabilityId[],
-    currency: Currency
+    unitsConfig: UnitConfigModel[],
+    capabilities: CapabilityId[]
   ): UnitModel[] => {
-    return units.map((unitId) =>
-      this.unitBuilder.build({ unitId, capabilities, currency })
+    return unitsConfig.map((unitConfig) =>
+      this.unitBuilder.build({ unitConfig, capabilities })
     );
   };
 }

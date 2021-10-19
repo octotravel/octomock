@@ -6,31 +6,34 @@ import { PricingPer } from "../types/Pricing";
 import { OptionModel } from "./../models/Option";
 import { Product } from "./../types/Product";
 import { CapabilityId } from "../types/Capability";
-import { AvailabilityType } from "../types/Availability";
+import { AvailabilityType, OpeningHours } from "../types/Availability";
 import {
   DeliveryFormat,
   DeliveryMethod,
   RedemptionMethod,
 } from "../types/Product";
+import { AvailabilityConfigModel } from "./AvailabilityConfig";
 
 export class ProductModel {
   public id: string;
   private internalName: string;
   private reference: Nullable<string>;
   private locale: string;
-  private timeZone: string;
+  public timeZone: string;
   private allowFreesale: boolean;
   private instantConfirmation: boolean;
   private instantDelivery: boolean;
   private availabilityRequired: boolean;
-  private availabilityType: AvailabilityType;
+  public availabilityType: AvailabilityType;
   public deliveryFormats: Array<DeliveryFormat>;
   public deliveryMethods: Array<DeliveryMethod>;
   public redemptionMethod: RedemptionMethod;
   private options: OptionModel[];
+  public openingHours: OpeningHours[];
   private productContentModel?: ProductContentModel;
   private productPickupModel?: ProductPickupModel;
   private productPricingModel?: ProductPricingModel;
+  public availabilityConfig: AvailabilityConfigModel;
 
   private capabilities: CapabilityId[] = [];
 
@@ -39,11 +42,15 @@ export class ProductModel {
     internalName,
     availabilityType,
     options,
+    openingHours,
+    availabilityConfig,
   }: {
     id: string;
     internalName: string;
     availabilityType: AvailabilityType;
     options: OptionModel[];
+    openingHours: OpeningHours[];
+    availabilityConfig: AvailabilityConfigModel;
   }) {
     this.id = id;
     this.internalName = internalName;
@@ -59,12 +66,18 @@ export class ProductModel {
     this.deliveryMethods = [DeliveryMethod.VOUCHER, DeliveryMethod.TICKET];
     this.redemptionMethod = RedemptionMethod.DIGITAL;
     this.options = options;
+    this.openingHours = openingHours;
+    this.availabilityConfig = availabilityConfig;
   }
 
   public addContent = (): ProductModel => {
     this.capabilities.push(CapabilityId.Content);
     this.productContentModel = new ProductContentModel();
     return this;
+  };
+
+  public getOption = (id: string): Nullable<OptionModel> => {
+    return this.options.find((option) => option.id === id) ?? null;
   };
 
   public addPricing = (
@@ -126,9 +139,6 @@ export class ProductModel {
       pojo.defaultCurrency = this.productPricingModel.defaultCurrency;
       pojo.availableCurrencies = this.productPricingModel.availableCurrencies;
       pojo.pricingPer = this.productPricingModel.pricingPer;
-      if (this.productPricingModel.pricingPer === PricingPer.BOOKING) {
-        pojo.pricingFrom = this.productPricingModel.pricingFrom;
-      }
     }
 
     if (this.capabilities.includes(CapabilityId.Pickups)) {

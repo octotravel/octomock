@@ -1,32 +1,31 @@
-import * as R from "ramda";
 import { OptionModel } from "./../models/Option";
 import { OptionBuilder } from "./OptionBuilder";
 import { Currency } from "./../types/Currency";
-import { UnitId } from "./../types/Unit";
 import { PricingPer } from "./../types/Pricing";
 import { ProductModel } from "./../models/Product";
 import { CapabilityId } from "./../types/Capability";
-import { AvailabilityType } from "./../types/Availability";
+import { OptionConfigModel } from "../models/OptionConfig";
+import { AvailabilityConfigModel } from "../models/AvailabilityConfig";
 
-interface OptionConfig {
-  id: string;
-  name: string;
+export interface PricingConfig {
+  currencies: Currency[];
+  pricingPer: PricingPer;
+  currency: Currency;
 }
 
-const defaultOptionConfig: OptionConfig = {
-  id: "DEFAULT",
-  name: "Default Option",
+const defaultPricingConfig: PricingConfig = {
+  currencies: [Currency.EUR],
+  pricingPer: PricingPer.UNIT,
+  currency: Currency.EUR,
 };
 
 interface ProductBuilderData {
   id: string;
   name: string;
-  units: UnitId[];
-  availabilityType: AvailabilityType;
-  optionsConfig?: OptionConfig[];
+  optionsConfig: OptionConfigModel[];
+  pricingConfig?: PricingConfig;
   capabilities?: CapabilityId[];
-  pricingPer?: PricingPer;
-  currency?: Currency;
+  availabilityConfig: AvailabilityConfigModel;
 }
 
 export class ProductBuilder {
@@ -37,25 +36,23 @@ export class ProductBuilder {
     const {
       id,
       name,
-      availabilityType,
       capabilities = [],
-      pricingPer,
-      currency = Currency.EUR,
-      units,
-      optionsConfig = [defaultOptionConfig],
+      optionsConfig,
+      pricingConfig = defaultPricingConfig,
+      availabilityConfig,
     } = data;
 
     this.product = new ProductModel({
       id,
       internalName: name,
-      availabilityType,
+      availabilityType: availabilityConfig.availabilityType,
+      openingHours: availabilityConfig.openingHours,
       options: this.generateOptionModels(
         optionsConfig,
-        units,
-        capabilities,
-        pricingPer,
-        currency
+        pricingConfig,
+        capabilities
       ),
+      availabilityConfig,
     });
 
     if (capabilities.includes(CapabilityId.Content)) {
@@ -63,17 +60,10 @@ export class ProductBuilder {
     }
 
     if (capabilities.includes(CapabilityId.Pricing)) {
-      if (R.isNil(pricingPer)) {
-        throw new Error(
-          "pricingPer is required when Pricing Capability is provided"
-        );
-      }
-      if (R.isNil(currency)) {
-        throw new Error(
-          "currency is required when Pricing Capability is provided"
-        );
-      }
-      this.product = this.product.addPricing(pricingPer, currency);
+      this.product = this.product.addPricing(
+        pricingConfig.pricingPer,
+        pricingConfig.currency
+      );
     }
 
     if (capabilities.includes(CapabilityId.Pickups)) {
@@ -84,21 +74,16 @@ export class ProductBuilder {
   }
 
   private generateOptionModels = (
-    optionsConfig: OptionConfig[],
-    units: UnitId[],
-    capabilities: CapabilityId[],
-    pricingPer: PricingPer,
-    currency: Currency
+    optionsConfig: OptionConfigModel[],
+    pricingConfig: PricingConfig,
+    capabilities: CapabilityId[]
   ): OptionModel[] => {
-    return optionsConfig.map(({ id, name }, index) =>
+    return optionsConfig.map((optionConfig, index) =>
       this.optionBuilder.build({
-        id,
         primary: index === 0,
-        name,
-        units,
         capabilities,
-        pricingPer,
-        currency,
+        pricingPer: pricingConfig.pricingPer,
+        optionConfig,
       })
     );
   };

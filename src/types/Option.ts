@@ -1,5 +1,7 @@
 import { Unit } from "./Unit";
 import { PickupPoint } from "./PickupPoint";
+import { Pricing } from "./Pricing";
+import { DurationUnit } from "./Duration";
 
 export enum ContactField {
   firstName = "firstName",
@@ -39,7 +41,7 @@ export type Itinerary = {
   durationUnit: string;
 };
 
-export interface Option extends OptionContent, OptionPickup {
+export interface Option extends OptionContent, OptionPickup, OptionPricing {
   id: string;
   default: boolean;
   internalName: string;
@@ -60,8 +62,12 @@ interface OptionContent {
   shortDescription?: string;
   duration?: string;
   durationAmount?: string;
-  durationUnit?: string;
+  durationUnit?: DurationUnit;
   itinerary?: Nullable<Itinerary[]>;
+}
+
+interface OptionPricing {
+  pricingFrom?: Array<Pricing>;
 }
 
 interface OptionPickup {

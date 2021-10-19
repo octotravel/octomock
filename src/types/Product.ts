@@ -96,7 +96,6 @@ interface ProductPricing {
   defaultCurrency?: string;
   availableCurrencies?: Array<string>;
   pricingPer?: PricingPer;
-  pricingFrom?: Pricing;
   pricing?: Pricing;
 }
 

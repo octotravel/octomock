@@ -1,5 +1,3 @@
-import { pricingEUR } from "./../data/Pricing";
-import { Currency } from "./../types/Currency";
 import { CapabilityId } from "../types/Capability";
 import { Unit, UnitId, Restrictions } from "../types/Unit";
 import { Pricing } from "../types/Pricing";
@@ -41,11 +39,9 @@ export class UnitModel {
     return this;
   };
 
-  public addPricing = (currency: Currency): UnitModel => {
+  public addPricing = (pricings: Pricing[]): UnitModel => {
     this.capabilities.push(CapabilityId.Pricing);
-    if (currency === Currency.EUR) {
-      this.pricingFrom = [pricingEUR];
-    }
+    this.pricingFrom = pricings;
     return this;
   };
 

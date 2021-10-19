@@ -4,17 +4,22 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "tsc-watch --onSuccess 'node --inspect=0.0.0.0:5858 dist/index.js'",
-    "format": "prettier --write '**/*.{ts,js,css,json,md}'"
+    "dev": "tsc-watch --onSuccess \"node --inspect=0.0.0.0:5858 dist/index.js\"",
+    "format": "prettier --write \"**/*.{ts,js,css,json,md}\""
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@koa/router": "^10.1.0",
     "@types/ramda": "^0.27.44",
+    "date-fns": "^2.25.0",
+    "date-fns-tz": "^1.1.6",
     "koa": "^2.13.1",
     "koa-bodyparser": "^4.3.0",
-    "ramda": "^0.27.1"
+    "ramda": "^0.27.1",
+    "sqlite": "^4.0.23",
+    "sqlite3": "^5.0.2",
+    "yup": "^0.32.11"
   },
   "devDependencies": {
     "@types/koa": "^2.13.4",

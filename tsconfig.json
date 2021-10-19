@@ -9,6 +9,6 @@
     "esModuleInterop": true,
     "typeRoots": ["node_modules/@types"]
   },
-  "include": ["src/**/**.ts", "test/**/**.ts"],
+  "include": ["src/**/**.ts", "test/**/**.ts", "src/models/Availability.ts"],
   "exclude": ["node_modules"]
 }

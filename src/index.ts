@@ -1,9 +1,22 @@
 import Koa from "koa";
 import { router } from "./router/AppRouter";
 import { parseCapabilities } from "./router/middlewares";
+import { DB } from "./storage/Database";
 
 const app = new Koa();
 
+DB.getInstance().open();
+app.use(async (ctx, next) => {
+    try {
+      await next();
+    } catch (err) {
+      ctx.status = err.statusCode || err.status || 500;
+      ctx.body = {
+        error: 'BAD_REQUEST',
+        errorMessage: err.message
+      };
+    }
+  })
 app.use(parseCapabilities);
 app.use(router.routes());
 
