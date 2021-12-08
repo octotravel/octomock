@@ -3,29 +3,26 @@ import {
   AvailabilityStatus,
   OpeningHours,
 } from "../types/Availability";
-import { CapabilityId } from "../types/Capability";
 import { AvailabilityContentModel } from "./AvailabilityContent";
 import { AvailabilityPickupModel } from "./AvailabilityPickup";
 import { AvailabilityPricingModel } from "./AvailabilityPricing";
 
 export class AvailabilityModel {
   public id: string;
-  private localDateTimeStart: string;
-  private localDateTimeEnd: string;
-  private allDay: boolean;
-  private available: boolean;
-  private status: AvailabilityStatus;
-  private vacancies: Nullable<number>;
-  private capacity: Nullable<number>;
-  private maxUnits: Nullable<number>;
-  private utcCutoffAt: string;
-  private openingHours: OpeningHours[];
+  public localDateTimeStart: string;
+  public localDateTimeEnd: string;
+  public allDay: boolean;
+  public available: boolean;
+  public status: AvailabilityStatus;
+  public vacancies: Nullable<number>;
+  public capacity: Nullable<number>;
+  public maxUnits: Nullable<number>;
+  public utcCutoffAt: string;
+  public openingHours: OpeningHours[];
 
-  private availabilityContentModel?: AvailabilityContentModel;
-  private availabilityPricingModel?: AvailabilityPricingModel;
-  private availabilityPickupModel?: AvailabilityPickupModel;
-
-  private capabilities: CapabilityId[] = [];
+  public availabilityContentModel?: AvailabilityContentModel;
+  public availabilityPricingModel?: AvailabilityPricingModel;
+  public availabilityPickupModel?: AvailabilityPickupModel;
 
   constructor({
     id,
@@ -77,22 +74,6 @@ export class AvailabilityModel {
     this.availabilityPickupModel = new AvailabilityPickupModel();
   }
 
-  public addContent = (): AvailabilityModel => {
-    this.capabilities.push(CapabilityId.Content);
-    return this;
-  };
-
-  public addPricing = (): AvailabilityModel => {
-    this.capabilities.push(CapabilityId.Pricing);
-
-    return this;
-  };
-
-  public addPickup = (): AvailabilityModel => {
-    this.capabilities.push(CapabilityId.Pickups);
-    return this;
-  };
-
   public toPOJO = (): Availability => {
     const {
       id,
@@ -121,25 +102,19 @@ export class AvailabilityModel {
       openingHours,
     };
 
-    if (this.capabilities.includes(CapabilityId.Content)) {
-      Object.keys(this.availabilityContentModel).forEach((key) => {
-        pojo[key] = this.availabilityContentModel[key];
-      });
+    Object.keys(this.availabilityContentModel).forEach((key) => {
+      pojo[key] = this.availabilityContentModel[key];
+    });
+
+    if (this.availabilityPricingModel.pricing) {
+      pojo.pricing = this.availabilityPricingModel.pricing;
+    } else if (this.availabilityPricingModel.unitPricing) {
+      pojo.unitPricing = this.availabilityPricingModel.unitPricing;
     }
 
-    if (this.capabilities.includes(CapabilityId.Pricing)) {
-      if (this.availabilityPricingModel.pricing) {
-        pojo.pricing = this.availabilityPricingModel.pricing;
-      } else if (this.availabilityPricingModel.unitPricing) {
-        pojo.unitPricing = this.availabilityPricingModel.unitPricing;
-      }
-    }
-
-    if (this.capabilities.includes(CapabilityId.Pickups)) {
-      Object.keys(this.availabilityPickupModel).forEach((key) => {
-        pojo[key] = this.availabilityPickupModel[key];
-      });
-    }
+    Object.keys(this.availabilityPickupModel).forEach((key) => {
+      pojo[key] = this.availabilityPickupModel[key];
+    });
 
     return pojo;
   };

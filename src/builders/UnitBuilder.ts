@@ -1,17 +1,27 @@
 import { UnitModel } from "./../models/Unit";
-import { CapabilityId } from "../types/Capability";
 import { UnitConfigModel } from "../models/UnitConfig";
+import { PricingPer } from "../types/Pricing";
 
 interface UnitBuilderData {
   unitConfig: UnitConfigModel;
-  capabilities: CapabilityId[];
+  pricingPer: PricingPer;
 }
 
 export class UnitBuilder {
   private unit: UnitModel;
   build(data: UnitBuilderData): UnitModel {
-    const { unitConfig, capabilities } = data;
-
+    const { unitConfig, pricingPer } = data;
+    const pricing =
+      pricingPer === PricingPer.UNIT
+        ? unitConfig.pricingFrom.map((pricing) => ({
+            currency: pricing.currency,
+            currencyPrecision: pricing.currencyPrecision,
+            includedTaxes: pricing.includedTaxes,
+            net: pricing.net,
+            original: pricing.original,
+            retail: pricing.retail,
+          }))
+        : [];
     this.unit = new UnitModel({
       id: unitConfig.id,
       restrictions: {
@@ -23,23 +33,8 @@ export class UnitBuilder {
         paxCount: 1,
         accompaniedBy: [],
       },
+      pricing,
     });
-
-    if (capabilities.includes(CapabilityId.Content)) {
-      this.unit = this.unit.addContent();
-    }
-
-    if (capabilities.includes(CapabilityId.Pricing)) {
-      const pricing = unitConfig.pricingFrom.map((pricing) => ({
-        currency: pricing.currency,
-        currencyPrecision: pricing.currencyPrecision,
-        includedTaxes: pricing.includedTaxes,
-        net: pricing.net,
-        original: pricing.original,
-        retail: pricing.retail,
-      }));
-      this.unit = this.unit.addPricing(pricing);
-    }
 
     return this.unit;
   }

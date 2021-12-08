@@ -11,40 +11,37 @@ import {
   BookingAvailability,
   BookingStatus,
 } from "./../types/Booking";
-import { CapabilityId } from "../types/Capability";
 import { DeliveryMethod } from "../types/Product";
 
 export class BookingModel {
   private id: string;
-  private uuid: string;
-  private testMode: boolean;
-  private resellerReference: string;
-  private supplierReference: string;
-  private status: BookingStatus;
-  private utcCreatedAt: string;
-  private utcUpdatedAt: Nullable<string>;
-  private utcExpiresAt: Nullable<string>;
-  private utcRedeemedAt: Nullable<string>;
-  private utcConfirmedAt: Nullable<string>;
-  private productId: string;
-  private product: ProductModel;
-  private optionId: string;
-  private option: OptionModel;
-  private cancellable: boolean;
-  private cancellation: Nullable<unknown>; // TODO: get the object type
-  private freesale: boolean;
-  private availabilityId: string;
-  private availability: BookingAvailability;
-  private contact: Contact;
-  private notes: Nullable<string>;
-  private deliveryMethods: DeliveryMethod[];
-  private voucher: Voucher;
-  private unitItems: UnitItem[];
-  private bookingContentModel?: BookingContentModel;
-  private bookingPricingModel?: BookingPricingModel;
-  private bookingPickupModel?: BookingPickupModel;
-
-  private capabilities: CapabilityId[];
+  public uuid: string;
+  public testMode: boolean;
+  public resellerReference: Nullable<string>;
+  public supplierReference: Nullable<string>;
+  public status: BookingStatus;
+  public utcCreatedAt: string;
+  public utcUpdatedAt: Nullable<string>;
+  public utcExpiresAt: Nullable<string>;
+  public utcRedeemedAt: Nullable<string>;
+  public utcConfirmedAt: Nullable<string>;
+  public productId: string;
+  public product: ProductModel;
+  public optionId: string;
+  public option: OptionModel;
+  public cancellable: boolean;
+  public cancellation: Nullable<unknown>; // TODO: get the object type
+  public freesale: boolean;
+  public availabilityId: string;
+  public availability: BookingAvailability;
+  public contact: Contact;
+  public notes: Nullable<string>;
+  public deliveryMethods: DeliveryMethod[];
+  public voucher: Voucher;
+  public unitItems: UnitItem[];
+  public bookingContentModel?: BookingContentModel;
+  public bookingPricingModel?: BookingPricingModel;
+  public bookingPickupModel?: BookingPickupModel;
 
   constructor({
     id,
@@ -52,11 +49,11 @@ export class BookingModel {
     resellerReference,
     supplierReference,
     status,
-    // utcCreatedAt,
-    // utcUpdatedAt,
-    // utcExpiresAt,
-    // utcRedeemedAt,
-    // utcConfirmedAt,
+    utcCreatedAt,
+    utcUpdatedAt,
+    utcExpiresAt,
+    utcRedeemedAt,
+    utcConfirmedAt,
     product,
     option,
     availability,
@@ -65,14 +62,14 @@ export class BookingModel {
   }: {
     id: string;
     uuid: string;
-    resellerReference: string;
-    supplierReference: string;
+    resellerReference: Nullable<string>;
+    supplierReference: Nullable<string>;
     status: BookingStatus;
-    // utcCreatedAt: string;
-    // utcUpdatedAt: Nullable<string>;
-    // utcExpiresAt: Nullable<string>;
-    // utcRedeemedAt: Nullable<string>;
-    // utcConfirmedAt: Nullable<string>;
+    utcCreatedAt: string;
+    utcUpdatedAt: Nullable<string>;
+    utcExpiresAt: Nullable<string>;
+    utcRedeemedAt: Nullable<string>;
+    utcConfirmedAt: Nullable<string>;
     product: ProductModel;
     option: OptionModel;
     availability: BookingAvailability;
@@ -82,12 +79,14 @@ export class BookingModel {
     this.id = id;
     this.uuid = uuid;
     this.testMode = true;
-    this.resellerReference = resellerReference;
-    this.supplierReference = supplierReference;
+    this.resellerReference = resellerReference ?? null;
+    this.supplierReference = supplierReference ?? null;
     this.status = status;
-    this.utcCreatedAt = new Date().toISOString();
-    this.utcUpdatedAt = null;
-    this.utcExpiresAt = null;
+    this.utcCreatedAt = utcCreatedAt;
+    this.utcUpdatedAt = utcUpdatedAt;
+    this.utcExpiresAt = utcExpiresAt;
+    this.utcRedeemedAt = utcRedeemedAt;
+    this.utcConfirmedAt = utcConfirmedAt;
     this.utcRedeemedAt = null;
     this.utcConfirmedAt = null;
     this.productId = product.id;
@@ -113,16 +112,7 @@ export class BookingModel {
       };
     }
     this.unitItems = unitItems;
-  }
-
-  public addContent = (): BookingModel => {
-    this.capabilities.push(CapabilityId.Content);
     this.bookingContentModel = new BookingContentModel();
-    return this;
-  };
-
-  public addPricing = (): BookingModel => {
-    this.capabilities.push(CapabilityId.Pricing);
     const pricing = {
       original: 0,
       retail: 0,
@@ -132,13 +122,8 @@ export class BookingModel {
       includedTaxes: [],
     };
     this.bookingPricingModel = new BookingPricingModel(pricing);
-    return this;
-  };
-
-  public addPickup = (): BookingModel => {
-    this.capabilities.push(CapabilityId.Pickups);
-    return this;
-  };
+    this.bookingPickupModel = new BookingPickupModel();
+  }
 
   public toPOJO = (): Booking => {
     const {
@@ -196,22 +181,36 @@ export class BookingModel {
       unitItems,
     };
 
-    if (this.capabilities.includes(CapabilityId.Content)) {
-      Object.keys(this.bookingContentModel).forEach((key) => {
-        pojo[key] = this.bookingContentModel[key];
-      });
-    }
+    Object.keys(this.bookingContentModel).forEach((key) => {
+      pojo[key] = this.bookingContentModel[key];
+    });
 
-    if (this.capabilities.includes(CapabilityId.Pricing)) {
-      pojo.pricing = this.bookingPricingModel.pricing;
-    }
+    pojo.pricing = this.bookingPricingModel.pricing;
 
-    if (this.capabilities.includes(CapabilityId.Pickups)) {
-      Object.keys(this.bookingPickupModel).forEach((key) => {
-        pojo[key] = this.bookingPickupModel[key];
-      });
-    }
+    Object.keys(this.bookingPickupModel).forEach((key) => {
+      pojo[key] = this.bookingPickupModel[key];
+    });
 
     return pojo;
+  };
+
+  public static fromPOJO = (booking: Booking): BookingModel => {
+    return new BookingModel({
+      id: booking.id,
+      uuid: booking.uuid,
+      resellerReference: booking.resellerReference,
+      supplierReference: booking.supplierReference,
+      status: booking.status,
+      product: ProductModel.fromPOJO(booking.product),
+      option: OptionModel.fromPOJO(booking.option),
+      availability: booking.availability,
+      contact: booking.contact,
+      unitItems: booking.unitItems,
+      utcCreatedAt: booking.utcCreatedAt,
+      utcUpdatedAt: booking.utcUpdatedAt,
+      utcExpiresAt: booking.utcExpiresAt,
+      utcRedeemedAt: booking.utcRedeemedAt,
+      utcConfirmedAt: booking.utcConfirmedAt,
+    });
   };
 }

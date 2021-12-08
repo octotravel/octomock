@@ -27,6 +27,7 @@ export interface Unit extends UnitContent, UnitPricing {
   reference: string;
   type: Nullable<string>;
   restrictions: Restrictions;
+  requiredContactFields: string[];
 }
 
 interface UnitContent {

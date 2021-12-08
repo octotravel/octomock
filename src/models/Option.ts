@@ -1,41 +1,31 @@
+import { OptionPickupModel } from "./OptionPickup";
+import { OptionContentModel } from "./OptionContent";
+import { UnitId } from "./../types/Unit";
 import { Option } from "../types/Option";
 import { UnitModel } from "./Unit";
-import { PickupPoint } from "../types/PickupPoint";
 import { ContactField, UnitRestrictions } from "../types/Option";
-import { CapabilityId } from "../types/Capability";
-import { Itinerary } from "../types/Option";
 import { OptionPricingModel } from "./OptionPricing";
 import { Pricing } from "../types/Pricing";
 import { DurationUnit } from "../types/Duration";
 
 export class OptionModel {
   public id: string;
-  private primary: boolean;
-  private internalName: string;
-  private reference: Nullable<string>;
+  public primary: boolean;
+  public internalName: string;
+  public reference: Nullable<string>;
   public availabilityLocalStartTimes: Array<string>;
-  private cancellationCutoff: string;
-  private cancellationCutoffAmount: number;
-  private cancellationCutoffUnit: string;
-  private requiredContactFields: Array<ContactField>;
+  public cancellationCutoff: string;
+  public cancellationCutoffAmount: number;
+  public cancellationCutoffUnit: string;
+  public requiredContactFields: Array<ContactField>;
   public restrictions: UnitRestrictions;
-  private units: Array<UnitModel>;
+  public units: Array<UnitModel>;
   // content
-  private title?: string;
-  private subtitle?: string;
-  private language?: string;
-  private shortDescription?: string;
-  private duration?: string;
-  public durationAmount?: string;
-  public durationUnit?: DurationUnit;
-  private itinerary?: Nullable<Itinerary[]>;
-  private optionPricingModel?: OptionPricingModel;
+  public optionContentModel?: OptionContentModel;
+  // pricing
+  public optionPricingModel?: OptionPricingModel;
   // pickup
-  private pickupRequired?: boolean;
-  private pickupAvailable?: boolean;
-  private pickupPoints?: Array<PickupPoint> = [];
-
-  private capabilities: CapabilityId[] = [];
+  public optionPickupModel?: OptionPickupModel;
 
   constructor({
     id,
@@ -46,6 +36,7 @@ export class OptionModel {
     units,
     durationAmount,
     durationUnit,
+    pricing,
   }: {
     id: string;
     primary?: boolean;
@@ -55,6 +46,7 @@ export class OptionModel {
     units: UnitModel[];
     durationUnit?: DurationUnit;
     durationAmount?: string;
+    pricing: Pricing[];
   }) {
     this.id = id;
     this.primary = primary ?? true;
@@ -67,34 +59,16 @@ export class OptionModel {
     this.requiredContactFields = [];
     this.restrictions = restrictions;
     this.units = units;
-    this.durationUnit = durationUnit ?? DurationUnit.HOURS;
-    this.durationAmount = durationAmount ?? "0";
-
-    this.title = "title";
-    this.subtitle = "subtitle";
-    this.language = "en";
-    this.shortDescription = "shortDescription";
-    this.duration = `${this.durationAmount} ${this.durationUnit}`;
-    this.itinerary = [];
+    this.optionContentModel = new OptionContentModel({
+      durationAmount,
+      durationUnit,
+    });
+    this.optionPricingModel = new OptionPricingModel(pricing);
+    this.optionPickupModel = new OptionPickupModel();
   }
 
-  public addContent = (): OptionModel => {
-    this.capabilities.push(CapabilityId.Content);
-
-    return this;
-  };
-
-  public addPricing = (pricing: Pricing[]) => {
-    this.optionPricingModel = new OptionPricingModel(pricing);
-    return this;
-  };
-
-  public addPickup = (): OptionModel => {
-    this.capabilities.push(CapabilityId.Pickups);
-    this.pickupRequired = false;
-    this.pickupAvailable = false;
-    this.pickupPoints = [];
-    return this;
+  public findUnitModel = (unitId: UnitId): Nullable<UnitModel> => {
+    return this.units.find((unit) => unit.id === unitId) ?? null;
   };
 
   public toPOJO = (): Option => {
@@ -126,27 +100,30 @@ export class OptionModel {
       units: units.map((unit) => unit.toPOJO()),
     };
 
-    if (this.capabilities.includes(CapabilityId.Content)) {
-      pojo.title = this.title;
-      pojo.subtitle = this.subtitle;
-      pojo.language = this.language;
-      pojo.shortDescription = this.shortDescription;
-      pojo.duration = this.duration;
-      pojo.durationAmount = this.durationAmount;
-      pojo.durationUnit = this.durationUnit;
-      pojo.itinerary = this.itinerary;
-    }
+    Object.keys(this.optionContentModel).forEach((key) => {
+      pojo[key] = this.optionContentModel[key];
+    });
 
-    if (this.capabilities.includes(CapabilityId.Pricing)) {
-      pojo.pricingFrom = this.optionPricingModel.pricingFrom;
-    }
+    pojo.pricingFrom = this.optionPricingModel.pricingFrom;
 
-    if (this.capabilities.includes(CapabilityId.Pickups)) {
-      pojo.pickupRequired = this.pickupRequired;
-      pojo.pickupAvailable = this.pickupAvailable;
-      pojo.pickupPoints = this.pickupPoints;
-    }
+    Object.keys(this.optionPickupModel).forEach((key) => {
+      pojo[key] = this.optionPickupModel[key];
+    });
 
     return pojo;
+  };
+
+  public static fromPOJO = (option: Option): OptionModel => {
+    return new OptionModel({
+      id: option.id,
+      internalName: option.id,
+      primary: option.default,
+      availabilityLocalStartTimes: option.availabilityLocalStartTimes,
+      restrictions: option.restrictions,
+      units: option.units.map((unit) => UnitModel.fromPOJO(unit)),
+      durationAmount: option.durationAmount,
+      durationUnit: option.durationUnit,
+      pricing: option.pricingFrom,
+    });
   };
 }

@@ -2,13 +2,11 @@ import { UnitBuilder } from "./UnitBuilder";
 import { UnitModel } from "./../models/Unit";
 import { OptionModel } from "./../models/Option";
 import { PricingPer } from "../types/Pricing";
-import { CapabilityId } from "../types/Capability";
 import { OptionConfigModel } from "../models/OptionConfig";
 import { UnitConfigModel } from "../models/UnitConfig";
 
 interface OptionBuilderData {
   primary: boolean;
-  capabilities: CapabilityId[];
   pricingPer?: PricingPer;
   optionConfig: OptionConfigModel;
 }
@@ -18,7 +16,7 @@ export class OptionBuilder {
   private option: OptionModel;
 
   build(data: OptionBuilderData): OptionModel {
-    const { optionConfig, capabilities, primary, pricingPer } = data;
+    const { optionConfig, primary, pricingPer } = data;
 
     this.option = new OptionModel({
       id: optionConfig.id,
@@ -29,37 +27,21 @@ export class OptionBuilder {
         minUnits: optionConfig.minUnits,
         maxUnits: optionConfig.maxUnits,
       },
-      units: this.generateUnitModels(
-        optionConfig.unitConfigModels,
-        capabilities
-      ),
+      units: this.generateUnitModels(optionConfig.unitConfigModels, pricingPer),
       durationAmount: optionConfig.durationAmount,
       durationUnit: optionConfig.durationUnit,
+      pricing: optionConfig.pricingFrom,
     });
-
-    if (capabilities.includes(CapabilityId.Content)) {
-      this.option = this.option.addContent();
-    }
-
-    if (capabilities.includes(CapabilityId.Pricing)) {
-      if (pricingPer === PricingPer.BOOKING) {
-        this.option = this.option.addPricing(optionConfig.pricingFrom);
-      }
-    }
-
-    if (capabilities.includes(CapabilityId.Pickups)) {
-      this.option = this.option.addPickup();
-    }
 
     return this.option;
   }
 
   private generateUnitModels = (
     unitsConfig: UnitConfigModel[],
-    capabilities: CapabilityId[]
+    pricingPer: PricingPer
   ): UnitModel[] => {
     return unitsConfig.map((unitConfig) =>
-      this.unitBuilder.build({ unitConfig, capabilities })
+      this.unitBuilder.build({ unitConfig, pricingPer })
     );
   };
 }

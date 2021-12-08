@@ -1,70 +1,70 @@
-import { CapabilityId } from "../types/Capability";
+import { UnitContentModel } from "./UnitContent";
 import { Unit, UnitId, Restrictions } from "../types/Unit";
 import { Pricing } from "../types/Pricing";
 
 export class UnitModel {
-  private id: UnitId;
+  public id: UnitId;
   private internalName: string;
   private reference: string;
   private type: string;
+  private requiredContactFields: string[];
   private restrictions: Restrictions;
   // content
-  private title: string;
-  private titlePlural: string;
-  private subtitle: string;
+  private unitContentModel: UnitContentModel;
   // pricing
   private pricingFrom: Array<Pricing> = [];
-
-  private capabilities: CapabilityId[] = [];
 
   constructor({
     id,
     restrictions,
+    pricing,
   }: {
     id: UnitId;
     restrictions: Restrictions;
+    pricing: Pricing[];
   }) {
     this.id = id;
     this.internalName = id;
     this.reference = id.toLowerCase();
     this.type = id.toUpperCase();
+    this.requiredContactFields = [];
     this.restrictions = restrictions;
+    this.unitContentModel = new UnitContentModel(this.id);
+    this.pricingFrom = pricing;
   }
 
-  public addContent = (): UnitModel => {
-    this.capabilities.push(CapabilityId.Content);
-    this.title = this.id;
-    this.titlePlural = `${this.title}s`;
-    this.subtitle = `${this.title}'s subtitle`;
-    return this;
-  };
-
-  public addPricing = (pricings: Pricing[]): UnitModel => {
-    this.capabilities.push(CapabilityId.Pricing);
-    this.pricingFrom = pricings;
-    return this;
-  };
-
   public toPOJO = (): Unit => {
-    const { id, internalName, reference, type, restrictions } = this;
+    const {
+      id,
+      internalName,
+      reference,
+      type,
+      requiredContactFields,
+      restrictions,
+    } = this;
     const pojo: Unit = {
       id,
       internalName,
       reference,
       type,
+      requiredContactFields,
       restrictions,
     };
 
-    if (this.capabilities.includes(CapabilityId.Content)) {
-      pojo.title = this.title;
-      pojo.titlePlural = this.titlePlural;
-      pojo.subtitle = this.subtitle;
-    }
+    Object.keys(this.unitContentModel).forEach((key) => {
+      pojo[key] = this.unitContentModel[key];
+    });
 
-    if (this.capabilities.includes(CapabilityId.Pricing)) {
-      pojo.pricingFrom = this.pricingFrom;
-    }
+    pojo.pricingFrom = this.pricingFrom;
 
     return pojo;
+  };
+
+  public static fromPOJO = (unit: Unit): UnitModel => {
+    return new UnitModel({
+      id: unit.id,
+      restrictions: unit.restrictions,
+      pricing: unit.pricing,
+    });
   };
 }

@@ -3,8 +3,9 @@ import { CapabilityId } from "../types/Capability";
 
 import { AvailabilityModel } from "../models/Availability";
 import { AvailabilityBuilder } from "../builders/AvailabilityBuilder";
-import { addDays, eachDayOfInterval, format, getDay } from "date-fns";
+import { addDays, eachDayOfInterval, getDay } from "date-fns";
 import { AvailabilityStatus } from "../types/Availability";
+import { DateHelper } from "../helpers/DateHelper";
 
 interface GenerateAvailabiltyData {
   product: ProductModel;
@@ -31,7 +32,7 @@ export class AvailabilityGenerator {
         return this.builder.build({
           product,
           optionId,
-          date: format(day, "yyyy-MM-dd"),
+          date: DateHelper.availabilityDateFormat(day),
           status: isSoldOut
             ? AvailabilityStatus.SOLD_OUT
             : AvailabilityStatus.AVAILABLE,

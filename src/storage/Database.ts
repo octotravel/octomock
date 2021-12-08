@@ -5,7 +5,9 @@ export class DB {
   private static instance: DB;
   private db: Database<sqlite3.Database, sqlite3.Statement>;
 
-  private constructor() {}
+  private constructor() {
+    //
+  }
 
   public static getInstance(): DB {
     if (!DB.instance) {
@@ -15,7 +17,7 @@ export class DB {
     return DB.instance;
   }
 
-  public open = async () => {
+  public open = async (): Promise<void> => {
     const db = await open({
       filename: "./database.db",
       driver: sqlite3.cached.Database,
@@ -25,7 +27,7 @@ export class DB {
     await this.createTables();
   };
 
-  public getDB = () => this.db;
+  public getDB = (): Database<sqlite3.Database, sqlite3.Statement> => this.db;
 
   private createTables = async () => {
     await this.db.exec(`

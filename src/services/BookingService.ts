@@ -1,27 +1,31 @@
-import { CreateBookingSchema } from "../schemas/Booking";
+import { Booking } from "./../types/Booking";
+import { GetBookingSchema, GetBookingsSchema } from "./../schemas/Booking";
+import { BookingModel } from "./../models/Booking";
 import { DB } from "../storage/Database";
-import { Booking } from "../types/Booking";
 import { CapabilityId } from "../types/Capability";
 
 interface IBookingService {
   createBooking(
-    data: CreateBookingSchema,
+    bookingModel: BookingModel,
     capabilities: CapabilityId[]
-  ): Promise<Booking>;
+  ): Promise<BookingModel>;
+  getBooking(
+    bookingModel: BookingModel,
+    capabilities: CapabilityId[]
+  ): Promise<BookingModel>;
+  getBookings(schema: GetBookingsSchema): Promise<BookingModel[]>;
 }
 
 export class BookingService implements IBookingService {
   public createBooking = async (
-    data: CreateBookingSchema,
-    capabilities: CapabilityId[]
-  ): Promise<Booking> => {
-    const db = DB.getInstance().getDB();
-
+    bookingModel: BookingModel,
+    _: CapabilityId[]
+  ): Promise<BookingModel> => {
     // TODO: build booking model
-    console.log(data, capabilities);
-
-    await db.run(
-      `
+    const query = await DB.getInstance()
+      .getDB()
+      .run(
+        `
       INSERT INTO booking (
         id,
         resellerReference,
@@ -29,17 +33,53 @@ export class BookingService implements IBookingService {
         data
       ) VALUES (?, ?, ?, ?)
     `,
-      "123",
-      null,
-      undefined,
-      JSON.stringify({ x: 1 })
+        bookingModel.uuid,
+        bookingModel.resellerReference ?? null,
+        bookingModel.supplierReference ?? null,
+        JSON.stringify(bookingModel.toPOJO())
+      );
+    console.log("data inserted", query);
+    return bookingModel;
+  };
+
+  public getBooking = async (
+    data: GetBookingSchema,
+    _: CapabilityId[]
+  ): Promise<BookingModel> => {
+    const result = await DB.getInstance()
+      .getDB()
+      .get(`SELECT * FROM booking WHERE id = ?`, data.uuid);
+    return BookingModel.fromPOJO(JSON.parse(result.data) as Booking);
+  };
+
+  public getBookings = async (
+    data: GetBookingsSchema
+  ): Promise<BookingModel[]> => {
+    if (data.resellerReference) {
+      const result = await DB.getInstance()
+        .getDB()
+        .all(
+          `SELECT * FROM booking WHERE resellerReference = ?`,
+          data.resellerReference
+        );
+      return result.map((r) =>
+        BookingModel.fromPOJO(JSON.parse(r.data) as Booking)
+      );
+    }
+    if (data.supplierReference) {
+      const result = await DB.getInstance()
+        .getDB()
+        .all(
+          `SELECT * FROM booking WHERE supplierReference = ?`,
+          data.supplierReference
+        );
+      return result.map((r) =>
+        BookingModel.fromPOJO(JSON.parse(r.data) as Booking)
+      );
+    }
+    const result = await DB.getInstance().getDB().all(`SELECT * FROM booking`);
+    return result.map((r) =>
+      BookingModel.fromPOJO(JSON.parse(r.data) as Booking)
     );
-
-    console.log("data inserted");
-
-    const result = await db.all(`SELECT * FROM booking`);
-    console.log(JSON.stringify(result));
-    console.log(result);
-    return {} as Booking;
   };
 }

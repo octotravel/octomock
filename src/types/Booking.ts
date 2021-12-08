@@ -89,6 +89,7 @@ export interface UnitItem {
   unit: Unit;
   status: BookingStatus;
   utcRedeemedAt: Nullable<string>;
+  contact: Contact;
   ticket: Ticket;
 }
 

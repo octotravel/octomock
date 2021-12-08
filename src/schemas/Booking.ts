@@ -1,8 +1,9 @@
+import { UnitId } from "./../types/Unit";
 import * as yup from "yup";
 
-type OctoUnitItem = {
+export type OctoUnitItem = {
   uuid?: string;
-  unitId: string;
+  unitId: UnitId;
   resellerReference?: string;
 };
 
@@ -104,7 +105,7 @@ export const createBookingSchema: yup.SchemaOf<CreateBookingSchema> =
       .of(
         yup.object({
           uuid: yup.string().notRequired(),
-          unitId: yup.string().required(),
+          unitId: yup.mixed().oneOf(Object.values(UnitId)).required(),
           resellerReference: yup.string().notRequired(),
         })
       )
@@ -201,7 +202,11 @@ export const patchBookingSchema: yup.SchemaOf<UpdateBookingSchema> = yup.object(
   }
 );
 
-export const getBookingSchema: yup.SchemaOf<string> = yup.string().required();
+export const getBookingSchema: yup.SchemaOf<GetBookingSchema> = yup
+  .object()
+  .shape({
+    uuid: yup.string().required(),
+  });
 
 export const confirmBookingSchema: yup.SchemaOf<ConfirmBookingSchema> =
   patchBookingSchema.clone();

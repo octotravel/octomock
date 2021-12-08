@@ -1,18 +1,20 @@
 import * as yup from "yup";
 
 export type AvailabilitySchema = {
-    productId: string;
-    optionId: string;
-    localDate?: string;
-    localDateStart?: string;
-    localDateEnd?: string;
-    availabilityIds?: Array<string>;
-    pickupRequested?: Nullable<boolean>;
-    pickupPointId?: Nullable<string>;
-    currency?: string;
-  };
+  productId: string;
+  optionId: string;
+  localDate?: string;
+  localDateStart?: string;
+  localDateEnd?: string;
+  availabilityIds?: Array<string>;
+  pickupRequested?: Nullable<boolean>;
+  pickupPointId?: Nullable<string>;
+  currency?: string;
+};
 
-  export const availabilitySchema: yup.SchemaOf<AvailabilitySchema> = yup.object().shape({
+export const availabilitySchema: yup.SchemaOf<AvailabilitySchema> = yup
+  .object()
+  .shape({
     productId: yup.string().required(),
     optionId: yup.string().required(),
     localDateStart: yup.string().notRequired(),
@@ -25,7 +27,7 @@ export type AvailabilitySchema = {
         yup.object().shape({
           id: yup.string().required(),
           quantity: yup.number().required(),
-        }),
+        })
       )
       .notRequired()
       .nullable(),
