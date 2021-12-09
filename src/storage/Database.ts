@@ -33,6 +33,7 @@ export class DB {
     await this.db.exec(`
     CREATE TABLE IF NOT EXISTS booking  (
       id TEXT NOT NULL PRIMARY KEY,
+      status TEXT,
       resellerReference TEXT,
       supplierReference TEXT,
       data TEXT

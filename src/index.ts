@@ -1,4 +1,5 @@
 import Koa from "koa";
+import koaBody from "koa-body"
 import { router } from "./router/AppRouter";
 import { parseCapabilities } from "./router/middlewares";
 import { DB } from "./storage/Database";
@@ -6,6 +7,7 @@ import { DB } from "./storage/Database";
 const app = new Koa();
 
 DB.getInstance().open();
+app.use(koaBody());
 app.use(async (ctx, next) => {
   try {
     await next();

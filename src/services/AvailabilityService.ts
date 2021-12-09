@@ -69,7 +69,6 @@ export class AvailabilityService implements IAvailabilityService {
       capabilities,
       date: DateHelper.availabilityDateFormat(new Date(data.availabilityId)),
     });
-    console.log("data");
     const availability =
       availabilities.find(
         (availability) => availability.id === data.availabilityId
@@ -80,7 +79,6 @@ export class AvailabilityService implements IAvailabilityService {
     if (!availability.available) {
       throw new Error('not available')
     }
-    console.log('availability', availability)
     return availability;
   };
 

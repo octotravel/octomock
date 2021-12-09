@@ -1,5 +1,4 @@
-import { GetBookingSchema, GetBookingsSchema } from "./../schemas/Booking";
-import { DataGenerator } from "./../generators/DataGenerator";
+import { CancelBookingSchema, ConfirmBookingSchema, ExtendBookingSchema, GetBookingSchema, GetBookingsSchema, UpdateBookingSchema } from "./../schemas/Booking";
 import { AvailabilityService } from "./../services/AvailabilityService";
 import { ProductService } from "./../services/ProductService";
 import { CapabilityId } from "../types/Capability";
@@ -10,16 +9,26 @@ import { BookingBuilder } from "../builders/BookingBuilder";
 
 interface IBookingController {
   createBooking(
-    data: CreateBookingSchema,
-    capabilities: CapabilityId[]
+    schema: CreateBookingSchema,
+    capabilities: CapabilityId[],
+  ): Promise<Booking>;
+  confirmBooking(
+    schema: ConfirmBookingSchema,
+  ): Promise<Booking>;
+  confirmBooking(
+    schema: UpdateBookingSchema,
+  ): Promise<Booking>;
+  extendBooking(
+    schema: ExtendBookingSchema,
+  ): Promise<Booking>;
+  cancelBooking(
+    schema: CancelBookingSchema,
   ): Promise<Booking>;
   getBooking(
-    data: GetBookingSchema,
-    capabilities: CapabilityId[]
+    schema: GetBookingSchema,
   ): Promise<Booking>;
   getBookings(
-    data: GetBookingsSchema,
-    capabilities: CapabilityId[]
+    schema: GetBookingsSchema,
   ): Promise<Booking[]>;
 }
 
@@ -30,35 +39,23 @@ export class BookingController implements IBookingController {
   private bookingBuilder = new BookingBuilder();
 
   public createBooking = async (
-    data: CreateBookingSchema,
+    schema: CreateBookingSchema,
     capabilities: CapabilityId[]
   ): Promise<Booking> => {
     const product = this.productService.getProduct(
-      data.productId,
+      schema.productId,
     );
     const availability = await this.availabilityService.findBookingAvailability(
       {
         product,
-        optionId: data.optionId,
-        availabilityId: data.availabilityId,
+        optionId: schema.optionId,
+        availabilityId: schema.availabilityId,
       },
       capabilities
     );
 
-    // build booking here
-    const bookingModel = this.bookingBuilder.build({
-      id: DataGenerator.generateUUID(),
-      uuid: data.uuid ?? DataGenerator.generateUUID(),
-      resellerReference: data.resellerReference ?? null,
-      supplierReference: DataGenerator.generateSupplierReference(),
-      status: BookingStatus.ON_HOLD,
-      utcCreatedAt: "",
-      utcUpdatedAt: null,
-      utcExpiresAt: null,
-      utcRedeemedAt: null,
-      utcConfirmedAt: null,
+    const bookingModel = this.bookingBuilder.createBooking({
       product,
-      option: product.getOption(data.optionId),
       availability: {
         id: availability.id,
         localDateTimeStart: availability.localDateTimeStart,
@@ -66,40 +63,76 @@ export class BookingController implements IBookingController {
         allDay: availability.allDay,
         openingHours: availability.openingHours,
       },
-      contact: {
-        fullName: null,
-        firstName: null,
-        lastName: null,
-        emailAddress: null,
-        phoneNumber: null,
-        locales: [],
-        country: null,
-        notes: null,
-      },
-      unitItems: data.unitItems,
-      capabilities,
-    });
+    }, schema);
 
     const createdBookingModel = await this.bookingService.createBooking(
       bookingModel,
-      capabilities
     );
     return createdBookingModel.toPOJO();
   };
 
-  public getBooking = async (
-    data: GetBookingSchema,
-    capabilities: CapabilityId[]
+  public confirmBooking = async (
+    schema: ConfirmBookingSchema,
   ): Promise<Booking> => {
-    const booking = await this.bookingService.getBooking(data, capabilities);
-    return booking.toPOJO();
+    const booking = await this.bookingService.getBooking(schema);
+    if (booking.status === BookingStatus.CONFIRMED) {
+      return booking.toPOJO()
+    }
+    const confirmedBooking = this.bookingBuilder.confirmBooking(booking, schema)
+    const bookingModel = await this.bookingService.updateBooking(confirmedBooking);
+    return bookingModel.toPOJO()
+  }
+
+  public updateBooking = async (
+    schema: UpdateBookingSchema,
+  ): Promise<Booking> => {
+    const booking = await this.bookingService.getBooking(schema);
+    if (booking.cancellable === false) {
+      throw new Error('booking cannot be updated')
+    }
+    const confirmedBooking = this.bookingBuilder.updateBooking(booking, schema)
+    const bookingModel = await this.bookingService.updateBooking(confirmedBooking);
+    return bookingModel.toPOJO()
+  }
+
+  public extendBooking = async (
+    schema: ExtendBookingSchema,
+  ): Promise<Booking> => {
+    const booking = await this.bookingService.getBooking(schema);
+    if (booking.status !== BookingStatus.ON_HOLD) {
+      throw new Error('booking cannot be extended');
+    }
+    const extendedBooking = this.bookingBuilder.extendBooking(booking, schema)
+    const bookingModel = await this.bookingService.updateBooking(extendedBooking);
+    return bookingModel.toPOJO()
+  }
+
+  public cancelBooking = async (
+    schema: ConfirmBookingSchema,
+  ): Promise<Booking> => {
+    const booking = await this.bookingService.getBooking(schema);
+    if (booking.cancellable === false) {
+      throw new Error('booking not cancellable')
+    }
+    if (booking.status === BookingStatus.CANCELLED) {
+      return booking.toPOJO()
+    }
+    const cancelledBooking = this.bookingBuilder.cancelBooking(booking, schema)
+    const bookingModel = await this.bookingService.updateBooking(cancelledBooking);
+    return bookingModel.toPOJO()
+  }
+
+  public getBooking = async (
+    schema: GetBookingSchema,
+  ): Promise<Booking> => {
+    const bookingModel = await this.bookingService.getBooking(schema);
+    return bookingModel.toPOJO();
   };
 
   public getBookings = async (
-    data: GetBookingsSchema,
-    _: CapabilityId[]
+    schema: GetBookingsSchema,
   ): Promise<Booking[]> => {
-    const bookings = await this.bookingService.getBookings(data);
-    return bookings.map((b) => b.toPOJO());
+    const bookingModels = await this.bookingService.getBookings(schema);
+    return bookingModels.map((b) => b.toPOJO());
   };
 }

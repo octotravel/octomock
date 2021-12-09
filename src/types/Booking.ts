@@ -44,7 +44,11 @@ export interface Booking extends BookingPricing, BookingPickup, BookingContent {
   voucher: Voucher;
   unitItems: UnitItem[];
 }
-
+export interface Cancellation {
+  refund: string,
+  reason: Nullable<string>,
+  utcCancelledAt: Nullable<string>,
+}
 export interface BookingAvailability {
   id: string;
   localDateTimeStart: string;

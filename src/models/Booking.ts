@@ -10,11 +10,12 @@ import {
   Contact,
   BookingAvailability,
   BookingStatus,
+  Cancellation,
 } from "./../types/Booking";
 import { DeliveryMethod } from "../types/Product";
 
 export class BookingModel {
-  private id: string;
+  public id: string;
   public uuid: string;
   public testMode: boolean;
   public resellerReference: Nullable<string>;
@@ -30,7 +31,7 @@ export class BookingModel {
   public optionId: string;
   public option: OptionModel;
   public cancellable: boolean;
-  public cancellation: Nullable<unknown>; // TODO: get the object type
+  public cancellation: Nullable<Cancellation>; // TODO: get the object type
   public freesale: boolean;
   public availabilityId: string;
   public availability: BookingAvailability;
@@ -59,6 +60,10 @@ export class BookingModel {
     availability,
     contact,
     unitItems,
+    notes,
+    voucher,
+    cancellation,
+    freesale,
   }: {
     id: string;
     uuid: string;
@@ -75,6 +80,10 @@ export class BookingModel {
     availability: BookingAvailability;
     contact: Contact;
     unitItems: UnitItem[];
+    notes: Nullable<string>,
+    voucher?: Voucher
+    cancellation?: Cancellation
+    freesale?: boolean;
   }) {
     this.id = id;
     this.uuid = uuid;
@@ -87,30 +96,28 @@ export class BookingModel {
     this.utcExpiresAt = utcExpiresAt;
     this.utcRedeemedAt = utcRedeemedAt;
     this.utcConfirmedAt = utcConfirmedAt;
-    this.utcRedeemedAt = null;
-    this.utcConfirmedAt = null;
     this.productId = product.id;
     this.product = product;
     this.optionId = option.id;
     this.option = option;
     this.cancellable = true;
     this.cancellation = null;
-    this.freesale = false;
+    this.freesale = freesale ?? false;
     this.availabilityId = availability.id;
     this.availability = availability;
     this.contact = contact;
-    this.notes = null;
+    this.notes = notes;
     this.deliveryMethods = product.deliveryMethods;
-    if (product.deliveryMethods.includes(DeliveryMethod.VOUCHER)) {
+    if (voucher) {
+      this.voucher = voucher
+    } else {
       this.voucher = {
         redemptionMethod: product.redemptionMethod,
         utcRedeemedAt: null,
-        deliveryOptions: product.deliveryFormats.map((format) => ({
-          deliveryFormat: format,
-          deliveryValue: "",
-        })),
+        deliveryOptions: [],
       };
     }
+    this.cancellation = cancellation ?? null
     this.unitItems = unitItems;
     this.bookingContentModel = new BookingContentModel();
     const pricing = {
@@ -206,6 +213,7 @@ export class BookingModel {
       availability: booking.availability,
       contact: booking.contact,
       unitItems: booking.unitItems,
+      notes: booking.notes,
       utcCreatedAt: booking.utcCreatedAt,
       utcUpdatedAt: booking.utcUpdatedAt,
       utcExpiresAt: booking.utcExpiresAt,

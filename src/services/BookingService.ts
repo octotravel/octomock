@@ -2,16 +2,16 @@ import { Booking } from "./../types/Booking";
 import { GetBookingSchema, GetBookingsSchema } from "./../schemas/Booking";
 import { BookingModel } from "./../models/Booking";
 import { DB } from "../storage/Database";
-import { CapabilityId } from "../types/Capability";
 
 interface IBookingService {
   createBooking(
     bookingModel: BookingModel,
-    capabilities: CapabilityId[]
+  ): Promise<BookingModel>;
+  updateBooking(
+    bookingModel: BookingModel,
   ): Promise<BookingModel>;
   getBooking(
     bookingModel: BookingModel,
-    capabilities: CapabilityId[]
   ): Promise<BookingModel>;
   getBookings(schema: GetBookingsSchema): Promise<BookingModel[]>;
 }
@@ -19,36 +19,58 @@ interface IBookingService {
 export class BookingService implements IBookingService {
   public createBooking = async (
     bookingModel: BookingModel,
-    _: CapabilityId[]
   ): Promise<BookingModel> => {
-    // TODO: build booking model
-    const query = await DB.getInstance()
+    await DB.getInstance()
       .getDB()
       .run(
         `
       INSERT INTO booking (
         id,
+        status,
         resellerReference,
         supplierReference,
         data
-      ) VALUES (?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?)
     `,
         bookingModel.uuid,
-        bookingModel.resellerReference ?? null,
-        bookingModel.supplierReference ?? null,
+        bookingModel.status,
+        bookingModel.resellerReference,
+        bookingModel.supplierReference,
         JSON.stringify(bookingModel.toPOJO())
       );
-    console.log("data inserted", query);
+    return bookingModel;
+  };
+
+  public updateBooking = async (
+    bookingModel: BookingModel,
+  ): Promise<BookingModel> => {
+    await DB.getInstance()
+      .getDB()
+      .run(
+        `
+      UPDATE booking
+        SET status = ?,
+            resellerReference = ?,
+            data = ?
+        WHERE id = ?
+    `,
+    bookingModel.status,
+    bookingModel.resellerReference,
+    JSON.stringify(bookingModel.toPOJO()),
+    bookingModel.uuid,
+      );
     return bookingModel;
   };
 
   public getBooking = async (
     data: GetBookingSchema,
-    _: CapabilityId[]
   ): Promise<BookingModel> => {
     const result = await DB.getInstance()
       .getDB()
-      .get(`SELECT * FROM booking WHERE id = ?`, data.uuid);
+      .get(`SELECT * FROM booking WHERE id = ?`, data.uuid) ?? null;
+      if (result == null) {
+        throw new Error('booking not found')
+      }
     return BookingModel.fromPOJO(JSON.parse(result.data) as Booking);
   };
 
