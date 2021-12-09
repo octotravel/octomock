@@ -80,9 +80,9 @@ export class BookingModel {
     availability: BookingAvailability;
     contact: Contact;
     unitItems: UnitItem[];
-    notes: Nullable<string>,
-    voucher?: Voucher
-    cancellation?: Cancellation
+    notes: Nullable<string>;
+    voucher?: Voucher;
+    cancellation?: Cancellation;
     freesale?: boolean;
   }) {
     this.id = id;
@@ -109,7 +109,7 @@ export class BookingModel {
     this.notes = notes;
     this.deliveryMethods = product.deliveryMethods;
     if (voucher) {
-      this.voucher = voucher
+      this.voucher = voucher;
     } else {
       this.voucher = {
         redemptionMethod: product.redemptionMethod,
@@ -117,7 +117,7 @@ export class BookingModel {
         deliveryOptions: [],
       };
     }
-    this.cancellation = cancellation ?? null
+    this.cancellation = cancellation ?? null;
     this.unitItems = unitItems;
     this.bookingContentModel = new BookingContentModel();
     const pricing = {

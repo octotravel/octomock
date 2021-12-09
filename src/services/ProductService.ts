@@ -11,9 +11,7 @@ export class ProductService implements IProductService {
   public getProducts = (): ProductModel[] => {
     return this.productRepository.getProducts();
   };
-  public getProduct = (
-    id: string,
-  ): ProductModel => {
+  public getProduct = (id: string): ProductModel => {
     return this.productRepository.getProduct(id);
   };
 }

@@ -9,9 +9,7 @@ interface IProductController {
 export class ProductController implements IProductController {
   private productService = new ProductService();
   public getProducts = (): Product[] => {
-    return this.productService
-      .getProducts()
-      .map((model) => model.toPOJO());
+    return this.productService.getProducts().map((model) => model.toPOJO());
   };
   public getProduct = (id: string): Product => {
     return this.productService.getProduct(id).toPOJO();

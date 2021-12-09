@@ -4,21 +4,15 @@ import { BookingModel } from "./../models/Booking";
 import { DB } from "../storage/Database";
 
 interface IBookingService {
-  createBooking(
-    bookingModel: BookingModel,
-  ): Promise<BookingModel>;
-  updateBooking(
-    bookingModel: BookingModel,
-  ): Promise<BookingModel>;
-  getBooking(
-    bookingModel: BookingModel,
-  ): Promise<BookingModel>;
+  createBooking(bookingModel: BookingModel): Promise<BookingModel>;
+  updateBooking(bookingModel: BookingModel): Promise<BookingModel>;
+  getBooking(bookingModel: BookingModel): Promise<BookingModel>;
   getBookings(schema: GetBookingsSchema): Promise<BookingModel[]>;
 }
 
 export class BookingService implements IBookingService {
   public createBooking = async (
-    bookingModel: BookingModel,
+    bookingModel: BookingModel
   ): Promise<BookingModel> => {
     await DB.getInstance()
       .getDB()
@@ -42,7 +36,7 @@ export class BookingService implements IBookingService {
   };
 
   public updateBooking = async (
-    bookingModel: BookingModel,
+    bookingModel: BookingModel
   ): Promise<BookingModel> => {
     await DB.getInstance()
       .getDB()
@@ -54,23 +48,22 @@ export class BookingService implements IBookingService {
             data = ?
         WHERE id = ?
     `,
-    bookingModel.status,
-    bookingModel.resellerReference,
-    JSON.stringify(bookingModel.toPOJO()),
-    bookingModel.uuid,
+        bookingModel.status,
+        bookingModel.resellerReference,
+        JSON.stringify(bookingModel.toPOJO()),
+        bookingModel.uuid
       );
     return bookingModel;
   };
 
-  public getBooking = async (
-    data: GetBookingSchema,
-  ): Promise<BookingModel> => {
-    const result = await DB.getInstance()
-      .getDB()
-      .get(`SELECT * FROM booking WHERE id = ?`, data.uuid) ?? null;
-      if (result == null) {
-        throw new Error('booking not found')
-      }
+  public getBooking = async (data: GetBookingSchema): Promise<BookingModel> => {
+    const result =
+      (await DB.getInstance()
+        .getDB()
+        .get(`SELECT * FROM booking WHERE id = ?`, data.uuid)) ?? null;
+    if (result == null) {
+      throw new Error("booking not found");
+    }
     return BookingModel.fromPOJO(JSON.parse(result.data) as Booking);
   };
 

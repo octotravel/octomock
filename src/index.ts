@@ -1,5 +1,5 @@
 import Koa from "koa";
-import koaBody from "koa-body"
+import koaBody from "koa-body";
 import { router } from "./router/AppRouter";
 import { parseCapabilities } from "./router/middlewares";
 import { DB } from "./storage/Database";

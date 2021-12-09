@@ -10,7 +10,7 @@ export interface InMemoryStorage<T> {
 export class ProductModelInMemoryStorage
   implements InMemoryStorage<ProductModel>
 {
-  public get(id: string, ): Nullable<ProductModel> {
+  public get(id: string): Nullable<ProductModel> {
     return this.generateProducts().find((p) => p.id === id) ?? null;
   }
   public getAll(): ProductModel[] {

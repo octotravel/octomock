@@ -32,9 +32,7 @@ export class AvailabilityService implements IAvailabilityService {
     schema: AvailabilitySchema,
     capabilities: CapabilityId[]
   ): Promise<AvailabilityModel[]> => {
-    const product = this.productService.getProduct(
-      schema.productId,
-    );
+    const product = this.productService.getProduct(schema.productId);
     const optionId = schema.optionId;
 
     const availabilities = this.generator.generate({
@@ -77,7 +75,7 @@ export class AvailabilityService implements IAvailabilityService {
       throw new Error("availability not found");
     }
     if (!availability.available) {
-      throw new Error('not available')
+      throw new Error("not available");
     }
     return availability;
   };

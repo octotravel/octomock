@@ -1,8 +1,15 @@
-
-import { DeliveryFormat } from './../types/Product';
+import { DeliveryFormat } from "./../types/Product";
 import { addMinutes } from "date-fns";
 import { DataGenerator } from "./../generators/DataGenerator";
-import { ConfirmBookingSchema, CreateBookingSchema, OctoUnitItem, Contact, CancelBookingSchema, ExtendBookingSchema, UpdateBookingSchema } from "./../schemas/Booking";
+import {
+  ConfirmBookingSchema,
+  CreateBookingSchema,
+  OctoUnitItem,
+  Contact,
+  CancelBookingSchema,
+  ExtendBookingSchema,
+  UpdateBookingSchema,
+} from "./../schemas/Booking";
 import {
   BookingStatus,
   BookingAvailability,
@@ -11,7 +18,7 @@ import {
 } from "./../types/Booking";
 import { OptionModel } from "./../models/Option";
 import { ProductModel } from "./../models/Product";
-import { BookingModel } from './../models/Booking';
+import { BookingModel } from "./../models/Booking";
 import { DateHelper } from "../helpers/DateHelper";
 import { RedemptionMethod } from "../types/Product";
 
@@ -21,13 +28,18 @@ interface BookingBuilderData {
 }
 
 export class BookingBuilder {
-  createBooking(data: BookingBuilderData, schema: CreateBookingSchema): BookingModel {
-    const status = BookingStatus.ON_HOLD
-    const option = data.product.getOption(schema.optionId)
+  createBooking(
+    data: BookingBuilderData,
+    schema: CreateBookingSchema
+  ): BookingModel {
+    const status = BookingStatus.ON_HOLD;
+    const option = data.product.getOption(schema.optionId);
 
     let utcExpiresAt = DateHelper.bookingUTCFormat(addMinutes(new Date(), 30));
     if (schema.expirationMinutes) {
-      utcExpiresAt = DateHelper.bookingUTCFormat(addMinutes(new Date(), schema.expirationMinutes));
+      utcExpiresAt = DateHelper.bookingUTCFormat(
+        addMinutes(new Date(), schema.expirationMinutes)
+      );
     }
 
     // TODO: allow update unit items
@@ -41,7 +53,7 @@ export class BookingBuilder {
       product: data.product,
       option,
       availability: data.availability,
-      contact: this.updateContact({booking: null, contact: schema.contact}),
+      contact: this.updateContact({ booking: null, contact: schema.contact }),
       unitItems: schema.unitItems.map((item) =>
         this.buildUnitItem(item, status, option)
       ),
@@ -57,8 +69,11 @@ export class BookingBuilder {
     return bookingModel;
   }
 
-  confirmBooking(booking: BookingModel, schema: ConfirmBookingSchema): BookingModel {
-    const status = BookingStatus.CONFIRMED
+  confirmBooking(
+    booking: BookingModel,
+    schema: ConfirmBookingSchema
+  ): BookingModel {
+    const status = BookingStatus.CONFIRMED;
 
     const bookingModel = new BookingModel({
       id: booking.id,
@@ -69,7 +84,7 @@ export class BookingBuilder {
       product: booking.product,
       option: booking.option,
       availability: booking.availability,
-      contact: this.updateContact({booking, contact: schema.contact}),
+      contact: this.updateContact({ booking, contact: schema.contact }),
       unitItems: this.generateTickets(booking),
       utcCreatedAt: booking.utcCreatedAt,
       utcUpdatedAt: DateHelper.bookingUTCFormat(new Date()),
@@ -84,12 +99,17 @@ export class BookingBuilder {
     return bookingModel;
   }
 
-  updateBooking(booking: BookingModel, schema: UpdateBookingSchema): BookingModel {
-    const status = booking.status
+  updateBooking(
+    booking: BookingModel,
+    schema: UpdateBookingSchema
+  ): BookingModel {
+    const status = booking.status;
 
     let utcExpiresAt = booking.utcExpiresAt;
     if (schema.expirationMinutes) {
-      utcExpiresAt = DateHelper.bookingUTCFormat(addMinutes(new Date(), schema.expirationMinutes));
+      utcExpiresAt = DateHelper.bookingUTCFormat(
+        addMinutes(new Date(), schema.expirationMinutes)
+      );
     }
     const bookingModel = new BookingModel({
       id: booking.id,
@@ -100,7 +120,7 @@ export class BookingBuilder {
       product: booking.product,
       option: booking.option,
       availability: booking.availability,
-      contact: this.updateContact({booking, contact: schema.contact}),
+      contact: this.updateContact({ booking, contact: schema.contact }),
       unitItems: booking.unitItems,
       utcCreatedAt: booking.utcCreatedAt,
       utcUpdatedAt: DateHelper.bookingUTCFormat(new Date()),
@@ -115,8 +135,11 @@ export class BookingBuilder {
     return bookingModel;
   }
 
-  extendBooking(booking: BookingModel, schema: ExtendBookingSchema): BookingModel {
-    const status = BookingStatus.ON_HOLD
+  extendBooking(
+    booking: BookingModel,
+    schema: ExtendBookingSchema
+  ): BookingModel {
+    const status = BookingStatus.ON_HOLD;
 
     const bookingModel = new BookingModel({
       id: booking.id,
@@ -131,7 +154,9 @@ export class BookingBuilder {
       unitItems: booking.unitItems,
       utcCreatedAt: booking.utcCreatedAt,
       utcUpdatedAt: DateHelper.bookingUTCFormat(new Date()),
-      utcExpiresAt: DateHelper.bookingUTCFormat(addMinutes(new Date(), schema.expirationMinutes ?? 30)),
+      utcExpiresAt: DateHelper.bookingUTCFormat(
+        addMinutes(new Date(), schema.expirationMinutes ?? 30)
+      ),
       utcRedeemedAt: null,
       utcConfirmedAt: null,
       notes: booking.notes,
@@ -142,13 +167,16 @@ export class BookingBuilder {
     return bookingModel;
   }
 
-  cancelBooking(booking: BookingModel, schema: CancelBookingSchema): BookingModel {
-    const status = BookingStatus.CANCELLED
+  cancelBooking(
+    booking: BookingModel,
+    schema: CancelBookingSchema
+  ): BookingModel {
+    const status = BookingStatus.CANCELLED;
     const cancellation = {
       refund: "FULL",
       reason: schema.reason ?? null,
-      utcCancelledAt: DateHelper.bookingUTCFormat(new Date())
-    }
+      utcCancelledAt: DateHelper.bookingUTCFormat(new Date()),
+    };
 
     const bookingModel = new BookingModel({
       id: booking.id,
@@ -175,12 +203,12 @@ export class BookingBuilder {
   }
 
   private generateTickets = (booking: BookingModel): UnitItem[] => {
-    return booking.unitItems.map(item => {
-      const deliveryOptions = []
+    return booking.unitItems.map((item) => {
+      const deliveryOptions = [];
       if (booking.product.deliveryFormats.includes(DeliveryFormat.PDF_URL)) {
         deliveryOptions.push({
           deliveryFormat: DeliveryFormat.PDF_URL,
-          deliveryValue: `https://api.octomock.com/octo/pdf?booking=${booking.uuid}&ticket=${item.uuid}`
+          deliveryValue: `https://api.octomock.com/octo/pdf?booking=${booking.uuid}&ticket=${item.uuid}`,
         });
       }
       if (booking.product.deliveryFormats.includes(DeliveryFormat.QRCODE)) {
@@ -195,17 +223,17 @@ export class BookingBuilder {
         ticket: {
           ...ticket,
           deliveryOptions,
-        }
-      }
-    })
-  }
+        },
+      };
+    });
+  };
 
   private generateVoucher = (booking: BookingModel): Voucher => {
-    const deliveryOptions = []
+    const deliveryOptions = [];
     if (booking.product.deliveryFormats.includes(DeliveryFormat.PDF_URL)) {
       deliveryOptions.push({
         deliveryFormat: DeliveryFormat.PDF_URL,
-        deliveryValue: `https://api.octomock.com/octo/pdf?booking=${booking.uuid}`
+        deliveryValue: `https://api.octomock.com/octo/pdf?booking=${booking.uuid}`,
       });
     }
     if (booking.product.deliveryFormats.includes(DeliveryFormat.QRCODE)) {
@@ -218,27 +246,29 @@ export class BookingBuilder {
       redemptionMethod: booking.product.redemptionMethod,
       utcRedeemedAt: null,
       deliveryOptions: deliveryOptions,
-    }
-  }
+    };
+  };
 
   private updateContact = ({
     booking,
     contact,
   }: {
-    booking: Nullable<BookingModel>,
-    contact?: Contact
+    booking: Nullable<BookingModel>;
+    contact?: Contact;
   }) => {
-      return {
-        fullName: contact?.fullName ?? booking?.contact?.fullName ?? null,
-        firstName:contact?.firstName ?? booking?.contact?.firstName ?? null,
-        lastName: contact?.lastName ?? booking?.contact?.lastName ?? null,
-        emailAddress: contact?.emailAddress ?? booking?.contact?.emailAddress ?? null,
-        phoneNumber: contact?.phoneNumber ?? booking?.contact?.phoneNumber ?? null,
-        locales: contact?.locales ?? booking?.contact?.locales ?? null,
-        country: contact?.country ?? booking?.contact?.country ?? null,
-        notes: contact?.notes ?? booking?.contact?.notes ?? null,
-      }
-  }
+    return {
+      fullName: contact?.fullName ?? booking?.contact?.fullName ?? null,
+      firstName: contact?.firstName ?? booking?.contact?.firstName ?? null,
+      lastName: contact?.lastName ?? booking?.contact?.lastName ?? null,
+      emailAddress:
+        contact?.emailAddress ?? booking?.contact?.emailAddress ?? null,
+      phoneNumber:
+        contact?.phoneNumber ?? booking?.contact?.phoneNumber ?? null,
+      locales: contact?.locales ?? booking?.contact?.locales ?? null,
+      country: contact?.country ?? booking?.contact?.country ?? null,
+      notes: contact?.notes ?? booking?.contact?.notes ?? null,
+    };
+  };
 
   private buildUnitItem = (
     item: OctoUnitItem,

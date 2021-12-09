@@ -13,9 +13,7 @@ export class ProductRepository implements IProductRepository {
     return this.storage.getAll();
   };
 
-  public getProduct = (
-    id: string,
-  ): Nullable<ProductModel> => {
+  public getProduct = (id: string): Nullable<ProductModel> => {
     return this.storage.get(id);
   };
 }
