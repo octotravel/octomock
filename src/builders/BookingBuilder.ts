@@ -284,7 +284,7 @@ export class BookingBuilder {
       supplierReferecne: DataGenerator.generateSupplierReference(),
       resellerReference: item.resellerReference ?? null,
       unitId: item.unitId,
-      unit: unitModel.toPOJO(),
+      unit: unitModel.toPOJO({}),
       status,
       utcRedeemedAt: null,
       contact: {

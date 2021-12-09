@@ -1,8 +1,11 @@
+import { CapabilityId } from "./../types/Capability";
+import { CapableToPOJOType } from "./../interfaces/Capable";
 import { UnitContentModel } from "./UnitContent";
 import { Unit, UnitId, Restrictions } from "../types/Unit";
 import { Pricing } from "../types/Pricing";
+import { Capable } from "../interfaces/Capable";
 
-export class UnitModel {
+export class UnitModel implements Capable {
   public id: UnitId;
   private internalName: string;
   private reference: string;
@@ -33,7 +36,10 @@ export class UnitModel {
     this.pricingFrom = pricing;
   }
 
-  public toPOJO = (): Unit => {
+  public toPOJO = ({
+    useCapabilities = false,
+    capabilities = [],
+  }: CapableToPOJOType): Unit => {
     const {
       id,
       internalName,
@@ -51,11 +57,20 @@ export class UnitModel {
       restrictions,
     };
 
-    Object.keys(this.unitContentModel).forEach((key) => {
-      pojo[key] = this.unitContentModel[key];
-    });
-
-    pojo.pricingFrom = this.pricingFrom;
+    if (
+      useCapabilities === false ||
+      (useCapabilities === true && capabilities.includes(CapabilityId.Content))
+    ) {
+      Object.keys(this.unitContentModel).forEach((key) => {
+        pojo[key] = this.unitContentModel[key];
+      });
+    }
+    if (
+      useCapabilities === false ||
+      (useCapabilities === true && capabilities.includes(CapabilityId.Pricing))
+    ) {
+      pojo.pricingFrom = this.pricingFrom;
+    }
 
     return pojo;
   };

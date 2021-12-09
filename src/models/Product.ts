@@ -1,3 +1,5 @@
+import { CapabilityId } from "./../types/Capability";
+import { CapableToPOJOType, Capable } from "./../interfaces/Capable";
 import { ProductPricingModel } from "./ProductPricing";
 import { ProductPickupModel } from "./ProductPickup";
 import { ProductContentModel } from "./ProductContent";
@@ -13,7 +15,7 @@ import {
 } from "../types/Product";
 import { AvailabilityConfigModel } from "./AvailabilityConfig";
 
-export class ProductModel {
+export class ProductModel implements Capable {
   public id: string;
   public internalName: string;
   public reference: Nullable<string>;
@@ -79,7 +81,10 @@ export class ProductModel {
     return this.options.find((option) => option.id === id) ?? null;
   };
 
-  public toPOJO = (): Product => {
+  public toPOJO = ({
+    useCapabilities = false,
+    capabilities = [],
+  }: CapableToPOJOType): Product => {
     const {
       id,
       internalName,
@@ -110,20 +115,37 @@ export class ProductModel {
       deliveryFormats,
       deliveryMethods,
       redemptionMethod,
-      options: options.map((option) => option.toPOJO()),
+      options: options.map((option) =>
+        option.toPOJO({ useCapabilities, capabilities })
+      ),
     };
 
-    Object.keys(this.productContentModel).forEach((key) => {
-      pojo[key] = this.productContentModel[key];
-    });
+    if (
+      useCapabilities === false ||
+      (useCapabilities === true && capabilities.includes(CapabilityId.Content))
+    ) {
+      Object.keys(this.productContentModel).forEach((key) => {
+        pojo[key] = this.productContentModel[key];
+      });
+    }
 
-    pojo.defaultCurrency = this.productPricingModel.defaultCurrency;
-    pojo.availableCurrencies = this.productPricingModel.availableCurrencies;
-    pojo.pricingPer = this.productPricingModel.pricingPer;
+    if (
+      useCapabilities === false ||
+      (useCapabilities === true && capabilities.includes(CapabilityId.Pricing))
+    ) {
+      pojo.defaultCurrency = this.productPricingModel.defaultCurrency;
+      pojo.availableCurrencies = this.productPricingModel.availableCurrencies;
+      pojo.pricingPer = this.productPricingModel.pricingPer;
+    }
 
-    Object.keys(this.productPickupModel).forEach((key) => {
-      pojo[key] = this.productPickupModel[key];
-    });
+    if (
+      useCapabilities === false ||
+      (useCapabilities === true && capabilities.includes(CapabilityId.Pickups))
+    ) {
+      Object.keys(this.productPickupModel).forEach((key) => {
+        pojo[key] = this.productPickupModel[key];
+      });
+    }
 
     return pojo;
   };

@@ -20,6 +20,6 @@ export class AvailabilityController implements IAvailabilityController {
       schema,
       capabilities
     );
-    return models.map((m) => m.toPOJO());
+    return models.map((m) => m.toPOJO({ useCapabilities: true, capabilities }));
   };
 }

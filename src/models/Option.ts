@@ -1,3 +1,5 @@
+import { CapabilityId } from "./../types/Capability";
+import { Capable, CapableToPOJOType } from "./../interfaces/Capable";
 import { OptionPickupModel } from "./OptionPickup";
 import { OptionContentModel } from "./OptionContent";
 import { UnitId } from "./../types/Unit";
@@ -8,7 +10,7 @@ import { OptionPricingModel } from "./OptionPricing";
 import { Pricing } from "../types/Pricing";
 import { DurationUnit } from "../types/Duration";
 
-export class OptionModel {
+export class OptionModel implements Capable {
   public id: string;
   public primary: boolean;
   public internalName: string;
@@ -71,7 +73,10 @@ export class OptionModel {
     return this.units.find((unit) => unit.id === unitId) ?? null;
   };
 
-  public toPOJO = (): Option => {
+  public toPOJO = ({
+    useCapabilities = false,
+    capabilities = [],
+  }: CapableToPOJOType): Option => {
     const {
       id,
       primary,
@@ -97,18 +102,35 @@ export class OptionModel {
       cancellationCutoffUnit,
       requiredContactFields,
       restrictions,
-      units: units.map((unit) => unit.toPOJO()),
+      units: units.map((unit) =>
+        unit.toPOJO({ useCapabilities, capabilities })
+      ),
     };
 
-    Object.keys(this.optionContentModel).forEach((key) => {
-      pojo[key] = this.optionContentModel[key];
-    });
+    if (
+      useCapabilities === false ||
+      (useCapabilities === true && capabilities.includes(CapabilityId.Content))
+    ) {
+      Object.keys(this.optionContentModel).forEach((key) => {
+        pojo[key] = this.optionContentModel[key];
+      });
+    }
 
-    pojo.pricingFrom = this.optionPricingModel.pricingFrom;
+    if (
+      useCapabilities === false ||
+      (useCapabilities === true && capabilities.includes(CapabilityId.Pricing))
+    ) {
+      pojo.pricingFrom = this.optionPricingModel.pricingFrom;
+    }
 
-    Object.keys(this.optionPickupModel).forEach((key) => {
-      pojo[key] = this.optionPickupModel[key];
-    });
+    if (
+      useCapabilities === false ||
+      (useCapabilities === true && capabilities.includes(CapabilityId.Pickups))
+    ) {
+      Object.keys(this.optionPickupModel).forEach((key) => {
+        pojo[key] = this.optionPickupModel[key];
+      });
+    }
 
     return pojo;
   };

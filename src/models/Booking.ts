@@ -1,3 +1,5 @@
+import { CapabilityId } from "./../types/Capability";
+import { Capable, CapableToPOJOType } from "./../interfaces/Capable";
 import { BookingPickupModel } from "./BookingPickup";
 import { BookingPricingModel } from "./BookingPricing";
 import { BookingContentModel } from "./BookingContent";
@@ -14,7 +16,7 @@ import {
 } from "./../types/Booking";
 import { DeliveryMethod } from "../types/Product";
 
-export class BookingModel {
+export class BookingModel implements Capable {
   public id: string;
   public uuid: string;
   public testMode: boolean;
@@ -132,7 +134,10 @@ export class BookingModel {
     this.bookingPickupModel = new BookingPickupModel();
   }
 
-  public toPOJO = (): Booking => {
+  public toPOJO = ({
+    useCapabilities = false,
+    capabilities = [],
+  }: CapableToPOJOType): Booking => {
     const {
       id,
       uuid,
@@ -173,9 +178,9 @@ export class BookingModel {
       utcRedeemedAt,
       utcConfirmedAt,
       productId,
-      product: product.toPOJO(),
+      product: product.toPOJO({ useCapabilities, capabilities }),
       optionId,
-      option: option.toPOJO(),
+      option: option.toPOJO({ useCapabilities, capabilities }),
       cancellable,
       cancellation,
       freesale,
@@ -188,15 +193,30 @@ export class BookingModel {
       unitItems,
     };
 
-    Object.keys(this.bookingContentModel).forEach((key) => {
-      pojo[key] = this.bookingContentModel[key];
-    });
+    if (
+      useCapabilities === false ||
+      (useCapabilities === true && capabilities.includes(CapabilityId.Content))
+    ) {
+      Object.keys(this.bookingContentModel).forEach((key) => {
+        pojo[key] = this.bookingContentModel[key];
+      });
+    }
 
-    pojo.pricing = this.bookingPricingModel.pricing;
+    if (
+      useCapabilities === false ||
+      (useCapabilities === true && capabilities.includes(CapabilityId.Pricing))
+    ) {
+      pojo.pricing = this.bookingPricingModel.pricing;
+    }
 
-    Object.keys(this.bookingPickupModel).forEach((key) => {
-      pojo[key] = this.bookingPickupModel[key];
-    });
+    if (
+      useCapabilities === false ||
+      (useCapabilities === true && capabilities.includes(CapabilityId.Pickups))
+    ) {
+      Object.keys(this.bookingPickupModel).forEach((key) => {
+        pojo[key] = this.bookingPickupModel[key];
+      });
+    }
 
     return pojo;
   };

@@ -31,16 +31,16 @@ const getCapabilities = (ctx: any): CapabilityId[] => {
 };
 
 router.get("/products", (ctx, _) => {
-  // const __ = getCapabilities(ctx);
-  const data = productController.getProducts();
+  const capabilities = getCapabilities(ctx);
+  const data = productController.getProducts(capabilities);
   ctx.body = data;
   ctx.toJSON();
 });
 
 router.get("/products/:productId", (ctx, _) => {
-  // const __ = getCapabilities(ctx);
+  const capabilities = getCapabilities(ctx);
   const productId = ctx.params.productId;
-  const data = productController.getProduct(productId);
+  const data = productController.getProduct(productId, capabilities);
   ctx.body = data;
   ctx.toJSON();
 });
@@ -91,7 +91,7 @@ router.post("/bookings", async (ctx, _) => {
 });
 
 router.post("/bookings/:uuid/confirm", async (ctx, _) => {
-  // const capabilities = getCapabilities(ctx);
+  const capabilities = getCapabilities(ctx);
   ctx.body = {
     ...ctx.request.body,
     uuid: ctx.params.uuid,
@@ -99,13 +99,13 @@ router.post("/bookings/:uuid/confirm", async (ctx, _) => {
   await confirmBookingSchema.validate(ctx.body);
   const schema = confirmBookingSchema.cast(ctx.body);
 
-  const booking = await bookingController.confirmBooking(schema);
+  const booking = await bookingController.confirmBooking(schema, capabilities);
   ctx.body = booking;
   ctx.toJSON();
 });
 
 router.post("/bookings/:uuid/update", async (ctx, _) => {
-  // const capabilities = getCapabilities(ctx);
+  const capabilities = getCapabilities(ctx);
   ctx.body = {
     ...ctx.request.body,
     uuid: ctx.params.uuid,
@@ -113,13 +113,13 @@ router.post("/bookings/:uuid/update", async (ctx, _) => {
   await patchBookingSchema.validate(ctx.body);
   const schema = patchBookingSchema.cast(ctx.body);
 
-  const booking = await bookingController.updateBooking(schema);
+  const booking = await bookingController.updateBooking(schema, capabilities);
   ctx.body = booking;
   ctx.toJSON();
 });
 
 router.post("/bookings/:uuid/extend", async (ctx, _) => {
-  // const capabilities = getCapabilities(ctx);
+  const capabilities = getCapabilities(ctx);
   ctx.body = {
     ...ctx.request.body,
     uuid: ctx.params.uuid,
@@ -127,13 +127,13 @@ router.post("/bookings/:uuid/extend", async (ctx, _) => {
   await extendBookingSchema.validate(ctx.body);
   const schema = extendBookingSchema.cast(ctx.body);
 
-  const booking = await bookingController.extendBooking(schema);
+  const booking = await bookingController.extendBooking(schema, capabilities);
   ctx.body = booking;
   ctx.toJSON();
 });
 
 router.post("/bookings/:uuid/cancel", async (ctx, _) => {
-  // const capabilities = getCapabilities(ctx);
+  const capabilities = getCapabilities(ctx);
   ctx.body = {
     ...ctx.request.body,
     uuid: ctx.params.uuid,
@@ -141,13 +141,13 @@ router.post("/bookings/:uuid/cancel", async (ctx, _) => {
   await cancelBookingSchema.validate(ctx.body);
   const schema = cancelBookingSchema.cast(ctx.body);
 
-  const booking = await bookingController.cancelBooking(schema);
+  const booking = await bookingController.cancelBooking(schema, capabilities);
   ctx.body = booking;
   ctx.toJSON();
 });
 
 router.delete("/bookings/:uuid", async (ctx, _) => {
-  // const capabilities = getCapabilities(ctx);
+  const capabilities = getCapabilities(ctx);
   ctx.body = {
     ...ctx.request.body,
     uuid: ctx.params.uuid,
@@ -155,26 +155,26 @@ router.delete("/bookings/:uuid", async (ctx, _) => {
   await cancelBookingSchema.validate(ctx.body);
   const schema = cancelBookingSchema.cast(ctx.body);
 
-  const booking = await bookingController.cancelBooking(schema);
+  const booking = await bookingController.cancelBooking(schema, capabilities);
   ctx.body = booking;
   ctx.toJSON();
 });
 
 router.get("/bookings/:uuid", async (ctx, _) => {
-  // const capabilities = getCapabilities(ctx);
+  const capabilities = getCapabilities(ctx);
   const data: GetBookingSchema = {
     uuid: ctx.params.uuid,
   };
 
   await getBookingSchema.validate(data);
   const schema = getBookingSchema.cast(data);
-  const result = await bookingController.getBooking(schema);
+  const result = await bookingController.getBooking(schema, capabilities);
   ctx.body = result;
   ctx.toJSON();
 });
 
 router.get("/bookings", async (ctx, _) => {
-  // const capabilities = getCapabilities(ctx);
+  const capabilities = getCapabilities(ctx);
   const data: GetBookingsSchema = {
     resellerReference: ctx.query.resellerReference as string,
     supplierReference: ctx.query.supplierReference as string,
@@ -182,7 +182,7 @@ router.get("/bookings", async (ctx, _) => {
 
   await getBookingsSchema.validate(data);
   const schema = getBookingsSchema.cast(data);
-  const result = await bookingController.getBookings(schema);
+  const result = await bookingController.getBookings(schema, capabilities);
   ctx.body = result;
   ctx.toJSON();
 });

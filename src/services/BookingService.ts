@@ -30,7 +30,7 @@ export class BookingService implements IBookingService {
         bookingModel.status,
         bookingModel.resellerReference,
         bookingModel.supplierReference,
-        JSON.stringify(bookingModel.toPOJO())
+        JSON.stringify(bookingModel.toPOJO({}))
       );
     return bookingModel;
   };
@@ -50,7 +50,7 @@ export class BookingService implements IBookingService {
     `,
         bookingModel.status,
         bookingModel.resellerReference,
-        JSON.stringify(bookingModel.toPOJO()),
+        JSON.stringify(bookingModel.toPOJO({})),
         bookingModel.uuid
       );
     return bookingModel;
