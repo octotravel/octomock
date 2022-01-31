@@ -34,7 +34,7 @@ export interface Booking extends BookingPricing, BookingPickup, BookingContent {
   optionId: string;
   option: Option;
   cancellable: boolean;
-  cancellation: Nullable<unknown>; // TODO: get the object type
+  cancellation: Nullable<Cancellation>;
   freesale: boolean;
   availabilityId: string;
   availability: BookingAvailability;

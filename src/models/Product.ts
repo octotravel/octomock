@@ -30,8 +30,6 @@ export class ProductModel implements Capable {
   public deliveryMethods: Array<DeliveryMethod>;
   public redemptionMethod: RedemptionMethod;
   public options: OptionModel[];
-  // TODO: move opening hours to ProductConfig which doesn't exist yet
-  // public openingHours: OpeningHours[];
   public productContentModel?: ProductContentModel;
   public productPickupModel?: ProductPickupModel;
   public productPricingModel?: ProductPricingModel;
@@ -41,17 +39,15 @@ export class ProductModel implements Capable {
     id,
     internalName,
     availabilityType,
-    options,
-    // openingHours,
     pricingPer,
     currency,
     availabilityConfig,
+    options,
   }: {
     id: string;
     internalName: string;
     availabilityType: AvailabilityType;
     options: OptionModel[];
-    // openingHours: OpeningHours[];
     pricingPer: PricingPer;
     currency: Currency;
     availabilityConfig: AvailabilityConfigModel;
@@ -70,7 +66,6 @@ export class ProductModel implements Capable {
     this.deliveryMethods = [DeliveryMethod.VOUCHER, DeliveryMethod.TICKET];
     this.redemptionMethod = RedemptionMethod.DIGITAL;
     this.options = options;
-    // this.openingHours = openingHours;
     this.availabilityConfig = availabilityConfig;
     this.productContentModel = new ProductContentModel();
     this.productPricingModel = new ProductPricingModel(pricingPer, currency);
@@ -155,7 +150,6 @@ export class ProductModel implements Capable {
       id: product.id,
       internalName: product.internalName,
       availabilityType: product.availabilityType,
-      // openingHours: [],
       options: product.options.map((o) => OptionModel.fromPOJO(o)),
       pricingPer: product.pricingPer,
       currency: product.defaultCurrency as Currency,

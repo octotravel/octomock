@@ -39,6 +39,7 @@ export class AvailabilityModel implements Capable {
     maxUnits,
     utcCutoffAt,
     openingHours,
+    availabilityPricing
   }: {
     id: string;
     localDateTimeStart: string;
@@ -51,6 +52,7 @@ export class AvailabilityModel implements Capable {
     maxUnits: Nullable<number>;
     utcCutoffAt: string;
     openingHours: OpeningHours[];
+    availabilityPricing: AvailabilityPricingModel
   }) {
     this.id = id;
     this.localDateTimeStart = localDateTimeStart;
@@ -64,16 +66,8 @@ export class AvailabilityModel implements Capable {
     this.utcCutoffAt = utcCutoffAt;
     this.openingHours = openingHours;
 
-    const pricing = {
-      original: 0,
-      retail: 0,
-      net: 0,
-      currency: "USD",
-      currencyPrecision: 0,
-      includedTaxes: [],
-    };
     this.availabilityContentModel = new AvailabilityContentModel();
-    this.availabilityPricingModel = new AvailabilityPricingModel({ pricing });
+    this.availabilityPricingModel = availabilityPricing
     this.availabilityPickupModel = new AvailabilityPickupModel();
   }
 

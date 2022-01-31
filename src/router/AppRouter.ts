@@ -47,13 +47,8 @@ router.get("/products/:productId", (ctx, _) => {
 
 router.post("/availability", async (ctx, _) => {
   const capabilities = getCapabilities(ctx);
-  const data: AvailabilitySchema = {
-    productId: "1",
-    optionId: "DEFAULT",
-    // localDate: "2021-12-20",
-    localDateStart: "2021-12-20",
-    localDateEnd: "2021-12-30",
-  };
+
+  const data: AvailabilitySchema = ctx.request.body
 
   await availabilitySchema.validate(data);
   const schema = availabilitySchema.cast(data) as AvailabilitySchema;
@@ -75,18 +70,17 @@ router.post("/availability", async (ctx, _) => {
 
 router.post("/bookings", async (ctx, _) => {
   const capabilities = getCapabilities(ctx);
-  const data = await bookingController.createBooking(
+
+  const data: CreateBookingSchema = ctx.request.body
+
+  await availabilitySchema.validate(data);
+  const booking = await bookingController.createBooking(
     {
-      uuid: undefined,
-      productId: "1",
-      optionId: "DEFAULT",
-      availabilityId: "2021-12-30T00:00:00+00:00",
-      unitItems: [{ unitId: "adult" }],
-      resellerReference: "reseller",
+      ...data,
     } as CreateBookingSchema,
     capabilities
   );
-  ctx.body = data;
+  ctx.body = booking;
   ctx.toJSON();
 });
 
@@ -168,8 +162,8 @@ router.get("/bookings/:uuid", async (ctx, _) => {
 
   await getBookingSchema.validate(data);
   const schema = getBookingSchema.cast(data);
-  const result = await bookingController.getBooking(schema, capabilities);
-  ctx.body = result;
+  const booking = await bookingController.getBooking(schema, capabilities);
+  ctx.body = booking;
   ctx.toJSON();
 });
 
@@ -182,7 +176,7 @@ router.get("/bookings", async (ctx, _) => {
 
   await getBookingsSchema.validate(data);
   const schema = getBookingsSchema.cast(data);
-  const result = await bookingController.getBookings(schema, capabilities);
-  ctx.body = result;
+  const bookings = await bookingController.getBookings(schema, capabilities);
+  ctx.body = bookings;
   ctx.toJSON();
 });

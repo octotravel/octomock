@@ -8,7 +8,7 @@ import { Currency } from "../types/Currency";
 import { UnitConfigModel } from "../models/UnitConfig";
 import { OptionConfigModel } from "../models/OptionConfig";
 import { DurationUnit } from "../types/Duration";
-import { AvailabilityConfigModel } from "../models/AvailabilityConfig";
+import { AvailabilityConfigModel, Day } from "../models/AvailabilityConfig";
 
 // TODO: Products to generate
 
@@ -83,6 +83,8 @@ export class ProductGenerator {
           availabilityConfig: new AvailabilityConfigModel({
             availabilityType: AvailabilityType.OPENING_HOURS,
             openingHours: [{ from: "09:00", to: "17:00" }],
+            capacity: 20,
+            daysClosed: [Day.Sat, Day.Sun],
           }),
           optionsConfig: [
             new OptionConfigModel({
@@ -109,7 +111,6 @@ export class ProductGenerator {
           name: "PPU | ST",
           availabilityConfig: new AvailabilityConfigModel({
             availabilityType: AvailabilityType.START_TIME,
-            daysClosed: [0, 6],
           }),
           optionsConfig: [
             new OptionConfigModel({

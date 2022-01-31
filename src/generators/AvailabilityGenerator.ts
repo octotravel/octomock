@@ -3,7 +3,7 @@ import { CapabilityId } from "../types/Capability";
 
 import { AvailabilityModel } from "../models/Availability";
 import { AvailabilityBuilder } from "../builders/AvailabilityBuilder";
-import { addDays, eachDayOfInterval, getDay } from "date-fns";
+import { addDays, eachDayOfInterval, getDay, getMonth } from "date-fns";
 import { AvailabilityStatus } from "../types/Availability";
 import { DateHelper } from "../helpers/DateHelper";
 
@@ -20,25 +20,32 @@ export class AvailabilityGenerator {
   public generate = (data: GenerateAvailabiltyData): AvailabilityModel[] => {
     const { product, optionId, date, capabilities } = data;
     const config = product.availabilityConfig;
-
     const days = eachDayOfInterval({
       start: new Date(date),
       end: addDays(new Date(date), config.days),
     });
 
-    return days
+
+    const dates = days
       .map((day) => {
-        const isSoldOut = config.daysClosed.includes(getDay(day));
-        return this.builder.build({
+        const isClosed = config.daysClosed.includes(getDay(day)) || config.monthsClosed.includes(getMonth(day))
+        if (isClosed) {
+          return null
+        }
+        const model = this.builder.build({
           product,
           optionId,
           date: DateHelper.availabilityDateFormat(day),
-          status: isSoldOut
+          status: isClosed
             ? AvailabilityStatus.SOLD_OUT
             : AvailabilityStatus.AVAILABLE,
           capabilities,
         });
+        return model
       })
       .flat(1);
+
+      return dates.filter(Boolean)
   };
+
 }

@@ -1,25 +1,105 @@
+import { PricingConfig } from './../builders/ProductBuilder';
+import { OptionConfigModel } from './OptionConfig';
+import { PricingUnit, PricingPer } from './../types/Pricing';
+import * as R from 'ramda'
 import { AvailabilityType, OpeningHours } from "../types/Availability";
+import { Pricing } from '../types/Pricing';
+
+export enum Day {
+  Mon = 1,
+  Tue = 2,
+  Wed = 3,
+  Thu = 4,
+  Fri = 5,
+  Sat = 6,
+  Sun = 0,
+}
+
+
+export enum Month {
+  Jan = 0,
+  Feb = 1,
+  Mar = 2,
+  Apr = 3,
+  May = 4,
+  Jun = 5,
+  Jul = 6,
+  Aug = 7,
+  Sep = 8,
+  Oct = 9,
+  Nov = 10,
+  Dec = 11,
+}
 
 export class AvailabilityConfigModel {
   public days: number;
-  public daysClosed: number[];
+  public daysClosed: Day[];
+  public monthsClosed: Month[];
   public availabilityType: AvailabilityType;
   public openingHours: OpeningHours[];
+  public capacity: Nullable<number>;
+  private pricing: Map<string, Pricing>;
+  private unitPricing: Map<string, PricingUnit[]>;
 
   constructor({
     days,
     daysClosed,
+    monthsClosed,
     availabilityType,
     openingHours,
+    capacity,
   }: {
     days?: number;
-    daysClosed?: number[];
+    daysClosed?: Day[];
+    monthsClosed?: Month[];
     availabilityType?: AvailabilityType;
     openingHours?: OpeningHours[];
+    capacity?: Nullable<number>
   }) {
-    this.days = days ?? 30;
+    if (availabilityType === AvailabilityType.OPENING_HOURS && R.isEmpty(openingHours.length)) {
+      throw new Error('openingHours cannot be empty when AvailabilityType = OPENING_HOURS')
+    }
+    this.days = days ?? 365;
     this.daysClosed = daysClosed ?? [];
+    this.monthsClosed = monthsClosed ?? [];
     this.availabilityType = availabilityType ?? AvailabilityType.START_TIME;
     this.openingHours = openingHours ?? [];
+    this.capacity = capacity ?? null;
+  }
+
+  public setPricing = (optionsConfig: OptionConfigModel[], pricingConfig: PricingConfig): AvailabilityConfigModel => {
+    const pricingMap = new Map<string, Pricing>()
+    if (pricingConfig.pricingPer === PricingPer.BOOKING) {
+      optionsConfig.forEach(config => {
+        pricingMap.set(config.id, config.pricingFrom[0])
+      })
+    }
+    this.pricing = pricingMap
+
+    const unitPricingMap = new Map<string, PricingUnit[]>()
+    if (pricingConfig.pricingPer === PricingPer.UNIT) {
+      optionsConfig.forEach(config => {
+        const unitPricing = config.unitConfigModels.map(unitConfig => {
+          return unitConfig.pricingFrom.map(pricing => {
+            return {
+              ...pricing,
+              unitId: unitConfig.id
+            }
+          })
+        }).flat(1)
+        unitPricingMap.set(config.id, unitPricing)
+      })
+    }
+    this.unitPricing = unitPricingMap
+
+    return this
+  }
+
+  public getPricing = (optionId: string): Pricing => {
+    return this.pricing.get(optionId)
+  }
+
+  public getUnitPricing = (optionId: string): PricingUnit[] => {
+    return this.unitPricing.get(optionId)
   }
 }

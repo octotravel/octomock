@@ -33,7 +33,7 @@ export class BookingModel implements Capable {
   public optionId: string;
   public option: OptionModel;
   public cancellable: boolean;
-  public cancellation: Nullable<Cancellation>; // TODO: get the object type
+  public cancellation: Nullable<Cancellation>;
   public freesale: boolean;
   public availabilityId: string;
   public availability: BookingAvailability;

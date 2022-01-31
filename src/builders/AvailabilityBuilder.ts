@@ -12,6 +12,7 @@ import { AvailabilityStatus } from "../types/Availability";
 import { OptionModel } from "../models/Option";
 import { DurationUnit } from "../types/Duration";
 import { DateHelper } from "../helpers/DateHelper";
+import { AvailabilityPricingModel } from "../models/AvailabilityPricing";
 
 interface AvailabilityBuilderData {
   product: ProductModel;
@@ -39,6 +40,7 @@ export class AvailabilityBuilder {
           option,
           product.timeZone
         );
+
         const availability = new AvailabilityModel({
           id: localDateTimeStart,
           localDateTimeStart,
@@ -46,12 +48,17 @@ export class AvailabilityBuilder {
           allDay: option.availabilityLocalStartTimes.length === 1,
           available: status === AvailabilityStatus.AVAILABLE,
           status: status,
-          vacancies: null,
-          capacity: null,
+          vacancies: product.availabilityConfig.capacity,
+          capacity: product.availabilityConfig.capacity,
           maxUnits: option.restrictions.maxUnits,
           utcCutoffAt: datetime.toISOString(),
           openingHours: product.availabilityConfig.openingHours,
+          availabilityPricing: new AvailabilityPricingModel({
+            unitPricing: product.availabilityConfig.getUnitPricing(optionId),
+            pricing: product.availabilityConfig.getPricing(optionId)
+          })
         });
+
         return availability;
       }
     );

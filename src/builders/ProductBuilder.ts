@@ -1,10 +1,10 @@
+import { ProductConfigModel } from './../models/ProductConfig';
 import { OptionModel } from "./../models/Option";
 import { OptionBuilder } from "./OptionBuilder";
 import { Currency } from "./../types/Currency";
 import { PricingPer } from "./../types/Pricing";
 import { ProductModel } from "./../models/Product";
 import { OptionConfigModel } from "../models/OptionConfig";
-import { AvailabilityConfigModel } from "../models/AvailabilityConfig";
 
 export interface PricingConfig {
   currencies: Currency[];
@@ -18,26 +18,19 @@ const defaultPricingConfig: PricingConfig = {
   currency: Currency.EUR,
 };
 
-interface ProductBuilderData {
-  id: string;
-  name: string;
-  optionsConfig: OptionConfigModel[];
-  pricingConfig?: PricingConfig;
-  availabilityConfig: AvailabilityConfigModel;
-}
 
 export class ProductBuilder {
   private product: ProductModel;
   private optionBuilder = new OptionBuilder();
 
-  build(data: ProductBuilderData): ProductModel {
+  build(config: ProductConfigModel): ProductModel {
     const {
       id,
       name,
       optionsConfig,
       pricingConfig = defaultPricingConfig,
       availabilityConfig,
-    } = data;
+    } = config;
 
     this.product = new ProductModel({
       id,
