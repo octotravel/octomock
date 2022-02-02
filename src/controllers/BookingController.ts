@@ -1,4 +1,4 @@
-import { UnprocessableEntityError } from './../models/Error';
+import { UnprocessableEntityError } from "./../models/Error";
 import {
   CancelBookingSchema,
   ConfirmBookingSchema,

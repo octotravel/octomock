@@ -1,3 +1,4 @@
+import { SupplierController } from './../controllers/SupplierController';
 import {
   cancelBookingSchema,
   confirmBookingSchema,
@@ -24,11 +25,14 @@ export const router = new Router();
 const productController = new ProductController();
 const availabilityController = new AvailabilityController();
 const bookingController = new BookingController();
+const supplierController = new SupplierController();
 const availabilityValidator = new AvailabilityValidator();
 
 const getCapabilities = (ctx: any): CapabilityId[] => {
   return ctx.capabilities as CapabilityId[];
 };
+
+// TODO: make router "modular"
 
 router.get("/products", (ctx, _) => {
   const capabilities = getCapabilities(ctx);
@@ -178,5 +182,17 @@ router.get("/bookings", async (ctx, _) => {
   const schema = getBookingsSchema.cast(data);
   const bookings = await bookingController.getBookings(schema, capabilities);
   ctx.body = bookings;
+  ctx.toJSON();
+});
+
+router.get("/suppliers", async (ctx, _) => {
+  const suppliers = await supplierController.getSuppliers()
+  ctx.body = suppliers;
+  ctx.toJSON();
+});
+
+router.get("/suppliers/:id", async (ctx, _) => {
+  const supplier = await supplierController.getSupplier(ctx.params.id)
+  ctx.body = supplier;
   ctx.toJSON();
 });

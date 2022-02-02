@@ -1,4 +1,4 @@
-import { OctoError, InternalServerError } from './models/Error';
+import { OctoError, InternalServerError } from "./models/Error";
 import Koa from "koa";
 import koaBody from "koa-body";
 import { router } from "./router/AppRouter";
@@ -17,7 +17,7 @@ app.use(async (ctx, next) => {
       ctx.status = err.status;
       ctx.body = err.body;
     } else {
-      const error = new InternalServerError(err.message)
+      const error = new InternalServerError(err.message);
       ctx.status = error.status;
       ctx.body = error.body;
     }

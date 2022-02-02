@@ -1,4 +1,4 @@
-import { InvalidBookingUUIDError } from './../models/Error';
+import { InvalidBookingUUIDError } from "./../models/Error";
 import { Booking } from "./../types/Booking";
 import { GetBookingSchema, GetBookingsSchema } from "./../schemas/Booking";
 import { BookingModel } from "./../models/Booking";

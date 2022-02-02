@@ -1,4 +1,4 @@
-import { BadRequestError } from './../models/Error';
+import { BadRequestError } from "./../models/Error";
 type Params = {
   availabilityIds: Nullable<Array<string>>;
   localDate: Nullable<string>;
@@ -48,6 +48,8 @@ export class AvailabilityValidator implements IAvailabilityValidator {
     const d = new Date(from);
     const c = new Date(d.getFullYear() + 1, d.getMonth(), d.getDate());
     if (c < new Date(to))
-      throw new BadRequestError("cannot request more than 1 year of availability");
+      throw new BadRequestError(
+        "cannot request more than 1 year of availability"
+      );
   };
 }

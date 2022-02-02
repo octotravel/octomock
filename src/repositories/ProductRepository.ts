@@ -1,4 +1,4 @@
-import { ProductModelInMemoryStorage } from "./../storage/InMemoryStorage";
+import { ProductModelStorage } from "./../storage/ProductStorage";
 import { ProductModel } from "./../models/Product";
 
 interface IProductRepository {
@@ -7,7 +7,7 @@ interface IProductRepository {
 }
 
 export class ProductRepository implements IProductRepository {
-  private storage = new ProductModelInMemoryStorage();
+  private storage = new ProductModelStorage();
 
   public getProducts = (): ProductModel[] => {
     return this.storage.getAll();
