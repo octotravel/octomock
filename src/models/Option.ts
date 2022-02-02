@@ -28,6 +28,7 @@ export class OptionModel implements Capable {
   public optionPricingModel?: OptionPricingModel;
   // pickup
   public optionPickupModel?: OptionPickupModel;
+  private onBooking: boolean;
 
   constructor({
     id,
@@ -71,6 +72,12 @@ export class OptionModel implements Capable {
 
   public findUnitModel = (unitId: UnitId): Nullable<UnitModel> => {
     return this.units.find((unit) => unit.id === unitId) ?? null;
+  };
+
+  public setOnBooking = (): OptionModel => {
+    this.onBooking = true;
+    this.units.map((u) => u.setOnBooking());
+    return this;
   };
 
   public toPOJO = ({
@@ -120,7 +127,11 @@ export class OptionModel implements Capable {
       useCapabilities === false ||
       (useCapabilities === true && capabilities.includes(CapabilityId.Pricing))
     ) {
-      pojo.pricingFrom = this.optionPricingModel.pricingFrom;
+      if (this.onBooking) {
+        pojo.pricing = this.optionPricingModel.pricingFrom;
+      } else {
+        pojo.pricingFrom = this.optionPricingModel.pricingFrom;
+      }
     }
 
     if (

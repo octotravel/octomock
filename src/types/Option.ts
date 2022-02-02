@@ -68,6 +68,7 @@ interface OptionContent {
 
 interface OptionPricing {
   pricingFrom?: Array<Pricing>;
+  pricing?: Array<Pricing>;
 }
 
 interface OptionPickup {

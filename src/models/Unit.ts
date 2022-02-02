@@ -16,6 +16,7 @@ export class UnitModel implements Capable {
   private unitContentModel: UnitContentModel;
   // pricing
   private pricingFrom: Array<Pricing> = [];
+  private onBooking: boolean;
 
   constructor({
     id,
@@ -35,6 +36,11 @@ export class UnitModel implements Capable {
     this.unitContentModel = new UnitContentModel(this.id);
     this.pricingFrom = pricing;
   }
+
+  public setOnBooking = (): UnitModel => {
+    this.onBooking = true;
+    return this;
+  };
 
   public toPOJO = ({
     useCapabilities = false,
@@ -69,7 +75,11 @@ export class UnitModel implements Capable {
       useCapabilities === false ||
       (useCapabilities === true && capabilities.includes(CapabilityId.Pricing))
     ) {
-      pojo.pricingFrom = this.pricingFrom;
+      if (this.onBooking) {
+        pojo.pricing = this.pricingFrom;
+      } else {
+        pojo.pricingFrom = this.pricingFrom;
+      }
     }
 
     return pojo;

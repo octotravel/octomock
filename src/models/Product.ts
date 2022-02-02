@@ -76,6 +76,11 @@ export class ProductModel implements Capable {
     return this.options.find((option) => option.id === id) ?? null;
   };
 
+  public setOnBooking = (): ProductModel => {
+    this.options = this.options.map((model) => model.setOnBooking());
+    return this;
+  };
+
   public toPOJO = ({
     useCapabilities = false,
     capabilities = [],
