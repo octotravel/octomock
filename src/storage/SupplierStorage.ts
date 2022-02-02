@@ -17,10 +17,9 @@ export class SupplierStorage implements InMemoryStorage<Supplier> {
     },
   ];
   public get(id: string): Nullable<Supplier> {
-    let supplier: Nullable<Supplier> = null
-    console.log(id)
-    if (id === '0') {
-      supplier = this.suppliers[0] ?? null
+    let supplier: Nullable<Supplier> = null;
+    if (id === "0") {
+      supplier = this.suppliers[0] ?? null;
     } else {
       supplier = this.suppliers.find((p) => p.id === id) ?? null;
       if (supplier === null) {

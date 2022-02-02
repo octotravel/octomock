@@ -1,5 +1,5 @@
-import { SupplierStorage } from './../storage/SupplierStorage';
-import { Supplier } from './../types/Supplier';
+import { SupplierStorage } from "./../storage/SupplierStorage";
+import { Supplier } from "./../types/Supplier";
 
 interface ISupplierRepository {
   getSuppliers(): Supplier[];
@@ -7,8 +7,8 @@ interface ISupplierRepository {
 }
 
 export class SupplierRepository implements ISupplierRepository {
-  private storage = new SupplierStorage()
-  public getSuppliers = (): Supplier[] => this.storage.getAll()
+  private storage = new SupplierStorage();
+  public getSuppliers = (): Supplier[] => this.storage.getAll();
 
-  public getSupplier = (id: string): Nullable<Supplier> => this.storage.get(id)
+  public getSupplier = (id: string): Nullable<Supplier> => this.storage.get(id);
 }

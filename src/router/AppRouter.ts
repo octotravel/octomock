@@ -1,4 +1,4 @@
-import { SupplierController } from './../controllers/SupplierController';
+import { SupplierController } from "./../controllers/SupplierController";
 import {
   cancelBookingSchema,
   confirmBookingSchema,
@@ -186,13 +186,13 @@ router.get("/bookings", async (ctx, _) => {
 });
 
 router.get("/suppliers", async (ctx, _) => {
-  const suppliers = await supplierController.getSuppliers()
+  const suppliers = await supplierController.getSuppliers();
   ctx.body = suppliers;
   ctx.toJSON();
 });
 
 router.get("/suppliers/:id", async (ctx, _) => {
-  const supplier = await supplierController.getSupplier(ctx.params.id)
+  const supplier = await supplierController.getSupplier(ctx.params.id);
   ctx.body = supplier;
   ctx.toJSON();
 });
