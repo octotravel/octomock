@@ -1,3 +1,4 @@
+import { InvalidOptionIdError } from './../models/Error';
 import {
   addDays,
   addHours,
@@ -27,6 +28,9 @@ export class AvailabilityBuilder {
     const { product, date, optionId, status } = data;
 
     const option = product.getOption(optionId);
+    if (option === null) {
+      throw new InvalidOptionIdError(optionId)
+    }
     const availabilities = option.availabilityLocalStartTimes.map(
       (startTime) => {
         const datetime = new Date(`${date}T${startTime}`);
@@ -55,8 +59,8 @@ export class AvailabilityBuilder {
           openingHours: product.availabilityConfig.openingHours,
           availabilityPricing: new AvailabilityPricingModel({
             unitPricing: product.availabilityConfig.getUnitPricing(optionId),
-            pricing: product.availabilityConfig.getPricing(optionId)
-          })
+            pricing: product.availabilityConfig.getPricing(optionId),
+          }),
         });
 
         return availability;

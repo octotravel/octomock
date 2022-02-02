@@ -1,3 +1,4 @@
+import { InvalidOptionIdError, InvalidUnitIdError } from './../models/Error';
 import { DeliveryFormat } from "./../types/Product";
 import { addMinutes } from "date-fns";
 import { DataGenerator } from "./../generators/DataGenerator";
@@ -34,6 +35,9 @@ export class BookingBuilder {
   ): BookingModel {
     const status = BookingStatus.ON_HOLD;
     const option = data.product.getOption(schema.optionId);
+    if (option === null) {
+      throw new InvalidOptionIdError(schema.optionId)
+    }
 
     let utcExpiresAt = DateHelper.bookingUTCFormat(addMinutes(new Date(), 30));
     if (schema.expirationMinutes) {
@@ -277,7 +281,7 @@ export class BookingBuilder {
   ): UnitItem => {
     const unitModel = option.findUnitModel(item.unitId);
     if (unitModel === null) {
-      throw new Error("invalid unit id");
+      throw new InvalidUnitIdError(item.unitId)
     }
     const unitItem: UnitItem = {
       uuid: item.uuid ?? DataGenerator.generateUUID(),

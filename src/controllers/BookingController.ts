@@ -1,3 +1,4 @@
+import { UnprocessableEntityError } from './../models/Error';
 import {
   CancelBookingSchema,
   ConfirmBookingSchema,
@@ -109,7 +110,7 @@ export class BookingController implements IBookingController {
   ): Promise<Booking> => {
     const booking = await this.bookingService.getBooking(schema);
     if (booking.cancellable === false) {
-      throw new Error("booking cannot be updated");
+      throw new UnprocessableEntityError("booking cannot be updated");
     }
     const confirmedBooking = this.bookingBuilder.updateBooking(booking, schema);
     const bookingModel = await this.bookingService.updateBooking(
@@ -124,7 +125,7 @@ export class BookingController implements IBookingController {
   ): Promise<Booking> => {
     const booking = await this.bookingService.getBooking(schema);
     if (booking.status !== BookingStatus.ON_HOLD) {
-      throw new Error("booking cannot be extended");
+      throw new UnprocessableEntityError("booking cannot be extended");
     }
     const extendedBooking = this.bookingBuilder.extendBooking(booking, schema);
     const bookingModel = await this.bookingService.updateBooking(
@@ -139,7 +140,7 @@ export class BookingController implements IBookingController {
   ): Promise<Booking> => {
     const booking = await this.bookingService.getBooking(schema);
     if (booking.cancellable === false) {
-      throw new Error("booking not cancellable");
+      throw new UnprocessableEntityError("booking not cancellable");
     }
     if (booking.status === BookingStatus.CANCELLED) {
       return booking.toPOJO({ useCapabilities: true, capabilities });

@@ -1,3 +1,4 @@
+import { InvalidAvailabilityIdError, BadRequestError } from './../models/Error';
 import { ProductModel } from "./../models/Product";
 import { ProductService } from "./ProductService";
 import { CapabilityId } from "../types/Capability";
@@ -72,10 +73,10 @@ export class AvailabilityService implements IAvailabilityService {
         (availability) => availability.id === data.availabilityId
       ) ?? null;
     if (availability === null) {
-      throw new Error("availability not found");
+      throw new InvalidAvailabilityIdError(data.availabilityId)
     }
     if (!availability.available) {
-      throw new Error("not available");
+      throw new BadRequestError("not available");
     }
     return availability;
   };

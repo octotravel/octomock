@@ -48,7 +48,7 @@ router.get("/products/:productId", (ctx, _) => {
 router.post("/availability", async (ctx, _) => {
   const capabilities = getCapabilities(ctx);
 
-  const data: AvailabilitySchema = ctx.request.body
+  const data: AvailabilitySchema = ctx.request.body;
 
   await availabilitySchema.validate(data);
   const schema = availabilitySchema.cast(data) as AvailabilitySchema;
@@ -71,7 +71,7 @@ router.post("/availability", async (ctx, _) => {
 router.post("/bookings", async (ctx, _) => {
   const capabilities = getCapabilities(ctx);
 
-  const data: CreateBookingSchema = ctx.request.body
+  const data: CreateBookingSchema = ctx.request.body;
 
   await availabilitySchema.validate(data);
   const booking = await bookingController.createBooking(

@@ -1,3 +1,4 @@
+import { OctoError, InternalServerError } from './models/Error';
 import Koa from "koa";
 import koaBody from "koa-body";
 import { router } from "./router/AppRouter";
@@ -12,12 +13,14 @@ app.use(async (ctx, next) => {
   try {
     await next();
   } catch (err) {
-    ctx.status = err.statusCode || err.status || 500;
-    ctx.body = {
-      error: "BAD_REQUEST",
-      errorMessage: err.message,
-      stack: err.stack,
-    };
+    if (err instanceof OctoError) {
+      ctx.status = err.status;
+      ctx.body = err.body;
+    } else {
+      const error = new InternalServerError(err.message)
+      ctx.status = error.status;
+      ctx.body = error.body;
+    }
   }
 });
 app.use(parseCapabilities);

@@ -1,3 +1,4 @@
+import { InvalidBookingUUIDError } from './../models/Error';
 import { Booking } from "./../types/Booking";
 import { GetBookingSchema, GetBookingsSchema } from "./../schemas/Booking";
 import { BookingModel } from "./../models/Booking";
@@ -62,7 +63,7 @@ export class BookingService implements IBookingService {
         .getDB()
         .get(`SELECT * FROM booking WHERE id = ?`, data.uuid)) ?? null;
     if (result == null) {
-      throw new Error("booking not found");
+      throw new InvalidBookingUUIDError(data.uuid);
     }
     return BookingModel.fromPOJO(JSON.parse(result.data) as Booking);
   };

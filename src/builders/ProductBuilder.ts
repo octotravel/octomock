@@ -1,4 +1,4 @@
-import { ProductConfigModel } from './../models/ProductConfig';
+import { ProductConfigModel } from "./../models/ProductConfig";
 import { OptionModel } from "./../models/Option";
 import { OptionBuilder } from "./OptionBuilder";
 import { Currency } from "./../types/Currency";
@@ -17,7 +17,6 @@ const defaultPricingConfig: PricingConfig = {
   pricingPer: PricingPer.UNIT,
   currency: Currency.EUR,
 };
-
 
 export class ProductBuilder {
   private product: ProductModel;

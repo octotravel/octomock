@@ -1,3 +1,4 @@
+import { InvalidProductIdError } from './../models/Error';
 import { CapabilityId } from "./../types/Capability";
 import { ProductModel } from "./../models/Product";
 import { ProductGenerator } from "../generators/ProductGenerator";
@@ -11,7 +12,11 @@ export class ProductModelInMemoryStorage
   implements InMemoryStorage<ProductModel>
 {
   public get(id: string): Nullable<ProductModel> {
-    return this.generateProducts().find((p) => p.id === id) ?? null;
+    const model = this.generateProducts().find((p) => p.id === id) ?? null;
+    if (model === null) {
+      throw new InvalidProductIdError(id)
+    }
+    return model
   }
   public getAll(): ProductModel[] {
     return this.generateProducts();

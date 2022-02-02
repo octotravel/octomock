@@ -25,12 +25,13 @@ export class AvailabilityGenerator {
       end: addDays(new Date(date), config.days),
     });
 
-
     const dates = days
       .map((day) => {
-        const isClosed = config.daysClosed.includes(getDay(day)) || config.monthsClosed.includes(getMonth(day))
+        const isClosed =
+          config.daysClosed.includes(getDay(day)) ||
+          config.monthsClosed.includes(getMonth(day));
         if (isClosed) {
-          return null
+          return null;
         }
         const model = this.builder.build({
           product,
@@ -41,11 +42,10 @@ export class AvailabilityGenerator {
             : AvailabilityStatus.AVAILABLE,
           capabilities,
         });
-        return model
+        return model;
       })
       .flat(1);
 
-      return dates.filter(Boolean)
+    return dates.filter(Boolean);
   };
-
 }
