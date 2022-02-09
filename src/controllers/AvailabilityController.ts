@@ -1,3 +1,4 @@
+// import { AvailabilityValidator } from './../validators/backendValidator/AvailabilityValidator';
 import { AvailabilityService } from "./../services/AvailabilityService";
 import { CapabilityId } from "../types/Capability";
 import { Availability } from "../types/Availability";
@@ -20,6 +21,14 @@ export class AvailabilityController implements IAvailabilityController {
       schema,
       capabilities
     );
-    return models.map((m) => m.toPOJO({ useCapabilities: true, capabilities }));
+    const availability = models.map((m) =>
+      m.toPOJO({ useCapabilities: true, capabilities })
+    );
+
+    // const validator = new AvailabilityValidator('', capabilities)
+    // availability.forEach(a => {
+    //   validator.validate(a)
+    // })
+    return availability;
   };
 }

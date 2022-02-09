@@ -125,7 +125,7 @@ export class ProductGenerator {
                   pricingFrom: [pricingAdult],
                 }),
               ],
-              localStartTimes: ["12:00", "14:00"],
+              localStartTimes: ["12:30", "14:30"],
               durationAmount: "2",
               durationUnit: DurationUnit.HOURS,
             }),

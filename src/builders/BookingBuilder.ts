@@ -39,9 +39,9 @@ export class BookingBuilder {
       throw new InvalidOptionIdError(schema.optionId);
     }
 
-    let utcExpiresAt = DateHelper.bookingUTCFormat(addMinutes(new Date(), 30));
+    let utcExpiresAt = DateHelper.utcDateFormat(addMinutes(new Date(), 30));
     if (schema.expirationMinutes) {
-      utcExpiresAt = DateHelper.bookingUTCFormat(
+      utcExpiresAt = DateHelper.utcDateFormat(
         addMinutes(new Date(), schema.expirationMinutes)
       );
     }
@@ -61,8 +61,8 @@ export class BookingBuilder {
       unitItems: schema.unitItems.map((item) =>
         this.buildUnitItem(item, status, option)
       ),
-      utcCreatedAt: DateHelper.bookingUTCFormat(new Date()),
-      utcUpdatedAt: DateHelper.bookingUTCFormat(new Date()),
+      utcCreatedAt: DateHelper.utcDateFormat(new Date()),
+      utcUpdatedAt: DateHelper.utcDateFormat(new Date()),
       utcExpiresAt: utcExpiresAt,
       utcRedeemedAt: null,
       utcConfirmedAt: null,
@@ -91,10 +91,10 @@ export class BookingBuilder {
       contact: this.updateContact({ booking, contact: schema.contact }),
       unitItems: this.generateTickets(booking),
       utcCreatedAt: booking.utcCreatedAt,
-      utcUpdatedAt: DateHelper.bookingUTCFormat(new Date()),
+      utcUpdatedAt: DateHelper.utcDateFormat(new Date()),
       utcExpiresAt: null,
       utcRedeemedAt: null,
-      utcConfirmedAt: DateHelper.bookingUTCFormat(new Date()),
+      utcConfirmedAt: DateHelper.utcDateFormat(new Date()),
       notes: schema.notes ?? booking.notes,
       voucher: this.generateVoucher(booking),
       freesale: schema.freesale,
@@ -111,7 +111,7 @@ export class BookingBuilder {
 
     let utcExpiresAt = booking.utcExpiresAt;
     if (schema.expirationMinutes) {
-      utcExpiresAt = DateHelper.bookingUTCFormat(
+      utcExpiresAt = DateHelper.utcDateFormat(
         addMinutes(new Date(), schema.expirationMinutes)
       );
     }
@@ -127,10 +127,10 @@ export class BookingBuilder {
       contact: this.updateContact({ booking, contact: schema.contact }),
       unitItems: booking.unitItems,
       utcCreatedAt: booking.utcCreatedAt,
-      utcUpdatedAt: DateHelper.bookingUTCFormat(new Date()),
+      utcUpdatedAt: DateHelper.utcDateFormat(new Date()),
       utcExpiresAt: utcExpiresAt,
       utcRedeemedAt: null,
-      utcConfirmedAt: DateHelper.bookingUTCFormat(new Date()),
+      utcConfirmedAt: DateHelper.utcDateFormat(new Date()),
       notes: schema.notes ?? booking.notes,
       voucher: booking.voucher,
       freesale: schema.freesale,
@@ -157,8 +157,8 @@ export class BookingBuilder {
       contact: booking.contact,
       unitItems: booking.unitItems,
       utcCreatedAt: booking.utcCreatedAt,
-      utcUpdatedAt: DateHelper.bookingUTCFormat(new Date()),
-      utcExpiresAt: DateHelper.bookingUTCFormat(
+      utcUpdatedAt: DateHelper.utcDateFormat(new Date()),
+      utcExpiresAt: DateHelper.utcDateFormat(
         addMinutes(new Date(), schema.expirationMinutes ?? 30)
       ),
       utcRedeemedAt: null,
@@ -179,7 +179,7 @@ export class BookingBuilder {
     const cancellation = {
       refund: "FULL",
       reason: schema.reason ?? null,
-      utcCancelledAt: DateHelper.bookingUTCFormat(new Date()),
+      utcCancelledAt: DateHelper.utcDateFormat(new Date()),
     };
 
     const bookingModel = new BookingModel({
@@ -194,8 +194,8 @@ export class BookingBuilder {
       contact: booking.contact,
       unitItems: [],
       utcCreatedAt: booking.utcCreatedAt,
-      utcUpdatedAt: DateHelper.bookingUTCFormat(new Date()),
-      utcExpiresAt: DateHelper.bookingUTCFormat(addMinutes(new Date(), 30)),
+      utcUpdatedAt: DateHelper.utcDateFormat(new Date()),
+      utcExpiresAt: DateHelper.utcDateFormat(addMinutes(new Date(), 30)),
       utcRedeemedAt: null,
       utcConfirmedAt: null,
       notes: booking.notes,

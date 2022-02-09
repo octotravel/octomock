@@ -12,7 +12,7 @@ export abstract class DateHelper {
   public static availabilityDateFormat = (date: Date): string => {
     return format(date, "yyyy-MM-dd");
   };
-  public static bookingUTCFormat = (date: Date): string => {
+  public static utcDateFormat = (date: Date): string => {
     return format(date, "yyyy-MM-dd'T'HH:mm:ssX", {
       timeZone: "UTC",
     });

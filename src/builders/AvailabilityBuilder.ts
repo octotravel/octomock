@@ -55,7 +55,7 @@ export class AvailabilityBuilder {
           vacancies: product.availabilityConfig.capacity,
           capacity: product.availabilityConfig.capacity,
           maxUnits: option.restrictions.maxUnits,
-          utcCutoffAt: datetime.toISOString(),
+          utcCutoffAt: DateHelper.utcDateFormat(datetime),
           openingHours: product.availabilityConfig.openingHours,
           availabilityPricing: new AvailabilityPricingModel({
             unitPricing: product.availabilityConfig.getUnitPricing(optionId),

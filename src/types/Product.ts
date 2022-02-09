@@ -1,6 +1,6 @@
 import { AvailabilityType } from "./Availability";
 import { PickupPoint } from "./PickupPoint";
-import { Pricing, PricingPer } from "./Pricing";
+import { PricingPer } from "./Pricing";
 import { Option } from "./Option";
 
 export enum DeliveryFormat {
@@ -96,7 +96,6 @@ interface ProductPricing {
   defaultCurrency?: string;
   availableCurrencies?: Array<string>;
   pricingPer?: PricingPer;
-  pricing?: Pricing;
 }
 
 interface ProductPickup {
