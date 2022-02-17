@@ -1,3 +1,4 @@
+import { BookingValidator } from "./../validators/backendValidator/BookingValidator";
 import { UnprocessableEntityError } from "./../models/Error";
 import {
   CancelBookingSchema,
@@ -79,6 +80,8 @@ export class BookingController implements IBookingController {
       },
       schema
     );
+
+    new BookingValidator(capabilities).validate(bookingModel.toPOJO({}));
 
     const createdBookingModel = await this.bookingService.createBooking(
       bookingModel

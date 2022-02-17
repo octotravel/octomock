@@ -1,5 +1,5 @@
 import { InvalidOptionIdError, InvalidUnitIdError } from "./../models/Error";
-import { DeliveryFormat } from "./../types/Product";
+import { DeliveryFormat, DeliveryMethod } from "./../types/Product";
 import { addMinutes } from "date-fns";
 import { DataGenerator } from "./../generators/DataGenerator";
 import {
@@ -46,8 +46,17 @@ export class BookingBuilder {
       );
     }
 
-    // TODO: allow update unit items
-    // TODO: calculate booking pricing
+    const voucherAvailabile = data.product.deliveryMethods.includes(
+      DeliveryMethod.VOUCHER
+    );
+    const voucher = voucherAvailabile
+      ? {
+          redemptionMethod: data.product.redemptionMethod,
+          utcRedeemedAt: null,
+          deliveryOptions: [],
+        }
+      : null;
+
     const bookingModel = new BookingModel({
       id: DataGenerator.generateUUID(),
       uuid: schema.uuid ?? DataGenerator.generateUUID(),
@@ -59,11 +68,12 @@ export class BookingBuilder {
       availability: data.availability,
       contact: this.updateContact({ booking: null, contact: schema.contact }),
       unitItems: schema.unitItems.map((item) =>
-        this.buildUnitItem(item, status, option)
+        this.buildUnitItem(item, status, option, data.product.deliveryMethods)
       ),
       utcCreatedAt: DateHelper.utcDateFormat(new Date()),
       utcUpdatedAt: DateHelper.utcDateFormat(new Date()),
       utcExpiresAt: utcExpiresAt,
+      voucher,
       utcRedeemedAt: null,
       utcConfirmedAt: null,
       notes: schema.notes ?? null,
@@ -115,6 +125,17 @@ export class BookingBuilder {
         addMinutes(new Date(), schema.expirationMinutes)
       );
     }
+
+    const unitItems = schema.unitItems
+      ? schema.unitItems.map((item) =>
+          this.buildUnitItem(
+            item,
+            status,
+            booking.option,
+            booking.deliveryMethods
+          )
+        )
+      : booking.unitItems;
     const bookingModel = new BookingModel({
       id: booking.id,
       uuid: booking.uuid,
@@ -125,7 +146,7 @@ export class BookingBuilder {
       option: booking.option.setOnBooking(),
       availability: booking.availability,
       contact: this.updateContact({ booking, contact: schema.contact }),
-      unitItems: booking.unitItems,
+      unitItems,
       utcCreatedAt: booking.utcCreatedAt,
       utcUpdatedAt: DateHelper.utcDateFormat(new Date()),
       utcExpiresAt: utcExpiresAt,
@@ -199,6 +220,7 @@ export class BookingBuilder {
       utcRedeemedAt: null,
       utcConfirmedAt: null,
       notes: booking.notes,
+      voucher: null,
       cancellation,
       freesale: booking.freesale,
     });
@@ -207,50 +229,62 @@ export class BookingBuilder {
   }
 
   private generateTickets = (booking: BookingModel): UnitItem[] => {
+    if (booking.deliveryMethods.includes(DeliveryMethod.TICKET)) {
+      return booking.unitItems.map((item) => {
+        const deliveryOptions = [];
+        if (booking.product.deliveryFormats.includes(DeliveryFormat.PDF_URL)) {
+          deliveryOptions.push({
+            deliveryFormat: DeliveryFormat.PDF_URL,
+            deliveryValue: `https://api.octomock.com/octo/pdf?booking=${booking.uuid}&ticket=${item.uuid}`,
+          });
+        }
+        if (booking.product.deliveryFormats.includes(DeliveryFormat.QRCODE)) {
+          deliveryOptions.push({
+            deliveryFormat: DeliveryFormat.QRCODE,
+            deliveryValue: item.supplierReferecne,
+          });
+        }
+        const ticket = item.ticket;
+        return {
+          ...item,
+          ticket: {
+            ...ticket,
+            deliveryOptions,
+          },
+          pricing: item.unit.pricing,
+        };
+      });
+    }
     return booking.unitItems.map((item) => {
+      return {
+        ...item,
+        pricing: item.unit.pricing,
+      };
+    });
+  };
+
+  private generateVoucher = (booking: BookingModel): Nullable<Voucher> => {
+    if (booking.deliveryMethods.includes(DeliveryMethod.VOUCHER)) {
       const deliveryOptions = [];
       if (booking.product.deliveryFormats.includes(DeliveryFormat.PDF_URL)) {
         deliveryOptions.push({
           deliveryFormat: DeliveryFormat.PDF_URL,
-          deliveryValue: `https://api.octomock.com/octo/pdf?booking=${booking.uuid}&ticket=${item.uuid}`,
+          deliveryValue: `https://api.octomock.com/octo/pdf?booking=${booking.uuid}`,
         });
       }
       if (booking.product.deliveryFormats.includes(DeliveryFormat.QRCODE)) {
         deliveryOptions.push({
           deliveryFormat: DeliveryFormat.QRCODE,
-          deliveryValue: item.supplierReferecne,
+          deliveryValue: booking.supplierReference,
         });
       }
-      const ticket = item.ticket;
       return {
-        ...item,
-        ticket: {
-          ...ticket,
-          deliveryOptions,
-        },
+        redemptionMethod: booking.product.redemptionMethod,
+        utcRedeemedAt: null,
+        deliveryOptions: deliveryOptions,
       };
-    });
-  };
-
-  private generateVoucher = (booking: BookingModel): Voucher => {
-    const deliveryOptions = [];
-    if (booking.product.deliveryFormats.includes(DeliveryFormat.PDF_URL)) {
-      deliveryOptions.push({
-        deliveryFormat: DeliveryFormat.PDF_URL,
-        deliveryValue: `https://api.octomock.com/octo/pdf?booking=${booking.uuid}`,
-      });
     }
-    if (booking.product.deliveryFormats.includes(DeliveryFormat.QRCODE)) {
-      deliveryOptions.push({
-        deliveryFormat: DeliveryFormat.QRCODE,
-        deliveryValue: booking.supplierReference,
-      });
-    }
-    return {
-      redemptionMethod: booking.product.redemptionMethod,
-      utcRedeemedAt: null,
-      deliveryOptions: deliveryOptions,
-    };
+    return null;
   };
 
   private updateContact = ({
@@ -268,7 +302,7 @@ export class BookingBuilder {
         contact?.emailAddress ?? booking?.contact?.emailAddress ?? null,
       phoneNumber:
         contact?.phoneNumber ?? booking?.contact?.phoneNumber ?? null,
-      locales: contact?.locales ?? booking?.contact?.locales ?? null,
+      locales: contact?.locales ?? booking?.contact?.locales ?? [],
       country: contact?.country ?? booking?.contact?.country ?? null,
       notes: contact?.notes ?? booking?.contact?.notes ?? null,
     };
@@ -277,18 +311,29 @@ export class BookingBuilder {
   private buildUnitItem = (
     item: OctoUnitItem,
     status: BookingStatus,
-    option: OptionModel
+    option: OptionModel,
+    deliveryMethods: DeliveryMethod[]
   ): UnitItem => {
     const unitModel = option.findUnitModel(item.unitId);
     if (unitModel === null) {
       throw new InvalidUnitIdError(item.unitId);
     }
+    const ticketAvailable = deliveryMethods.includes(DeliveryMethod.TICKET);
+    const unit = unitModel.setOnBooking().toPOJO({});
+
+    const ticket = ticketAvailable
+      ? {
+          redemptionMethod: RedemptionMethod.DIGITAL,
+          utcRedeemedAt: null,
+          deliveryOptions: [],
+        }
+      : null;
     const unitItem: UnitItem = {
       uuid: item.uuid ?? DataGenerator.generateUUID(),
       supplierReferecne: DataGenerator.generateSupplierReference(),
       resellerReference: item.resellerReference ?? null,
       unitId: item.unitId,
-      unit: unitModel.setOnBooking().toPOJO({}),
+      unit,
       status,
       utcRedeemedAt: null,
       contact: {
@@ -301,11 +346,8 @@ export class BookingBuilder {
         country: null,
         notes: null,
       },
-      ticket: {
-        redemptionMethod: RedemptionMethod.DIGITAL,
-        utcRedeemedAt: null,
-        deliveryOptions: [],
-      },
+      ticket,
+      pricing: unit.pricing,
     };
 
     return unitItem;

@@ -3,6 +3,7 @@ import { Booking } from "./../types/Booking";
 import { GetBookingSchema, GetBookingsSchema } from "./../schemas/Booking";
 import { BookingModel } from "./../models/Booking";
 import { DB } from "../storage/Database";
+import { DateHelper } from "../helpers/DateHelper";
 
 interface IBookingService {
   createBooking(bookingModel: BookingModel): Promise<BookingModel>;
@@ -65,7 +66,18 @@ export class BookingService implements IBookingService {
     if (result == null) {
       throw new InvalidBookingUUIDError(data.uuid);
     }
-    return BookingModel.fromPOJO(JSON.parse(result.data) as Booking);
+    const booking = JSON.parse(result.data) as Booking;
+    const bookingModel = BookingModel.fromPOJO(booking);
+    this.handleExpiredBooking(bookingModel);
+    return bookingModel;
+  };
+
+  private handleExpiredBooking = (booking: BookingModel): void => {
+    const isExpired =
+      booking.utcExpiresAt < DateHelper.utcDateFormat(new Date());
+    if (isExpired) {
+      throw new InvalidBookingUUIDError(booking.uuid);
+    }
   };
 
   public getBookings = async (

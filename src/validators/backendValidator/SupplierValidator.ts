@@ -4,7 +4,7 @@ import { Supplier } from "../../types/Supplier";
 export class SupplierValidator {
   private path: string;
   constructor(path?: string) {
-    this.path ? `${path}supplier` : `supplier`;
+    this.path = this.path ? `${path}supplier` : `supplier`;
   }
 
   public validate = (supplier: Supplier): void => {

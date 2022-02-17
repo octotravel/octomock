@@ -14,8 +14,6 @@ import {
   Month,
 } from "../models/AvailabilityConfig";
 
-// TODO: Products to generate
-
 // pricing per booking | opening hours
 // pricing per booking | start times
 // pricing per unit | opening hours
@@ -30,6 +28,15 @@ const pricingAdult: Pricing = {
   currencyPrecision: 2,
 };
 
+const pricingChild: Pricing = {
+  original: 800,
+  retail: 800,
+  net: 800,
+  includedTaxes: [],
+  currency: Currency.EUR,
+  currencyPrecision: 2,
+};
+
 const pricingBooking: Pricing = {
   original: 4000,
   retail: 4000,
@@ -38,6 +45,8 @@ const pricingBooking: Pricing = {
   currency: Currency.EUR,
   currencyPrecision: 2,
 };
+
+// TODO: add support for multiple currency and taxes
 
 export class ProductGenerator {
   private builder = new ProductBuilder();
@@ -124,8 +133,12 @@ export class ProductGenerator {
                   id: UnitId.Adult,
                   pricingFrom: [pricingAdult],
                 }),
+                new UnitConfigModel({
+                  id: UnitId.Child,
+                  pricingFrom: [pricingChild],
+                }),
               ],
-              localStartTimes: ["12:30", "14:30"],
+              localStartTimes: ["12:00", "14:00"],
               durationAmount: "2",
               durationUnit: DurationUnit.HOURS,
             }),

@@ -2,6 +2,8 @@ import {
   StringArrayValidator,
   NumberValidator,
   NumberArrayValidator,
+  NullValidator,
+  ArrayValidator,
 } from "./../ValidatorHelpers";
 import {
   StringValidator,
@@ -21,6 +23,30 @@ describe("ValidatorHelpers", () => {
         ValidatorError
       );
       expect(StringValidator.validate("id", "123")).toBe(true);
+    });
+    it("should validate nullable string", () => {
+      expect(() =>
+        StringValidator.validate("id", 123, { nullable: true })
+      ).toThrow(ValidatorError);
+      expect(() =>
+        StringValidator.validate("id", {}, { nullable: true })
+      ).toThrow(ValidatorError);
+      expect(() =>
+        StringValidator.validate("id", undefined, { nullable: true })
+      ).toThrow(ValidatorError);
+      expect(StringValidator.validate("id", null, { nullable: true })).toBe(
+        true
+      );
+    });
+  });
+  describe("NullValidator", () => {
+    it("should validate null", () => {
+      expect(() => NullValidator.validate("id", 123)).toThrow(ValidatorError);
+      expect(() => NullValidator.validate("id", {})).toThrow(ValidatorError);
+      expect(() => NullValidator.validate("id", undefined)).toThrow(
+        ValidatorError
+      );
+      expect(NullValidator.validate("id", null)).toBe(true);
     });
     it("should validate nullable string", () => {
       expect(() =>
@@ -224,6 +250,37 @@ describe("ValidatorHelpers", () => {
           integer: true,
         })
       ).toBe(true);
+    });
+  });
+  describe("ArrayValidator", () => {
+    it("should validate array", () => {
+      expect(() => ArrayValidator.validate("strings", [], { min: 1 })).toThrow(
+        ValidatorError
+      );
+      expect(() =>
+        ArrayValidator.validate("strings", [1, 2, 3, 4], { max: 3 })
+      ).toThrow(ValidatorError);
+      expect(() =>
+        ArrayValidator.validate("strings", [null], { empty: true })
+      ).toThrow(ValidatorError);
+      expect(() =>
+        ArrayValidator.validate("strings", [undefined], { min: 2 })
+      ).toThrow(ValidatorError);
+      expect(() => ArrayValidator.validate("strings", {})).toThrow(
+        ValidatorError
+      );
+      expect(() => ArrayValidator.validate("strings", [{}])).toThrow(
+        ValidatorError
+      );
+      expect(
+        ArrayValidator.validate("strings", ["123", "456"], { max: 2 })
+      ).toBe(true);
+      expect(
+        ArrayValidator.validate("strings", ["12:00", "15:00"], { min: 1 })
+      ).toBe(true);
+      expect(ArrayValidator.validate("strings", [], { empty: true })).toBe(
+        true
+      );
     });
   });
 });

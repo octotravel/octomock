@@ -40,7 +40,7 @@ export class BookingModel implements Capable {
   public contact: Contact;
   public notes: Nullable<string>;
   public deliveryMethods: DeliveryMethod[];
-  public voucher: Voucher;
+  public voucher: Nullable<Voucher>;
   public unitItems: UnitItem[];
   public bookingContentModel?: BookingContentModel;
   public bookingPricingModel?: BookingPricingModel;
@@ -83,9 +83,9 @@ export class BookingModel implements Capable {
     contact: Contact;
     unitItems: UnitItem[];
     notes: Nullable<string>;
-    voucher?: Voucher;
+    voucher: Nullable<Voucher>;
     cancellation?: Cancellation;
-    freesale?: boolean;
+    freesale: boolean;
   }) {
     this.id = id;
     this.uuid = uuid;
@@ -103,34 +103,17 @@ export class BookingModel implements Capable {
     this.optionId = option.id;
     this.option = option;
     this.cancellable = true;
-    this.cancellation = null;
+    this.cancellation = cancellation ?? null;
     this.freesale = freesale ?? false;
     this.availabilityId = availability.id;
     this.availability = availability;
     this.contact = contact;
     this.notes = notes;
     this.deliveryMethods = product.deliveryMethods;
-    if (voucher) {
-      this.voucher = voucher;
-    } else {
-      this.voucher = {
-        redemptionMethod: product.redemptionMethod,
-        utcRedeemedAt: null,
-        deliveryOptions: [],
-      };
-    }
-    this.cancellation = cancellation ?? null;
+    this.voucher = voucher;
     this.unitItems = unitItems;
     this.bookingContentModel = new BookingContentModel();
-    const pricing = {
-      original: 0,
-      retail: 0,
-      net: 0,
-      currency: "USD",
-      currencyPrecision: 0,
-      includedTaxes: [],
-    };
-    this.bookingPricingModel = new BookingPricingModel(pricing);
+    this.bookingPricingModel = new BookingPricingModel(this.product, this.option, this.unitItems);
     this.bookingPickupModel = new BookingPickupModel();
   }
 
@@ -206,7 +189,7 @@ export class BookingModel implements Capable {
       useCapabilities === false ||
       (useCapabilities === true && capabilities.includes(CapabilityId.Pricing))
     ) {
-      pojo.pricing = this.bookingPricingModel.pricing;
+      pojo.pricing = this.bookingPricingModel.getPricing();
     }
 
     if (
@@ -234,11 +217,13 @@ export class BookingModel implements Capable {
       contact: booking.contact,
       unitItems: booking.unitItems,
       notes: booking.notes,
+      voucher: booking.voucher,
       utcCreatedAt: booking.utcCreatedAt,
       utcUpdatedAt: booking.utcUpdatedAt,
       utcExpiresAt: booking.utcExpiresAt,
       utcRedeemedAt: booking.utcRedeemedAt,
       utcConfirmedAt: booking.utcConfirmedAt,
+      freesale: booking.freesale,
     });
   };
 }

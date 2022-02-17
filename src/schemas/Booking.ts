@@ -62,7 +62,7 @@ export type UpdateBookingSchema = Capabilities & {
   redeemed?: boolean;
   notes?: string;
   emailReceipt?: boolean;
-  unitItems?: OctoUnitItem;
+  unitItems?: OctoUnitItem[];
   contact?: Contact;
 };
 

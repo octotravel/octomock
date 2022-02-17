@@ -102,7 +102,7 @@ router.post("/bookings/:uuid/confirm", async (ctx, _) => {
   ctx.toJSON();
 });
 
-router.post("/bookings/:uuid/update", async (ctx, _) => {
+router.patch("/bookings/:uuid/update", async (ctx, _) => {
   const capabilities = getCapabilities(ctx);
   ctx.body = {
     ...ctx.request.body,

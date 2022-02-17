@@ -29,6 +29,7 @@ export class ProductBuilder {
       optionsConfig,
       pricingConfig = defaultPricingConfig,
       availabilityConfig,
+      deliveryMethods,
     } = config;
 
     this.product = new ProductModel({
@@ -39,6 +40,7 @@ export class ProductBuilder {
       pricingPer: pricingConfig.pricingPer,
       currency: pricingConfig.currency,
       availabilityConfig,
+      deliveryMethods,
     });
 
     return this.product;

@@ -2,6 +2,8 @@ import { PricingUnit, Pricing } from "./../types/Pricing";
 import { PricingConfig } from "./../builders/ProductBuilder";
 import { AvailabilityConfigModel } from "./AvailabilityConfig";
 import { OptionConfigModel } from "./OptionConfig";
+import { DeliveryMethod } from "../types/Product";
+import { isEmpty } from "ramda";
 
 export class ProductConfigModel {
   public id: string;
@@ -9,6 +11,7 @@ export class ProductConfigModel {
   public availabilityConfig: AvailabilityConfigModel;
   public optionsConfig: OptionConfigModel[];
   public pricingConfig: PricingConfig;
+  public deliveryMethods: DeliveryMethod[];
 
   constructor({
     id,
@@ -16,12 +19,14 @@ export class ProductConfigModel {
     availabilityConfig,
     optionsConfig,
     pricingConfig,
+    deliveryMethods,
   }: {
     id: string;
     name: string;
     availabilityConfig: AvailabilityConfigModel;
     optionsConfig: OptionConfigModel[];
     pricingConfig: PricingConfig;
+    deliveryMethods?: DeliveryMethod[];
   }) {
     this.id = id;
     this.name = name;
@@ -31,6 +36,14 @@ export class ProductConfigModel {
     );
     this.optionsConfig = optionsConfig;
     this.pricingConfig = pricingConfig;
+    this.deliveryMethods = deliveryMethods ?? [
+      DeliveryMethod.TICKET,
+      DeliveryMethod.VOUCHER,
+    ];
+
+    if (isEmpty(this.deliveryMethods)) {
+      throw new Error("product has to contain at least 1 DeliveryMethod");
+    }
   }
 
   private getOptionConfig = (optionId: string): OptionConfigModel => {

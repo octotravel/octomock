@@ -1,9 +1,6 @@
+import { CommonValidator } from "./CommonValidator";
 import { PricingUnit } from "./../../types/Pricing";
-import {
-  Availability,
-  AvailabilityStatus,
-  OpeningHours,
-} from "./../../types/Availability";
+import { Availability, AvailabilityStatus } from "./../../types/Availability";
 import { CapabilityId } from "../../types/Capability";
 
 import {
@@ -43,7 +40,6 @@ export class AvailabilityValidator {
       `${this.path}.localDateTimeEnd`,
       availability.localDateTimeEnd
     );
-    console.log("availability.localDateTimeEnd", availability.localDateTimeEnd);
     this.validateLocalDateTime(
       `${this.path}.localDateTimeEnd`,
       availability.localDateTimeEnd
@@ -72,25 +68,9 @@ export class AvailabilityValidator {
     );
     this.validateUTCDate(`${this.path}.utcCutoffAt`, availability.utcCutoffAt);
 
-    this.validateOpeningHours(availability.openingHours);
+    CommonValidator.validateOpeningHours(this.path, availability.openingHours);
 
     this.validatePricingCapability(availability);
-  };
-
-  private validateOpeningHours = (openingHours: OpeningHours[]): void => {
-    const regExp = new RegExp(/^\d{2}:\d{2}$/g);
-    openingHours.forEach((openingHour, i) => {
-      RegExpValidator.validate(
-        `${this.path}.openingHours[${i}].from`,
-        openingHour.from,
-        regExp
-      );
-      RegExpValidator.validate(
-        `${this.path}.openingHours[${i}].to`,
-        openingHour.to,
-        regExp
-      );
-    });
   };
 
   private validatePricingCapability = (availability: Availability): void => {

@@ -17,84 +17,72 @@ export class OptionValidator {
   private path: string;
   private capabilites: CapabilityId[];
   constructor(path: string, capabilites: CapabilityId[]) {
-    this.path = `${path}.options`;
+    this.path = path;
     this.capabilites = capabilites;
   }
-  public validate = (option: Option, index: number): void => {
-    StringValidator.validate(`${this.path}[${index}].id`, option.id);
-    BooleanValidator.validate(`${this.path}[${index}].default`, option.default);
-    StringValidator.validate(
-      `${this.path}[${index}].internalName`,
-      option.internalName
-    );
-    StringValidator.validate(
-      `${this.path}[${index}].reference`,
-      option.reference,
-      {
-        nullable: true,
-      }
-    );
+  public validate = (option: Option): void => {
+    StringValidator.validate(`${this.path}.id`, option.id);
+    BooleanValidator.validate(`${this.path}.default`, option.default);
+    StringValidator.validate(`${this.path}.internalName`, option.internalName);
+    StringValidator.validate(`${this.path}.reference`, option.reference, {
+      nullable: true,
+    });
     RegExpArrayValidator.validate(
-      `${this.path}[${index}].availabilityLocalStartTimes`,
+      `${this.path}.availabilityLocalStartTimes`,
       option.availabilityLocalStartTimes,
       new RegExp(/^\d{2}:\d{2}$/g),
       { min: 1 }
     );
     StringValidator.validate(
-      `${this.path}[${index}].cancellationCutoff`,
+      `${this.path}.cancellationCutoff`,
       option.cancellationCutoff
     );
     NumberValidator.validate(
-      `${this.path}[${index}].cancellationCutoffAmount`,
+      `${this.path}.cancellationCutoffAmount`,
       option.cancellationCutoffAmount,
       { integer: true }
     );
     StringValidator.validate(
-      `${this.path}[${index}].cancellationCutoffUnit`,
+      `${this.path}.cancellationCutoffUnit`,
       option.cancellationCutoffUnit
     );
     EnumArrayValidator.validate(
-      `${this.path}[${index}].requiredContactFields`,
+      `${this.path}.requiredContactFields`,
       option.requiredContactFields,
       Object.values(ContactField)
     );
-    this.validateUnitRestrictions(option.restrictions, index);
-    this.validateUnits(option.units, index);
+    this.validateUnitRestrictions(option.restrictions);
+    this.validateUnits(option.units);
 
-    this.validatePricingCapability(option, index);
+    this.validatePricingCapability(option);
   };
 
-  private validateUnitRestrictions = (
-    restrictions: UnitRestrictions,
-    index: number
-  ) => {
+  private validateUnitRestrictions = (restrictions: UnitRestrictions) => {
     NumberValidator.validate(
-      `${this.path}[${index}].restrictions.minUnits`,
+      `${this.path}.restrictions.minUnits`,
       restrictions.minUnits,
       { integer: true }
     );
     NumberValidator.validate(
-      `${this.path}[${index}].restrictions.maxUnits`,
+      `${this.path}.restrictions.maxUnits`,
       restrictions.maxUnits,
       { nullable: true, integer: true }
     );
   };
 
-  private validateUnits = (units: Unit[], index: number) => {
-    const validator = new UnitValidator(
-      `${this.path}[${index}]`,
-      this.capabilites
-    );
+  private validateUnits = (units: Unit[]) => {
     units.forEach((unit, i) => {
-      validator.validate(unit, i);
+      const validator = new UnitValidator(
+        `${this.path}.units[${i}]`,
+        this.capabilites
+      );
+      validator.validate(unit);
     });
   };
 
-  private validatePricingCapability = (option: Option, index: number): void => {
+  private validatePricingCapability = (option: Option): void => {
     if (this.capabilites.includes(CapabilityId.Pricing)) {
-      const pricingValidator = new OptionPricingValidator(
-        `${this.path}[${index}]`
-      );
+      const pricingValidator = new OptionPricingValidator(`${this.path}`);
       pricingValidator.validate(option);
     }
   };

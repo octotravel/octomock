@@ -21,8 +21,8 @@ export interface Booking extends BookingPricing, BookingPickup, BookingContent {
   id: string;
   uuid: string;
   testMode: boolean;
-  resellerReference: string;
-  supplierReference: string;
+  resellerReference: Nullable<string>;
+  supplierReference: Nullable<string>;
   status: BookingStatus;
   utcCreatedAt: string;
   utcUpdatedAt: Nullable<string>;
@@ -41,13 +41,13 @@ export interface Booking extends BookingPricing, BookingPickup, BookingContent {
   contact: Contact;
   notes: Nullable<string>;
   deliveryMethods: DeliveryMethod[];
-  voucher: Voucher;
+  voucher: Nullable<Voucher>;
   unitItems: UnitItem[];
 }
 export interface Cancellation {
   refund: string;
   reason: Nullable<string>;
-  utcCancelledAt: Nullable<string>;
+  utcCancelledAt: string;
 }
 export interface BookingAvailability {
   id: string;
@@ -85,7 +85,7 @@ export interface DeliveryOption {
   deliveryValue: string;
 }
 
-export interface UnitItem {
+export interface UnitItem extends UnitItemPricing {
   uuid: string;
   resellerReference: Nullable<string>;
   supplierReferecne: Nullable<string>;
@@ -95,6 +95,10 @@ export interface UnitItem {
   utcRedeemedAt: Nullable<string>;
   contact: Contact;
   ticket: Ticket;
+}
+
+interface UnitItemPricing {
+  pricing?: Array<Pricing>;
 }
 
 interface BookingPricing {

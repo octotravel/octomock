@@ -43,6 +43,7 @@ export class ProductModel implements Capable {
     currency,
     availabilityConfig,
     options,
+    deliveryMethods,
   }: {
     id: string;
     internalName: string;
@@ -51,6 +52,7 @@ export class ProductModel implements Capable {
     pricingPer: PricingPer;
     currency: Currency;
     availabilityConfig: AvailabilityConfigModel;
+    deliveryMethods: DeliveryMethod[];
   }) {
     this.id = id;
     this.internalName = internalName;
@@ -63,7 +65,7 @@ export class ProductModel implements Capable {
     this.availabilityRequired = true;
     this.availabilityType = availabilityType;
     this.deliveryFormats = [DeliveryFormat.PDF_URL, DeliveryFormat.QRCODE];
-    this.deliveryMethods = [DeliveryMethod.VOUCHER, DeliveryMethod.TICKET];
+    this.deliveryMethods = deliveryMethods;
     this.redemptionMethod = RedemptionMethod.DIGITAL;
     this.options = options;
     this.availabilityConfig = availabilityConfig;
@@ -159,6 +161,7 @@ export class ProductModel implements Capable {
       pricingPer: product.pricingPer,
       currency: product.defaultCurrency as Currency,
       availabilityConfig: new AvailabilityConfigModel({}),
+      deliveryMethods: product.deliveryMethods,
     });
   };
 }

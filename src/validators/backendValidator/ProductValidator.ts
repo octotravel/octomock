@@ -80,9 +80,12 @@ export class ProductValidator {
   };
 
   private validateOptions = (options: Option[]): void => {
-    const optionValidator = new OptionValidator(this.path, this.capabilites);
     options.forEach((option, i) => {
-      optionValidator.validate(option, i);
+      const optionValidator = new OptionValidator(
+        `${this.path}.options[${i}]`,
+        this.capabilites
+      );
+      optionValidator.validate(option);
     });
   };
 
