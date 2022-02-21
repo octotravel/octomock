@@ -11,3 +11,11 @@ export enum CapabilityId {
   Mappings = "octo/mappings",
   Redemption = "octo/redemption",
 }
+
+export interface Capability {
+  id: CapabilityId;
+  revision: number;
+  required: boolean;
+  dependencies: CapabilityId[];
+  docs: Nullable<string>;
+}

@@ -36,11 +36,18 @@ export class AvailabilityService implements IAvailabilityService {
     const product = this.productService.getProduct(schema.productId);
     const optionId = schema.optionId;
 
+    const unitsCount = schema.units
+      ? schema.units.reduce((acc, unit) => {
+          return acc + unit.quantity;
+        }, 0)
+      : null;
+
     const availabilities = this.generator.generate({
       product,
       optionId,
       capabilities,
       date: DateHelper.availabilityDateFormat(new Date()),
+      unitsCount,
     });
 
     if (schema.localDate) {
@@ -67,6 +74,7 @@ export class AvailabilityService implements IAvailabilityService {
       optionId,
       capabilities,
       date: DateHelper.availabilityDateFormat(new Date(data.availabilityId)),
+      unitsCount: null,
     });
     const availability =
       availabilities.find(

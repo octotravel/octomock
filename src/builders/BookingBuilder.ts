@@ -228,15 +228,20 @@ export class BookingBuilder {
     return bookingModel;
   }
 
-  private generateTickets = (booking: BookingModel, schema: ConfirmBookingSchema): UnitItem[] => {
-    const unitItems = schema.unitItems ? schema.unitItems.map((item) =>
+  private generateTickets = (
+    booking: BookingModel,
+    schema: ConfirmBookingSchema
+  ): UnitItem[] => {
+    const unitItems = schema.unitItems
+      ? schema.unitItems.map((item) =>
           this.buildUnitItem(
             item,
             booking.status,
             booking.option,
             booking.deliveryMethods
           )
-        ) : booking.unitItems
+        )
+      : booking.unitItems;
     if (booking.deliveryMethods.includes(DeliveryMethod.TICKET)) {
       return unitItems.map((item) => {
         const deliveryOptions = [];

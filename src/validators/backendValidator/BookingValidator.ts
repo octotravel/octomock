@@ -16,7 +16,6 @@ import { UnitItemValidator } from "./UnitItemValidator";
 import { PricingValidator } from "./PricingValidator";
 import { CommonValidator } from "./CommonValidator";
 
-
 // TODO: add support for validating pricing
 // TODO: add support for validating delivery method related things
 

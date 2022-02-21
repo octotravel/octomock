@@ -21,11 +21,12 @@ interface AvailabilityBuilderData {
   date: string;
   capabilities: CapabilityId[];
   status: AvailabilityStatus;
+  unitsCount: Nullable<number>;
 }
 
 export class AvailabilityBuilder {
   build(data: AvailabilityBuilderData): AvailabilityModel[] {
-    const { product, date, optionId, status } = data;
+    const { product, date, optionId, status, unitsCount } = data;
 
     const option = product.getOption(optionId);
     if (option === null) {
@@ -45,13 +46,18 @@ export class AvailabilityBuilder {
           product.timeZone
         );
 
+        const availabilityStatus =
+          product.availabilityConfig.capacity < unitsCount
+            ? AvailabilityStatus.SOLD_OUT
+            : status;
+
         const availability = new AvailabilityModel({
           id: localDateTimeStart,
           localDateTimeStart,
           localDateTimeEnd,
           allDay: option.availabilityLocalStartTimes.length === 1,
-          available: status === AvailabilityStatus.AVAILABLE,
-          status: status,
+          available: availabilityStatus === AvailabilityStatus.AVAILABLE,
+          status,
           vacancies: product.availabilityConfig.capacity,
           capacity: product.availabilityConfig.capacity,
           maxUnits: option.restrictions.maxUnits,

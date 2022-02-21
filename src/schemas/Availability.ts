@@ -10,6 +10,12 @@ export type AvailabilitySchema = {
   pickupRequested?: Nullable<boolean>;
   pickupPointId?: Nullable<string>;
   currency?: string;
+  units?: AvailabilityUnit[];
+};
+
+export type AvailabilityUnit = {
+  id: string;
+  quantity: number;
 };
 
 export const availabilitySchema: yup.SchemaOf<AvailabilitySchema> = yup

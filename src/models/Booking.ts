@@ -113,7 +113,11 @@ export class BookingModel implements Capable {
     this.voucher = voucher;
     this.unitItems = unitItems;
     this.bookingContentModel = new BookingContentModel();
-    this.bookingPricingModel = new BookingPricingModel(this.product, this.option, this.unitItems);
+    this.bookingPricingModel = new BookingPricingModel(
+      this.product,
+      this.option,
+      this.unitItems
+    );
     this.bookingPickupModel = new BookingPickupModel();
   }
 

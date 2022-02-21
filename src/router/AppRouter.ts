@@ -196,3 +196,9 @@ router.get("/suppliers/:id", async (ctx, _) => {
   ctx.body = supplier;
   ctx.toJSON();
 });
+
+router.get("/capabilities", async (ctx, _) => {
+  const supplier = await supplierController.getSupplier(ctx.params.id);
+  ctx.body = supplier;
+  ctx.toJSON();
+});
