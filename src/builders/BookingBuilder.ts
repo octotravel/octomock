@@ -99,7 +99,7 @@ export class BookingBuilder {
       option: booking.option.setOnBooking(),
       availability: booking.availability,
       contact: this.updateContact({ booking, contact: schema.contact }),
-      unitItems: this.generateTickets(booking),
+      unitItems: this.generateTickets(booking, schema),
       utcCreatedAt: booking.utcCreatedAt,
       utcUpdatedAt: DateHelper.utcDateFormat(new Date()),
       utcExpiresAt: null,
@@ -228,9 +228,17 @@ export class BookingBuilder {
     return bookingModel;
   }
 
-  private generateTickets = (booking: BookingModel): UnitItem[] => {
+  private generateTickets = (booking: BookingModel, schema: ConfirmBookingSchema): UnitItem[] => {
+    const unitItems = schema.unitItems ? schema.unitItems.map((item) =>
+          this.buildUnitItem(
+            item,
+            booking.status,
+            booking.option,
+            booking.deliveryMethods
+          )
+        ) : booking.unitItems
     if (booking.deliveryMethods.includes(DeliveryMethod.TICKET)) {
-      return booking.unitItems.map((item) => {
+      return unitItems.map((item) => {
         const deliveryOptions = [];
         if (booking.product.deliveryFormats.includes(DeliveryFormat.PDF_URL)) {
           deliveryOptions.push({
@@ -255,7 +263,7 @@ export class BookingBuilder {
         };
       });
     }
-    return booking.unitItems.map((item) => {
+    return unitItems.map((item) => {
       return {
         ...item,
         pricing: item.unit.pricing,
