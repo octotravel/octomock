@@ -58,9 +58,18 @@ export class AvailabilityBuilder {
           allDay: option.availabilityLocalStartTimes.length === 1,
           available: availabilityStatus === AvailabilityStatus.AVAILABLE,
           status,
-          vacancies: product.availabilityConfig.capacity,
-          capacity: product.availabilityConfig.capacity,
-          maxUnits: option.restrictions.maxUnits,
+          vacancies:
+            availabilityStatus === AvailabilityStatus.SOLD_OUT
+              ? 0
+              : product.availabilityConfig.capacity,
+          capacity:
+            availabilityStatus === AvailabilityStatus.SOLD_OUT
+              ? 0
+              : product.availabilityConfig.capacity,
+          maxUnits:
+            availabilityStatus === AvailabilityStatus.SOLD_OUT
+              ? 0
+              : option.restrictions.maxUnits,
           utcCutoffAt: DateHelper.utcDateFormat(datetime),
           openingHours: product.availabilityConfig.openingHours,
           availabilityPricing: new AvailabilityPricingModel({

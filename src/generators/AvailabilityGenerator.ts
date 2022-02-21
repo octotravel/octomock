@@ -31,9 +31,9 @@ export class AvailabilityGenerator {
           config.daysClosed.includes(getDay(day)) ||
           config.monthsClosed.includes(getMonth(day));
 
-        if (isClosed) {
-          return null;
-        }
+        // if (isClosed) {
+        //   return null;
+        // }
 
         const model = this.builder.build({
           product,
