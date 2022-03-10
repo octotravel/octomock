@@ -1,3 +1,4 @@
+import { CapabilityController } from './../controllers/CapabilityController';
 import { SupplierController } from "./../controllers/SupplierController";
 import {
   cancelBookingSchema,
@@ -26,6 +27,7 @@ const productController = new ProductController();
 const availabilityController = new AvailabilityController();
 const bookingController = new BookingController();
 const supplierController = new SupplierController();
+const capabilityController = new CapabilityController();
 const availabilityValidator = new AvailabilityValidator();
 
 const getCapabilities = (ctx: any): CapabilityId[] => {
@@ -198,7 +200,7 @@ router.get("/suppliers/:id", async (ctx, _) => {
 });
 
 router.get("/capabilities", async (ctx, _) => {
-  const supplier = await supplierController.getSupplier(ctx.params.id);
+  const supplier = await capabilityController.getCapabilities();
   ctx.body = supplier;
   ctx.toJSON();
 });
