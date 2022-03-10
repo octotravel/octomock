@@ -44,7 +44,7 @@ export class AvailabilityGenerator {
             : AvailabilityStatus.AVAILABLE,
           unitsCount,
           capabilities,
-          capacity: config.capacity.get(getDay(day)),
+          capacity: config.freesale ? null : config.capacity.get(getDay(day)),
         });
         return model;
       })

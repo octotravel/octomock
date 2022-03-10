@@ -58,7 +58,7 @@ export class AvailabilityBuilder {
           localDateTimeStart,
           localDateTimeEnd,
           allDay: option.availabilityLocalStartTimes.length === 1,
-          available: availabilityStatus === AvailabilityStatus.AVAILABLE,
+          available: availabilityStatus !== AvailabilityStatus.SOLD_OUT,
           status: availabilityStatus,
           vacancies:
             availabilityStatus === AvailabilityStatus.SOLD_OUT ? 0 : capacity,

@@ -69,6 +69,7 @@ export class ProductGenerator {
           availabilityConfig: new AvailabilityConfigModel({
             availabilityType: AvailabilityType.OPENING_HOURS,
             openingHours: [{ from: "09:00", to: "17:00" }],
+            freesale: true,
             monthsClosed: [Month.Feb],
           }),
           optionsConfig: [
@@ -97,6 +98,7 @@ export class ProductGenerator {
           availabilityConfig: new AvailabilityConfigModel({
             availabilityType: AvailabilityType.OPENING_HOURS,
             openingHours: [{ from: "09:00", to: "17:00" }],
+            freesale: true,
             daysClosed: [Day.Sat, Day.Sun],
             capacityValue: 30,
           }),
