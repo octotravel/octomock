@@ -130,6 +130,11 @@ export class ProductGenerator {
           name: "PPU | ST",
           availabilityConfig: new AvailabilityConfigModel({
             availabilityType: AvailabilityType.START_TIME,
+            capacityValue: 10,
+            capacity: new Map([
+              [Day.Mon, 10],
+              [Day.Tue, 20],
+            ]),
           }),
           optionsConfig: [
             new OptionConfigModel({

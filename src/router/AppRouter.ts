@@ -1,3 +1,4 @@
+import { AvailabilityCalendarController } from './../controllers/AvailabilityCalendarController';
 import { CapabilityController } from "./../controllers/CapabilityController";
 import { SupplierController } from "./../controllers/SupplierController";
 import {
@@ -21,10 +22,12 @@ import {
   AvailabilitySchema,
 } from "../schemas/Availability";
 import { AvailabilityValidator } from "../validators/AvailabilityValidator";
+import { availabilityCalendarSchema, AvailabilityCalendarSchema } from "../schemas/AvailabilityCalendar";
 
 export const router = new Router();
 const productController = new ProductController();
 const availabilityController = new AvailabilityController();
+const availabilityCalendarController = new AvailabilityCalendarController();
 const bookingController = new BookingController();
 const supplierController = new SupplierController();
 const capabilityController = new CapabilityController();
@@ -66,6 +69,23 @@ router.post("/availability", async (ctx, _) => {
   });
 
   const body = await availabilityController.getAvailability(
+    schema,
+    capabilities
+  );
+
+  ctx.body = body;
+  ctx.toJSON();
+});
+
+router.post("/availability/calendar", async (ctx, _) => {
+  const capabilities = getCapabilities(ctx);
+
+  const data: AvailabilityCalendarSchema = ctx.request.body;
+
+  await availabilityCalendarSchema.validate(data);
+  const schema = availabilitySchema.cast(data) as AvailabilityCalendarSchema;
+
+  const body = await availabilityCalendarController.getAvailability(
     schema,
     capabilities
   );
