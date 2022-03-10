@@ -22,11 +22,12 @@ interface AvailabilityBuilderData {
   capabilities: CapabilityId[];
   status: AvailabilityStatus;
   unitsCount: Nullable<number>;
+  capacity: number;
 }
 
 export class AvailabilityBuilder {
   build(data: AvailabilityBuilderData): AvailabilityModel[] {
-    const { product, date, optionId, status, unitsCount } = data;
+    const { product, date, optionId, status, unitsCount, capacity } = data;
 
     const option = product.getOption(optionId);
     if (option === null) {
@@ -46,10 +47,11 @@ export class AvailabilityBuilder {
           product.timeZone
         );
 
-        const availabilityStatus =
-          product.availabilityConfig.capacity < unitsCount
-            ? AvailabilityStatus.SOLD_OUT
-            : status;
+        const availabilityStatus = this.getStatus({
+          status,
+          unitsCount,
+          capacity,
+        });
 
         const availability = new AvailabilityModel({
           id: localDateTimeStart,
@@ -57,15 +59,11 @@ export class AvailabilityBuilder {
           localDateTimeEnd,
           allDay: option.availabilityLocalStartTimes.length === 1,
           available: availabilityStatus === AvailabilityStatus.AVAILABLE,
-          status,
+          status: availabilityStatus,
           vacancies:
-            availabilityStatus === AvailabilityStatus.SOLD_OUT
-              ? 0
-              : product.availabilityConfig.capacity,
+            availabilityStatus === AvailabilityStatus.SOLD_OUT ? 0 : capacity,
           capacity:
-            availabilityStatus === AvailabilityStatus.SOLD_OUT
-              ? 0
-              : product.availabilityConfig.capacity,
+            availabilityStatus === AvailabilityStatus.SOLD_OUT ? 0 : capacity,
           maxUnits:
             availabilityStatus === AvailabilityStatus.SOLD_OUT
               ? 0
@@ -83,6 +81,26 @@ export class AvailabilityBuilder {
     );
     return availabilities;
   }
+
+  private getStatus = ({
+    capacity,
+    status,
+    unitsCount,
+  }: {
+    capacity: number;
+    status: AvailabilityStatus;
+    unitsCount: Nullable<number>;
+  }) => {
+    if (unitsCount) {
+      return capacity < unitsCount ? AvailabilityStatus.SOLD_OUT : status;
+    }
+
+    if (capacity === 0) {
+      return AvailabilityStatus.SOLD_OUT;
+    }
+
+    return status;
+  };
 
   private calculateTimeEnd = (
     date: Date,

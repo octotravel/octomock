@@ -30,13 +30,28 @@ export enum Month {
   Dec = 11,
 }
 
+type Capacity = Map<Day, Nullable<number>>;
+
+const fillCapacity = (value: Nullable<number>): Capacity => {
+  return new Map([
+    [Day.Mon, value],
+    [Day.Tue, value],
+    [Day.Wed, value],
+    [Day.Thu, value],
+    [Day.Fri, value],
+    [Day.Sat, value],
+    [Day.Sun, value],
+  ]);
+};
+
 export class AvailabilityConfigModel {
   public days: number;
   public daysClosed: Day[];
   public monthsClosed: Month[];
   public availabilityType: AvailabilityType;
   public openingHours: OpeningHours[];
-  public capacity: Nullable<number>;
+  public capacity: Capacity;
+  public freesale: boolean;
   private pricing: Map<string, Pricing>;
   private unitPricing: Map<string, PricingUnit[]>;
 
@@ -47,13 +62,17 @@ export class AvailabilityConfigModel {
     availabilityType,
     openingHours,
     capacity,
+    capacityValue,
+    freesale,
   }: {
     days?: number;
     daysClosed?: Day[];
     monthsClosed?: Month[];
     availabilityType?: AvailabilityType;
     openingHours?: OpeningHours[];
-    capacity?: Nullable<number>;
+    capacity?: Capacity;
+    capacityValue?: number;
+    freesale?: boolean;
   }) {
     if (
       availabilityType === AvailabilityType.OPENING_HOURS &&
@@ -63,12 +82,22 @@ export class AvailabilityConfigModel {
         "openingHours cannot be empty when AvailabilityType = OPENING_HOURS"
       );
     }
+
+    if (capacity) {
+      this.capacity = new Map([
+        ...Array.from(fillCapacity(capacityValue ?? 0).entries()),
+        ...Array.from(capacity.entries()),
+      ]);
+    } else {
+      this.capacity = fillCapacity(capacityValue ?? null);
+    }
+
     this.days = days ?? 365;
     this.daysClosed = daysClosed ?? [];
     this.monthsClosed = monthsClosed ?? [];
     this.availabilityType = availabilityType ?? AvailabilityType.START_TIME;
     this.openingHours = openingHours ?? [];
-    this.capacity = capacity ?? null;
+    this.freesale = freesale ?? false;
   }
 
   public setPricing = (

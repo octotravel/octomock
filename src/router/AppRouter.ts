@@ -1,4 +1,4 @@
-import { CapabilityController } from './../controllers/CapabilityController';
+import { CapabilityController } from "./../controllers/CapabilityController";
 import { SupplierController } from "./../controllers/SupplierController";
 import {
   cancelBookingSchema,

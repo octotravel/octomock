@@ -31,19 +31,20 @@ export class AvailabilityGenerator {
           config.daysClosed.includes(getDay(day)) ||
           config.monthsClosed.includes(getMonth(day));
 
-        // if (isClosed) {
-        //   return null;
-        // }
+        if (isClosed) {
+          return null;
+        }
 
         const model = this.builder.build({
           product,
           optionId,
           date: DateHelper.availabilityDateFormat(day),
-          status: isClosed
-            ? AvailabilityStatus.SOLD_OUT
+          status: config.freesale
+            ? AvailabilityStatus.FREESALE
             : AvailabilityStatus.AVAILABLE,
           unitsCount,
           capabilities,
+          capacity: config.capacity.get(getDay(day)),
         });
         return model;
       })
