@@ -1,4 +1,7 @@
-import { InvalidOptionIdError } from "./../models/Error";
+import * as R from "ramda";
+import { defaultPricing, Pricing } from "./../types/Pricing";
+import { AvailabilityUnit } from "./../schemas/Availability";
+import { InvalidOptionIdError, InvalidUnitIdError } from "./../models/Error";
 import {
   addDays,
   addHours,
@@ -14,6 +17,7 @@ import { OptionModel } from "../models/Option";
 import { DurationUnit } from "../types/Duration";
 import { DateHelper } from "../helpers/DateHelper";
 import { AvailabilityPricingModel } from "../models/AvailabilityPricing";
+import { PricingPer } from "../types/Pricing";
 
 interface AvailabilityBuilderData {
   product: ProductModel;
@@ -21,18 +25,24 @@ interface AvailabilityBuilderData {
   date: string;
   capabilities: CapabilityId[];
   status: AvailabilityStatus;
-  unitsCount: Nullable<number>;
+  units: AvailabilityUnit[];
   capacity: number;
 }
 
 export class AvailabilityBuilder {
   build(data: AvailabilityBuilderData): AvailabilityModel[] {
-    const { product, date, optionId, status, unitsCount, capacity } = data;
+    const { product, date, optionId, status, units, capacity } = data;
 
     const option = product.getOption(optionId);
     if (option === null) {
       throw new InvalidOptionIdError(optionId);
     }
+    const unitsCount = units
+      ? units.reduce((acc, unit) => {
+          return acc + unit.quantity;
+        }, 0)
+      : null;
+
     const availabilities = option.availabilityLocalStartTimes.map(
       (startTime) => {
         const datetime = new Date(`${date}T${startTime}`);
@@ -70,10 +80,7 @@ export class AvailabilityBuilder {
               : option.restrictions.maxUnits,
           utcCutoffAt: DateHelper.utcDateFormat(datetime),
           openingHours: product.availabilityConfig.openingHours,
-          availabilityPricing: new AvailabilityPricingModel({
-            unitPricing: product.availabilityConfig.getUnitPricing(optionId),
-            pricing: product.availabilityConfig.getPricing(optionId),
-          }),
+          availabilityPricing: this.getPricing(data),
         });
 
         return availability;
@@ -81,6 +88,51 @@ export class AvailabilityBuilder {
     );
     return availabilities;
   }
+
+  private getPricing = (
+    data: AvailabilityBuilderData
+  ): AvailabilityPricingModel => {
+    const pricingPer = data.product.productPricingModel.pricingPer;
+    if (data.units && pricingPer === PricingPer.UNIT) {
+      const unitPricing = data.product.availabilityConfig.getUnitPricing(
+        data.optionId
+      );
+      const pricing = data.units
+        .map(({ id, quantity }) => {
+          const uPricing = unitPricing.find((p) => p.unitId === id) ?? null;
+          if (uPricing === null) {
+            throw new InvalidUnitIdError(id);
+          }
+          const pricing: Pricing = R.omit(["unitId"], uPricing);
+          return new Array(quantity).fill(pricing);
+        })
+        .flat(1)
+        .reduce(
+          (acc, unitPricing) => ({
+            original: acc.original + unitPricing.original,
+            retail: acc.retail + unitPricing.retail,
+            net: acc.net + unitPricing.net,
+            currency: unitPricing.currency,
+            currencyPrecision: unitPricing.currencyPrecision,
+            includedTaxes: [...acc.includedTaxes, ...unitPricing.includedTaxes],
+          }),
+          defaultPricing
+        );
+      return new AvailabilityPricingModel({
+        unitPricing,
+        pricing,
+        pricingPer,
+        containsUnits: true,
+      });
+    }
+    return new AvailabilityPricingModel({
+      unitPricing: data.product.availabilityConfig.getUnitPricing(
+        data.optionId
+      ),
+      pricing: data.product.availabilityConfig.getPricing(data.optionId),
+      pricingPer,
+    });
+  };
 
   private getStatus = ({
     capacity,
@@ -91,6 +143,9 @@ export class AvailabilityBuilder {
     status: AvailabilityStatus;
     unitsCount: Nullable<number>;
   }) => {
+    if (capacity === null) {
+      return status;
+    }
     if (unitsCount) {
       return capacity < unitsCount ? AvailabilityStatus.SOLD_OUT : status;
     }

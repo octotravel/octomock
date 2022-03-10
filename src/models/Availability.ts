@@ -116,9 +116,10 @@ export class AvailabilityModel implements Capable {
       useCapabilities === false ||
       (useCapabilities === true && capabilities.includes(CapabilityId.Pricing))
     ) {
-      if (this.availabilityPricingModel.pricing) {
+      if (this.availabilityPricingModel.shouldUsePricing()) {
         pojo.pricing = this.availabilityPricingModel.pricing;
-      } else if (this.availabilityPricingModel.unitPricing) {
+      }
+      if (this.availabilityPricingModel.shouldUseUnitPricing()) {
         pojo.unitPricing = this.availabilityPricingModel.unitPricing;
       }
     }

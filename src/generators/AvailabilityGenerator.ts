@@ -1,3 +1,4 @@
+import { AvailabilityUnit } from "./../schemas/Availability";
 import { ProductModel } from "../models/Product";
 import { CapabilityId } from "../types/Capability";
 
@@ -11,7 +12,7 @@ interface GenerateAvailabiltyData {
   product: ProductModel;
   optionId: string;
   date: string;
-  unitsCount: Nullable<number>;
+  units?: AvailabilityUnit[];
   capabilities: CapabilityId[];
 }
 
@@ -19,7 +20,7 @@ export class AvailabilityGenerator {
   private builder = new AvailabilityBuilder();
 
   public generate = (data: GenerateAvailabiltyData): AvailabilityModel[] => {
-    const { product, optionId, date, capabilities, unitsCount } = data;
+    const { product, optionId, date, capabilities, units } = data;
     const config = product.availabilityConfig;
     const days = eachDayOfInterval({
       start: new Date(date),
@@ -42,7 +43,7 @@ export class AvailabilityGenerator {
           status: config.freesale
             ? AvailabilityStatus.FREESALE
             : AvailabilityStatus.AVAILABLE,
-          unitsCount,
+          units,
           capabilities,
           capacity: config.freesale ? null : config.capacity.get(getDay(day)),
         });

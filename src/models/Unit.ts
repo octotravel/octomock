@@ -1,3 +1,4 @@
+import * as R from "ramda";
 import { CapabilityId } from "./../types/Capability";
 import { CapableToPOJOType } from "./../interfaces/Capable";
 import { UnitContentModel } from "./UnitContent";
@@ -76,7 +77,9 @@ export class UnitModel implements Capable {
       (useCapabilities === true && capabilities.includes(CapabilityId.Pricing))
     ) {
       if (this.onBooking) {
-        pojo.pricing = this.pricingFrom;
+        if (R.not(R.isEmpty(this.pricingFrom))) {
+          pojo.pricing = this.pricingFrom;
+        }
       } else {
         pojo.pricingFrom = this.pricingFrom;
       }

@@ -50,7 +50,9 @@ interface AvailabilityContent {
 
 interface AvailabilityPricing {
   unitPricing?: PricingUnit[]; // pricingPer = UNIT
-  pricing?: Pricing; // pricingPer = BOOKING
+  // pricingPer = BOOKING
+  // or when units are provided to the availability request
+  pricing?: Pricing;
 }
 
 interface AvailabilityPickup {

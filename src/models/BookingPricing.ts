@@ -1,5 +1,5 @@
 import { UnitItem } from "./../types/Booking";
-import { PricingPer, Pricing } from "./../types/Pricing";
+import { PricingPer, Pricing, defaultPricing } from "./../types/Pricing";
 import { ProductModel } from "./Product";
 import { OptionModel } from "./Option";
 
@@ -33,14 +33,6 @@ export class BookingPricingModel {
   };
 
   private calculatePerUnitPricing = (): Pricing => {
-    const defaultPricing = {
-      original: 0,
-      retail: 0,
-      net: 0,
-      currency: "",
-      currencyPrecision: 0,
-      includedTaxes: [],
-    };
     return this.unitItems.reduce((acc: Pricing, item: UnitItem) => {
       const itemPricing = item.pricing[0];
       return {
