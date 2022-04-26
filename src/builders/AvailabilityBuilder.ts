@@ -1,5 +1,4 @@
 import * as R from "ramda";
-import { defaultPricing, Pricing } from "./../types/Pricing";
 import { AvailabilityUnit } from "./../schemas/Availability";
 import { InvalidOptionIdError, InvalidUnitIdError } from "./../models/Error";
 import {
@@ -9,15 +8,19 @@ import {
   addSeconds,
   startOfDay,
 } from "date-fns";
-import { CapabilityId } from "../types/Capability";
 import { AvailabilityModel } from "../models/Availability";
 import { ProductModel } from "../models/Product";
-import { AvailabilityStatus } from "../types/Availability";
 import { OptionModel } from "../models/Option";
-import { DurationUnit } from "../types/Duration";
 import { DateHelper } from "../helpers/DateHelper";
 import { AvailabilityPricingModel } from "../models/AvailabilityPricing";
-import { PricingPer } from "../types/Pricing";
+import {
+  defaultPricing,
+  Pricing,
+  CapabilityId,
+  AvailabilityStatus,
+  DurationUnit,
+  PricingPer,
+} from '@octocloud/types'
 
 interface AvailabilityBuilderData {
   product: ProductModel;
