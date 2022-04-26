@@ -1,5 +1,4 @@
-import { PricingPer } from "./../types/Pricing";
-import { Pricing, PricingUnit } from "../types/Pricing";
+import { PricingPer, Pricing, PricingUnit } from '@octocloud/types';
 
 export class AvailabilityPricingModel {
   public unitPricing?: PricingUnit[];

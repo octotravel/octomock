@@ -1,4 +1,4 @@
-import { UnitId } from "./../types/Unit";
+import { UnitId } from '@octocloud/types';
 import * as yup from "yup";
 
 export type OctoUnitItem = {

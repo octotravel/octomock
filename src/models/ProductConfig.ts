@@ -1,8 +1,7 @@
-import { PricingUnit, Pricing } from "./../types/Pricing";
+import { PricingUnit, Pricing, DeliveryMethod } from '@octocloud/types';
 import { PricingConfig } from "./../builders/ProductBuilder";
 import { AvailabilityConfigModel } from "./AvailabilityConfig";
 import { OptionConfigModel } from "./OptionConfig";
-import { DeliveryMethod } from "../types/Product";
 import { isEmpty } from "ramda";
 
 export class ProductConfigModel {

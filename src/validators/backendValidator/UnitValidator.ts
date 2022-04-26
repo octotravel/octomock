@@ -1,5 +1,4 @@
-import { CapabilityId } from "./../../types/Capability";
-import { Restrictions, Unit } from "./../../types/Unit";
+import { CapabilityId, Restrictions, Unit, ContactField, Pricing } from '@octocloud/types';
 import { PricingValidator } from "./PricingValidator";
 
 import {
@@ -9,8 +8,6 @@ import {
   NumberValidator,
   NumberArrayValidator,
 } from "./ValidatorHelpers";
-import { ContactField } from "../../types/Option";
-import { Pricing } from "../../types/Pricing";
 
 export class UnitValidator {
   private path: string;

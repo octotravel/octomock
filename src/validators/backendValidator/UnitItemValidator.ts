@@ -1,6 +1,4 @@
-import { RedemptionMethod, DeliveryFormat } from "./../../types/Product";
-import { BookingStatus } from "./../../types/Booking";
-import { CapabilityId } from "../../types/Capability";
+import { RedemptionMethod, DeliveryFormat, BookingStatus, CapabilityId, UnitItem } from '@octocloud/types';
 import { UnitValidator } from "./UnitValidator";
 
 import {
@@ -8,7 +6,6 @@ import {
   EnumValidator,
   NullValidator,
 } from "./ValidatorHelpers";
-import { UnitItem } from "../../types/Booking";
 import { ContactValidator } from "./ContactValidator";
 import { PricingValidator } from "./PricingValidator";
 

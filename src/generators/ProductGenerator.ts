@@ -1,13 +1,9 @@
 import { ProductConfigModel } from "./../models/ProductConfig";
-import { UnitId } from "./../types/Unit";
+import { UnitId, Pricing, PricingPer, AvailabilityType, Currency, DurationUnit } from '@octocloud/types';
 import { ProductModel } from "./../models/Product";
 import { ProductBuilder } from "./../builders/ProductBuilder";
-import { Pricing, PricingPer } from "../types/Pricing";
-import { AvailabilityType } from "../types/Availability";
-import { Currency } from "../types/Currency";
 import { UnitConfigModel } from "../models/UnitConfig";
 import { OptionConfigModel } from "../models/OptionConfig";
-import { DurationUnit } from "../types/Duration";
 import {
   AvailabilityConfigModel,
   Day,

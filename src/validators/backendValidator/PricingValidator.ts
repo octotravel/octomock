@@ -1,5 +1,5 @@
+import { Pricing, Tax } from '@octocloud/types';
 import { NumberValidator, StringValidator } from "./ValidatorHelpers";
-import { Pricing, Tax } from "./../../types/Pricing";
 
 export class PricingValidator {
   private path: string;

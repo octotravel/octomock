@@ -1,7 +1,7 @@
+import { PricingPer } from '@octocloud/types';
 import { UnitBuilder } from "./UnitBuilder";
 import { UnitModel } from "./../models/Unit";
 import { OptionModel } from "./../models/Option";
-import { PricingPer } from "../types/Pricing";
 import { OptionConfigModel } from "../models/OptionConfig";
 import { UnitConfigModel } from "../models/UnitConfig";
 

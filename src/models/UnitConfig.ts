@@ -1,5 +1,4 @@
-import { Pricing } from "../types/Pricing";
-import { UnitId } from "../types/Unit";
+import { Pricing, UnitId } from '@octocloud/types';
 
 export class UnitConfigModel {
   public id: UnitId;

@@ -1,3 +1,12 @@
+import {
+  defaultPricing,
+  Pricing,
+  CapabilityId,
+  AvailabilityStatus,
+  DurationUnit,
+  PricingPer,
+  PricingUnit
+} from '@octocloud/types';
 import * as R from "ramda";
 import { AvailabilityUnit } from "./../schemas/Availability";
 import { InvalidOptionIdError, InvalidUnitIdError } from "./../models/Error";
@@ -13,14 +22,6 @@ import { ProductModel } from "../models/Product";
 import { OptionModel } from "../models/Option";
 import { DateHelper } from "../helpers/DateHelper";
 import { AvailabilityPricingModel } from "../models/AvailabilityPricing";
-import {
-  defaultPricing,
-  Pricing,
-  CapabilityId,
-  AvailabilityStatus,
-  DurationUnit,
-  PricingPer,
-} from '@octocloud/types'
 
 interface AvailabilityBuilderData {
   product: ProductModel;
@@ -102,7 +103,7 @@ export class AvailabilityBuilder {
       );
       const pricing = data.units
         .map(({ id, quantity }) => {
-          const uPricing = unitPricing.find((p) => p.unitId === id) ?? null;
+          const uPricing: PricingUnit = unitPricing.find((p) => p.unitId === id) ?? null;
           if (uPricing === null) {
             throw new InvalidUnitIdError(id);
           }

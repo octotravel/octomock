@@ -1,9 +1,7 @@
 import * as R from "ramda";
-import { CapabilityId } from "./../types/Capability";
+import { CapabilityId, Unit, UnitId, Restrictions, Pricing } from '@octocloud/types';
 import { CapableToPOJOType } from "./../interfaces/Capable";
 import { UnitContentModel } from "./UnitContent";
-import { Unit, UnitId, Restrictions } from "../types/Unit";
-import { Pricing } from "../types/Pricing";
 import { Capable } from "../interfaces/Capable";
 
 export class UnitModel implements Capable {

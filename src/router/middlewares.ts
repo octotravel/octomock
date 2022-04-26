@@ -1,5 +1,5 @@
 import Koa from "koa";
-import { CapabilityId } from "./../types/Capability";
+import { CapabilityId } from '@octocloud/types';
 
 export async function parseCapabilities(
   ctx: Koa.Context,

@@ -1,5 +1,4 @@
-import { Currency } from "./../types/Currency";
-import { PricingPer } from "../types/Pricing";
+import { Currency, PricingPer } from '@octocloud/types';
 
 export class ProductPricingModel {
   public defaultCurrency?: string;

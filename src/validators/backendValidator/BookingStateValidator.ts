@@ -1,4 +1,4 @@
-import { Booking, BookingStatus } from "../../types/Booking";
+import { Booking, BookingStatus } from '@octocloud/types';
 import {
   ArrayValidator,
   NullValidator,

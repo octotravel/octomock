@@ -1,7 +1,6 @@
+import { CapabilityId, Product } from '@octocloud/types';
 import { ProductValidator } from "./../validators/backendValidator/ProductValidator";
-import { CapabilityId } from "./../types/Capability";
 import { ProductService } from "./../services/ProductService";
-import { Product } from "./../types/Product";
 
 interface IProductController {
   getProducts(capabilities: CapabilityId[]): Product[];

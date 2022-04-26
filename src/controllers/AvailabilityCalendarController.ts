@@ -1,5 +1,4 @@
-import { AvailabilityCalendar } from './../types/AvailabilityCalendar';
-import { CapabilityId } from "../types/Capability";
+import { AvailabilityCalendar, CapabilityId } from '@octocloud/types';
 import { AvailabilityCalendarSchema } from "../schemas/AvailabilityCalendar";
 import { AvailabilityCalendarService } from '../services/AvailabilityCalendarService';
 

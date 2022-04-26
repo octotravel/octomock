@@ -1,5 +1,4 @@
-import { DurationUnit } from "../types/Duration";
-import { Pricing } from "../types/Pricing";
+import { DurationUnit, Pricing } from '@octocloud/types';
 import { UnitConfigModel } from "./UnitConfig";
 
 export class OptionConfigModel {

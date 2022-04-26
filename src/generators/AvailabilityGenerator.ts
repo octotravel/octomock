@@ -1,11 +1,10 @@
+import { CapabilityId, AvailabilityStatus } from '@octocloud/types';
 import { AvailabilityUnit } from "./../schemas/Availability";
 import { ProductModel } from "../models/Product";
-import { CapabilityId } from "../types/Capability";
 
 import { AvailabilityModel } from "../models/Availability";
 import { AvailabilityBuilder } from "../builders/AvailabilityBuilder";
 import { addDays, eachDayOfInterval, getDay, getMonth } from "date-fns";
-import { AvailabilityStatus } from "../types/Availability";
 import { DateHelper } from "../helpers/DateHelper";
 
 interface GenerateAvailabiltyData {

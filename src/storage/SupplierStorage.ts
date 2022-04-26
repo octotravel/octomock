@@ -1,5 +1,5 @@
+import { Supplier } from '@octocloud/types';
 import { BadRequestError } from "./../models/Error";
-import { Supplier } from "./../types/Supplier";
 import { InMemoryStorage } from "./InMemoryStorage";
 
 export class SupplierStorage implements InMemoryStorage<Supplier> {

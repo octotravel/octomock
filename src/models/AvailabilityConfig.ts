@@ -1,9 +1,7 @@
+import { PricingUnit, PricingPer, Pricing, AvailabilityType, OpeningHours } from '@octocloud/types';
 import { PricingConfig } from "./../builders/ProductBuilder";
 import { OptionConfigModel } from "./OptionConfig";
-import { PricingUnit, PricingPer } from "./../types/Pricing";
 import * as R from "ramda";
-import { AvailabilityType, OpeningHours } from "../types/Availability";
-import { Pricing } from "../types/Pricing";
 
 export enum Day {
   Mon = 1,

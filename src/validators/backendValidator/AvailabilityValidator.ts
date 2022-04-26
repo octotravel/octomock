@@ -1,8 +1,12 @@
-import { CommonValidator } from "./CommonValidator";
-import { PricingUnit } from "./../../types/Pricing";
-import { Availability, AvailabilityStatus } from "./../../types/Availability";
-import { CapabilityId } from "../../types/Capability";
+import {
+  PricingUnit,
+  Availability,
+  AvailabilityStatus,
+  CapabilityId,
+  Pricing,
 
+} from '@octocloud/types';
+import { CommonValidator } from "./CommonValidator";
 import {
   StringValidator,
   BooleanValidator,
@@ -10,7 +14,6 @@ import {
   NumberValidator,
   RegExpValidator,
 } from "./ValidatorHelpers";
-import { Pricing } from "../../types/Pricing";
 import { PricingValidator } from "./PricingValidator";
 
 export class AvailabilityValidator {
