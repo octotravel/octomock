@@ -1,4 +1,4 @@
-import { PickupPoint } from "../types/PickupPoint";
+import { PickupPoint } from '@octocloud/types';
 
 export class AvailabilityPickupModel {
   public pickupRequired: boolean;

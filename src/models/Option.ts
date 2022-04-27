@@ -1,14 +1,16 @@
-import { CapabilityId } from "./../types/Capability";
+import {
+  CapabilityId,
+  Option,
+  ContactField,
+  UnitRestrictions,
+  Pricing,
+  DurationUnit,
+} from '@octocloud/types';
 import { Capable, CapableToPOJOType } from "./../interfaces/Capable";
 import { OptionPickupModel } from "./OptionPickup";
 import { OptionContentModel } from "./OptionContent";
-import { UnitId } from "./../types/Unit";
-import { Option } from "../types/Option";
 import { UnitModel } from "./Unit";
-import { ContactField, UnitRestrictions } from "../types/Option";
 import { OptionPricingModel } from "./OptionPricing";
-import { Pricing } from "../types/Pricing";
-import { DurationUnit } from "../types/Duration";
 
 export class OptionModel implements Capable {
   public id: string;
@@ -70,7 +72,7 @@ export class OptionModel implements Capable {
     this.optionPickupModel = new OptionPickupModel();
   }
 
-  public findUnitModel = (unitId: UnitId): Nullable<UnitModel> => {
+  public findUnitModel = (unitId: string): Nullable<UnitModel> => {
     return this.units.find((unit) => unit.id === unitId) ?? null;
   };
 

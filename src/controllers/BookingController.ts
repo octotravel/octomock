@@ -1,4 +1,5 @@
 // import { BookingValidator } from "./../validators/backendValidator/BookingValidator";
+import { CapabilityId, Booking, BookingStatus } from '@octocloud/types';
 import { UnprocessableEntityError } from "./../models/Error";
 import {
   CancelBookingSchema,
@@ -10,9 +11,7 @@ import {
 } from "./../schemas/Booking";
 import { AvailabilityService } from "./../services/AvailabilityService";
 import { ProductService } from "./../services/ProductService";
-import { CapabilityId } from "../types/Capability";
 import { CreateBookingSchema } from "../schemas/Booking";
-import { Booking, BookingStatus } from "../types/Booking";
 import { BookingService } from "../services/BookingService";
 import { BookingBuilder } from "../builders/BookingBuilder";
 

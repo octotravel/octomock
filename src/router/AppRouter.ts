@@ -1,3 +1,4 @@
+import { CapabilityId } from '@octocloud/types';
 import { AvailabilityCalendarController } from './../controllers/AvailabilityCalendarController';
 import { CapabilityController } from "./../controllers/CapabilityController";
 import { SupplierController } from "./../controllers/SupplierController";
@@ -11,7 +12,6 @@ import {
   getBookingsSchema,
   patchBookingSchema,
 } from "./../schemas/Booking";
-import { CapabilityId } from "./../types/Capability";
 import Router from "@koa/router";
 import { ProductController } from "../controllers/ProductController";
 import { BookingController } from "../controllers/BookingController";

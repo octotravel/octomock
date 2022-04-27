@@ -1,16 +1,14 @@
 import * as R from "ramda";
-import { CapabilityId } from "./../types/Capability";
+import { CapabilityId, Unit, Restrictions, Pricing, UnitType } from '@octocloud/types';
 import { CapableToPOJOType } from "./../interfaces/Capable";
 import { UnitContentModel } from "./UnitContent";
-import { Unit, UnitId, Restrictions } from "../types/Unit";
-import { Pricing } from "../types/Pricing";
 import { Capable } from "../interfaces/Capable";
 
 export class UnitModel implements Capable {
-  public id: UnitId;
+  public id: string;
   private internalName: string;
   private reference: string;
-  private type: string;
+  private type: UnitType;
   private requiredContactFields: string[];
   private restrictions: Restrictions;
   // content
@@ -21,17 +19,19 @@ export class UnitModel implements Capable {
 
   constructor({
     id,
+    type,
     restrictions,
     pricing,
   }: {
-    id: UnitId;
+    id: string;
+    type: UnitType
     restrictions: Restrictions;
     pricing: Pricing[];
   }) {
     this.id = id;
     this.internalName = id;
     this.reference = id.toLowerCase();
-    this.type = id.toUpperCase();
+    this.type = type;
     this.requiredContactFields = [];
     this.restrictions = restrictions;
     this.unitContentModel = new UnitContentModel(this.id);
@@ -91,6 +91,7 @@ export class UnitModel implements Capable {
   public static fromPOJO = (unit: Unit): UnitModel => {
     return new UnitModel({
       id: unit.id,
+      type: unit.type,
       restrictions: unit.restrictions,
       pricing: unit.pricing,
     });

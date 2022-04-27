@@ -1,4 +1,4 @@
-import { Contact } from "./../../types/Booking";
+import { Contact } from '@octocloud/types';
 import { StringArrayValidator, StringValidator } from "./ValidatorHelpers";
 
 export class ContactValidator {

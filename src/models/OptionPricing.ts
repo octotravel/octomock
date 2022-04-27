@@ -1,4 +1,4 @@
-import { Pricing } from "../types/Pricing";
+import { Pricing } from '@octocloud/types';
 
 export class OptionPricingModel {
   public pricingFrom?: Pricing[];

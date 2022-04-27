@@ -1,8 +1,7 @@
+import { CapabilityId, Booking, BookingStatus, DeliveryMethod } from '@octocloud/types';
 import { BookingStateValidator } from "./BookingStateValidator";
 import { OptionValidator } from "./OptionValidator";
-import { CapabilityId } from "./../../types/Capability";
 import { ProductValidator } from "./ProductValidator";
-import { Booking, BookingStatus } from "./../../types/Booking";
 import {
   BooleanValidator,
   EnumArrayValidator,
@@ -10,7 +9,6 @@ import {
   RegExpValidator,
   StringValidator,
 } from "./ValidatorHelpers";
-import { DeliveryMethod } from "../../types/Product";
 import { ContactValidator } from "./ContactValidator";
 import { UnitItemValidator } from "./UnitItemValidator";
 import { PricingValidator } from "./PricingValidator";

@@ -1,6 +1,4 @@
-import { RedemptionMethod, DeliveryFormat } from "./../../types/Product";
-import { BookingStatus } from "./../../types/Booking";
-import { CapabilityId } from "../../types/Capability";
+import { RedemptionMethod, DeliveryFormat, BookingStatus, CapabilityId, UnitItem } from '@octocloud/types';
 import { UnitValidator } from "./UnitValidator";
 
 import {
@@ -8,7 +6,6 @@ import {
   EnumValidator,
   NullValidator,
 } from "./ValidatorHelpers";
-import { UnitItem } from "../../types/Booking";
 import { ContactValidator } from "./ContactValidator";
 import { PricingValidator } from "./PricingValidator";
 
@@ -77,12 +74,10 @@ export class UnitItemValidator {
 
   private validatePricingCapability = (unitItem: UnitItem): void => {
     if (this.capabilites.includes(CapabilityId.Pricing)) {
-      unitItem.pricing.forEach((pricing, i) => {
-        const pricingValidator = new PricingValidator(
-          `${this.path}.pricing[${i}]`
-        );
-        pricingValidator.validate(pricing);
-      });
+      const pricingValidator = new PricingValidator(
+        `${this.path}.pricing`
+      );
+      pricingValidator.validate(unitItem.pricing);
     }
   };
 }

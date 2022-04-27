@@ -1,6 +1,6 @@
+import { PricingPer } from '@octocloud/types';
 import { UnitModel } from "./../models/Unit";
 import { UnitConfigModel } from "../models/UnitConfig";
-import { PricingPer } from "../types/Pricing";
 
 interface UnitBuilderData {
   unitConfig: UnitConfigModel;
@@ -24,6 +24,7 @@ export class UnitBuilder {
         : [];
     this.unit = new UnitModel({
       id: unitConfig.id,
+      type: unitConfig.type,
       restrictions: {
         minAge: 18,
         maxAge: 100,

@@ -1,10 +1,3 @@
-import { CapabilityId } from "./../types/Capability";
-import { Capable, CapableToPOJOType } from "./../interfaces/Capable";
-import { BookingPickupModel } from "./BookingPickup";
-import { BookingPricingModel } from "./BookingPricing";
-import { BookingContentModel } from "./BookingContent";
-import { OptionModel } from "./Option";
-import { ProductModel } from "./Product";
 import {
   Booking,
   UnitItem,
@@ -13,8 +6,15 @@ import {
   BookingAvailability,
   BookingStatus,
   Cancellation,
-} from "./../types/Booking";
-import { DeliveryMethod } from "../types/Product";
+  CapabilityId,
+  DeliveryMethod,
+} from '@octocloud/types';
+import { Capable, CapableToPOJOType } from "./../interfaces/Capable";
+import { BookingPickupModel } from "./BookingPickup";
+import { BookingPricingModel } from "./BookingPricing";
+import { BookingContentModel } from "./BookingContent";
+import { OptionModel } from "./Option";
+import { ProductModel } from "./Product";
 
 export class BookingModel implements Capable {
   public id: string;

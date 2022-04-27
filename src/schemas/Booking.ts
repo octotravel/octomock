@@ -1,9 +1,8 @@
-import { UnitId } from "./../types/Unit";
 import * as yup from "yup";
 
 export type OctoUnitItem = {
   uuid?: string;
-  unitId: UnitId;
+  unitId: string;
   resellerReference?: string;
 };
 
@@ -105,7 +104,7 @@ export const createBookingSchema: yup.SchemaOf<CreateBookingSchema> =
       .of(
         yup.object({
           uuid: yup.string().notRequired(),
-          unitId: yup.mixed().oneOf(Object.values(UnitId)).required(),
+          unitId: yup.string().required(),
           resellerReference: yup.string().notRequired(),
         })
       )

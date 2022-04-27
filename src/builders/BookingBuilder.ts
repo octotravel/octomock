@@ -1,5 +1,13 @@
+import {
+  DeliveryFormat,
+  DeliveryMethod,
+  BookingStatus,
+  BookingAvailability,
+  UnitItem,
+  Voucher,
+  RedemptionMethod
+} from '@octocloud/types';
 import { InvalidOptionIdError, InvalidUnitIdError } from "./../models/Error";
-import { DeliveryFormat, DeliveryMethod } from "./../types/Product";
 import { addMinutes } from "date-fns";
 import { DataGenerator } from "./../generators/DataGenerator";
 import {
@@ -11,17 +19,10 @@ import {
   ExtendBookingSchema,
   UpdateBookingSchema,
 } from "./../schemas/Booking";
-import {
-  BookingStatus,
-  BookingAvailability,
-  UnitItem,
-  Voucher,
-} from "./../types/Booking";
 import { OptionModel } from "./../models/Option";
 import { ProductModel } from "./../models/Product";
 import { BookingModel } from "./../models/Booking";
 import { DateHelper } from "../helpers/DateHelper";
-import { RedemptionMethod } from "../types/Product";
 
 interface BookingBuilderData {
   product: ProductModel;

@@ -1,5 +1,5 @@
+import { Supplier } from '@octocloud/types';
 import { StringValidator } from "./ValidatorHelpers";
-import { Supplier } from "../../types/Supplier";
 
 export class SupplierValidator {
   private path: string;

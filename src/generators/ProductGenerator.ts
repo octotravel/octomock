@@ -1,13 +1,9 @@
 import { ProductConfigModel } from "./../models/ProductConfig";
-import { UnitId } from "./../types/Unit";
+import { Pricing, UnitType, PricingPer, AvailabilityType, Currency, DurationUnit } from '@octocloud/types';
 import { ProductModel } from "./../models/Product";
 import { ProductBuilder } from "./../builders/ProductBuilder";
-import { Pricing, PricingPer } from "../types/Pricing";
-import { AvailabilityType } from "../types/Availability";
-import { Currency } from "../types/Currency";
 import { UnitConfigModel } from "../models/UnitConfig";
 import { OptionConfigModel } from "../models/OptionConfig";
-import { DurationUnit } from "../types/Duration";
 import {
   AvailabilityConfigModel,
   Day,
@@ -80,7 +76,8 @@ export class ProductGenerator {
             new OptionConfigModel({
               unitConfigModels: [
                 new UnitConfigModel({
-                  id: UnitId.Adult,
+                  id: 'adult',
+                  type: UnitType.ADULT,
                   pricingFrom: [pricingAdult],
                 }),
               ],
@@ -109,7 +106,8 @@ export class ProductGenerator {
             new OptionConfigModel({
               unitConfigModels: [
                 new UnitConfigModel({
-                  id: UnitId.Adult,
+                  id: 'adult',
+                  type: UnitType.ADULT,
                 }),
               ],
               pricing: [pricingBooking],
@@ -140,11 +138,13 @@ export class ProductGenerator {
             new OptionConfigModel({
               unitConfigModels: [
                 new UnitConfigModel({
-                  id: UnitId.Adult,
+                  id: 'adult',
+                  type: UnitType.ADULT,
                   pricingFrom: [pricingAdult],
                 }),
                 new UnitConfigModel({
-                  id: UnitId.Child,
+                  id: 'child',
+                  type: UnitType.CHILD,
                   pricingFrom: [pricingChild],
                 }),
               ],
@@ -174,7 +174,8 @@ export class ProductGenerator {
             new OptionConfigModel({
               unitConfigModels: [
                 new UnitConfigModel({
-                  id: UnitId.Adult,
+                  id: 'adult',
+                  type: UnitType.ADULT,
                 }),
               ],
               pricing: [pricingBooking],

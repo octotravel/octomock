@@ -1,13 +1,14 @@
-import { CapabilityId } from "./../../types/Capability";
-import { OptionValidator } from "./OptionValidator";
 import {
+  CapabilityId,
   Destination,
   Category,
   FAQ,
   Image,
   Product,
-} from "./../../types/Product";
-
+  Option,
+  PricingPer
+} from '@octocloud/types';
+import { OptionValidator } from "./OptionValidator";
 import {
   StringValidator,
   BooleanValidator,
@@ -15,8 +16,6 @@ import {
   EnumArrayValidator,
   StringArrayValidator,
 } from "./ValidatorHelpers";
-import { Option } from "../../types/Option";
-import { PricingPer } from "../../types/Pricing";
 
 export class ProductValidator {
   private productPricingValidator: ProductPricingValidator;

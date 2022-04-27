@@ -1,18 +1,18 @@
-import { CapabilityId } from "./../types/Capability";
+import {
+  CapabilityId,
+  Currency,
+  PricingPer,
+  Product,
+  AvailabilityType,
+  DeliveryFormat,
+  DeliveryMethod,
+  RedemptionMethod,
+} from '@octocloud/types';
 import { CapableToPOJOType, Capable } from "./../interfaces/Capable";
 import { ProductPricingModel } from "./ProductPricing";
 import { ProductPickupModel } from "./ProductPickup";
 import { ProductContentModel } from "./ProductContent";
-import { Currency } from "./../types/Currency";
-import { PricingPer } from "../types/Pricing";
 import { OptionModel } from "./../models/Option";
-import { Product } from "./../types/Product";
-import { AvailabilityType } from "../types/Availability";
-import {
-  DeliveryFormat,
-  DeliveryMethod,
-  RedemptionMethod,
-} from "../types/Product";
 import { AvailabilityConfigModel } from "./AvailabilityConfig";
 
 export class ProductModel implements Capable {

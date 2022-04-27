@@ -1,11 +1,11 @@
-import { AvailabilityCalendar } from './../types/AvailabilityCalendar';
-import { CapabilityId } from "../types/Capability";
+import {
+  AvailabilityCalendar,
+  CapabilityId,
+  AvailabilityStatus,
+  OpeningHours
+ } from '@octocloud/types';
 import { CapableToPOJOType } from "../interfaces/Capable";
 import { Capable } from "../interfaces/Capable";
-import {
-  AvailabilityStatus,
-  OpeningHours,
-} from "../types/Availability";
 import { AvailabilityPricingModel } from "./AvailabilityPricing";
 
 export class AvailabilityCalendarModel implements Capable {

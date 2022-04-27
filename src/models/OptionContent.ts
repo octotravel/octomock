@@ -1,5 +1,4 @@
-import { DurationUnit } from "./../types/Duration";
-import { Itinerary } from "../types/Option";
+import { DurationUnit, Itinerary } from '@octocloud/types';
 
 export class OptionContentModel {
   public title: string;
