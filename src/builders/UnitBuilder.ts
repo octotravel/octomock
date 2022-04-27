@@ -24,6 +24,7 @@ export class UnitBuilder {
         : [];
     this.unit = new UnitModel({
       id: unitConfig.id,
+      type: unitConfig.type,
       restrictions: {
         minAge: 18,
         maxAge: 100,

@@ -1,7 +1,8 @@
-import { Pricing, UnitId } from '@octocloud/types';
+import { Pricing, UnitType } from '@octocloud/types';
 
 export class UnitConfigModel {
-  public id: UnitId;
+  public id: string;
+  public type: UnitType
   public minAge: number;
   public maxAge: number;
   public idRequired = false;
@@ -11,13 +12,15 @@ export class UnitConfigModel {
 
   constructor({
     id,
+    type,
     minAge,
     maxAge,
     minQuantity,
     maxQuantity,
     pricingFrom,
   }: {
-    id: UnitId;
+    id: string;
+    type: UnitType
     minAge?: number;
     maxAge?: number;
     minQuantity?: Nullable<number>;
@@ -25,6 +28,7 @@ export class UnitConfigModel {
     pricingFrom?: Pricing[];
   }) {
     this.id = id;
+    this.type = type;
     this.minAge = minAge ?? 0;
     this.maxAge = maxAge ?? 99;
     this.minQuantity = minQuantity ?? null;

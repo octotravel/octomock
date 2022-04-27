@@ -1,6 +1,5 @@
 import {
   CapabilityId,
-  UnitId,
   Option,
   ContactField,
   UnitRestrictions,
@@ -73,7 +72,7 @@ export class OptionModel implements Capable {
     this.optionPickupModel = new OptionPickupModel();
   }
 
-  public findUnitModel = (unitId: UnitId): Nullable<UnitModel> => {
+  public findUnitModel = (unitId: string): Nullable<UnitModel> => {
     return this.units.find((unit) => unit.id === unitId) ?? null;
   };
 
