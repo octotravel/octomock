@@ -1,5 +1,4 @@
 import {
-  defaultPricing,
   Pricing,
   CapabilityId,
   AvailabilityStatus,
@@ -7,6 +6,7 @@ import {
   PricingPer,
   PricingUnit
 } from '@octocloud/types';
+import { defaultPricing } from '../_types/Pricing';
 import * as R from "ramda";
 import { AvailabilityUnit } from "./../schemas/Availability";
 import { InvalidOptionIdError, InvalidUnitIdError } from "./../models/Error";

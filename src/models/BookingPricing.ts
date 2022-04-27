@@ -1,4 +1,5 @@
-import { UnitItem, PricingPer, Pricing, defaultPricing  } from '@octocloud/types';
+import { UnitItem, PricingPer, Pricing } from '@octocloud/types';
+import { defaultPricing } from '../_types/Pricing';
 import { ProductModel } from "./Product";
 import { OptionModel } from "./Option";
 
