@@ -216,7 +216,7 @@ export class BookingBuilder {
       unitItems: [],
       utcCreatedAt: booking.utcCreatedAt,
       utcUpdatedAt: DateHelper.utcDateFormat(new Date()),
-      utcExpiresAt: DateHelper.utcDateFormat(addMinutes(new Date(), 30)),
+      utcExpiresAt: null,
       utcRedeemedAt: null,
       utcConfirmedAt: null,
       notes: booking.notes,
@@ -264,14 +264,14 @@ export class BookingBuilder {
             ...ticket,
             deliveryOptions,
           },
-          pricing: item.unit.pricing,
+          pricing: item.unit.pricing[0],
         };
       });
     }
     return unitItems.map((item) => {
       return {
         ...item,
-        pricing: item.unit.pricing,
+        pricing: item.unit.pricing[0],
       };
     });
   };
@@ -360,7 +360,7 @@ export class BookingBuilder {
         notes: null,
       },
       ticket,
-      pricing: unit.pricing,
+      pricing: unit.pricing[0],
     };
 
     return unitItem;
