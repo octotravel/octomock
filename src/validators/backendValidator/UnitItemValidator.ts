@@ -7,7 +7,7 @@ import {
   NullValidator,
 } from "./ValidatorHelpers";
 import { ContactValidator } from "./ContactValidator";
-// import { PricingValidator } from "./PricingValidator";
+import { PricingValidator } from "./PricingValidator";
 
 export class UnitItemValidator {
   private path: string;
@@ -74,12 +74,10 @@ export class UnitItemValidator {
 
   private validatePricingCapability = (unitItem: UnitItem): void => {
     if (this.capabilites.includes(CapabilityId.Pricing)) {
-      // unitItem.pricing.forEach((pricing, i) => {
-      //   const pricingValidator = new PricingValidator(
-      //     `${this.path}.pricing[${i}]`
-      //   );
-      //   pricingValidator.validate(pricing);
-      // });
+      const pricingValidator = new PricingValidator(
+        `${this.path}.pricing`
+      );
+      pricingValidator.validate(unitItem.pricing);
     }
   };
 }
