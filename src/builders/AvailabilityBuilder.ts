@@ -6,7 +6,6 @@ import {
   PricingPer,
   PricingUnit
 } from '@octocloud/types';
-import { defaultPricing } from '../_types/Pricing';
 import * as R from "ramda";
 import { AvailabilityUnit } from "./../schemas/Availability";
 import { InvalidOptionIdError, InvalidUnitIdError } from "./../models/Error";
@@ -31,6 +30,15 @@ interface AvailabilityBuilderData {
   status: AvailabilityStatus;
   units: AvailabilityUnit[];
   capacity: number;
+}
+
+const defaultPricing = {
+  original: 0,
+  retail: 0,
+  net: 0,
+  currency: "",
+  currencyPrecision: 0,
+  includedTaxes: [],
 }
 
 export class AvailabilityBuilder {

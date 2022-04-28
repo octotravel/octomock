@@ -223,6 +223,7 @@ export class BookingBuilder {
       notes: booking.notes,
       voucher: null,
       cancellation,
+      cancellable: false,
       freesale: booking.freesale,
     });
 
@@ -255,7 +256,7 @@ export class BookingBuilder {
         if (booking.product.deliveryFormats.includes(DeliveryFormat.QRCODE)) {
           deliveryOptions.push({
             deliveryFormat: DeliveryFormat.QRCODE,
-            deliveryValue: item.supplierReferecne,
+            deliveryValue: item.supplierReference,
           });
         }
         const ticket = item.ticket;
@@ -344,7 +345,7 @@ export class BookingBuilder {
       : null;
     const unitItem: UnitItem = {
       uuid: item.uuid ?? DataGenerator.generateUUID(),
-      supplierReferecne: DataGenerator.generateSupplierReference(),
+      supplierReference: DataGenerator.generateSupplierReference(),
       resellerReference: item.resellerReference ?? null,
       unitId: item.unitId,
       unit,

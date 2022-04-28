@@ -1,8 +1,15 @@
 import { UnitItem, PricingPer, Pricing } from '@octocloud/types';
-import { defaultPricing } from '../_types/Pricing';
 import { ProductModel } from "./Product";
 import { OptionModel } from "./Option";
 
+const defaultPricing = {
+  original: 0,
+  retail: 0,
+  net: 0,
+  currency: "",
+  currencyPrecision: 0,
+  includedTaxes: [],
+}
 export class BookingPricingModel {
   private product: ProductModel;
   private option: OptionModel;
@@ -34,7 +41,7 @@ export class BookingPricingModel {
 
   private calculatePerUnitPricing = (): Pricing => {
     return this.unitItems.reduce((acc: Pricing, item: UnitItem) => {
-      const itemPricing = item.pricing[0];
+      const itemPricing = item.pricing;
       return {
         original: acc.original + itemPricing.original,
         retail: acc.retail + itemPricing.retail,

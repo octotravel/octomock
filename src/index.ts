@@ -4,6 +4,7 @@ import koaBody from "koa-body";
 import { router } from "./router/AppRouter";
 import { parseCapabilities } from "./router/middlewares";
 import { DB } from "./storage/Database";
+import { DataGenerator } from "./generators/DataGenerator";
 
 const app = new Koa();
 
@@ -13,6 +14,7 @@ app.use(async (ctx, next) => {
   try {
     await next();
   } catch (err) {
+    console.log(err)
     if (err instanceof OctoError) {
       ctx.status = err.status;
       ctx.body = err.body;
@@ -23,6 +25,10 @@ app.use(async (ctx, next) => {
     }
   }
 });
+app.use(async (ctx, next) => {
+  ctx.set('x-request-id', DataGenerator.generateUUID())
+  await next()
+})
 app.use(parseCapabilities);
 app.use(router.routes());
 

@@ -65,6 +65,7 @@ export class BookingModel implements Capable {
     notes,
     voucher,
     cancellation,
+    cancellable,
     freesale,
   }: {
     id: string;
@@ -85,6 +86,7 @@ export class BookingModel implements Capable {
     notes: Nullable<string>;
     voucher: Nullable<Voucher>;
     cancellation?: Cancellation;
+    cancellable?: boolean;
     freesale: boolean;
   }) {
     this.id = id;
@@ -102,7 +104,7 @@ export class BookingModel implements Capable {
     this.product = product;
     this.optionId = option.id;
     this.option = option;
-    this.cancellable = true;
+    this.cancellable = cancellable ?? true;
     this.cancellation = cancellation ?? null;
     this.freesale = freesale ?? false;
     this.availabilityId = availability.id;
@@ -227,6 +229,8 @@ export class BookingModel implements Capable {
       utcExpiresAt: booking.utcExpiresAt,
       utcRedeemedAt: booking.utcRedeemedAt,
       utcConfirmedAt: booking.utcConfirmedAt,
+      cancellation: booking.cancellation,
+      cancellable: booking.cancellable,
       freesale: booking.freesale,
     });
   };

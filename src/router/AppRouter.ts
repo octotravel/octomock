@@ -118,13 +118,12 @@ router.post("/bookings/:uuid/confirm", async (ctx, _) => {
   };
   await confirmBookingSchema.validate(ctx.body);
   const schema = confirmBookingSchema.cast(ctx.body);
-
   const booking = await bookingController.confirmBooking(schema, capabilities);
   ctx.body = booking;
   ctx.toJSON();
 });
 
-router.patch("/bookings/:uuid/update", async (ctx, _) => {
+router.patch("/bookings/:uuid", async (ctx, _) => {
   const capabilities = getCapabilities(ctx);
   ctx.body = {
     ...ctx.request.body,
@@ -160,7 +159,6 @@ router.post("/bookings/:uuid/cancel", async (ctx, _) => {
   };
   await cancelBookingSchema.validate(ctx.body);
   const schema = cancelBookingSchema.cast(ctx.body);
-
   const booking = await bookingController.cancelBooking(schema, capabilities);
   ctx.body = booking;
   ctx.toJSON();

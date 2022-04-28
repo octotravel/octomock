@@ -25,7 +25,7 @@ export class UnitItemValidator {
     StringValidator.validate(`${this.path}.resellerReference`, unitItem.uuid, {
       nullable: true,
     });
-    StringValidator.validate(`${this.path}.supplierReferecne`, unitItem.uuid, {
+    StringValidator.validate(`${this.path}.supplierReference`, unitItem.uuid, {
       nullable: true,
     });
     StringValidator.validate(`${this.path}.unitId`, unitItem.unitId);
