@@ -1,5 +1,5 @@
 // import { BookingValidator } from "./../validators/backendValidator/BookingValidator";
-import { CapabilityId, Booking, BookingStatus } from '@octocloud/types';
+import { CapabilityId, Booking, BookingStatus } from "@octocloud/types";
 import { UnprocessableEntityError } from "./../models/Error";
 import {
   CancelBookingSchema,

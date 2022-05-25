@@ -2,8 +2,8 @@ import {
   CapabilityId,
   Availability,
   AvailabilityStatus,
-  OpeningHours
-} from '@octocloud/types';
+  OpeningHours,
+} from "@octocloud/types";
 import { CapableToPOJOType } from "./../interfaces/Capable";
 import { Capable } from "../interfaces/Capable";
 import { AvailabilityContentModel } from "./AvailabilityContent";

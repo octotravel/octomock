@@ -1,4 +1,4 @@
-import { Booking } from '@octocloud/types';
+import { Booking } from "@octocloud/types";
 import { InvalidBookingUUIDError } from "./../models/Error";
 import { GetBookingSchema, GetBookingsSchema } from "./../schemas/Booking";
 import { BookingModel } from "./../models/Booking";

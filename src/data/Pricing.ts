@@ -1,4 +1,4 @@
-import { Pricing } from '@octocloud/types';
+import { Pricing } from "@octocloud/types";
 
 export const pricingEUR: Pricing = {
   original: 2513,

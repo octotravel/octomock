@@ -6,8 +6,8 @@ import {
   Image,
   Product,
   Option,
-  PricingPer
-} from '@octocloud/types';
+  PricingPer,
+} from "@octocloud/types";
 import { OptionValidator } from "./OptionValidator";
 import {
   StringValidator,

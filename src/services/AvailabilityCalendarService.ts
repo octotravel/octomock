@@ -1,9 +1,9 @@
-import { CapabilityId } from '@octocloud/types';
+import { CapabilityId } from "@octocloud/types";
 import { eachDayOfInterval } from "date-fns";
-import { AvailabilityCalendarModel } from './../models/AvailabilityCalendar';
-import { AvailabilityModel } from './../models/Availability';
+import { AvailabilityCalendarModel } from "./../models/AvailabilityCalendar";
+import { AvailabilityModel } from "./../models/Availability";
 // import { AvailabilityCalendar } from './../types/AvailabilityCalendar';
-import { AvailabilityCalendarSchema } from './../schemas/AvailabilityCalendar';
+import { AvailabilityCalendarSchema } from "./../schemas/AvailabilityCalendar";
 import { ProductService } from "./ProductService";
 import { AvailabilityGenerator } from "../generators/AvailabilityGenerator";
 import { DateHelper } from "../helpers/DateHelper";
@@ -33,39 +33,47 @@ export class AvailabilityCalendarService implements IAvailabilityService {
       date: DateHelper.availabilityDateFormat(new Date()),
       units: schema.units,
     });
-      return this.mapToCalendar(this.getIntervalDate(
+    return this.mapToCalendar(
+      this.getIntervalDate(
         schema.localDateStart,
         schema.localDateEnd,
-        availabilities,
-      ));
+        availabilities
+      )
+    );
   };
 
-  private mapToCalendar = (availabilities: AvailabilityModel[]): AvailabilityCalendarModel[] => {
+  private mapToCalendar = (
+    availabilities: AvailabilityModel[]
+  ): AvailabilityCalendarModel[] => {
     const groupedAvailabilities = availabilities.reduce(
       (acc: { [key: string]: AvailabilityModel[] }, availability) => {
-        const [date, _] = availability.id.split('T');
+        const [date, _] = availability.id.split("T");
         acc[date] = acc[date] ? [...acc[date], availability] : [availability];
         return acc;
       },
-      {},
+      {}
     );
 
-    return Object.keys(groupedAvailabilities).map(key => {
-      const max = groupedAvailabilities[key].reduce((prev, current) => (prev.vacancies > current.vacancies) ? prev : current);
-      return max
-    }).map(model =>
-      new AvailabilityCalendarModel({
-        localDate: model.id.split("T")[0],
-        available: model.available,
-        status: model.status,
-        vacancies: model.vacancies,
-        capacity: model.capacity,
-        openingHours: model.openingHours,
-        availabilityPricing: model.availabilityPricingModel,
-
+    return Object.keys(groupedAvailabilities)
+      .map((key) => {
+        const max = groupedAvailabilities[key].reduce((prev, current) =>
+          prev.vacancies > current.vacancies ? prev : current
+        );
+        return max;
       })
-    )
-  }
+      .map(
+        (model) =>
+          new AvailabilityCalendarModel({
+            localDate: model.id.split("T")[0],
+            available: model.available,
+            status: model.status,
+            vacancies: model.vacancies,
+            capacity: model.capacity,
+            openingHours: model.openingHours,
+            availabilityPricing: model.availabilityPricingModel,
+          })
+      );
+  };
 
   private getIntervalDate = (
     start: string,

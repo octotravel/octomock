@@ -1,5 +1,5 @@
-import { CapabilityId } from '@octocloud/types';
-import { AvailabilityCalendarController } from './../controllers/AvailabilityCalendarController';
+import { CapabilityId } from "@octocloud/types";
+import { AvailabilityCalendarController } from "./../controllers/AvailabilityCalendarController";
 import { CapabilityController } from "./../controllers/CapabilityController";
 import { SupplierController } from "./../controllers/SupplierController";
 import {
@@ -22,7 +22,10 @@ import {
   AvailabilitySchema,
 } from "../schemas/Availability";
 import { AvailabilityValidator } from "../validators/AvailabilityValidator";
-import { availabilityCalendarSchema, AvailabilityCalendarSchema } from "../schemas/AvailabilityCalendar";
+import {
+  availabilityCalendarSchema,
+  AvailabilityCalendarSchema,
+} from "../schemas/AvailabilityCalendar";
 
 export const router = new Router();
 const productController = new ProductController();

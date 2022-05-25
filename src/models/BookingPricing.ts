@@ -1,4 +1,5 @@
-import { UnitItem, PricingPer, Pricing } from '@octocloud/types';
+import { PricingPer, Pricing } from "@octocloud/types";
+import { UnitItemModel } from "./UnitItemModel";
 import { ProductModel } from "./Product";
 import { OptionModel } from "./Option";
 
@@ -9,16 +10,16 @@ const defaultPricing = {
   currency: "",
   currencyPrecision: 0,
   includedTaxes: [],
-}
+};
 export class BookingPricingModel {
   private product: ProductModel;
   private option: OptionModel;
-  private unitItems: UnitItem[];
+  private unitItems: UnitItemModel[];
 
   constructor(
     product: ProductModel,
     option: OptionModel,
-    unitItems: UnitItem[]
+    unitItems: UnitItemModel[]
   ) {
     this.product = product;
     this.option = option;
@@ -40,7 +41,7 @@ export class BookingPricingModel {
   };
 
   private calculatePerUnitPricing = (): Pricing => {
-    return this.unitItems.reduce((acc: Pricing, item: UnitItem) => {
+    return this.unitItems.reduce((acc: Pricing, item: UnitItemModel) => {
       const itemPricing = item.pricing;
       return {
         original: acc.original + itemPricing.original,

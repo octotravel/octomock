@@ -7,7 +7,7 @@ import {
   DeliveryFormat,
   DeliveryMethod,
   RedemptionMethod,
-} from '@octocloud/types';
+} from "@octocloud/types";
 import { CapableToPOJOType, Capable } from "./../interfaces/Capable";
 import { ProductPricingModel } from "./ProductPricing";
 import { ProductPickupModel } from "./ProductPickup";

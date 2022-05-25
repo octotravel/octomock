@@ -1,4 +1,9 @@
-import { CapabilityId, Booking, BookingStatus, DeliveryMethod } from '@octocloud/types';
+import {
+  CapabilityId,
+  Booking,
+  BookingStatus,
+  DeliveryMethod,
+} from "@octocloud/types";
 import { BookingStateValidator } from "./BookingStateValidator";
 import { OptionValidator } from "./OptionValidator";
 import { ProductValidator } from "./ProductValidator";

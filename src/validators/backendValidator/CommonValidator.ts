@@ -1,4 +1,4 @@
-import { OpeningHours } from '@octocloud/types';
+import { OpeningHours } from "@octocloud/types";
 import { RegExpValidator } from "./ValidatorHelpers";
 
 export class CommonValidator {

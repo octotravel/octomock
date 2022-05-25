@@ -1,4 +1,4 @@
-import { CapabilityId, AvailabilityStatus } from '@octocloud/types';
+import { CapabilityId, AvailabilityStatus } from "@octocloud/types";
 import { AvailabilityUnit } from "./../schemas/Availability";
 import { ProductModel } from "../models/Product";
 

@@ -1,4 +1,4 @@
-import { Category, FAQ, Image } from '@octocloud/types';
+import { Category, FAQ, Image } from "@octocloud/types";
 
 export class ProductContentModel {
   public title: string;

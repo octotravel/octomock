@@ -1,4 +1,4 @@
-import { Supplier } from '@octocloud/types';
+import { Supplier } from "@octocloud/types";
 import { StringValidator } from "./ValidatorHelpers";
 
 export class SupplierValidator {

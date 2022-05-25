@@ -1,4 +1,4 @@
-import { CapabilityId, Product } from '@octocloud/types';
+import { CapabilityId, Product } from "@octocloud/types";
 import { ProductValidator } from "./../validators/backendValidator/ProductValidator";
 import { ProductService } from "./../services/ProductService";
 

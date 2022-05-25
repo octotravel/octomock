@@ -1,4 +1,4 @@
-import { CapabilityId } from '@octocloud/types';
+import { CapabilityId } from "@octocloud/types";
 
 export type CapableToPOJOType = {
   useCapabilities?: boolean;

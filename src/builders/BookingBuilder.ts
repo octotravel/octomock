@@ -1,14 +1,14 @@
+import { addMinutes } from "date-fns";
 import {
   DeliveryFormat,
   DeliveryMethod,
   BookingStatus,
   BookingAvailability,
-  UnitItem,
   Voucher,
-  RedemptionMethod
-} from '@octocloud/types';
+  RedemptionMethod,
+} from "@octocloud/types";
+import { UnitItemModel } from "./../models/UnitItemModel";
 import { InvalidOptionIdError, InvalidUnitIdError } from "./../models/Error";
-import { addMinutes } from "date-fns";
 import { DataGenerator } from "./../generators/DataGenerator";
 import {
   ConfirmBookingSchema,
@@ -68,7 +68,7 @@ export class BookingBuilder {
       option: option.setOnBooking(),
       availability: data.availability,
       contact: this.updateContact({ booking: null, contact: schema.contact }),
-      unitItems: schema.unitItems.map((item) =>
+      unitItemModels: schema.unitItems.map((item) =>
         this.buildUnitItem(item, status, option, data.product.deliveryMethods)
       ),
       utcCreatedAt: DateHelper.utcDateFormat(new Date()),
@@ -100,7 +100,7 @@ export class BookingBuilder {
       option: booking.option.setOnBooking(),
       availability: booking.availability,
       contact: this.updateContact({ booking, contact: schema.contact }),
-      unitItems: this.generateTickets(booking, schema),
+      unitItemModels: this.generateTickets(booking, schema),
       utcCreatedAt: booking.utcCreatedAt,
       utcUpdatedAt: DateHelper.utcDateFormat(new Date()),
       utcExpiresAt: null,
@@ -127,7 +127,7 @@ export class BookingBuilder {
       );
     }
 
-    const unitItems = schema.unitItems
+    const unitItemModels = schema.unitItems
       ? schema.unitItems.map((item) =>
           this.buildUnitItem(
             item,
@@ -136,7 +136,7 @@ export class BookingBuilder {
             booking.deliveryMethods
           )
         )
-      : booking.unitItems;
+      : booking.unitItemModels;
     const bookingModel = new BookingModel({
       id: booking.id,
       uuid: booking.uuid,
@@ -147,7 +147,7 @@ export class BookingBuilder {
       option: booking.option.setOnBooking(),
       availability: booking.availability,
       contact: this.updateContact({ booking, contact: schema.contact }),
-      unitItems,
+      unitItemModels,
       utcCreatedAt: booking.utcCreatedAt,
       utcUpdatedAt: DateHelper.utcDateFormat(new Date()),
       utcExpiresAt: utcExpiresAt,
@@ -177,7 +177,7 @@ export class BookingBuilder {
       option: booking.option.setOnBooking(),
       availability: booking.availability,
       contact: booking.contact,
-      unitItems: booking.unitItems,
+      unitItemModels: booking.unitItemModels,
       utcCreatedAt: booking.utcCreatedAt,
       utcUpdatedAt: DateHelper.utcDateFormat(new Date()),
       utcExpiresAt: DateHelper.utcDateFormat(
@@ -214,7 +214,7 @@ export class BookingBuilder {
       option: booking.option.setOnBooking(),
       availability: booking.availability,
       contact: booking.contact,
-      unitItems: [],
+      unitItemModels: [],
       utcCreatedAt: booking.utcCreatedAt,
       utcUpdatedAt: DateHelper.utcDateFormat(new Date()),
       utcExpiresAt: null,
@@ -233,8 +233,8 @@ export class BookingBuilder {
   private generateTickets = (
     booking: BookingModel,
     schema: ConfirmBookingSchema
-  ): UnitItem[] => {
-    const unitItems = schema.unitItems
+  ): UnitItemModel[] => {
+    const unitItemModel = schema.unitItems
       ? schema.unitItems.map((item) =>
           this.buildUnitItem(
             item,
@@ -243,9 +243,9 @@ export class BookingBuilder {
             booking.deliveryMethods
           )
         )
-      : booking.unitItems;
+      : booking.unitItemModels;
     if (booking.deliveryMethods.includes(DeliveryMethod.TICKET)) {
-      return unitItems.map((item) => {
+      return unitItemModel.map((item) => {
         const deliveryOptions = [];
         if (booking.product.deliveryFormats.includes(DeliveryFormat.PDF_URL)) {
           deliveryOptions.push({
@@ -259,23 +259,14 @@ export class BookingBuilder {
             deliveryValue: item.supplierReference,
           });
         }
-        const ticket = item.ticket;
-        return {
-          ...item,
-          ticket: {
-            ...ticket,
-            deliveryOptions,
-          },
-          pricing: item.unit.pricing[0],
+        const ticket = {
+          ...item.ticket,
+          deliveryOptions,
         };
+
+        return item.updateTicket(ticket);
       });
     }
-    return unitItems.map((item) => {
-      return {
-        ...item,
-        pricing: item.unit.pricing[0],
-      };
-    });
   };
 
   private generateVoucher = (booking: BookingModel): Nullable<Voucher> => {
@@ -328,13 +319,12 @@ export class BookingBuilder {
     status: BookingStatus,
     option: OptionModel,
     deliveryMethods: DeliveryMethod[]
-  ): UnitItem => {
+  ): UnitItemModel => {
     const unitModel = option.findUnitModel(item.unitId);
     if (unitModel === null) {
       throw new InvalidUnitIdError(item.unitId);
     }
     const ticketAvailable = deliveryMethods.includes(DeliveryMethod.TICKET);
-    const unit = unitModel.setOnBooking().toPOJO({});
 
     const ticket = ticketAvailable
       ? {
@@ -343,28 +333,14 @@ export class BookingBuilder {
           deliveryOptions: [],
         }
       : null;
-    const unitItem: UnitItem = {
+
+    return new UnitItemModel({
       uuid: item.uuid ?? DataGenerator.generateUUID(),
       supplierReference: DataGenerator.generateSupplierReference(),
       resellerReference: item.resellerReference ?? null,
-      unitId: item.unitId,
-      unit,
+      unitModel,
       status,
-      utcRedeemedAt: null,
-      contact: {
-        fullName: null,
-        firstName: null,
-        lastName: null,
-        emailAddress: null,
-        phoneNumber: null,
-        locales: [],
-        country: null,
-        notes: null,
-      },
       ticket,
-      pricing: unit.pricing[0],
-    };
-
-    return unitItem;
+    });
   };
 }

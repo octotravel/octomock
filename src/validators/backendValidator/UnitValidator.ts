@@ -1,4 +1,10 @@
-import { CapabilityId, Restrictions, Unit, ContactField, Pricing } from '@octocloud/types';
+import {
+  CapabilityId,
+  Restrictions,
+  Unit,
+  ContactField,
+  Pricing,
+} from "@octocloud/types";
 import { PricingValidator } from "./PricingValidator";
 
 import {

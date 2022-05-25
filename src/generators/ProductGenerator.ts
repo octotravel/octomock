@@ -1,5 +1,12 @@
 import { ProductConfigModel } from "./../models/ProductConfig";
-import { Pricing, UnitType, PricingPer, AvailabilityType, Currency, DurationUnit } from '@octocloud/types';
+import {
+  Pricing,
+  UnitType,
+  PricingPer,
+  AvailabilityType,
+  Currency,
+  DurationUnit,
+} from "@octocloud/types";
 import { ProductModel } from "./../models/Product";
 import { ProductBuilder } from "./../builders/ProductBuilder";
 import { UnitConfigModel } from "../models/UnitConfig";
@@ -76,7 +83,7 @@ export class ProductGenerator {
             new OptionConfigModel({
               unitConfigModels: [
                 new UnitConfigModel({
-                  id: 'adult',
+                  id: "adult",
                   type: UnitType.ADULT,
                   pricingFrom: [pricingAdult],
                 }),
@@ -106,7 +113,7 @@ export class ProductGenerator {
             new OptionConfigModel({
               unitConfigModels: [
                 new UnitConfigModel({
-                  id: 'adult',
+                  id: "adult",
                   type: UnitType.ADULT,
                 }),
               ],
@@ -138,12 +145,12 @@ export class ProductGenerator {
             new OptionConfigModel({
               unitConfigModels: [
                 new UnitConfigModel({
-                  id: 'adult',
+                  id: "adult",
                   type: UnitType.ADULT,
                   pricingFrom: [pricingAdult],
                 }),
                 new UnitConfigModel({
-                  id: 'child',
+                  id: "child",
                   type: UnitType.CHILD,
                   pricingFrom: [pricingChild],
                 }),
@@ -174,7 +181,7 @@ export class ProductGenerator {
             new OptionConfigModel({
               unitConfigModels: [
                 new UnitConfigModel({
-                  id: 'adult',
+                  id: "adult",
                   type: UnitType.ADULT,
                 }),
               ],

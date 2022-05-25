@@ -4,8 +4,8 @@ import {
   AvailabilityStatus,
   DurationUnit,
   PricingPer,
-  PricingUnit
-} from '@octocloud/types';
+  PricingUnit,
+} from "@octocloud/types";
 import * as R from "ramda";
 import { AvailabilityUnit } from "./../schemas/Availability";
 import { InvalidOptionIdError, InvalidUnitIdError } from "./../models/Error";
@@ -39,7 +39,7 @@ const defaultPricing = {
   currency: "",
   currencyPrecision: 0,
   includedTaxes: [],
-}
+};
 
 export class AvailabilityBuilder {
   build(data: AvailabilityBuilderData): AvailabilityModel[] {
@@ -111,7 +111,8 @@ export class AvailabilityBuilder {
       );
       const pricing = data.units
         .map(({ id, quantity }) => {
-          const uPricing: PricingUnit = unitPricing.find((p) => p.unitId === id) ?? null;
+          const uPricing: PricingUnit =
+            unitPricing.find((p) => p.unitId === id) ?? null;
           if (uPricing === null) {
             throw new InvalidUnitIdError(id);
           }

@@ -1,6 +1,5 @@
 import {
   Booking,
-  UnitItem,
   Voucher,
   Contact,
   BookingAvailability,
@@ -8,13 +7,14 @@ import {
   Cancellation,
   CapabilityId,
   DeliveryMethod,
-} from '@octocloud/types';
+} from "@octocloud/types";
 import { Capable, CapableToPOJOType } from "./../interfaces/Capable";
 import { BookingPickupModel } from "./BookingPickup";
 import { BookingPricingModel } from "./BookingPricing";
 import { BookingContentModel } from "./BookingContent";
 import { OptionModel } from "./Option";
 import { ProductModel } from "./Product";
+import { UnitItemModel } from "./UnitItemModel";
 
 export class BookingModel implements Capable {
   public id: string;
@@ -41,7 +41,7 @@ export class BookingModel implements Capable {
   public notes: Nullable<string>;
   public deliveryMethods: DeliveryMethod[];
   public voucher: Nullable<Voucher>;
-  public unitItems: UnitItem[];
+  public unitItemModels: UnitItemModel[];
   public bookingContentModel?: BookingContentModel;
   public bookingPricingModel?: BookingPricingModel;
   public bookingPickupModel?: BookingPickupModel;
@@ -61,7 +61,7 @@ export class BookingModel implements Capable {
     option,
     availability,
     contact,
-    unitItems,
+    unitItemModels,
     notes,
     voucher,
     cancellation,
@@ -82,7 +82,7 @@ export class BookingModel implements Capable {
     option: OptionModel;
     availability: BookingAvailability;
     contact: Contact;
-    unitItems: UnitItem[];
+    unitItemModels: UnitItemModel[];
     notes: Nullable<string>;
     voucher: Nullable<Voucher>;
     cancellation?: Cancellation;
@@ -113,12 +113,12 @@ export class BookingModel implements Capable {
     this.notes = notes;
     this.deliveryMethods = product.deliveryMethods;
     this.voucher = voucher;
-    this.unitItems = unitItems;
+    this.unitItemModels = unitItemModels;
     this.bookingContentModel = new BookingContentModel();
     this.bookingPricingModel = new BookingPricingModel(
       this.product,
       this.option,
-      this.unitItems
+      this.unitItemModels
     );
     this.bookingPickupModel = new BookingPickupModel();
   }
@@ -152,7 +152,7 @@ export class BookingModel implements Capable {
       notes,
       deliveryMethods,
       voucher,
-      unitItems,
+      unitItemModels,
     } = this;
     const pojo: Booking = {
       id,
@@ -179,7 +179,9 @@ export class BookingModel implements Capable {
       notes,
       deliveryMethods,
       voucher,
-      unitItems,
+      unitItems: unitItemModels.map((model) =>
+        model.toPOJO({ useCapabilities, capabilities })
+      ),
     };
 
     if (
@@ -221,7 +223,9 @@ export class BookingModel implements Capable {
       option: OptionModel.fromPOJO(booking.option).setOnBooking(),
       availability: booking.availability,
       contact: booking.contact,
-      unitItems: booking.unitItems,
+      unitItemModels: booking.unitItems.map((unitItem) =>
+        UnitItemModel.fromPOJO(unitItem)
+      ),
       notes: booking.notes,
       voucher: booking.voucher,
       utcCreatedAt: booking.utcCreatedAt,

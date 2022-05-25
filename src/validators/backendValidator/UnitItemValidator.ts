@@ -1,4 +1,10 @@
-import { RedemptionMethod, DeliveryFormat, BookingStatus, CapabilityId, UnitItem } from '@octocloud/types';
+import {
+  RedemptionMethod,
+  DeliveryFormat,
+  BookingStatus,
+  CapabilityId,
+  UnitItem,
+} from "@octocloud/types";
 import { UnitValidator } from "./UnitValidator";
 
 import {
@@ -74,9 +80,7 @@ export class UnitItemValidator {
 
   private validatePricingCapability = (unitItem: UnitItem): void => {
     if (this.capabilites.includes(CapabilityId.Pricing)) {
-      const pricingValidator = new PricingValidator(
-        `${this.path}.pricing`
-      );
+      const pricingValidator = new PricingValidator(`${this.path}.pricing`);
       pricingValidator.validate(unitItem.pricing);
     }
   };

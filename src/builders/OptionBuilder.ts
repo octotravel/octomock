@@ -1,4 +1,4 @@
-import { PricingPer } from '@octocloud/types';
+import { PricingPer } from "@octocloud/types";
 import { UnitBuilder } from "./UnitBuilder";
 import { UnitModel } from "./../models/Unit";
 import { OptionModel } from "./../models/Option";

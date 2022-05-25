@@ -1,4 +1,4 @@
-import { PickupPoint } from '@octocloud/types';
+import { PickupPoint } from "@octocloud/types";
 
 export class ProductPickupModel {
   public pickupRequired: boolean;

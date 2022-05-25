@@ -1,5 +1,11 @@
 import * as R from "ramda";
-import { CapabilityId, Unit, Restrictions, Pricing, UnitType } from '@octocloud/types';
+import {
+  CapabilityId,
+  Unit,
+  Restrictions,
+  Pricing,
+  UnitType,
+} from "@octocloud/types";
 import { CapableToPOJOType } from "./../interfaces/Capable";
 import { UnitContentModel } from "./UnitContent";
 import { Capable } from "../interfaces/Capable";
@@ -14,7 +20,7 @@ export class UnitModel implements Capable {
   // content
   private unitContentModel: UnitContentModel;
   // pricing
-  private pricingFrom: Array<Pricing> = [];
+  public pricingFrom: Array<Pricing> = [];
   private onBooking: boolean;
 
   constructor({
@@ -24,7 +30,7 @@ export class UnitModel implements Capable {
     pricing,
   }: {
     id: string;
-    type: UnitType
+    type: UnitType;
     restrictions: Restrictions;
     pricing: Pricing[];
   }) {
@@ -93,7 +99,7 @@ export class UnitModel implements Capable {
       id: unit.id,
       type: unit.type,
       restrictions: unit.restrictions,
-      pricing: unit.pricing,
+      pricing: unit.pricing ?? unit.pricingFrom,
     });
   };
 }

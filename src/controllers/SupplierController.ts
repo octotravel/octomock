@@ -1,4 +1,4 @@
-import { Supplier } from '@octocloud/types';
+import { Supplier } from "@octocloud/types";
 import { SupplierService } from "./../services/SupplierService";
 
 interface ISupplierController {

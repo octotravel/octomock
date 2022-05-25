@@ -1,4 +1,4 @@
-import { CapabilityId } from '@octocloud/types';
+import { CapabilityId } from "@octocloud/types";
 import { InvalidAvailabilityIdError, BadRequestError } from "./../models/Error";
 import { ProductModel } from "./../models/Product";
 import { ProductService } from "./ProductService";

@@ -10,9 +10,8 @@ export type AvailabilityCalendarSchema = {
   units?: AvailabilityUnit[];
 };
 
-export const availabilityCalendarSchema: yup.SchemaOf<AvailabilityCalendarSchema> = yup
-  .object()
-  .shape({
+export const availabilityCalendarSchema: yup.SchemaOf<AvailabilityCalendarSchema> =
+  yup.object().shape({
     productId: yup.string().required(),
     optionId: yup.string().required(),
     localDateStart: yup.string().required(),

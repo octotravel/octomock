@@ -1,4 +1,4 @@
-import { Supplier } from '@octocloud/types';
+import { Supplier } from "@octocloud/types";
 import { BadRequestError } from "./../models/Error";
 import { InMemoryStorage } from "./InMemoryStorage";
 

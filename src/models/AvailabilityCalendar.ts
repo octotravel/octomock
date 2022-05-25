@@ -2,8 +2,8 @@ import {
   AvailabilityCalendar,
   CapabilityId,
   AvailabilityStatus,
-  OpeningHours
- } from '@octocloud/types';
+  OpeningHours,
+} from "@octocloud/types";
 import { CapableToPOJOType } from "../interfaces/Capable";
 import { Capable } from "../interfaces/Capable";
 import { AvailabilityPricingModel } from "./AvailabilityPricing";
@@ -49,14 +49,8 @@ export class AvailabilityCalendarModel implements Capable {
     useCapabilities = false,
     capabilities = [],
   }: CapableToPOJOType): AvailabilityCalendar => {
-    const {
-      localDate,
-      available,
-      status,
-      vacancies,
-      capacity,
-      openingHours,
-    } = this;
+    const { localDate, available, status, vacancies, capacity, openingHours } =
+      this;
 
     const pojo: AvailabilityCalendar = {
       localDate,

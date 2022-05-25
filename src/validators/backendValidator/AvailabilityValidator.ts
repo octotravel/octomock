@@ -4,8 +4,7 @@ import {
   AvailabilityStatus,
   CapabilityId,
   Pricing,
-
-} from '@octocloud/types';
+} from "@octocloud/types";
 import { CommonValidator } from "./CommonValidator";
 import {
   StringValidator,
