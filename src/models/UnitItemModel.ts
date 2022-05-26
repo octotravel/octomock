@@ -101,7 +101,6 @@ export class UnitItemModel implements Capable {
   };
 
   public static fromPOJO = (unitItem: UnitItem): UnitItemModel => {
-    console.log("fromPOJO unit item model");
     return new UnitItemModel({
       uuid: unitItem.uuid,
       resellerReference: unitItem.resellerReference,
