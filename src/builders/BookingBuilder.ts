@@ -4,7 +4,7 @@ import {
   DeliveryMethod,
   BookingStatus,
   BookingAvailability,
-  Voucher,
+  Ticket,
   RedemptionMethod,
 } from "@octocloud/types";
 import { UnitItemModel } from "./../models/UnitItemModel";
@@ -269,7 +269,7 @@ export class BookingBuilder {
     }
   };
 
-  private generateVoucher = (booking: BookingModel): Nullable<Voucher> => {
+  private generateVoucher = (booking: BookingModel): Nullable<Ticket> => {
     if (booking.deliveryMethods.includes(DeliveryMethod.VOUCHER)) {
       const deliveryOptions = [];
       if (booking.product.deliveryFormats.includes(DeliveryFormat.PDF_URL)) {

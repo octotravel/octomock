@@ -157,7 +157,7 @@ export class ProductGenerator {
               ],
               localStartTimes: ["12:00", "14:00"],
               durationAmount: "2",
-              durationUnit: DurationUnit.HOURS,
+              durationUnit: DurationUnit.HOUR,
             }),
           ],
           pricingConfig: {

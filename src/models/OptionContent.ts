@@ -21,7 +21,7 @@ export class OptionContentModel {
     this.subtitle = "subtitle";
     this.language = "en";
     this.shortDescription = "shortDescription";
-    this.durationUnit = durationUnit ?? DurationUnit.HOURS;
+    this.durationUnit = durationUnit ?? DurationUnit.HOUR;
     this.durationAmount = durationAmount ?? "0";
     this.duration = `${this.durationAmount} ${this.durationUnit}`;
     this.itinerary = [];

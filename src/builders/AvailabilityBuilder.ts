@@ -13,7 +13,6 @@ import {
   addDays,
   addHours,
   addMinutes,
-  addSeconds,
   startOfDay,
 } from "date-fns";
 import { AvailabilityModel } from "../models/Availability";
@@ -176,21 +175,21 @@ export class AvailabilityBuilder {
     timeZone: string
   ) => {
     if (option.optionContentModel.durationAmount !== "0") {
-      if (option.optionContentModel.durationUnit === DurationUnit.HOURS) {
+      if (option.optionContentModel.durationUnit === DurationUnit.HOUR) {
         return DateHelper.availabilityIdFormat(
           addHours(date, Number(option.optionContentModel.durationAmount)),
           timeZone
         );
       }
-      if (option.optionContentModel.durationUnit === DurationUnit.MINUTES) {
+      if (option.optionContentModel.durationUnit === DurationUnit.MINUTE) {
         return DateHelper.availabilityIdFormat(
           addMinutes(date, Number(option.optionContentModel.durationAmount)),
           timeZone
         );
       }
-      if (option.optionContentModel.durationUnit === DurationUnit.SECONDS) {
+      if (option.optionContentModel.durationUnit === DurationUnit.DAY) {
         return DateHelper.availabilityIdFormat(
-          addSeconds(date, Number(option.optionContentModel.durationAmount)),
+          addDays(date, Number(option.optionContentModel.durationAmount)),
           timeZone
         );
       }

@@ -9,7 +9,7 @@ export class OptionConfigModel {
   public unitConfigModels: UnitConfigModel[];
   public minUnits: number;
   public maxUnits: Nullable<number>;
-  public durationUnit: DurationUnit.HOURS;
+  public durationUnit: DurationUnit;
   public durationAmount: string;
 
   constructor({
@@ -30,7 +30,7 @@ export class OptionConfigModel {
     minUnits?: number;
     maxUnits?: number;
     unitConfigModels: UnitConfigModel[];
-    durationUnit?: DurationUnit.HOURS;
+    durationUnit?: DurationUnit;
     durationAmount?: string;
   }) {
     this.id = id ?? "DEFAULT";
@@ -40,7 +40,7 @@ export class OptionConfigModel {
     this.minUnits = minUnits ?? 0;
     this.maxUnits = maxUnits ?? null;
     this.unitConfigModels = unitConfigModels;
-    this.durationUnit = durationUnit ?? DurationUnit.HOURS;
+    this.durationUnit = durationUnit ?? DurationUnit.HOUR;
     this.durationAmount = durationAmount ?? "0";
   }
 }

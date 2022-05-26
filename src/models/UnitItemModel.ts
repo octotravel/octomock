@@ -3,7 +3,7 @@ import {
   CapabilityId,
   BookingStatus,
   Contact,
-  Voucher,
+  Ticket,
   UnitItem,
   Pricing,
 } from "@octocloud/types";
@@ -18,7 +18,7 @@ export class UnitItemModel implements Capable {
   public status: BookingStatus;
   public utcRedeemedAt: Nullable<string>;
   public contact: Contact;
-  public ticket: Nullable<Voucher>;
+  public ticket: Nullable<Ticket>;
   public pricing: Pricing;
 
   constructor({
@@ -38,7 +38,7 @@ export class UnitItemModel implements Capable {
     status: BookingStatus;
     utcRedeemedAt?: Nullable<string>;
     contact?: Contact;
-    ticket: Voucher;
+    ticket: Ticket;
   }) {
     this.uuid = uuid;
     this.resellerReference = resellerReference;
@@ -95,7 +95,7 @@ export class UnitItemModel implements Capable {
     return pojo;
   };
 
-  public updateTicket = (ticket: Voucher): UnitItemModel => {
+  public updateTicket = (ticket: Ticket): UnitItemModel => {
     this.ticket = ticket;
     return this;
   };

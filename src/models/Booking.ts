@@ -1,6 +1,6 @@
 import {
   Booking,
-  Voucher,
+  Ticket,
   Contact,
   BookingAvailability,
   BookingStatus,
@@ -40,7 +40,7 @@ export class BookingModel implements Capable {
   public contact: Contact;
   public notes: Nullable<string>;
   public deliveryMethods: DeliveryMethod[];
-  public voucher: Nullable<Voucher>;
+  public voucher: Nullable<Ticket>;
   public unitItemModels: UnitItemModel[];
   public bookingContentModel?: BookingContentModel;
   public bookingPricingModel?: BookingPricingModel;
@@ -84,7 +84,7 @@ export class BookingModel implements Capable {
     contact: Contact;
     unitItemModels: UnitItemModel[];
     notes: Nullable<string>;
-    voucher: Nullable<Voucher>;
+    voucher: Nullable<Ticket>;
     cancellation?: Cancellation;
     cancellable?: boolean;
     freesale: boolean;
