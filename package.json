@@ -22,7 +22,8 @@
     "ramda": "^0.28.0",
     "sqlite": "^4.1.1",
     "sqlite3": "^5.0.8",
-    "yup": "^0.32.11"
+    "yup": "^0.32.11",
+    "got": "^11.8.2"
   },
   "devDependencies": {
     "@octocloud/types": "^1.1.2",

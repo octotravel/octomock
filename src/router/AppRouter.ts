@@ -26,6 +26,8 @@ import {
   availabilityCalendarSchema,
   AvailabilityCalendarSchema,
 } from "../schemas/AvailabilityCalendar";
+import { BackendType, OctoMethod, OctoValidationService, ValidationData } from "../services/OctoValidationService";
+import { validationSchema } from "../schemas/Validation";
 
 export const router = new Router();
 const productController = new ProductController();
@@ -35,6 +37,7 @@ const bookingController = new BookingController();
 const supplierController = new SupplierController();
 const capabilityController = new CapabilityController();
 const availabilityValidator = new AvailabilityValidator();
+const validationService = new OctoValidationService();
 
 const getCapabilities = (ctx: any): CapabilityId[] => {
   return ctx.capabilities as CapabilityId[];
@@ -223,5 +226,22 @@ router.get("/suppliers/:id", async (ctx, _) => {
 router.get("/capabilities", async (ctx, _) => {
   const supplier = await capabilityController.getCapabilities();
   ctx.body = supplier;
+  ctx.toJSON();
+});
+
+router.get("/validate", async (ctx, _) => {
+  //const capabilities = getCapabilities(ctx);
+
+  const data: ValidationData = {
+    url: ctx.query.url as string,
+    method: ctx.query.method as OctoMethod,
+    backend: ctx.query.backend as BackendType,
+  }
+  await validationSchema.validate(data);
+  const params = validationSchema.cast(data);
+
+  const validation = await validationService.validate(params)
+
+  ctx.body = validation;
   ctx.toJSON();
 });
