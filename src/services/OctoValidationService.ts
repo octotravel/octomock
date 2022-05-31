@@ -1,9 +1,10 @@
-import { Supplier } from '@octocloud/types';
+import { Product, Supplier } from '@octocloud/types';
 import got from 'got';
+import { ProductValidator } from '../validators/backendValidator/ProductValidator';
 import { SupplierValidator } from '../validators/backendValidator/SupplierValidator';
 
 interface IOctoValidationService {
-    validate(params: ValidationData): Promise<Boolean>;
+    validate(params: ValidationData): Promise<ValidationResponse>;
 }
 
 export enum OctoMethod {
@@ -22,54 +23,135 @@ export enum OctoMethod {
     ExtendReservation = 'ExtendReservation',
 }
 
-export enum BackendType {
-    octo = 'octo',
-    anchor = 'anchor',
-    fareharbor = 'fareharbor',
-}
-
 export interface ValidationData {
     url: string;
     method: OctoMethod;
-    backend: BackendType;
 }
 
+interface ValidationResponse {
+    isValid: boolean;
+    body: any;
+}
 export class OctoValidationService implements IOctoValidationService {
-    private suppliertValidator = new SupplierValidator();
-
-    private getHeaders = (backend: BackendType) => {
-        if (backend === BackendType.anchor) {
-            return {"Authorization": "Bearer anchortest"}
+    private config = () => {
+        return {
+            token: 'fareharbortest',
+            supplier: 'bodyglove',
+            productId: '183',
         }
-        if (backend === BackendType.fareharbor) {
-            return {"Authorization": "Bearer fareharbortest"}
-        }  
     }
+    private suppliertValidator = new SupplierValidator();
+    private productValidator = new ProductValidator('octo', []);
 
-    private validateGetSuppliers = async (params: ValidationData): Promise<Boolean> => {
+    private validateGetSuppliers = async (params: ValidationData): Promise<ValidationResponse> => {
         const fullUrl = `${params.url}/suppliers`;
-        const headers = this.getHeaders(params.backend)
-        const data: Array<any> = await got.get(fullUrl, {headers}).json();
+        const data: Array<any> = await got.get(fullUrl, {headers:{"Authorization":`Bearer ${this.config().token}`}}).json();
 
         const valids: any[] = data.map(supplier => {
             try {
                 this.suppliertValidator.validate(supplier as Supplier);
                 return true
             } catch (e) {
+                console.log('invalid supplier', supplier)
                 return false
             }
         })
-        console.log(valids)
         if (valids.every(valid => valid === true)) {
-            return true;
+            return {
+                isValid: true,
+                body: data,
+            };
         } else {
-            return false;
+            return {
+                isValid: false,
+                body: data,
+            };
         }
     }
 
-    public validate = async (params: ValidationData): Promise<Boolean> => {
+    private validateGetSupplier = async (params: ValidationData): Promise<ValidationResponse> => {
+        const fullUrl = `${params.url}/suppliers/${this.config().supplier}`;
+        const data: any = await got.get(fullUrl, {headers:{"Authorization":`Bearer ${this.config().token}`}}).json();
+
+        try {
+            this.suppliertValidator.validate(data as Supplier);
+            return {
+                isValid: true,
+                body: data,
+            }
+        } catch (e) {
+            console.log('invalid supplier', data)
+            return {
+                isValid: false,
+                body: data,
+            }
+        }
+    }
+
+    private validateGetProducts = async (params: ValidationData): Promise<ValidationResponse> => {
+        const fullUrl = `${params.url}/products`;
+        console.log(fullUrl)
+        const data: Array<any> = await got.get(fullUrl, {headers:{"Authorization":`Bearer ${this.config().token}`}}).json();
+
+        const valids: any[] = data.map(product => {
+            try {
+                this.productValidator.validate(product as Product);
+                return true
+            } catch (e) {
+                console.log('invalid product', product)
+                return false
+            }
+        })
+        if (valids.every(valid => valid === true)) {
+            return {
+                isValid: true,
+                body: data,
+            };
+        } else {
+            return {
+                isValid: false,
+                body: data,
+            };
+        }
+    }
+
+    private validateGetProduct = async (params: ValidationData): Promise<ValidationResponse> => {
+        const fullUrl = `${params.url}/products/${this.config().productId}`;
+        const data: any = await got.get(fullUrl, {headers:{"Authorization":`Bearer ${this.config().token}`}}).json();
+
+        try {
+            this.productValidator.validate(data as Product);
+            return {
+                isValid: true,
+                body: data,
+            }
+        } catch (e) {
+            console.log('invalid product', data)
+            return {
+                isValid: false,
+                body: data,
+            }
+        }
+    }
+
+    public validate = async (params: ValidationData): Promise<ValidationResponse> => {
         if (params.method === OctoMethod.GetSuppliers) {
             const response = await this.validateGetSuppliers(params)
+            return response;
+        }
+
+        if (params.method === OctoMethod.GetSupplier) {
+            const response = await this.validateGetSupplier(params)
+            return response;
+        }
+
+        if (params.method === OctoMethod.GetProducts) {
+            const response = await this.validateGetProducts(params)
+            return response;
+        }
+
+        if (params.method === OctoMethod.GetProduct) {
+            const response = await this.validateGetProduct(params)
             return response;
         }
     }

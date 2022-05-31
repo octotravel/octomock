@@ -26,7 +26,7 @@ import {
   availabilityCalendarSchema,
   AvailabilityCalendarSchema,
 } from "../schemas/AvailabilityCalendar";
-import { BackendType, OctoMethod, OctoValidationService, ValidationData } from "../services/OctoValidationService";
+import { OctoMethod, OctoValidationService, ValidationData } from "../services/OctoValidationService";
 import { validationSchema } from "../schemas/Validation";
 
 export const router = new Router();
@@ -235,7 +235,6 @@ router.get("/validate", async (ctx, _) => {
   const data: ValidationData = {
     url: ctx.query.url as string,
     method: ctx.query.method as OctoMethod,
-    backend: ctx.query.backend as BackendType,
   }
   await validationSchema.validate(data);
   const params = validationSchema.cast(data);
