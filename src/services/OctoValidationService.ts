@@ -1,5 +1,6 @@
-import { Product, Supplier } from '@octocloud/types';
+import { Availability, Product, Supplier } from '@octocloud/types';
 import got from 'got';
+import { AvailabilityValidator } from '../validators/backendValidator/AvailabilityValidator';
 import { ProductValidator } from '../validators/backendValidator/ProductValidator';
 import { SupplierValidator } from '../validators/backendValidator/SupplierValidator';
 
@@ -38,10 +39,15 @@ export class OctoValidationService implements IOctoValidationService {
             token: 'fareharbortest',
             supplier: 'bodyglove',
             productId: '183',
+            optionId: 'DEFAULT',
+            localDate: '2022-10-13',
+            localDateStart: '2022-10-13',
+            localDateEnd: '2022-10-27',
         }
     }
     private suppliertValidator = new SupplierValidator();
-    private productValidator = new ProductValidator('octo', []);
+    private productValidator = new ProductValidator('', []);
+    private availabilityValidator = new AvailabilityValidator('', []);
 
     private validateGetSuppliers = async (params: ValidationData): Promise<ValidationResponse> => {
         const fullUrl = `${params.url}/suppliers`;
@@ -134,6 +140,61 @@ export class OctoValidationService implements IOctoValidationService {
         }
     }
 
+    private validateAvailabilityCheck = async (params: ValidationData): Promise<ValidationResponse> => {
+        const fullUrl = `${params.url}/availability`;
+
+        const dataLocalDate: any = await got.post(fullUrl, {headers:{"Authorization":`Bearer ${this.config().token}`},body:JSON.stringify({
+            productId: this.config().productId,
+            optionId: this.config().optionId,
+            localDate: this.config().localDate,
+        })}).json();
+
+        const validsLocalDate: any[] = dataLocalDate.map(availability => {
+            try {
+                this.availabilityValidator.validate(availability as Availability);
+                return true
+            } catch (e) {
+                console.log('invalid availability', availability)
+                return false
+            }
+        })
+
+        const dataLocalDateStartEnd: any = await got.post(fullUrl, {headers:{"Authorization":`Bearer ${this.config().token}`},body:JSON.stringify({
+            productId: this.config().productId,
+            optionId: this.config().optionId,
+            localDateStart: this.config().localDateStart,
+            localDateEnd: this.config().localDateEnd,
+        })}).json();
+
+        const validsLocalDateStartEnd: any[] = dataLocalDateStartEnd.map(availability => {
+            try {
+                this.availabilityValidator.validate(availability as Availability);
+                return true
+            } catch (e) {
+                console.log('invalid availability', availability)
+                return false
+            }
+        })
+
+        if (validsLocalDate.every(valid => valid === true) && validsLocalDateStartEnd.every(valid => valid === true)) {
+            return {
+                isValid: true,
+                body: {
+                    ...dataLocalDate,
+                    ...dataLocalDateStartEnd,
+                },
+            };
+        } else {
+            return {
+                isValid: false,
+                body: {
+                    ...dataLocalDate,
+                    ...dataLocalDateStartEnd,
+                },
+            };
+        }
+    }
+
     public validate = async (params: ValidationData): Promise<ValidationResponse> => {
         if (params.method === OctoMethod.GetSuppliers) {
             const response = await this.validateGetSuppliers(params)
@@ -152,6 +213,11 @@ export class OctoValidationService implements IOctoValidationService {
 
         if (params.method === OctoMethod.GetProduct) {
             const response = await this.validateGetProduct(params)
+            return response;
+        }
+
+        if (params.method === OctoMethod.AvailabilityCheck) {
+            const response = await this.validateAvailabilityCheck(params)
             return response;
         }
     }
