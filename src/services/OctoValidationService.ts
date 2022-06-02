@@ -1,6 +1,6 @@
-import { Availability, Product, Supplier } from '@octocloud/types';
+import { Availability, AvailabilityCalendar, Product, Supplier } from '@octocloud/types';
 import got from 'got';
-import { AvailabilityValidator } from '../validators/backendValidator/AvailabilityValidator';
+import { AvailabilityCalendarValidator, AvailabilityValidator } from '../validators/backendValidator/AvailabilityValidator';
 import { ProductValidator } from '../validators/backendValidator/ProductValidator';
 import { SupplierValidator } from '../validators/backendValidator/SupplierValidator';
 
@@ -48,6 +48,7 @@ export class OctoValidationService implements IOctoValidationService {
     private suppliertValidator = new SupplierValidator();
     private productValidator = new ProductValidator('', []);
     private availabilityValidator = new AvailabilityValidator('', []);
+    private availabilityCalendarValidator = new AvailabilityCalendarValidator('', []);
 
     private validateGetSuppliers = async (params: ValidationData): Promise<ValidationResponse> => {
         const fullUrl = `${params.url}/suppliers`;
@@ -195,6 +196,40 @@ export class OctoValidationService implements IOctoValidationService {
         }
     }
 
+    private validateAvailabilityCalendar = async (params: ValidationData): Promise<ValidationResponse> => {
+        const fullUrl = `${params.url}/availability/calendar`;
+
+        const data: any = await got.post(fullUrl, {headers:{"Authorization":`Bearer ${this.config().token}`},body:JSON.stringify({
+            productId: this.config().productId,
+            optionId: this.config().optionId,
+            localDateStart: this.config().localDateStart,
+            localDateEnd: this.config().localDateEnd,
+        })}).json();
+
+        const valids: any[] = data.map(availability => {
+            try {
+                this.availabilityCalendarValidator.validate(availability as AvailabilityCalendar);
+                return true
+            } catch (e) {
+                console.log('invalid availability', availability)
+                return false
+            }
+        })
+
+        if (valids.every(valid => valid === true)) {
+            return {
+                isValid: true,
+                body: data,
+            };
+        } else {
+            return {
+                isValid: false,
+                body: data,
+            };
+        }
+    }
+
+
     public validate = async (params: ValidationData): Promise<ValidationResponse> => {
         if (params.method === OctoMethod.GetSuppliers) {
             const response = await this.validateGetSuppliers(params)
@@ -218,6 +253,11 @@ export class OctoValidationService implements IOctoValidationService {
 
         if (params.method === OctoMethod.AvailabilityCheck) {
             const response = await this.validateAvailabilityCheck(params)
+            return response;
+        }
+
+        if (params.method === OctoMethod.AvailabilityCalendar) {
+            const response = await this.validateAvailabilityCalendar(params)
             return response;
         }
     }
