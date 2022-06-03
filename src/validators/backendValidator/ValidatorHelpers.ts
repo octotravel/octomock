@@ -80,14 +80,25 @@ export class BooleanValidator {
   };
 }
 
+interface EnumValidatorParams {
+  nullable?: boolean;
+}
+
 export class EnumValidator {
   public static validate = (
     label: string,
     value: unknown,
-    values: Array<string>
+    values: Array<string>,
+    params? : EnumValidatorParams
   ): boolean => {
     try {
-      const schema = yup.mixed().label(label).oneOf(values).required();
+      let schema;
+      if (params?.nullable) {
+        schema = yup.mixed().label(label).nullable().defined();
+      } else {
+
+        schema = yup.mixed().label(label).oneOf(values).required();
+      }
       schema.validateSync(value, { strict: true });
       return true;
     } catch (err) {

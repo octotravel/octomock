@@ -33,14 +33,8 @@ export class BookingStateValidator {
       label: `${this.path}.utcCreatedAt`,
       utcDate: booking.utcCreatedAt,
     });
-    this.validateUTCDate({
-      label: `${this.path}.utcUpdatedAt`,
-      utcDate: booking.utcUpdatedAt,
-    });
-    this.validateUTCDate({
-      label: `${this.path}.utcExpiresAt`,
-      utcDate: booking.utcExpiresAt,
-    });
+    NullValidator.validate( `${this.path}.utcUpdatedAt`,booking.utcUpdatedAt,);
+    NullValidator.validate(`${this.path}.utcExpiresAt`, booking.utcExpiresAt,);
     NullValidator.validate(`${this.path}.utcRedeemedAt`, booking.utcRedeemedAt);
     NullValidator.validate(
       `${this.path}.utcConfirmedAt`,

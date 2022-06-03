@@ -46,7 +46,9 @@ export class UnitItemValidator {
       unitItem.utcRedeemedAt
     );
     this.contactValidator.validate(unitItem.contact);
-    this.validateTicket(unitItem);
+    if (unitItem.ticket) {
+      this.validateTicket(unitItem);
+    }
 
     this.validatePricingCapability(unitItem);
   };
