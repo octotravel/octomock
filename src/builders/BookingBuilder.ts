@@ -204,6 +204,18 @@ export class BookingBuilder {
       utcCancelledAt: DateHelper.utcDateFormat(new Date()),
     };
 
+    const voucherAvailabile = booking.product.deliveryMethods.includes(
+      DeliveryMethod.VOUCHER
+    );
+    const voucher = voucherAvailabile
+      ? {
+          redemptionMethod: booking.product.redemptionMethod,
+          utcRedeemedAt: null,
+          deliveryOptions: [],
+        }
+      : null;
+
+
     const bookingModel = new BookingModel({
       id: booking.id,
       uuid: booking.uuid,
@@ -221,7 +233,7 @@ export class BookingBuilder {
       utcRedeemedAt: null,
       utcConfirmedAt: null,
       notes: booking.notes,
-      voucher: null,
+      voucher,
       cancellation,
       cancellable: false,
       freesale: booking.freesale,
