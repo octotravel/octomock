@@ -6,19 +6,20 @@ import {
   BookingAvailability,
   Ticket,
   RedemptionMethod,
+  BookingUnitItemSchema,
+  BookingContactSchema,
 } from "@octocloud/types";
-import { UnitItemModel } from "./../models/UnitItemModel";
-import { InvalidOptionIdError, InvalidUnitIdError } from "./../models/Error";
-import { DataGenerator } from "./../generators/DataGenerator";
+
 import {
   ConfirmBookingSchema,
   CreateBookingSchema,
-  OctoUnitItem,
-  Contact,
   CancelBookingSchema,
   ExtendBookingSchema,
   UpdateBookingSchema,
-} from "./../schemas/Booking";
+} from "../schemas/Booking";
+import { UnitItemModel } from "./../models/UnitItemModel";
+import { InvalidOptionIdError, InvalidUnitIdError } from "./../models/Error";
+import { DataGenerator } from "./../generators/DataGenerator";
 import { OptionModel } from "./../models/Option";
 import { ProductModel } from "./../models/Product";
 import { BookingModel } from "./../models/Booking";
@@ -78,7 +79,6 @@ export class BookingBuilder {
       utcRedeemedAt: null,
       utcConfirmedAt: null,
       notes: schema.notes ?? null,
-      freesale: schema.freesale,
     });
 
     return bookingModel;
@@ -108,7 +108,6 @@ export class BookingBuilder {
       utcConfirmedAt: DateHelper.utcDateFormat(new Date()),
       notes: schema.notes ?? booking.notes,
       voucher: this.generateVoucher(booking),
-      freesale: schema.freesale,
     });
 
     return bookingModel;
@@ -155,7 +154,6 @@ export class BookingBuilder {
       utcConfirmedAt: DateHelper.utcDateFormat(new Date()),
       notes: schema.notes ?? booking.notes,
       voucher: booking.voucher,
-      freesale: schema.freesale,
     });
 
     return bookingModel;
@@ -187,7 +185,6 @@ export class BookingBuilder {
       utcConfirmedAt: null,
       notes: booking.notes,
       voucher: booking.voucher,
-      freesale: booking.freesale,
     });
 
     return bookingModel;
@@ -235,7 +232,6 @@ export class BookingBuilder {
       voucher,
       cancellation,
       cancellable: false,
-      freesale: booking.freesale,
     });
 
     return bookingModel;
@@ -309,7 +305,7 @@ export class BookingBuilder {
     contact,
   }: {
     booking: Nullable<BookingModel>;
-    contact?: Contact;
+    contact?: BookingContactSchema;
   }) => {
     return {
       fullName: contact?.fullName ?? booking?.contact?.fullName ?? null,
@@ -326,7 +322,7 @@ export class BookingBuilder {
   };
 
   private buildUnitItem = (
-    item: OctoUnitItem,
+    item: BookingUnitItemSchema,
     status: BookingStatus,
     option: OptionModel,
     deliveryMethods: DeliveryMethod[]

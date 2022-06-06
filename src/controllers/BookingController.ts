@@ -8,10 +8,10 @@ import {
   GetBookingSchema,
   GetBookingsSchema,
   UpdateBookingSchema,
+  CreateBookingSchema,
 } from "./../schemas/Booking";
 import { AvailabilityService } from "./../services/AvailabilityService";
 import { ProductService } from "./../services/ProductService";
-import { CreateBookingSchema } from "../schemas/Booking";
 import { BookingService } from "../services/BookingService";
 import { BookingBuilder } from "../builders/BookingBuilder";
 
@@ -142,7 +142,7 @@ export class BookingController implements IBookingController {
   };
 
   public cancelBooking = async (
-    schema: ConfirmBookingSchema,
+    schema: CancelBookingSchema,
     capabilities: CapabilityId[]
   ): Promise<Booking> => {
     const booking = await this.bookingService.getBooking(schema);

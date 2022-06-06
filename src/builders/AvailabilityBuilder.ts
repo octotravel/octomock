@@ -5,9 +5,9 @@ import {
   DurationUnit,
   PricingPer,
   PricingUnit,
+  AvailabilityUnit,
 } from "@octocloud/types";
 import * as R from "ramda";
-import { AvailabilityUnit } from "./../schemas/Availability";
 import { InvalidOptionIdError, InvalidUnitIdError } from "./../models/Error";
 import { addDays, addHours, addMinutes, startOfDay } from "date-fns";
 import { AvailabilityModel } from "../models/Availability";

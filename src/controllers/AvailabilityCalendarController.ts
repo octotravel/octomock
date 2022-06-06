@@ -1,5 +1,8 @@
-import { AvailabilityCalendar, CapabilityId } from "@octocloud/types";
-import { AvailabilityCalendarSchema } from "../schemas/AvailabilityCalendar";
+import {
+  AvailabilityCalendar,
+  CapabilityId,
+  AvailabilityCalendarSchema,
+} from "@octocloud/types";
 import { AvailabilityCalendarService } from "../services/AvailabilityCalendarService";
 
 interface IAvailabilityCalendarController {

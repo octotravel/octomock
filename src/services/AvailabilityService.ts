@@ -1,11 +1,10 @@
-import { CapabilityId } from "@octocloud/types";
+import { CapabilityId, AvailabilitySchema } from "@octocloud/types";
 import { InvalidAvailabilityIdError, BadRequestError } from "./../models/Error";
 import { ProductModel } from "./../models/Product";
 import { ProductService } from "./ProductService";
 import { AvailabilityGenerator } from "../generators/AvailabilityGenerator";
 import { eachDayOfInterval } from "date-fns";
 import { AvailabilityModel } from "../models/Availability";
-import { AvailabilitySchema } from "../schemas/Availability";
 import { DateHelper } from "../helpers/DateHelper";
 
 interface FindBookingAvailabilityData {

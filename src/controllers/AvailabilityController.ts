@@ -1,7 +1,9 @@
-// import { AvailabilityValidator } from './../validators/backendValidator/AvailabilityValidator';
-import { CapabilityId, Availability } from "@octocloud/types";
+import {
+  CapabilityId,
+  Availability,
+  AvailabilitySchema,
+} from "@octocloud/types";
 import { AvailabilityService } from "./../services/AvailabilityService";
-import { AvailabilitySchema } from "../schemas/Availability";
 
 interface IAvailabilityController {
   getAvailability(

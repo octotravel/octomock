@@ -1,9 +1,8 @@
-import { CapabilityId } from "@octocloud/types";
+import { CapabilityId, AvailabilityCalendarSchema } from "@octocloud/types";
 import { eachDayOfInterval } from "date-fns";
 import { AvailabilityCalendarModel } from "./../models/AvailabilityCalendar";
 import { AvailabilityModel } from "./../models/Availability";
 // import { AvailabilityCalendar } from './../types/AvailabilityCalendar';
-import { AvailabilityCalendarSchema } from "./../schemas/AvailabilityCalendar";
 import { ProductService } from "./ProductService";
 import { AvailabilityGenerator } from "../generators/AvailabilityGenerator";
 import { DateHelper } from "../helpers/DateHelper";
