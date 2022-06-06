@@ -215,7 +215,6 @@ export class BookingBuilder {
         }
       : null;
 
-
     const bookingModel = new BookingModel({
       id: booking.id,
       uuid: booking.uuid,

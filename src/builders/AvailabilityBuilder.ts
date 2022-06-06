@@ -9,12 +9,7 @@ import {
 import * as R from "ramda";
 import { AvailabilityUnit } from "./../schemas/Availability";
 import { InvalidOptionIdError, InvalidUnitIdError } from "./../models/Error";
-import {
-  addDays,
-  addHours,
-  addMinutes,
-  startOfDay,
-} from "date-fns";
+import { addDays, addHours, addMinutes, startOfDay } from "date-fns";
 import { AvailabilityModel } from "../models/Availability";
 import { ProductModel } from "../models/Product";
 import { OptionModel } from "../models/Option";
