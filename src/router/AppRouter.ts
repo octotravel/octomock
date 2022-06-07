@@ -1,9 +1,9 @@
 import {
   CapabilityId,
-  AvailabilityCalendarSchema,
-  availabilityCalendarSchema,
-  availabilitySchema,
-  AvailabilitySchema,
+  AvailabilityCalendarBodySchema,
+  availabilityCalendarBodySchema,
+  availabilityBodySchema,
+  AvailabilityBodySchema,
 } from "@octocloud/types";
 import { AvailabilityCalendarController } from "./../controllers/AvailabilityCalendarController";
 import { CapabilityController } from "./../controllers/CapabilityController";
@@ -57,10 +57,10 @@ router.get("/products/:productId", (ctx, _) => {
 router.post("/availability", async (ctx, _) => {
   const capabilities = getCapabilities(ctx);
 
-  const data: AvailabilitySchema = ctx.request.body;
+  const data: AvailabilityBodySchema = ctx.request.body;
 
-  await availabilitySchema.validate(data);
-  const schema = availabilitySchema.cast(data) as AvailabilitySchema;
+  await availabilityBodySchema.validate(data);
+  const schema = availabilityBodySchema.cast(data) as AvailabilityBodySchema;
 
   const body = await availabilityController.getAvailability(
     schema,
@@ -74,10 +74,10 @@ router.post("/availability", async (ctx, _) => {
 router.post("/availability/calendar", async (ctx, _) => {
   const capabilities = getCapabilities(ctx);
 
-  const data: AvailabilityCalendarSchema = ctx.request.body;
+  const data: AvailabilityCalendarBodySchema = ctx.request.body;
 
-  await availabilityCalendarSchema.validate(data);
-  const schema = availabilitySchema.cast(data) as AvailabilityCalendarSchema;
+  await availabilityCalendarBodySchema.validate(data);
+  const schema = availabilityCalendarBodySchema.cast(data) as AvailabilityCalendarBodySchema;
 
   const body = await availabilityCalendarController.getAvailability(
     schema,
@@ -188,8 +188,11 @@ router.get("/bookings/:uuid", async (ctx, _) => {
 router.get("/bookings", async (ctx, _) => {
   const capabilities = getCapabilities(ctx);
   const data: GetBookingsSchema = {
-    resellerReference: ctx.query.resellerReference as string,
-    supplierReference: ctx.query.supplierReference as string,
+    resellerReference: ctx.query.resellerReference as string | undefined,
+    supplierReference: ctx.query.supplierReference as string | undefined,
+    localDate: ctx.query.localDate as string | undefined,
+    localDateEnd: ctx.query.localDateEnd as string | undefined,
+    localDateStart: ctx.query.localDateStart as string | undefined,
   };
 
   await getBookingsSchema.validate(data);

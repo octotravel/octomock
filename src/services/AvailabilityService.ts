@@ -1,4 +1,4 @@
-import { CapabilityId, AvailabilitySchema } from "@octocloud/types";
+import { CapabilityId, AvailabilityBodySchema } from "@octocloud/types";
 import { InvalidAvailabilityIdError, BadRequestError } from "./../models/Error";
 import { ProductModel } from "./../models/Product";
 import { ProductService } from "./ProductService";
@@ -15,7 +15,7 @@ interface FindBookingAvailabilityData {
 
 interface IAvailabilityService {
   getAvailability(
-    schema: AvailabilitySchema,
+    schema: AvailabilityBodySchema,
     capabilities: CapabilityId[]
   ): Promise<AvailabilityModel[]>;
   findBookingAvailability(
@@ -29,7 +29,7 @@ export class AvailabilityService implements IAvailabilityService {
   private productService = new ProductService();
 
   public getAvailability = async (
-    schema: AvailabilitySchema,
+    schema: AvailabilityBodySchema,
     capabilities: CapabilityId[]
   ): Promise<AvailabilityModel[]> => {
     const product = this.productService.getProduct(schema.productId);

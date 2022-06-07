@@ -1,4 +1,4 @@
-import { CapabilityId, AvailabilityCalendarSchema } from "@octocloud/types";
+import { CapabilityId, AvailabilityCalendarBodySchema } from "@octocloud/types";
 import { eachDayOfInterval } from "date-fns";
 import { AvailabilityCalendarModel } from "./../models/AvailabilityCalendar";
 import { AvailabilityModel } from "./../models/Availability";
@@ -9,7 +9,7 @@ import { DateHelper } from "../helpers/DateHelper";
 
 interface IAvailabilityService {
   getAvailability(
-    schema: AvailabilityCalendarSchema,
+    schema: AvailabilityCalendarBodySchema,
     capabilities: CapabilityId[]
   ): Promise<AvailabilityCalendarModel[]>;
 }
@@ -19,7 +19,7 @@ export class AvailabilityCalendarService implements IAvailabilityService {
   private productService = new ProductService();
 
   public getAvailability = async (
-    schema: AvailabilityCalendarSchema,
+    schema: AvailabilityCalendarBodySchema,
     capabilities: CapabilityId[]
   ): Promise<AvailabilityCalendarModel[]> => {
     const product = this.productService.getProduct(schema.productId);

@@ -1,85 +1,86 @@
 import * as yup from "yup";
 import {
-  CreateBookingSchema as BaseCreateBookingSchema,
-  createBookingSchema as baseCreateBookingSchema,
-  ConfirmBookingSchema as BaseConfirmBookingSchema,
-  confirmBookingSchema as baseConfirmBookingSchema,
-  UpdateBookingSchema as BaseUpdateBookingSchema,
-  updateBookingSchema as baseUpdateBookingSchema,
-  CancelBookingSchema as BaseCancelBookingSchema,
-  cancelBookingSchema as baseCancelBookingSchema,
-  ExtendBookingSchema as BaseExtendBookingSchema,
-  extendBookingSchema as baseExtendBookingSchema,
+  CreateBookingBodySchema,
+  createBookingBodySchema,
+  ConfirmBookingBodySchema,
+  ConfirmBookingPathParamsSchema,
+  confirmBookingBodySchema,
+  confirmBookingPathParamsSchema,
+  UpdateBookingBodySchema,
+  UpdateBookingPathParamsSchema,
+  updateBookingPathParamsSchema,
+  updateBookingBodySchema,
+  CancelBookingBodySchema,
+  CancelBookingPathParamsSchema,
+  cancelBookingBodySchema,
+  cancelBookingPathParamsSchema,
+  ExtendBookingBodySchema,
+  ExtendBookingPathParamsSchema,
+  extendBookingBodySchema,
+  extendBookingPathParamsSchema,
+  GetBookingPathParamsSchema,
+  getBookingPathParamsSchema,
+  GetBookingsQueryParamsSchema,
+  getBookingsQueryParamsSchema,
 } from "@octocloud/types";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface CreateBookingSchema extends BaseCreateBookingSchema {}
+export interface GetBookingSchema extends GetBookingPathParamsSchema {}
 
-export const createBookingSchema = baseCreateBookingSchema.clone();
+export const getBookingSchema: yup.SchemaOf<GetBookingSchema> =
+  getBookingPathParamsSchema.clone();
 
-export interface ConfirmBookingSchema extends BaseConfirmBookingSchema {
-  uuid: string;
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface GetBookingsSchema extends GetBookingsQueryParamsSchema {}
+
+export const getBookingsSchema: yup.SchemaOf<GetBookingsSchema> =
+  getBookingsQueryParamsSchema.clone();
+
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface CreateBookingSchema extends CreateBookingBodySchema {}
+
+export const createBookingSchema = createBookingBodySchema.clone();
+
+export interface ConfirmBookingSchema
+  extends ConfirmBookingPathParamsSchema,
+    ConfirmBookingBodySchema {}
 
 export const confirmBookingSchema: yup.SchemaOf<ConfirmBookingSchema> = yup
   .object()
   .shape({
-    uuid: yup.string().required(),
-    ...baseConfirmBookingSchema.fields,
+    ...confirmBookingPathParamsSchema.fields,
+    ...confirmBookingBodySchema.fields,
   });
 
-export interface UpdateBookingSchema extends BaseUpdateBookingSchema {
-  uuid: string;
-}
+export interface UpdateBookingSchema
+  extends UpdateBookingBodySchema,
+    UpdateBookingPathParamsSchema {}
 
 export const updateBookingSchema: yup.SchemaOf<UpdateBookingSchema> = yup
   .object()
   .shape({
-    uuid: yup.string().required(),
-    ...baseUpdateBookingSchema.fields,
+    ...updateBookingPathParamsSchema.fields,
+    ...updateBookingBodySchema.fields,
   });
 
-export interface CancelBookingSchema extends BaseCancelBookingSchema {
-  uuid: string;
-}
+export interface CancelBookingSchema
+  extends CancelBookingBodySchema,
+    CancelBookingPathParamsSchema {}
 
 export const cancelBookingSchema: yup.SchemaOf<CancelBookingSchema> = yup
   .object()
   .shape({
-    uuid: yup.string().required(),
-    ...baseCancelBookingSchema.fields,
+    ...cancelBookingBodySchema.fields,
+    ...cancelBookingPathParamsSchema.fields,
   });
 
-export interface ExtendBookingSchema extends BaseExtendBookingSchema {
-  uuid: string;
-}
+export interface ExtendBookingSchema
+  extends ExtendBookingBodySchema,
+    ExtendBookingPathParamsSchema {}
 
 export const extendBookingSchema: yup.SchemaOf<ExtendBookingSchema> = yup
   .object()
   .shape({
-    uuid: yup.string().required(),
-    ...baseExtendBookingSchema.fields,
+    ...extendBookingBodySchema.fields,
+    ...extendBookingPathParamsSchema.fields,
   });
-
-export type GetBookingSchema = {
-  uuid: string;
-};
-
-export const getBookingSchema: yup.SchemaOf<GetBookingSchema> = yup
-  .object()
-  .shape({
-    uuid: yup.string().required(),
-  });
-
-export type GetBookingsSchema = {
-  resellerReference?: string;
-  supplierReference?: string;
-};
-
-export const getBookingsSchema: yup.SchemaOf<GetBookingsSchema> = yup
-  .object()
-  .shape({
-    resellerReference: yup.string().notRequired(),
-    supplierReference: yup.string().notRequired(),
-  })
-  .required();
