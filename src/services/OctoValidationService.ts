@@ -1,4 +1,4 @@
-import { Availability, Booking, CapabilityId, Product, Supplier } from '@octocloud/types';
+import { Availability, CapabilityId, Product, Supplier } from '@octocloud/types';
 import got from 'got';
 import { AvailabilityCalendarValidator, AvailabilityValidator } from '../validators/backendValidator/AvailabilityValidator';
 import { BookingValidator } from '../validators/backendValidator/BookingValidator';
@@ -54,7 +54,7 @@ export class OctoValidationService implements IOctoValidationService {
 
     private validateGetSuppliers = async (params: ValidationData): Promise<ValidationResponse> => {
         const fullUrl = `${params.url}/suppliers`;
-        const data: Array<any> = await got.get(fullUrl, {headers:{"Authorization":`Bearer ${this.config().token}`,"Octo-Capabilities":"octo/content,octo/pricing"}}).json();
+        const data = await got.get(fullUrl, {headers:{"Authorization":`Bearer ${this.config().token}`,"Octo-Capabilities":"octo/content,octo/pricing"}}).json() as any;
 
         const valids: any[] = data.map(supplier => {
             try {
@@ -102,7 +102,7 @@ export class OctoValidationService implements IOctoValidationService {
     private validateGetProducts = async (params: ValidationData): Promise<ValidationResponse> => {
         const fullUrl = `${params.url}/products`;
         console.log(fullUrl)
-        const data: Array<any> = await got.get(fullUrl, {headers:{"Authorization":`Bearer ${this.config().token}`,"Octo-Capabilities":"octo/content,octo/pricing"}}).json();
+        const data = await got.get(fullUrl, {headers:{"Authorization":`Bearer ${this.config().token}`,"Octo-Capabilities":"octo/content,octo/pricing"}}).json() as any;
 
         const valids: any[] = data.map(product => {
             try {
@@ -241,7 +241,7 @@ export class OctoValidationService implements IOctoValidationService {
     private validateBookingReservation = async (params: ValidationData): Promise<ValidationResponse> => {
         const urlAvailability = `${params.url}/availability`;
 
-        const dataAvailability: Availability[] = await got.post(urlAvailability, {headers:{"Authorization":`Bearer ${this.config().token}`,"Octo-Capabilities":"octo/content,octo/pricing"},body:JSON.stringify({
+        const dataAvailability = await got.post(urlAvailability, {headers:{"Authorization":`Bearer ${this.config().token}`,"Octo-Capabilities":"octo/content,octo/pricing"},body:JSON.stringify({
             productId: this.config().productId,
             optionId: this.config().optionId,
             localDate: this.config().localDate,
@@ -284,7 +284,7 @@ export class OctoValidationService implements IOctoValidationService {
     private validateListBookings = async (params: ValidationData): Promise<ValidationResponse> => {
         const urlAvailability = `${params.url}/availability`;
 
-        const dataAvailability1: Availability[] = await got.post(urlAvailability, {headers:{"Authorization":`Bearer ${this.config().token}`,"Octo-Capabilities":"octo/content,octo/pricing"},body:JSON.stringify({
+        const dataAvailability1 = await got.post(urlAvailability, {headers:{"Authorization":`Bearer ${this.config().token}`,"Octo-Capabilities":"octo/content,octo/pricing"},body:JSON.stringify({
             productId: this.config().productId,
             optionId: this.config().optionId,
             localDate: this.config().localDate,
@@ -337,7 +337,7 @@ export class OctoValidationService implements IOctoValidationService {
     private validateBookingConfirmation = async (params: ValidationData): Promise<ValidationResponse> => {
         const urlAvailability = `${params.url}/availability`;
 
-        const dataAvailability: Availability[] = await got.post(urlAvailability, {headers:{"Authorization":`Bearer ${this.config().token}`,"Octo-Capabilities":"octo/content,octo/pricing"},body:JSON.stringify({
+        const dataAvailability = await got.post(urlAvailability, {headers:{"Authorization":`Bearer ${this.config().token}`,"Octo-Capabilities":"octo/content,octo/pricing"},body:JSON.stringify({
             productId: this.config().productId,
             optionId: this.config().optionId,
             localDate: this.config().localDate,
@@ -359,7 +359,7 @@ export class OctoValidationService implements IOctoValidationService {
             ]
         })
 
-        const dataBooking: Booking = await got.post(urlBooking, {headers:{"Authorization":`Bearer ${this.config().token}`,"Octo-Capabilities":"octo/content,octo/pricing"},body}).json();
+        const dataBooking = await got.post(urlBooking, {headers:{"Authorization":`Bearer ${this.config().token}`,"Octo-Capabilities":"octo/content,octo/pricing"},body}).json() as any;
 
         const urlBookingConfirm = `${params.url}/bookings/${dataBooking.uuid}/confirm`;
 
@@ -384,7 +384,7 @@ export class OctoValidationService implements IOctoValidationService {
     private validateGetBooking = async (params: ValidationData): Promise<ValidationResponse> => {
         const urlAvailability = `${params.url}/availability`;
 
-        const dataAvailability: Availability[] = await got.post(urlAvailability, {headers:{"Authorization":`Bearer ${this.config().token}`,"Octo-Capabilities":"octo/content,octo/pricing"},body:JSON.stringify({
+        const dataAvailability = await got.post(urlAvailability, {headers:{"Authorization":`Bearer ${this.config().token}`,"Octo-Capabilities":"octo/content,octo/pricing"},body:JSON.stringify({
             productId: this.config().productId,
             optionId: this.config().optionId,
             localDate: this.config().localDate,
@@ -405,7 +405,7 @@ export class OctoValidationService implements IOctoValidationService {
                 }
             ]
         })
-        const dataBooking: Booking = await got.post(urlBooking, {headers:{"Authorization":`Bearer ${this.config().token}`,"Octo-Capabilities":"octo/content,octo/pricing"},body}).json();
+        const dataBooking = await got.post(urlBooking, {headers:{"Authorization":`Bearer ${this.config().token}`,"Octo-Capabilities":"octo/content,octo/pricing"},body}).json() as any;
 
         const urlBookingConfirm = `${params.url}/bookings/${dataBooking.uuid}/confirm`;
         const dataBookingConfirm: any = await got.post(urlBookingConfirm, {headers:{"Authorization":`Bearer ${this.config().token}`,"Octo-Capabilities":"octo/content,octo/pricing"}}).json();
@@ -433,7 +433,7 @@ export class OctoValidationService implements IOctoValidationService {
     private validateBookingCancellation = async (params: ValidationData): Promise<ValidationResponse> => {
         const urlAvailability = `${params.url}/availability`;
 
-        const dataAvailability: Availability[] = await got.post(urlAvailability, {headers:{"Authorization":`Bearer ${this.config().token}`,"Octo-Capabilities":"octo/content,octo/pricing"},body:JSON.stringify({
+        const dataAvailability = await got.post(urlAvailability, {headers:{"Authorization":`Bearer ${this.config().token}`,"Octo-Capabilities":"octo/content,octo/pricing"},body:JSON.stringify({
             productId: this.config().productId,
             optionId: this.config().optionId,
             localDate: this.config().localDate,
@@ -455,7 +455,7 @@ export class OctoValidationService implements IOctoValidationService {
             ]
         })
 
-        const dataBooking: Booking = await got.post(urlBooking, {headers:{"Authorization":`Bearer ${this.config().token}`,"Octo-Capabilities":"octo/content,octo/pricing"},body}).json();
+        const dataBooking = await got.post(urlBooking, {headers:{"Authorization":`Bearer ${this.config().token}`,"Octo-Capabilities":"octo/content,octo/pricing"},body}).json() as any;
 
         const urlBookingCancel = `${params.url}/bookings/${dataBooking.uuid}`;
 
@@ -480,7 +480,7 @@ export class OctoValidationService implements IOctoValidationService {
     private validateBookingUpdate = async (params: ValidationData): Promise<ValidationResponse> => {
         const urlAvailability = `${params.url}/availability`;
 
-        const dataAvailability: Availability[] = await got.post(urlAvailability, {headers:{"Authorization":`Bearer ${this.config().token}`,"Octo-Capabilities":"octo/content,octo/pricing"},body:JSON.stringify({
+        const dataAvailability = await got.post(urlAvailability, {headers:{"Authorization":`Bearer ${this.config().token}`,"Octo-Capabilities":"octo/content,octo/pricing"},body:JSON.stringify({
             productId: this.config().productId,
             optionId: this.config().optionId,
             localDate: this.config().localDate,
@@ -502,7 +502,7 @@ export class OctoValidationService implements IOctoValidationService {
             ]
         })
 
-        const dataBooking: Booking = await got.post(urlBooking, {headers:{"Authorization":`Bearer ${this.config().token}`,"Octo-Capabilities":"octo/content,octo/pricing"}, body}).json();
+        const dataBooking = await got.post(urlBooking, {headers:{"Authorization":`Bearer ${this.config().token}`,"Octo-Capabilities":"octo/content,octo/pricing"}, body}).json() as any;
 
         const urlBookingUpdate = `${params.url}/bookings/${dataBooking.uuid}`;
 
