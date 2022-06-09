@@ -1,31 +1,29 @@
-import { CapabilityId } from "@octocloud/types";
+import {
+  CapabilityId,
+  AvailabilityCalendarBodySchema,
+  availabilityCalendarBodySchema,
+  availabilityBodySchema,
+  AvailabilityBodySchema,
+} from "@octocloud/types";
 import { AvailabilityCalendarController } from "./../controllers/AvailabilityCalendarController";
 import { CapabilityController } from "./../controllers/CapabilityController";
 import { SupplierController } from "./../controllers/SupplierController";
 import {
-  cancelBookingSchema,
-  confirmBookingSchema,
-  extendBookingSchema,
   getBookingSchema,
   GetBookingSchema,
   GetBookingsSchema,
   getBookingsSchema,
-  patchBookingSchema,
+  cancelBookingSchema,
+  confirmBookingSchema,
+  extendBookingSchema,
+  updateBookingSchema,
+  createBookingSchema,
+  CreateBookingSchema,
 } from "./../schemas/Booking";
 import Router from "@koa/router";
 import { ProductController } from "../controllers/ProductController";
 import { BookingController } from "../controllers/BookingController";
-import { CreateBookingSchema } from "../schemas/Booking";
 import { AvailabilityController } from "../controllers/AvailabilityController";
-import {
-  availabilitySchema,
-  AvailabilitySchema,
-} from "../schemas/Availability";
-import { AvailabilityValidator } from "../validators/AvailabilityValidator";
-import {
-  availabilityCalendarSchema,
-  AvailabilityCalendarSchema,
-} from "../schemas/AvailabilityCalendar";
 import { OctoMethod, OctoValidationService, ValidationData } from "../services/OctoValidationService";
 import { validationSchema } from "../schemas/Validation";
 
@@ -36,7 +34,6 @@ const availabilityCalendarController = new AvailabilityCalendarController();
 const bookingController = new BookingController();
 const supplierController = new SupplierController();
 const capabilityController = new CapabilityController();
-const availabilityValidator = new AvailabilityValidator();
 const validationService = new OctoValidationService();
 
 const getCapabilities = (ctx: any): CapabilityId[] => {
@@ -63,16 +60,10 @@ router.get("/products/:productId", (ctx, _) => {
 router.post("/availability", async (ctx, _) => {
   const capabilities = getCapabilities(ctx);
 
-  const data: AvailabilitySchema = ctx.request.body;
+  const data: AvailabilityBodySchema = ctx.request.body;
 
-  await availabilitySchema.validate(data);
-  const schema = availabilitySchema.cast(data) as AvailabilitySchema;
-  availabilityValidator.validate({
-    availabilityIds: schema.availabilityIds,
-    localDate: schema.localDate,
-    localDateEnd: schema.localDateEnd,
-    localDateStart: schema.localDateStart,
-  });
+  await availabilityBodySchema.validate(data);
+  const schema = availabilityBodySchema.cast(data) as AvailabilityBodySchema;
 
   const body = await availabilityController.getAvailability(
     schema,
@@ -86,10 +77,10 @@ router.post("/availability", async (ctx, _) => {
 router.post("/availability/calendar", async (ctx, _) => {
   const capabilities = getCapabilities(ctx);
 
-  const data: AvailabilityCalendarSchema = ctx.request.body;
+  const data: AvailabilityCalendarBodySchema = ctx.request.body;
 
-  await availabilityCalendarSchema.validate(data);
-  const schema = availabilitySchema.cast(data) as AvailabilityCalendarSchema;
+  await availabilityCalendarBodySchema.validate(data);
+  const schema = availabilityCalendarBodySchema.cast(data) as AvailabilityCalendarBodySchema;
 
   const body = await availabilityCalendarController.getAvailability(
     schema,
@@ -105,7 +96,7 @@ router.post("/bookings", async (ctx, _) => {
 
   const data: CreateBookingSchema = ctx.request.body;
 
-  await availabilitySchema.validate(data);
+  await createBookingSchema.validate(data);
   const booking = await bookingController.createBooking(
     {
       ...data,
@@ -135,8 +126,8 @@ router.patch("/bookings/:uuid", async (ctx, _) => {
     ...ctx.request.body,
     uuid: ctx.params.uuid,
   };
-  await patchBookingSchema.validate(ctx.body);
-  const schema = patchBookingSchema.cast(ctx.body);
+  await updateBookingSchema.validate(ctx.body);
+  const schema = updateBookingSchema.cast(ctx.body);
 
   const booking = await bookingController.updateBooking(schema, capabilities);
   ctx.body = booking;
@@ -200,8 +191,11 @@ router.get("/bookings/:uuid", async (ctx, _) => {
 router.get("/bookings", async (ctx, _) => {
   const capabilities = getCapabilities(ctx);
   const data: GetBookingsSchema = {
-    resellerReference: ctx.query.resellerReference as string,
-    supplierReference: ctx.query.supplierReference as string,
+    resellerReference: ctx.query.resellerReference as string | undefined,
+    supplierReference: ctx.query.supplierReference as string | undefined,
+    localDate: ctx.query.localDate as string | undefined,
+    localDateEnd: ctx.query.localDateEnd as string | undefined,
+    localDateStart: ctx.query.localDateStart as string | undefined,
   };
 
   await getBookingsSchema.validate(data);

@@ -1,10 +1,13 @@
-import { AvailabilityCalendar, CapabilityId } from "@octocloud/types";
-import { AvailabilityCalendarSchema } from "../schemas/AvailabilityCalendar";
+import {
+  AvailabilityCalendar,
+  CapabilityId,
+  AvailabilityCalendarBodySchema,
+} from "@octocloud/types";
 import { AvailabilityCalendarService } from "../services/AvailabilityCalendarService";
 
 interface IAvailabilityCalendarController {
   getAvailability(
-    schema: AvailabilityCalendarSchema,
+    schema: AvailabilityCalendarBodySchema,
     capabilities: CapabilityId[]
   ): Promise<AvailabilityCalendar[]>;
 }
@@ -14,7 +17,7 @@ export class AvailabilityCalendarController
 {
   private service = new AvailabilityCalendarService();
   public getAvailability = async (
-    schema: AvailabilityCalendarSchema,
+    schema: AvailabilityCalendarBodySchema,
     capabilities: CapabilityId[]
   ): Promise<AvailabilityCalendar[]> => {
     const models = await this.service.getAvailability(schema, capabilities);

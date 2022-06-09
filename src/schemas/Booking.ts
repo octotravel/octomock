@@ -1,232 +1,86 @@
 import * as yup from "yup";
+import {
+  CreateBookingBodySchema,
+  createBookingBodySchema,
+  ConfirmBookingBodySchema,
+  ConfirmBookingPathParamsSchema,
+  confirmBookingBodySchema,
+  confirmBookingPathParamsSchema,
+  UpdateBookingBodySchema,
+  UpdateBookingPathParamsSchema,
+  updateBookingPathParamsSchema,
+  updateBookingBodySchema,
+  CancelBookingBodySchema,
+  CancelBookingPathParamsSchema,
+  cancelBookingBodySchema,
+  cancelBookingPathParamsSchema,
+  ExtendBookingBodySchema,
+  ExtendBookingPathParamsSchema,
+  extendBookingBodySchema,
+  extendBookingPathParamsSchema,
+  GetBookingPathParamsSchema,
+  getBookingPathParamsSchema,
+  GetBookingsQueryParamsSchema,
+  getBookingsQueryParamsSchema,
+} from "@octocloud/types";
 
-export type OctoUnitItem = {
-  uuid?: string;
-  unitId: string;
-  resellerReference?: string;
-};
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface GetBookingSchema extends GetBookingPathParamsSchema {}
 
-type Capabilities = {
-  // octo/adjustments
-  adjustments?: Array<{
-    per?: string;
-    amount: number;
-    quantity?: number;
-    notes?: string;
-  }>;
-  // octo/cart
-  orderId?: string;
-  // octo/offers
-  offerCode?: string;
-  // octo/pickups
-  pickupRequested?: boolean;
-  pickupPointId?: string;
-  pickupHotel?: string;
-};
+export const getBookingSchema: yup.SchemaOf<GetBookingSchema> =
+  getBookingPathParamsSchema.clone();
 
-export type Contact = {
-  fullName?: string;
-  firstName?: string;
-  lastName?: string;
-  emailAddress?: string;
-  phoneNumber?: string;
-  country?: string;
-  notes?: string;
-  locales?: Array<string>;
-};
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface GetBookingsSchema extends GetBookingsQueryParamsSchema {}
 
-export type CreateBookingSchema = Capabilities & {
-  uuid?: string;
-  resellerReference?: string;
-  productId: string;
-  optionId: string;
-  availabilityId: string;
-  expirationMinutes?: number;
-  freesale?: boolean;
-  redeemed?: boolean;
-  notes?: string;
-  emailReceipt?: boolean;
-  unitItems: OctoUnitItem[];
-  contact?: Contact;
-};
+export const getBookingsSchema: yup.SchemaOf<GetBookingsSchema> =
+  getBookingsQueryParamsSchema.clone();
 
-export type UpdateBookingSchema = Capabilities & {
-  uuid: string;
-  resellerReference?: string;
-  productId?: string;
-  optionId?: string;
-  availabilityId?: string;
-  expirationMinutes?: number;
-  freesale?: boolean;
-  redeemed?: boolean;
-  notes?: string;
-  emailReceipt?: boolean;
-  unitItems?: OctoUnitItem[];
-  contact?: Contact;
-};
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface CreateBookingSchema extends CreateBookingBodySchema {}
 
-export type ConfirmBookingSchema = UpdateBookingSchema;
+export const createBookingSchema = createBookingBodySchema.clone();
 
-export type CancelBookingSchema = {
-  uuid: string;
-  reason?: string;
-  force?: boolean;
-};
+export interface ConfirmBookingSchema
+  extends ConfirmBookingPathParamsSchema,
+    ConfirmBookingBodySchema {}
 
-export type ExtendBookingSchema = {
-  uuid: string;
-  expirationMinutes?: number;
-};
-
-export type GetBookingSchema = {
-  uuid: string;
-};
-
-export type GetBookingsSchema = {
-  resellerReference?: string;
-  supplierReference?: string;
-};
-
-export const createBookingSchema: yup.SchemaOf<CreateBookingSchema> =
-  yup.object({
-    uuid: yup.string().notRequired(),
-    resellerReference: yup.string().notRequired(),
-    productId: yup.string().required(),
-    optionId: yup.string().required(),
-    availabilityId: yup.string().required(),
-    expirationMinutes: yup.number().integer().notRequired(),
-    freesale: yup.bool().notRequired(),
-    redeemed: yup.bool().notRequired(),
-    notes: yup.string().notRequired(),
-    emailReceipt: yup.bool().notRequired(),
-    unitItems: yup
-      .array()
-      .of(
-        yup.object({
-          uuid: yup.string().notRequired(),
-          unitId: yup.string().required(),
-          resellerReference: yup.string().notRequired(),
-        })
-      )
-      .required(),
-    contact: yup
-      .object({
-        fullName: yup.string().notRequired(),
-        firstName: yup.string().notRequired(),
-        lastName: yup.string().notRequired(),
-        emailAddress: yup.string().notRequired(),
-        phoneNumber: yup.string().notRequired(),
-        country: yup.string().notRequired(),
-        notes: yup.string().notRequired(),
-        locales: yup.array().of(yup.string()).notRequired(),
-      })
-      .notRequired()
-      .default(undefined),
-    // octo/adjustments
-    adjustments: yup
-      .array()
-      .of(
-        yup.object({
-          per: yup.string().notRequired(),
-          amount: yup.number().integer().required(),
-          quantity: yup.number().integer().notRequired(),
-          notes: yup.string().notRequired(),
-        })
-      )
-      .notRequired(),
-    // octo/cart
-    orderId: yup.string().notRequired(),
-    // octo/offers
-    offerCode: yup.string().notRequired(),
-    // octo/pickups
-    pickupRequested: yup.bool().notRequired(),
-    pickupPointId: yup.string().notRequired(),
-    pickupHotel: yup.string().notRequired(),
-  });
-
-export const patchBookingSchema: yup.SchemaOf<UpdateBookingSchema> = yup.object(
-  {
-    uuid: yup.string().required(),
-    resellerReference: yup.string().notRequired(),
-    productId: yup.string().notRequired(),
-    optionId: yup.string().notRequired(),
-    availabilityId: yup.string().notRequired(),
-    expirationMinutes: yup.number().integer().notRequired(),
-    freesale: yup.bool().notRequired(),
-    redeemed: yup.bool().notRequired(),
-    notes: yup.string().notRequired(),
-    emailReceipt: yup.bool().notRequired(),
-    unitItems: yup
-      .array()
-      .of(
-        yup.object({
-          uuid: yup.string().notRequired(),
-          unitId: yup.string().required(),
-          resellerReference: yup.string().notRequired(),
-        })
-      )
-      .notRequired(),
-    contact: yup
-      .object({
-        fullName: yup.string().notRequired(),
-        firstName: yup.string().notRequired(),
-        lastName: yup.string().notRequired(),
-        emailAddress: yup.string().notRequired(),
-        phoneNumber: yup.string().notRequired(),
-        country: yup.string().notRequired(),
-        notes: yup.string().notRequired(),
-        locales: yup.array().of(yup.string()).notRequired(),
-      })
-      .notRequired(),
-    // octo/adjustments
-    adjustments: yup
-      .array()
-      .of(
-        yup.object({
-          per: yup.string().notRequired(),
-          amount: yup.number().integer().required(),
-          quantity: yup.number().integer().notRequired(),
-          notes: yup.string().notRequired(),
-        })
-      )
-      .notRequired(),
-    // octo/cart
-    orderId: yup.string().notRequired(),
-    // octo/offers
-    offerCode: yup.string().notRequired(),
-    // octo/pickups
-    pickupRequested: yup.bool().notRequired(),
-    pickupPointId: yup.string().notRequired(),
-    pickupHotel: yup.string().notRequired(),
-  }
-);
-
-export const getBookingSchema: yup.SchemaOf<GetBookingSchema> = yup
+export const confirmBookingSchema: yup.SchemaOf<ConfirmBookingSchema> = yup
   .object()
   .shape({
-    uuid: yup.string().required(),
+    ...confirmBookingPathParamsSchema.fields,
+    ...confirmBookingBodySchema.fields,
   });
 
-export const confirmBookingSchema: yup.SchemaOf<ConfirmBookingSchema> =
-  patchBookingSchema.clone();
+export interface UpdateBookingSchema
+  extends UpdateBookingBodySchema,
+    UpdateBookingPathParamsSchema {}
 
-export const cancelBookingSchema: yup.SchemaOf<CancelBookingSchema> =
-  yup.object({
-    uuid: yup.string().required(),
-    reason: yup.string().notRequired(),
-    force: yup.boolean().notRequired(),
-  });
-
-export const extendBookingSchema: yup.SchemaOf<ExtendBookingSchema> =
-  yup.object({
-    uuid: yup.string().required(),
-    expirationMinutes: yup.number().integer().notRequired(),
-  });
-
-export const getBookingsSchema: yup.SchemaOf<GetBookingsSchema> = yup
+export const updateBookingSchema: yup.SchemaOf<UpdateBookingSchema> = yup
   .object()
   .shape({
-    resellerReference: yup.string().notRequired(),
-    supplierReference: yup.string().notRequired(),
-  })
-  .required();
+    ...updateBookingPathParamsSchema.fields,
+    ...updateBookingBodySchema.fields,
+  });
+
+export interface CancelBookingSchema
+  extends CancelBookingBodySchema,
+    CancelBookingPathParamsSchema {}
+
+export const cancelBookingSchema: yup.SchemaOf<CancelBookingSchema> = yup
+  .object()
+  .shape({
+    ...cancelBookingBodySchema.fields,
+    ...cancelBookingPathParamsSchema.fields,
+  });
+
+export interface ExtendBookingSchema
+  extends ExtendBookingBodySchema,
+    ExtendBookingPathParamsSchema {}
+
+export const extendBookingSchema: yup.SchemaOf<ExtendBookingSchema> = yup
+  .object()
+  .shape({
+    ...extendBookingBodySchema.fields,
+    ...extendBookingPathParamsSchema.fields,
+  });

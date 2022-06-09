@@ -66,7 +66,6 @@ export class BookingModel implements Capable {
     voucher,
     cancellation,
     cancellable,
-    freesale,
   }: {
     id: string;
     uuid: string;
@@ -87,7 +86,6 @@ export class BookingModel implements Capable {
     voucher: Nullable<Ticket>;
     cancellation?: Cancellation;
     cancellable?: boolean;
-    freesale: boolean;
   }) {
     this.id = id;
     this.uuid = uuid;
@@ -106,7 +104,7 @@ export class BookingModel implements Capable {
     this.option = option;
     this.cancellable = cancellable ?? true;
     this.cancellation = cancellation ?? null;
-    this.freesale = freesale ?? false;
+    this.freesale = product.allowFreesale;
     this.availabilityId = availability.id;
     this.availability = availability;
     this.contact = contact;
@@ -235,7 +233,6 @@ export class BookingModel implements Capable {
       utcConfirmedAt: booking.utcConfirmedAt,
       cancellation: booking.cancellation,
       cancellable: booking.cancellable,
-      freesale: booking.freesale,
     });
   };
 }

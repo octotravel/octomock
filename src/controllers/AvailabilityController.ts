@@ -1,11 +1,13 @@
-// import { AvailabilityValidator } from './../validators/backendValidator/AvailabilityValidator';
-import { CapabilityId, Availability } from "@octocloud/types";
+import {
+  CapabilityId,
+  Availability,
+  AvailabilityBodySchema,
+} from "@octocloud/types";
 import { AvailabilityService } from "./../services/AvailabilityService";
-import { AvailabilitySchema } from "../schemas/Availability";
 
 interface IAvailabilityController {
   getAvailability(
-    schema: AvailabilitySchema,
+    schema: AvailabilityBodySchema,
     capabilities: CapabilityId[]
   ): Promise<Availability[]>;
 }
@@ -13,7 +15,7 @@ interface IAvailabilityController {
 export class AvailabilityController implements IAvailabilityController {
   private availabilityService = new AvailabilityService();
   public getAvailability = async (
-    schema: AvailabilitySchema,
+    schema: AvailabilityBodySchema,
     capabilities: CapabilityId[]
   ): Promise<Availability[]> => {
     const models = await this.availabilityService.getAvailability(
