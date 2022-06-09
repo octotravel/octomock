@@ -1,6 +1,5 @@
 import { Booking, BookingStatus } from "@octocloud/types";
 import {
-  ArrayValidator,
   NullValidator,
   RegExpValidator,
   StringValidator,
@@ -70,20 +69,16 @@ export class BookingStateValidator {
       label: `${this.path}.utcUpdatedAt`,
       utcDate: booking.utcUpdatedAt,
     });
-    this.validateUTCDate({
-      label: `${this.path}.utcExpiresAt`,
-      utcDate: booking.utcExpiresAt,
-    });
+    NullValidator.validate(
+      `${this.path}.utcExpiresAt`,
+      booking.utcExpiresAt,
+    );
     NullValidator.validate(`${this.path}.utcRedeemedAt`, booking.utcRedeemedAt);
     NullValidator.validate(
       `${this.path}.utcConfirmedAt`,
       booking.utcConfirmedAt
     );
     this.validateCancellation(booking);
-    NullValidator.validate(`${this.path}.voucher`, booking.voucher);
-    ArrayValidator.validate(`${this.path}.unitItems`, booking.unitItems, {
-      empty: true,
-    });
   };
 
   private validateCancellation = (booking: Booking): void => {
