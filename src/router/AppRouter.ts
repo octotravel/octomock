@@ -24,8 +24,9 @@ import Router from "@koa/router";
 import { ProductController } from "../controllers/ProductController";
 import { BookingController } from "../controllers/BookingController";
 import { AvailabilityController } from "../controllers/AvailabilityController";
-import { OctoMethod, OctoValidationService, ValidationData } from "../services/OctoValidationService";
+import { OctoMethod, OctoValidationService, ValidationData } from "../services/validation/OldOctoValidationService";
 import { validationSchema } from "../schemas/Validation";
+import { OctoFlowValidationService } from "../services/validation/OctoFlowValidation";
 
 export const router = new Router();
 const productController = new ProductController();
@@ -35,6 +36,7 @@ const bookingController = new BookingController();
 const supplierController = new SupplierController();
 const capabilityController = new CapabilityController();
 const validationService = new OctoValidationService();
+const flowValidator = new OctoFlowValidationService();
 
 const getCapabilities = (ctx: any): CapabilityId[] => {
   return ctx.capabilities as CapabilityId[];
@@ -234,6 +236,13 @@ router.get("/validate", async (ctx, _) => {
   const params = validationSchema.cast(data);
 
   const validation = await validationService.validate(params)
+
+  ctx.body = validation;
+  ctx.toJSON();
+});
+
+router.get("/validateflow", async (ctx, _) => {
+  const validation = flowValidator.validateFlow();
 
   ctx.body = validation;
   ctx.toJSON();

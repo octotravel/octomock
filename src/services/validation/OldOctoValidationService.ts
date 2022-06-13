@@ -1,9 +1,9 @@
 import { Availability, CapabilityId, Product, Supplier } from '@octocloud/types';
 import got from 'got';
-import { AvailabilityCalendarValidator, AvailabilityValidator } from '../validators/backendValidator/AvailabilityValidator';
-import { BookingValidator } from '../validators/backendValidator/BookingValidator';
-import { ProductValidator } from '../validators/backendValidator/ProductValidator';
-import { SupplierValidator } from '../validators/backendValidator/SupplierValidator';
+import { AvailabilityCalendarValidator, AvailabilityValidator } from '../../validators/backendValidator/AvailabilityValidator';
+import { BookingValidator } from '../../validators/backendValidator/BookingValidator';
+import { ProductValidator } from '../../validators/backendValidator/ProductValidator';
+import { SupplierValidator } from '../../validators/backendValidator/SupplierValidator';
 
 interface IOctoValidationService {
     validate(params: ValidationData): Promise<ValidationResponse>;
