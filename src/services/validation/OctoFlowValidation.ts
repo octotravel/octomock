@@ -7,27 +7,33 @@ type Result<T> = {
 }
 export class OctoFlowValidationService {
     private api = new ApiClient();
-    private path = 'http://localhost:8787';
-    private headers = [{
+    private path = 'http://localhost:8787/octo/endpoint';
+    private headers = {
         "Authorization":`Bearer fareharbortest`,
-    }];
+    };
     private capabilities = [CapabilityId.Pricing, CapabilityId.Content]
 
     private getSuppliers = async (params: ApiParams): Promise<Result<Supplier>> => {
-        const data = await this.api.getSuppliers(params);
-        console.log('data', data);
+        const response = await this.api.getSuppliers(params);
+        if (response.status === 200) {
+            return {
+                result: await response.json(),
+                error: null,
+            }
+        }
         return {
             result: null,
-            error: null,
+            error: await response.json(),
+            
         }
-    }
+    };
 
     public validateFlow = async (): Promise<void> => {
-        const suppliers = this.getSuppliers({
+        const suppliers = await this.getSuppliers({
             capabilities: this.capabilities,
             headers: this.headers,
             url: this.path,
         })
         console.log('suppliers', suppliers);
-    }
+    };
 }
