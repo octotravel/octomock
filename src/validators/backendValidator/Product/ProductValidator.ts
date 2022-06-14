@@ -55,12 +55,12 @@ export class ProductValidator implements ModelValidator {
         product.instantConfirmation
       ),
       // this one
-      StringValidator.validate(
+      BooleanValidator.validate(
         `${this.path}.instantDelivery`,
         product.instantDelivery
       ),
       // this one
-      StringValidator.validate(
+      BooleanValidator.validate(
         `${this.path}.availabilityRequired`,
         product.availabilityRequired
       ),
