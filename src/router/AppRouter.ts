@@ -24,7 +24,11 @@ import Router from "@koa/router";
 import { ProductController } from "../controllers/ProductController";
 import { BookingController } from "../controllers/BookingController";
 import { AvailabilityController } from "../controllers/AvailabilityController";
-import { OctoMethod, OctoValidationService, ValidationData } from "../services/validation/OldOctoValidationService";
+import {
+  OctoMethod,
+  OctoValidationService,
+  ValidationData,
+} from "../services/validation/OldOctoValidationService";
 import { validationSchema } from "../schemas/Validation";
 import { OctoFlowValidationService } from "../services/validation/OctoFlowValidation";
 
@@ -82,7 +86,9 @@ router.post("/availability/calendar", async (ctx, _) => {
   const data: AvailabilityCalendarBodySchema = ctx.request.body;
 
   await availabilityCalendarBodySchema.validate(data);
-  const schema = availabilityCalendarBodySchema.cast(data) as AvailabilityCalendarBodySchema;
+  const schema = availabilityCalendarBodySchema.cast(
+    data
+  ) as AvailabilityCalendarBodySchema;
 
   const body = await availabilityCalendarController.getAvailability(
     schema,
@@ -231,11 +237,11 @@ router.get("/validate", async (ctx, _) => {
   const data: ValidationData = {
     url: ctx.query.url as string,
     method: ctx.query.method as OctoMethod,
-  }
+  };
   await validationSchema.validate(data);
   const params = validationSchema.cast(data);
 
-  const validation = await validationService.validate(params)
+  const validation = await validationService.validate(params);
 
   ctx.body = validation;
   ctx.toJSON();

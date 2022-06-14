@@ -6,12 +6,16 @@ interface StringValidatorParams {
 
 export class ValidatorError extends Error {}
 
+export interface ModelValidator {
+  validate(...args: any[]): ValidatorError[];
+}
+
 export class StringValidator {
   public static validate = (
     label: string,
     value: unknown,
     params?: StringValidatorParams
-  ): boolean => {
+  ): Nullable<ValidatorError> => {
     try {
       let schema;
       if (params?.nullable) {
@@ -20,21 +24,24 @@ export class StringValidator {
         schema = yup.string().label(label).required();
       }
       schema.validateSync(value, { strict: true });
-      return true;
+      return null;
     } catch (err) {
-      throw new ValidatorError(err.errors);
+      return new ValidatorError(err.errors);
     }
   };
 }
 
 export class NullValidator {
-  public static validate = (label: string, value: unknown): boolean => {
+  public static validate = (
+    label: string,
+    value: unknown
+  ): Nullable<ValidatorError> => {
     if (value !== null) {
-      throw new ValidatorError(
+      return new ValidatorError(
         `${label} must be a \`null\` type, but the final value was: \`${value}\``
       );
     }
-    return true;
+    return null;
   };
 }
 
@@ -48,7 +55,7 @@ export class NumberValidator {
     label: string,
     value: unknown,
     params?: NumberValidatorParams
-  ): boolean => {
+  ): Nullable<ValidatorError> => {
     try {
       let schema = yup.number().label(label);
       if (params?.integer) {
@@ -61,21 +68,24 @@ export class NumberValidator {
         schema = schema.required();
       }
       schema.validateSync(value, { strict: true });
-      return true;
+      return null;
     } catch (err) {
-      throw new ValidatorError(err.errors);
+      return new ValidatorError(err.errors);
     }
   };
 }
 
 export class BooleanValidator {
-  public static validate = (label: string, value: unknown): boolean => {
+  public static validate = (
+    label: string,
+    value: unknown
+  ): Nullable<ValidatorError> => {
     try {
       const schema = yup.boolean().label(label).required();
       schema.validateSync(value, { strict: true });
-      return true;
+      return null;
     } catch (err) {
-      throw new ValidatorError(err.errors);
+      return new ValidatorError(err.errors);
     }
   };
 }
@@ -89,20 +99,19 @@ export class EnumValidator {
     label: string,
     value: unknown,
     values: Array<string>,
-    params? : EnumValidatorParams
-  ): boolean => {
+    params?: EnumValidatorParams
+  ): Nullable<ValidatorError> => {
     try {
       let schema;
       if (params?.nullable) {
         schema = yup.mixed().label(label).nullable().defined();
       } else {
-
         schema = yup.mixed().label(label).oneOf(values).required();
       }
       schema.validateSync(value, { strict: true });
-      return true;
+      return null;
     } catch (err) {
-      throw new ValidatorError(err.errors);
+      return new ValidatorError(err.errors);
     }
   };
 }
@@ -118,7 +127,7 @@ export class EnumArrayValidator {
     value: unknown,
     values: Array<string>,
     params?: GeneralArrayValidatorParams
-  ): boolean => {
+  ): Nullable<ValidatorError> => {
     try {
       let schema = yup.array(yup.mixed().oneOf(values)).label(label).required();
       if (params?.min) {
@@ -128,9 +137,9 @@ export class EnumArrayValidator {
         schema = schema.max(params.max);
       }
       schema.validateSync(value, { strict: true });
-      return true;
+      return null;
     } catch (err) {
-      throw new ValidatorError(err.errors);
+      return new ValidatorError(err.errors);
     }
   };
 }
@@ -146,7 +155,7 @@ export class RegExpValidator {
     value: unknown,
     regexp: RegExp,
     params?: RegExpValidatorParams
-  ): boolean => {
+  ): Nullable<ValidatorError> => {
     try {
       let schema;
       if (params?.isNull) {
@@ -157,9 +166,9 @@ export class RegExpValidator {
         schema = yup.string().label(label).matches(regexp).required();
       }
       schema.validateSync(value, { strict: true });
-      return true;
+      return null;
     } catch (err) {
-      throw new ValidatorError(err.errors);
+      return new ValidatorError(err.errors);
     }
   };
 }
@@ -170,7 +179,7 @@ export class RegExpArrayValidator {
     value: unknown,
     regexp: RegExp,
     params?: GeneralArrayValidatorParams
-  ): boolean => {
+  ): Nullable<ValidatorError> => {
     try {
       let schema = yup
         .array(yup.string().matches(regexp))
@@ -183,15 +192,15 @@ export class RegExpArrayValidator {
         schema = schema.max(params.max);
       }
       schema.validateSync(value, { strict: true });
-      return true;
+      return null;
     } catch (err) {
       if (err instanceof yup.ValidationError) {
         if (err.path.length > 1) {
           const errorMessage = `${label}${err.errors.join()}`;
-          throw new ValidatorError(errorMessage);
+          return new ValidatorError(errorMessage);
         }
       }
-      throw new ValidatorError(err.errors);
+      return new ValidatorError(err.errors);
     }
   };
 }
@@ -205,7 +214,7 @@ export class ArrayValidator {
     label: string,
     value: unknown,
     params?: ArrayValidatorParams
-  ): boolean => {
+  ): Nullable<ValidatorError> => {
     try {
       let schema = yup.array();
       if (params?.min) {
@@ -218,17 +227,17 @@ export class ArrayValidator {
       schema.validateSync(value, { strict: true });
       if (params.empty) {
         if (Array.isArray(value) && value.length !== 0) {
-          throw new ValidatorError(
+          return new ValidatorError(
             `${label} must be an empty array, but it contains: \`${value.length}\` elements.`
           );
         }
       }
-      return true;
+      return null;
     } catch (err) {
       if (err instanceof ValidatorError) {
-        throw err;
+        return err;
       }
-      throw new ValidatorError(err.errors);
+      return new ValidatorError(err.errors);
     }
   };
 }
@@ -237,7 +246,7 @@ export class StringArrayValidator {
     label: string,
     value: unknown,
     params?: GeneralArrayValidatorParams
-  ): boolean => {
+  ): Nullable<ValidatorError> => {
     try {
       let schema = yup.array(yup.string().required()).label(label).required();
       if (params?.min) {
@@ -247,9 +256,9 @@ export class StringArrayValidator {
         schema = schema.max(params.max);
       }
       schema.validateSync(value, { strict: true });
-      return true;
+      return null;
     } catch (err) {
-      throw new ValidatorError(err.errors);
+      return new ValidatorError(err.errors);
     }
   };
 }
@@ -262,7 +271,7 @@ export class NumberArrayValidator {
     label: string,
     value: unknown,
     params?: NumberArrayValidatorParams
-  ): boolean => {
+  ): Nullable<ValidatorError> => {
     try {
       let numberSchema = yup.number().required();
       if (params?.integer) {
@@ -276,9 +285,9 @@ export class NumberArrayValidator {
         schema = schema.max(params.max);
       }
       schema.validateSync(value, { strict: true });
-      return true;
+      return null;
     } catch (err) {
-      throw new ValidatorError(err.errors);
+      return new ValidatorError(err.errors);
     }
   };
 }

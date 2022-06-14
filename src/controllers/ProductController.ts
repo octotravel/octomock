@@ -1,5 +1,5 @@
 import { CapabilityId, Product } from "@octocloud/types";
-import { ProductValidator } from "./../validators/backendValidator/ProductValidator";
+import { ProductValidator } from "../validators/backendValidator/Product/ProductValidator";
 import { ProductService } from "./../services/ProductService";
 
 interface IProductController {
@@ -19,7 +19,10 @@ export class ProductController implements IProductController {
       .getProduct(id)
       .toPOJO({ useCapabilities: true, capabilities });
 
-    new ProductValidator("", capabilities).validate(product);
+    const errors = new ProductValidator({ capabilities })
+      .validate(product)
+      .map((error) => error.message);
+    console.log(errors);
     return product;
   };
 }
