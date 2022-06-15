@@ -10,11 +10,11 @@ import { BookingValidator } from "../../validators/backendValidator/Booking/Book
 export class OctoFlowValidationService {
   private api = new ApiClient();
   private path = "http://localhost:8787/octo/endpoint";
+  private capabilities = [CapabilityId.Pricing, CapabilityId.Content];
   private headers = {
     "Authorization": `Bearer fareharbortest`,
-    "Octo-Capabilities": "octo/content,octo/pricing",
+    "Octo-Capabilities": `${this.capabilities.map(capability => `${capability}`)}`,
   };
-  private capabilities = [CapabilityId.Pricing, CapabilityId.Content];
 
   private supplierValidator = new SupplierValidator();
   private productValidator = new ProductValidator({capabilities: this.capabilities});
@@ -23,7 +23,6 @@ export class OctoFlowValidationService {
 
   public validateFlow = async (): Promise<void> => {
     const params: ApiParams = {
-      capabilities: this.capabilities,
       headers: this.headers,
       url: this.path,
     };
@@ -84,7 +83,7 @@ export class OctoFlowValidationService {
     }
 
     console.log('Validating confirm booking')
-    const bookingConfirm = (await this.api.bookingConfirmation({uuid: bookingCreate.uuid}, {unitItems: [{unitId: product.options[0].units[0].id},{unitId: product.options[0].units[0].id}]}, params)).result;    
+    const bookingConfirm = (await this.api.bookingConfirmation({uuid: bookingCreate.uuid, unitItems: [{unitId: product.options[0].units[0].id},{unitId: product.options[0].units[0].id}]}, params)).result;    
     const bookingConfirmError = this.bookingValidator.validate(bookingConfirm);
     if (bookingConfirmError.length !== 0) {
       console.log(bookingConfirmError);
@@ -92,7 +91,7 @@ export class OctoFlowValidationService {
     }
 
     console.log('Validating cancel booking')
-    const bookingCancel = (await this.api.cancelBooking({uuid: bookingConfirm.uuid}, {}, params)).result;    
+    const bookingCancel = (await this.api.cancelBooking({uuid: bookingConfirm.uuid}, params)).result;    
     const bookingCancelError = this.bookingValidator.validate(bookingCancel);
     if (bookingCancelError.length !== 0) {
       console.log(bookingCancelError);

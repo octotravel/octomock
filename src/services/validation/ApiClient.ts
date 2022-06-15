@@ -1,10 +1,9 @@
-import { Availability, AvailabilityBodySchema, Booking, CancelBookingBodySchema, CancelBookingPathParamsSchema, CapabilityId, ConfirmBookingBodySchema, ConfirmBookingPathParamsSchema, GetBookingPathParamsSchema, GetProductPathParamsSchema, GetSupplierPathParamsSchema, Product, Supplier } from "@octocloud/types";
+import { Availability, AvailabilityBodySchema, Booking, CancelBookingBodySchema, CancelBookingPathParamsSchema, ConfirmBookingBodySchema, ConfirmBookingPathParamsSchema, GetBookingPathParamsSchema, GetProductPathParamsSchema, GetSupplierPathParamsSchema, Product, Supplier } from "@octocloud/types";
 import "isomorphic-fetch";
 import { CreateBookingSchema } from "../../schemas/Booking";
 
 export type ApiParams = {
-  capabilities?: CapabilityId[];
-  headers?: any;
+  headers?: Record<string, string>;
   url: string;
 };
 
@@ -14,13 +13,7 @@ type Result<T> = {
 };
 
 export class ApiClient {
-  public getSuppliers = async (params: ApiParams): Promise<Result<Supplier[]>> => {
-    const url = `${params.url}/suppliers`;
-    const response = await fetch(url, {
-      method: "GET",
-      headers: params.headers,
-    });
-
+  private setResponse = async (response: Response) => {
     if (response.status === 200) {
       return {
         result: await response.json(),
@@ -31,6 +24,14 @@ export class ApiClient {
       result: null,
       error: await response.json(),
     };
+  }
+  public getSuppliers = async (params: ApiParams): Promise<Result<Supplier[]>> => {
+    const url = `${params.url}/suppliers`;
+    const response = await fetch(url, {
+      method: "GET",
+      headers: params.headers,
+    });
+    return await this.setResponse(response);  
   };
 
   public getSupplier = async (data: GetSupplierPathParamsSchema, params: ApiParams): Promise<Result<Supplier>> => {
@@ -39,16 +40,7 @@ export class ApiClient {
       method: "GET",
       headers: params.headers,
     });
-    if (response.status === 200) {
-      return {
-        result: await response.json(),
-        error: null,
-      };
-    }
-    return {
-      result: null,
-      error: await response.json(),
-    };
+    return await this.setResponse(response);
   };
 
   public getProducts = async (params: ApiParams): Promise<Result<Product[]>> => {
@@ -57,17 +49,7 @@ export class ApiClient {
       method: "GET",
       headers: params.headers,
     });
-
-    if (response.status === 200) {
-      return {
-        result: await response.json(),
-        error: null,
-      };
-    }
-    return {
-      result: null,
-      error: await response.json(),
-    };
+    return await this.setResponse(response);
   };
 
   public getProduct = async (data: GetProductPathParamsSchema, params: ApiParams): Promise<Result<Product>> => {
@@ -76,17 +58,7 @@ export class ApiClient {
       method: "GET",
       headers: params.headers,
     });
-
-    if (response.status === 200) {
-      return {
-        result: await response.json(),
-        error: null,
-      };
-    }
-    return {
-      result: null,
-      error: await response.json(),
-    };
+    return await this.setResponse(response);
   };
 
   public getAvailability = async (data: AvailabilityBodySchema, params: ApiParams): Promise<Result<Availability[]>> => {
@@ -97,16 +69,7 @@ export class ApiClient {
       headers: params.headers,
       body,
     });
-    if (response.status === 200) {
-      return {
-        result: await response.json(),
-        error: null,
-      };
-    }
-    return {
-      result: null,
-      error: await response.json(),
-    };
+    return await this.setResponse(response);
   };
 
   public bookingReservation = async (data: CreateBookingSchema, params: ApiParams): Promise<Result<Booking>> => {
@@ -117,36 +80,18 @@ export class ApiClient {
       headers: params.headers,
       body,
     });
-    if (response.status === 200) {
-      return {
-        result: await response.json(),
-        error: null,
-      };
-    }
-    return {
-      result: null,
-      error: await response.json(),
-    };
+    return await this.setResponse(response);
   };
 
-  public bookingConfirmation = async (urlParams: ConfirmBookingPathParamsSchema, data: ConfirmBookingBodySchema, params: ApiParams): Promise<Result<Booking>> => {
-    const url = `${params.url}/bookings/${urlParams.uuid}/confirm`;
+  public bookingConfirmation = async (data: ConfirmBookingBodySchema & ConfirmBookingPathParamsSchema, params: ApiParams): Promise<Result<Booking>> => {
+    const url = `${params.url}/bookings/${data.uuid}/confirm`;
     const body = JSON.stringify(data);
     const response = await fetch(url, {
       method: "POST",
       headers: params.headers,
       body,
     });
-    if (response.status === 200) {
-      return {
-        result: await response.json(),
-        error: null,
-      };
-    }
-    return {
-      result: null,
-      error: await response.json(),
-    };
+    return await this.setResponse(response);
   };
 
   public getBooking = async (data: GetBookingPathParamsSchema, params: ApiParams): Promise<Result<Booking>> => {
@@ -155,35 +100,17 @@ export class ApiClient {
       method: "GET",
       headers: params.headers,
     });
-    if (response.status === 200) {
-      return {
-        result: await response.json(),
-        error: null,
-      };
-    }
-    return {
-      result: null,
-      error: await response.json(),
-    };
+    return await this.setResponse(response);
   };
 
-  public cancelBooking = async (urlParams: CancelBookingPathParamsSchema, data: CancelBookingBodySchema, params: ApiParams): Promise<Result<Booking>> => {
-    const url = `${params.url}/bookings/${urlParams.uuid}`;
+  public cancelBooking = async (data: CancelBookingBodySchema & CancelBookingPathParamsSchema, params: ApiParams): Promise<Result<Booking>> => {
+    const url = `${params.url}/bookings/${data.uuid}`;
     const body = JSON.stringify(data);
     const response = await fetch(url, {
       method: "DELETE",
       headers: params.headers,
       body,
     });
-    if (response.status === 200) {
-      return {
-        result: await response.json(),
-        error: null,
-      };
-    }
-    return {
-      result: null,
-      error: await response.json(),
-    };
+    return await this.setResponse(response);
   };
 }
