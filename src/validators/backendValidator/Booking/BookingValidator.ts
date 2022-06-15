@@ -89,7 +89,7 @@ export class BookingValidator implements ModelValidator {
       ),
       ...this.validateUnitItems(booking),
       ...this.validatePricingCapability(booking),
-    ];
+    ].filter(Boolean);
   };
 
   private validateBookingAvailability = (booking: Booking): ValidatorError[] =>

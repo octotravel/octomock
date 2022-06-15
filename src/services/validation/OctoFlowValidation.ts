@@ -4,7 +4,7 @@ import { SupplierValidator } from "../../validators/backendValidator/Supplier/Su
 import { ApiClient, ApiParams } from "./ApiClient";
 import { addDays } from "date-fns";
 import { AvailabilityValidator } from "../../validators/backendValidator/Availability/AvailabilityValidator";
-// import { BookingValidator } from "../../validators/backendValidator/Booking/BookingValidator";
+import { BookingValidator } from "../../validators/backendValidator/Booking/BookingValidator";
 
 
 export class OctoFlowValidationService {
@@ -19,7 +19,7 @@ export class OctoFlowValidationService {
   private supplierValidator = new SupplierValidator();
   private productValidator = new ProductValidator({capabilities: this.capabilities});
   private availabilityValidator = new AvailabilityValidator({capabilities: this.capabilities});
-  // private bookingValidator = new BookingValidator({capabilities: this.capabilities});
+  private bookingValidator = new BookingValidator({capabilities: this.capabilities});
 
   public validateFlow = async (): Promise<void> => {
     const params: ApiParams = {
@@ -77,28 +77,27 @@ export class OctoFlowValidationService {
 
     console.log('Validating create booking')
     const bookingCreate = (await this.api.bookingReservation({productId: product.id, optionId: product.options[0].id, availabilityId: availabilities[0].id, unitItems: [{unitId: product.options[0].units[0].id},{unitId: product.options[0].units[0].id}]}, params)).result;    
-    // const bookingCreateError = this.bookingValidator.validate(bookingCreate);
-    // if (bookingCreateError.length !== 0) {
-    //   console.log(bookingCreateError);
-    //   throw new Error('Incorrect booking');
-    // }
+    const bookingCreateError = this.bookingValidator.validate(bookingCreate);
+    if (bookingCreateError.length !== 0) {
+      console.log(bookingCreateError);
+      throw new Error('Incorrect booking');
+    }
 
     console.log('Validating confirm booking')
     const bookingConfirm = (await this.api.bookingConfirmation({uuid: bookingCreate.uuid}, {unitItems: [{unitId: product.options[0].units[0].id},{unitId: product.options[0].units[0].id}]}, params)).result;    
-    // const bookingConfirmError = this.bookingValidator.validate(bookingConfirm);
-    // if (bookingConfirmError.length !== 0) {
-    //   console.log(bookingConfirmError);
-    //   throw new Error('Incorrect booking');
-    // }
+    const bookingConfirmError = this.bookingValidator.validate(bookingConfirm);
+    if (bookingConfirmError.length !== 0) {
+      console.log(bookingConfirmError);
+      throw new Error('Incorrect booking');
+    }
 
     console.log('Validating cancel booking')
     const bookingCancel = (await this.api.cancelBooking({uuid: bookingConfirm.uuid}, {}, params)).result;    
-    // const bookingConfirmError = this.bookingValidator.validate(bookingConfirm);
-    // if (bookingConfirmError.length !== 0) {
-    //   console.log(bookingConfirmError);
-    //   throw new Error('Incorrect booking');
-    // }
-    console.log(bookingCancel);
+    const bookingCancelError = this.bookingValidator.validate(bookingCancel);
+    if (bookingCancelError.length !== 0) {
+      console.log(bookingCancelError);
+      throw new Error('Incorrect booking');
+    }
 
     console.log('done')
 

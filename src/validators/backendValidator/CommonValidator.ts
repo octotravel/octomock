@@ -1,6 +1,10 @@
 import { OpeningHours } from "@octocloud/types";
 import { RegExpValidator, ValidatorError } from "./ValidatorHelpers";
 
+interface CommonValidatorParams {
+  nullable?: boolean;
+}
+
 export class CommonValidator {
   public static validateOpeningHours = (
     label: string,
@@ -46,11 +50,22 @@ export class CommonValidator {
 
   public static validateUTCDateTime = (
     label: string,
-    utcDate: string
+    utcDate: string,
+    params?: CommonValidatorParams
   ): ValidatorError => {
     const regExp = new RegExp(
       /^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])Z$/
     );
-    return RegExpValidator.validate(label, utcDate, regExp);
+    if (params?.nullable) {
+      if (utcDate !== null) {
+        return RegExpValidator.validate(label, utcDate, regExp);
+      } else {
+        return new ValidatorError(
+          `${label} must be a \`utcDate\` or \`null\` type, but the final value was: \`${utcDate}\``
+        );
+      }
+    } else {
+      return RegExpValidator.validate(label, utcDate, regExp);
+    }
   };
 }

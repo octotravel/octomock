@@ -27,9 +27,10 @@ export class BookingStateCancelledValidator implements ModelValidator {
         `${this.path}.utcRedeemedAt`,
         booking.utcRedeemedAt
       ),
-      NullValidator.validate(
+      CommonValidator.validateUTCDateTime(
         `${this.path}.utcConfirmedAt`,
-        booking.utcConfirmedAt
+        booking.utcConfirmedAt,
+        { nullable: true }
       ),
       ...this.validateCancellation(booking),
     ].filter(Boolean);

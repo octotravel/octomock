@@ -14,11 +14,11 @@ export class BookingStateOnHoldValidator implements ModelValidator {
         `${this.path}.utcCreatedAt`,
         booking.utcCreatedAt
       ),
-      CommonValidator.validateUTCDateTime(
+      NullValidator.validate(
         `${this.path}.utcUpdatedAt`,
         booking.utcUpdatedAt
       ),
-      CommonValidator.validateUTCDateTime(
+      NullValidator.validate(
         `${this.path}.utcExpiresAt`,
         booking.utcExpiresAt
       ),

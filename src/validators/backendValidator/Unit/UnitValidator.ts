@@ -49,7 +49,7 @@ export class UnitValidator implements ModelValidator {
   private validatePricingCapability = (unit: Unit): ValidatorError[] => {
     if (this.capabilities.includes(CapabilityId.Pricing)) {
       const pricingValidator = new UnitPricingValidator({
-        path: `${this.path}`,
+        path: ``,
       });
       return pricingValidator.validate(unit);
     }
