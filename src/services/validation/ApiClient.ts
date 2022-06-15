@@ -1,4 +1,4 @@
-import { Availability, AvailabilityBodySchema, Booking, CapabilityId, GetProductPathParamsSchema, GetSupplierPathParamsSchema, Product, Supplier } from "@octocloud/types";
+import { Availability, AvailabilityBodySchema, Booking, CancelBookingBodySchema, CancelBookingPathParamsSchema, CapabilityId, ConfirmBookingBodySchema, ConfirmBookingPathParamsSchema, GetBookingPathParamsSchema, GetProductPathParamsSchema, GetSupplierPathParamsSchema, Product, Supplier } from "@octocloud/types";
 import "isomorphic-fetch";
 import { CreateBookingSchema } from "../../schemas/Booking";
 
@@ -114,6 +114,64 @@ export class ApiClient {
     const body = JSON.stringify(data);
     const response = await fetch(url, {
       method: "POST",
+      headers: params.headers,
+      body,
+    });
+    if (response.status === 200) {
+      return {
+        result: await response.json(),
+        error: null,
+      };
+    }
+    return {
+      result: null,
+      error: await response.json(),
+    };
+  };
+
+  public bookingConfirmation = async (urlParams: ConfirmBookingPathParamsSchema, data: ConfirmBookingBodySchema, params: ApiParams): Promise<Result<Booking>> => {
+    const url = `${params.url}/bookings/${urlParams.uuid}/confirm`;
+    const body = JSON.stringify(data);
+    const response = await fetch(url, {
+      method: "POST",
+      headers: params.headers,
+      body,
+    });
+    if (response.status === 200) {
+      return {
+        result: await response.json(),
+        error: null,
+      };
+    }
+    return {
+      result: null,
+      error: await response.json(),
+    };
+  };
+
+  public getBooking = async (data: GetBookingPathParamsSchema, params: ApiParams): Promise<Result<Booking>> => {
+    const url = `${params.url}/bookings/${data.uuid}`;
+    const response = await fetch(url, {
+      method: "GET",
+      headers: params.headers,
+    });
+    if (response.status === 200) {
+      return {
+        result: await response.json(),
+        error: null,
+      };
+    }
+    return {
+      result: null,
+      error: await response.json(),
+    };
+  };
+
+  public cancelBooking = async (urlParams: CancelBookingPathParamsSchema, data: CancelBookingBodySchema, params: ApiParams): Promise<Result<Booking>> => {
+    const url = `${params.url}/bookings/${urlParams.uuid}`;
+    const body = JSON.stringify(data);
+    const response = await fetch(url, {
+      method: "DELETE",
       headers: params.headers,
       body,
     });
