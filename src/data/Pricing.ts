@@ -12,10 +12,8 @@ export const pricingEUR: Pricing = {
       name: "VAT 10%",
       original: 113,
 
-
       retail: 102,
-      net: 90
+      net: 90,
     },
-
   ],
 };
