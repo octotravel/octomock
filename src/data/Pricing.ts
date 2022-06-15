@@ -2,7 +2,6 @@ import { Pricing } from "@octocloud/types";
 
 export const pricingEUR: Pricing = {
   original: 2513,
-
   retail: 2262,
   net: 2010,
   currency: "EUR",
@@ -11,7 +10,6 @@ export const pricingEUR: Pricing = {
     {
       name: "VAT 10%",
       original: 113,
-
       retail: 102,
       net: 90,
     },
