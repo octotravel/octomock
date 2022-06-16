@@ -1,5 +1,19 @@
-import { Availability, AvailabilityBodySchema, Booking, CancelBookingBodySchema, CancelBookingPathParamsSchema, ConfirmBookingBodySchema, ConfirmBookingPathParamsSchema, GetBookingPathParamsSchema, GetProductPathParamsSchema, GetSupplierPathParamsSchema, Product, Supplier } from "@octocloud/types";
 import "isomorphic-fetch";
+import { ValidatedError } from "./../../validators/backendValidator/Error/index";
+import {
+  Availability,
+  AvailabilityBodySchema,
+  Booking,
+  CancelBookingBodySchema,
+  CancelBookingPathParamsSchema,
+  ConfirmBookingBodySchema,
+  ConfirmBookingPathParamsSchema,
+  GetBookingPathParamsSchema,
+  GetProductPathParamsSchema,
+  GetSupplierPathParamsSchema,
+  Product,
+  Supplier,
+} from "@octocloud/types";
 import { CreateBookingSchema } from "../../schemas/Booking";
 
 export type ApiParams = {
@@ -9,32 +23,25 @@ export type ApiParams = {
 
 type Result<T> = {
   result: Nullable<T>;
-  error: Nullable<Error>;
+  error: Nullable<ValidatedError>;
 };
 
 export class ApiClient {
-  private setResponse = async (response: Response) => {
-    if (response.status === 200) {
-      return {
-        result: await response.json(),
-        error: null,
-      };
-    }
-    return {
-      result: null,
-      error: await response.json(),
-    };
-  }
-  public getSuppliers = async (params: ApiParams): Promise<Result<Supplier[]>> => {
+  public getSuppliers = async (
+    params: ApiParams
+  ): Promise<Result<Supplier[]>> => {
     const url = `${params.url}/suppliers`;
     const response = await fetch(url, {
       method: "GET",
       headers: params.headers,
     });
-    return await this.setResponse(response);  
+    return await this.setResponse(response);
   };
 
-  public getSupplier = async (data: GetSupplierPathParamsSchema, params: ApiParams): Promise<Result<Supplier>> => {
+  public getSupplier = async (
+    data: GetSupplierPathParamsSchema,
+    params: ApiParams
+  ): Promise<Result<Supplier>> => {
     const url = `${params.url}/suppliers/${data.id}`;
     const response = await fetch(url, {
       method: "GET",
@@ -43,7 +50,9 @@ export class ApiClient {
     return await this.setResponse(response);
   };
 
-  public getProducts = async (params: ApiParams): Promise<Result<Product[]>> => {
+  public getProducts = async (
+    params: ApiParams
+  ): Promise<Result<Product[]>> => {
     const url = `${params.url}/products`;
     const response = await fetch(url, {
       method: "GET",
@@ -52,7 +61,10 @@ export class ApiClient {
     return await this.setResponse(response);
   };
 
-  public getProduct = async (data: GetProductPathParamsSchema, params: ApiParams): Promise<Result<Product>> => {
+  public getProduct = async (
+    data: GetProductPathParamsSchema,
+    params: ApiParams
+  ): Promise<Result<Product>> => {
     const url = `${params.url}/products/${data.id}`;
     const response = await fetch(url, {
       method: "GET",
@@ -61,7 +73,10 @@ export class ApiClient {
     return await this.setResponse(response);
   };
 
-  public getAvailability = async (data: AvailabilityBodySchema, params: ApiParams): Promise<Result<Availability[]>> => {
+  public getAvailability = async (
+    data: AvailabilityBodySchema,
+    params: ApiParams
+  ): Promise<Result<Availability[]>> => {
     const url = `${params.url}/availability`;
     const body = JSON.stringify(data);
     const response = await fetch(url, {
@@ -72,7 +87,10 @@ export class ApiClient {
     return await this.setResponse(response);
   };
 
-  public bookingReservation = async (data: CreateBookingSchema, params: ApiParams): Promise<Result<Booking>> => {
+  public bookingReservation = async (
+    data: CreateBookingSchema,
+    params: ApiParams
+  ): Promise<Result<Booking>> => {
     const url = `${params.url}/bookings`;
     const body = JSON.stringify(data);
     const response = await fetch(url, {
@@ -83,7 +101,10 @@ export class ApiClient {
     return await this.setResponse(response);
   };
 
-  public bookingConfirmation = async (data: ConfirmBookingBodySchema & ConfirmBookingPathParamsSchema, params: ApiParams): Promise<Result<Booking>> => {
+  public bookingConfirmation = async (
+    data: ConfirmBookingBodySchema & ConfirmBookingPathParamsSchema,
+    params: ApiParams
+  ): Promise<Result<Booking>> => {
     const url = `${params.url}/bookings/${data.uuid}/confirm`;
     const body = JSON.stringify(data);
     const response = await fetch(url, {
@@ -94,7 +115,10 @@ export class ApiClient {
     return await this.setResponse(response);
   };
 
-  public getBooking = async (data: GetBookingPathParamsSchema, params: ApiParams): Promise<Result<Booking>> => {
+  public getBooking = async (
+    data: GetBookingPathParamsSchema,
+    params: ApiParams
+  ): Promise<Result<Booking>> => {
     const url = `${params.url}/bookings/${data.uuid}`;
     const response = await fetch(url, {
       method: "GET",
@@ -103,7 +127,10 @@ export class ApiClient {
     return await this.setResponse(response);
   };
 
-  public cancelBooking = async (data: CancelBookingBodySchema & CancelBookingPathParamsSchema, params: ApiParams): Promise<Result<Booking>> => {
+  public cancelBooking = async (
+    data: CancelBookingBodySchema & CancelBookingPathParamsSchema,
+    params: ApiParams
+  ): Promise<Result<Booking>> => {
     const url = `${params.url}/bookings/${data.uuid}`;
     const body = JSON.stringify(data);
     const response = await fetch(url, {
@@ -112,5 +139,24 @@ export class ApiClient {
       body,
     });
     return await this.setResponse(response);
+  };
+
+  private setResponse = async <T>(response: Response): Promise<Result<T>> => {
+    const data = await response.json();
+    const status = response.status;
+
+    if (status === 200) {
+      return {
+        result: data as T,
+        error: null,
+      };
+    }
+    return {
+      result: null,
+      error: {
+        status,
+        body: data,
+      },
+    };
   };
 }

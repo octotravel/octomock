@@ -1,3 +1,4 @@
+import { InvalidAvailabilityIdErrorValidator } from "./../validators/backendValidator/Error/InvalidAvailabilityIdErrorValidator";
 import { CapabilityId, Product } from "@octocloud/types";
 import { ProductValidator } from "../validators/backendValidator/Product/ProductValidator";
 import { ProductService } from "./../services/ProductService";
@@ -23,6 +24,16 @@ export class ProductController implements IProductController {
       .validate(product)
       .map((error) => error.message);
     console.log(errors);
+
+    const errorss = new InvalidAvailabilityIdErrorValidator().validate({
+      body: {
+        error: "INVALID_AVAILABILITY_ID",
+        errorMessage: "123",
+        availabilityId: "asd",
+      },
+      status: 500,
+    });
+    console.log(errorss);
     return product;
   };
 }

@@ -2,6 +2,7 @@ import * as yup from "yup";
 
 interface StringValidatorParams {
   nullable?: boolean;
+  equalsTo?: string;
 }
 
 export class ValidatorError extends Error {}
@@ -24,6 +25,14 @@ export class StringValidator {
         schema = yup.string().label(label).required();
       }
       schema.validateSync(value, { strict: true });
+      if (params?.equalsTo) {
+        console.log(params, value);
+        if (params.equalsTo !== value) {
+          return new ValidatorError(
+            `${label} has to be equal to "${params.equalsTo}", but the provided value was: "${value}"`
+          );
+        }
+      }
       return null;
     } catch (err) {
       return new ValidatorError(err.errors);
@@ -48,6 +57,7 @@ export class NullValidator {
 interface NumberValidatorParams {
   nullable?: boolean;
   integer?: boolean;
+  equalsTo?: number;
 }
 
 export class NumberValidator {
@@ -68,7 +78,13 @@ export class NumberValidator {
         schema = schema.required();
       }
       schema.validateSync(value, { strict: true });
-      return null;
+      if (params?.equalsTo) {
+        if (params.equalsTo !== value) {
+          return new ValidatorError(
+            `${label} has to be equal to ${params.equalsTo}, but the provided value was: ${value}`
+          );
+        }
+      }
     } catch (err) {
       return new ValidatorError(err.errors);
     }
