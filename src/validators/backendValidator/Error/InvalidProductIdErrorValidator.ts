@@ -7,7 +7,7 @@ import {
   ValidatorError,
 } from "../ValidatorHelpers";
 
-export class InvalidProductIdError implements ModelValidator {
+export class InvalidProductIdErrorValidator implements ModelValidator {
   public validate = (data: ValidatedError): ValidatorError[] => {
     return [
       StringValidator.validate(`error`, data.body.error, {

@@ -3,6 +3,7 @@ import {
   Restrictions,
   Unit,
   ContactField,
+  PricingPer,
 } from "@octocloud/types";
 import {
   StringValidator,
@@ -28,7 +29,7 @@ export class UnitValidator implements ModelValidator {
     this.path = path;
     this.capabilities = capabilities;
   }
-  public validate = (unit: Unit): ValidatorError[] => {
+  public validate = (unit: Unit, pricingPer: PricingPer): ValidatorError[] => {
     return [
       StringValidator.validate(`${this.path}.id`, unit.id),
       StringValidator.validate(`${this.path}.internalName`, unit.internalName),
@@ -42,12 +43,18 @@ export class UnitValidator implements ModelValidator {
         unit.requiredContactFields,
         Object.values(ContactField)
       ),
-      ...this.validatePricingCapability(unit),
+      ...this.validatePricingCapability(unit, pricingPer),
     ].filter(Boolean);
   };
 
-  private validatePricingCapability = (unit: Unit): ValidatorError[] => {
-    if (this.capabilities.includes(CapabilityId.Pricing)) {
+  private validatePricingCapability = (
+    unit: Unit,
+    pricingPer: PricingPer
+  ): ValidatorError[] => {
+    if (
+      this.capabilities.includes(CapabilityId.Pricing) &&
+      pricingPer === PricingPer.UNIT
+    ) {
       const pricingValidator = new UnitPricingValidator({
         path: ``,
       });

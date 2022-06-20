@@ -70,7 +70,7 @@ export class OptionValidator implements ModelValidator {
         Object.values(ContactField)
       ),
       ...this.validateUnitRestrictions(option.restrictions),
-      ...this.validateUnits(option.units),
+      ...this.validateUnits(option.units, pricingPer),
 
       ...this.validatePricingCapability(option, pricingPer),
     ].filter(Boolean);
@@ -92,14 +92,17 @@ export class OptionValidator implements ModelValidator {
       ),
     ].filter(Boolean);
 
-  private validateUnits = (units: Unit[]): ValidatorError[] => {
+  private validateUnits = (
+    units: Unit[],
+    pricingPer: PricingPer
+  ): ValidatorError[] => {
     return units
       .map((unit, i) => {
         const validator = new UnitValidator({
           path: `${this.path}.units[${i}]`,
           capabilities: this.capabilities,
         });
-        return validator.validate(unit);
+        return validator.validate(unit, pricingPer);
       })
       .flat(1)
       .filter(Boolean);

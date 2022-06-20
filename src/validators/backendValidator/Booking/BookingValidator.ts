@@ -127,7 +127,7 @@ export class BookingValidator implements ModelValidator {
           path: `${this.path}.unitItems[${i}]`,
           capabilities: this.capabilities,
         });
-        return validator.validate(unitItem);
+        return validator.validate(unitItem, booking.product.pricingPer);
       })
       .flat(1)
       .filter(Boolean);

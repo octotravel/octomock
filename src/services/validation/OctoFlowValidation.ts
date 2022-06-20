@@ -7,7 +7,7 @@ import {
 } from "@octocloud/types";
 import { ProductValidator } from "../../validators/backendValidator/Product/ProductValidator";
 import { SupplierValidator } from "../../validators/backendValidator/Supplier/SupplierValidator";
-import { ApiClient, ApiParams } from "./ApiClient";
+import { ApiClient, ApiParams } from "./ApiClientOld";
 import { addDays } from "date-fns";
 import { AvailabilityValidator } from "../../validators/backendValidator/Availability/AvailabilityValidator";
 import { BookingValidator } from "../../validators/backendValidator/Booking/BookingValidator";

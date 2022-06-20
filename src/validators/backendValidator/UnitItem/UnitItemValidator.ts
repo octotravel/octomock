@@ -4,6 +4,7 @@ import {
   BookingStatus,
   CapabilityId,
   UnitItem,
+  PricingPer,
 } from "@octocloud/types";
 import { UnitValidator } from "../Unit/UnitValidator";
 
@@ -34,7 +35,10 @@ export class UnitItemValidator implements ModelValidator {
     this.unitValidator = new UnitValidator({ path: this.path, capabilities });
     this.contactValidator = new ContactValidator({ path: this.path });
   }
-  public validate = (unitItem: UnitItem): ValidatorError[] => {
+  public validate = (
+    unitItem: UnitItem,
+    pricingPer: PricingPer
+  ): ValidatorError[] => {
     const errors = [
       StringValidator.validate(`${this.path}.uuid`, unitItem.uuid),
       StringValidator.validate(
@@ -52,7 +56,7 @@ export class UnitItemValidator implements ModelValidator {
         }
       ),
       StringValidator.validate(`${this.path}.unitId`, unitItem.unitId),
-      ...this.unitValidator.validate(unitItem.unit),
+      ...this.unitValidator.validate(unitItem.unit, pricingPer),
       EnumValidator.validate(
         `${this.path}.status`,
         unitItem.status,

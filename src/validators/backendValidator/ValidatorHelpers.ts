@@ -26,7 +26,6 @@ export class StringValidator {
       }
       schema.validateSync(value, { strict: true });
       if (params?.equalsTo) {
-        console.log(params, value);
         if (params.equalsTo !== value) {
           return new ValidatorError(
             `${label} has to be equal to "${params.equalsTo}", but the provided value was: "${value}"`

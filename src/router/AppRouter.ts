@@ -1,3 +1,6 @@
+import "isomorphic-fetch";
+import fs from "fs";
+import path from "path";
 import {
   CapabilityId,
   AvailabilityCalendarBodySchema,
@@ -30,7 +33,9 @@ import {
   ValidationData,
 } from "../services/validation/OldOctoValidationService";
 import { validationSchema } from "../schemas/Validation";
-import { OctoFlowValidationService } from "../services/validation/OctoFlowValidation";
+import { ConfigParser } from "../services/validation/config/ConfigParser";
+import { ValidationController } from "../services/validation/Controller";
+// import { OctoFlowValidationService } from "../services/validation/OctoFlowValidation";
 
 export const router = new Router();
 const productController = new ProductController();
@@ -40,7 +45,7 @@ const bookingController = new BookingController();
 const supplierController = new SupplierController();
 const capabilityController = new CapabilityController();
 const validationService = new OctoValidationService();
-const flowValidator = new OctoFlowValidationService();
+// const flowValidator = new OctoFlowValidationService();
 
 const getCapabilities = (ctx: any): CapabilityId[] => {
   return ctx.capabilities as CapabilityId[];
@@ -248,8 +253,22 @@ router.get("/validate", async (ctx, _) => {
 });
 
 router.get("/validateflow", async (ctx, _) => {
-  const validation = flowValidator.validateFlow();
+  // const validation = flowValidator.validateFlow();
 
-  ctx.body = validation;
+  // ctx.body = validation;
+  ctx.toJSON();
+});
+
+router.get("/validat", async (ctx, _) => {
+  // create some init class
+  const file = path.join(__dirname, "..", "..", `config.json`);
+  const config = new ConfigParser().parse(
+    JSON.parse(fs.readFileSync(file, "utf-8"))
+  );
+
+  await new ValidationController({ config }).validate();
+
+  ctx.status = 201;
+  ctx.body = {};
   ctx.toJSON();
 });

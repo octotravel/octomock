@@ -23,7 +23,7 @@ export class ProductValidator implements ModelValidator {
   private capabilities: CapabilityId[];
 
   constructor({
-    path,
+    path = "",
     capabilities,
   }: {
     path?: string;
