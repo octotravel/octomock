@@ -27,12 +27,6 @@ import Router from "@koa/router";
 import { ProductController } from "../controllers/ProductController";
 import { BookingController } from "../controllers/BookingController";
 import { AvailabilityController } from "../controllers/AvailabilityController";
-import {
-  OctoMethod,
-  OctoValidationService,
-  ValidationData,
-} from "../services/validation/OldOctoValidationService";
-import { validationSchema } from "../schemas/Validation";
 import { ConfigParser } from "../services/validation/config/ConfigParser";
 import { ValidationController } from "../services/validation/Controller";
 // import { OctoFlowValidationService } from "../services/validation/OctoFlowValidation";
@@ -44,7 +38,6 @@ const availabilityCalendarController = new AvailabilityCalendarController();
 const bookingController = new BookingController();
 const supplierController = new SupplierController();
 const capabilityController = new CapabilityController();
-const validationService = new OctoValidationService();
 // const flowValidator = new OctoFlowValidationService();
 
 const getCapabilities = (ctx: any): CapabilityId[] => {
@@ -236,22 +229,6 @@ router.get("/capabilities", async (ctx, _) => {
   ctx.toJSON();
 });
 
-router.get("/validate", async (ctx, _) => {
-  //const capabilities = getCapabilities(ctx);
-
-  const data: ValidationData = {
-    url: ctx.query.url as string,
-    method: ctx.query.method as OctoMethod,
-  };
-  await validationSchema.validate(data);
-  const params = validationSchema.cast(data);
-
-  const validation = await validationService.validate(params);
-
-  ctx.body = validation;
-  ctx.toJSON();
-});
-
 router.get("/validateflow", async (ctx, _) => {
   // const validation = flowValidator.validateFlow();
 
@@ -259,7 +236,7 @@ router.get("/validateflow", async (ctx, _) => {
   ctx.toJSON();
 });
 
-router.get("/validat", async (ctx, _) => {
+router.get("/validate", async (ctx, _) => {
   // create some init class
   const file = path.join(__dirname, "..", "..", `config.json`);
   const config = new ConfigParser().parse(
