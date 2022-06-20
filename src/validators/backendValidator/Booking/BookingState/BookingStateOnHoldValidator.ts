@@ -14,14 +14,8 @@ export class BookingStateOnHoldValidator implements ModelValidator {
         `${this.path}.utcCreatedAt`,
         booking.utcCreatedAt
       ),
-      NullValidator.validate(
-        `${this.path}.utcUpdatedAt`,
-        booking.utcUpdatedAt
-      ),
-      NullValidator.validate(
-        `${this.path}.utcExpiresAt`,
-        booking.utcExpiresAt
-      ),
+      NullValidator.validate(`${this.path}.utcUpdatedAt`, booking.utcUpdatedAt),
+      NullValidator.validate(`${this.path}.utcExpiresAt`, booking.utcExpiresAt),
       NullValidator.validate(
         `${this.path}.utcRedeemedAt`,
         booking.utcRedeemedAt
