@@ -15,14 +15,10 @@ class ProductFlow {
       capabilities: config.capabilities,
     });
   }
-  public validate = async (): Promise<ScenarioResult<null>> => {
-    await this.validateProduct();
-    await this.validateProductError();
-    return {
-      success: true,
-      errors: [],
-      data: null,
-    };
+  public validate = async (): Promise<ScenarioResult<any>[]> => {
+    const product = await Promise.all(await this.validateProduct());
+    const productError = await this.validateProductError();
+    return [...product, productError];
   };
 
   private validateProduct = async (): Promise<
@@ -44,14 +40,52 @@ class ProductFlow {
   };
 }
 
+// class AvailabilityFlow {
+//   private config: Config;
+//   private apiClient: ApiClient;
+//   constructor({ config }: { config: Config }) {
+//     this.config = config;
+//     this.apiClient = new ApiClient({
+//       url: config.url,
+//       capabilities: config.capabilities,
+//     });
+//   }
+//   public validate = async (): Promise<ScenarioResult<any>[]> => {
+//     const product =  await Promise.all(await this.validateAvailability());
+//     const productError = await this.validateProductError();
+//     return [
+//       ...product,
+//       productError,
+//     ]
+//   };
+
+//   private validateAvailability = async (): Promise<
+//     Promise<ScenarioResult<Availability>>[]
+//   > => {
+//     return this.config.getProductConfigs().map((productConfig) => {
+//       return new ProductScenario({
+//         apiClient: this.apiClient,
+//         productId: productConfig.productId,
+//         capabilities: this.config.capabilities,
+//       }).validate();
+//     });
+//   };
+//   private validateProductError = async (): Promise<ScenarioResult<null>> => {
+//     return new ProductErrorScenario({
+//       apiClient: this.apiClient,
+//       productId: "badProductID",
+//     }).validate();
+//   };
+// }
+
 class PrimiteFlows {
   private config: Config;
   constructor({ config }: { config: Config }) {
     this.config = config;
   }
-  public validate = (): Promise<ScenarioResult<void>> => {
+  public validate = async (): Promise<ScenarioResult<any>[]> => {
     const config = this.config;
-    return new ProductFlow({ config }).validate();
+    return [...(await new ProductFlow({ config }).validate())];
     // new AvailabilityFlow().validate()
   };
 }
@@ -62,14 +96,14 @@ export class ValidationController {
     this.config = config;
   }
 
-  public validate = async () => {
+  public validate = async (): Promise<ScenarioResult<any>[]> => {
     const config = this.config;
     // validateProduct
-    new PrimiteFlows({ config }).validate();
+    const primitiveFlows = await new PrimiteFlows({ config }).validate();
 
     // new ComplextFlows().validate()
     // const { data } await ProductScenario().validate()
     // const productId = data.id
-    return null;
+    return [...primitiveFlows];
   };
 }

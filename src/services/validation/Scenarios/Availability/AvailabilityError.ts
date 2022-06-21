@@ -3,25 +3,30 @@ import { InvalidProductIdErrorValidator } from "../../../../validators/backendVa
 import { ApiClient } from "../../ApiClient";
 import { Scenario, ScenarioResult } from "../../Scenario";
 
-export class ProductErrorScenario implements Scenario<null> {
+export class AvailabilityErrorScenario implements Scenario<null> {
   private apiClient: ApiClient;
   private productId: string;
+  private optionId: string;
   constructor({
     apiClient,
     productId,
+    optionId,
   }: {
     apiClient: ApiClient;
     productId: string;
+    optionId: string;
   }) {
     this.apiClient = apiClient;
     this.productId = productId;
+    this.optionId = optionId;
   }
 
   public validate = async (): Promise<ScenarioResult<null>> => {
-    const { result, error } = await this.apiClient.getProduct({
-      id: this.productId,
+    const { result, error } = await this.apiClient.getAvailability({
+      productId: this.productId,
+      optionId: this.optionId,
     });
-    const name = `Product with bad id`;
+    const name = `availability with bad id`;
     if (result) {
       // test case failed
       return {

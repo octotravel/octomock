@@ -243,9 +243,10 @@ router.get("/validate", async (ctx, _) => {
     JSON.parse(fs.readFileSync(file, "utf-8"))
   );
 
-  await new ValidationController({ config }).validate();
+  const body = await new ValidationController({ config }).validate();
+  console.log(body[0].errors[0].message);
 
   ctx.status = 201;
-  ctx.body = {};
+  ctx.body = body;
   ctx.toJSON();
 });

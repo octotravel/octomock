@@ -5,6 +5,7 @@ export interface Scenario<T> {
 }
 
 export interface ScenarioResult<T> {
+  name: string;
   success: boolean;
   errors: ValidatorError[];
   data: Nullable<T>;
