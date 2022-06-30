@@ -37,7 +37,7 @@ export class ProductErrorScenario implements Scenario<null> {
       return {
         name,
         success: false,
-        errors: errors,
+        errors: errors.map((error) => error.message),
         data: null,
       };
     }

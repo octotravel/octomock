@@ -52,7 +52,7 @@ export class AvailabilityScenario implements Scenario<Availability[]> {
       return {
         name,
         success: false,
-        errors: errors,
+        errors: errors.map((error) => error.message),
         data: result,
       };
     }

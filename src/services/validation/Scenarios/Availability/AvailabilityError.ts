@@ -42,7 +42,7 @@ export class AvailabilityErrorScenario implements Scenario<null> {
       return {
         name,
         success: false,
-        errors: errors,
+        errors: errors.map((error) => error.message),
         data: null,
       };
     }

@@ -42,7 +42,7 @@ export class ProductScenario implements Scenario<Product> {
       return {
         name,
         success: false,
-        errors: errors,
+        errors: errors.map((error) => error.message),
         data: result,
       };
     }

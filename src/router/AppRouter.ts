@@ -244,7 +244,6 @@ router.get("/validate", async (ctx, _) => {
   );
 
   const body = await new ValidationController({ config }).validate();
-  console.log(body[0].errors[0].message);
 
   ctx.status = 201;
   ctx.body = body;
