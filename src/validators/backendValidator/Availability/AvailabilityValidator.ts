@@ -95,7 +95,9 @@ export class AvailabilityValidator implements ModelValidator {
       ),
 
       ...this.validatePricingCapability(availability),
-    ].filter(Boolean);
+    ]
+      .flat(1)
+      .filter(Boolean);
   };
 
   private validatePricingCapability = (

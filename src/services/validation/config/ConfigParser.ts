@@ -1,5 +1,9 @@
 import { AvailabilityType } from "@octocloud/types";
-import { Config, ProductValidatorConfig } from "./Config";
+import {
+  Config,
+  ProductValidatorConfig,
+  AvailabilityValidatorConfig,
+} from "./Config";
 
 export class ConfigParser {
   public parse = (data: any): Config => {
@@ -17,6 +21,18 @@ export class ConfigParser {
       productStartTimes:
         data.productStartTimes &&
         this.parseProduct(data.productStartTimes, AvailabilityType.START_TIME),
+      availabilityOpeningHours:
+        data.availabilityOpeningHours &&
+        this.parseAvailability(
+          data.availabilityOpeningHours,
+          AvailabilityType.OPENING_HOURS
+        ),
+      availabilityStartTimes:
+        data.availabilityStartTimes &&
+        this.parseAvailability(
+          data.availabilityStartTimes,
+          AvailabilityType.START_TIME
+        ),
     });
   };
   private parseProduct = (
@@ -31,6 +47,19 @@ export class ConfigParser {
       startTime: data.startTime,
       pricingPer: data.pricingPer,
       deliveryMethods: data.deliveryMethods,
+      availabilityType,
+    });
+  };
+  private parseAvailability = (
+    data: any,
+    availabilityType: AvailabilityType
+  ): AvailabilityValidatorConfig => {
+    return new AvailabilityValidatorConfig({
+      productId: data.productId,
+      optionId: data.optionId,
+      dateNotAvailable: data.dateNotAvailable,
+      dateFrom: data.dateFrom,
+      dateTo: data.dateTo,
       availabilityType,
     });
   };

@@ -11,6 +11,8 @@ export class Config {
   public supplierId: string;
   private productStartTimes: Nullable<ProductValidatorConfig>;
   private productOpeningHours: Nullable<ProductValidatorConfig>;
+  private availabilityStartTimes: Nullable<AvailabilityValidatorConfig>;
+  private availabilityOpeningHours: Nullable<AvailabilityValidatorConfig>;
 
   constructor({
     url,
@@ -18,18 +20,24 @@ export class Config {
     supplierId,
     productStartTimes,
     productOpeningHours,
+    availabilityStartTimes,
+    availabilityOpeningHours,
   }: {
     capabilities: CapabilityId[];
     url: string;
     supplierId: string;
     productStartTimes?: ProductValidatorConfig;
     productOpeningHours?: ProductValidatorConfig;
+    availabilityStartTimes?: AvailabilityValidatorConfig;
+    availabilityOpeningHours?: AvailabilityValidatorConfig;
   }) {
     this.url = url;
     this.capabilities = capabilities;
     this.supplierId = supplierId;
     this.productStartTimes = productStartTimes ?? null;
     this.productOpeningHours = productOpeningHours ?? null;
+    this.availabilityStartTimes = availabilityStartTimes ?? null;
+    this.availabilityOpeningHours = availabilityOpeningHours ?? null;
   }
 
   public getAvailabilityTypes = (): AvailabilityType[] => {
@@ -50,6 +58,17 @@ export class Config {
     }
     if (this.productOpeningHours) {
       configs.push(this.productOpeningHours);
+    }
+    return configs;
+  };
+
+  public getAvailabilityConfigs = (): AvailabilityValidatorConfig[] => {
+    const configs: AvailabilityValidatorConfig[] = [];
+    if (this.availabilityStartTimes) {
+      configs.push(this.availabilityStartTimes);
+    }
+    if (this.availabilityOpeningHours) {
+      configs.push(this.availabilityOpeningHours);
     }
     return configs;
   };
@@ -99,6 +118,38 @@ export class ProductValidatorConfig {
     this.startTime = startTime ?? null;
     this.pricingPer = pricingPer ?? PricingPer.UNIT;
     this.deliveryMethods = deliveryMethods;
+    this.availabilityType = availabilityType;
+  }
+}
+
+export class AvailabilityValidatorConfig {
+  public productId: string;
+  public optionId: Nullable<string>;
+  public dateNotAvailable: string[];
+  public dateFrom: string;
+  public dateTo: string;
+  public availabilityType: AvailabilityType;
+
+  constructor({
+    productId,
+    optionId,
+    dateNotAvailable,
+    dateFrom,
+    dateTo,
+    availabilityType,
+  }: {
+    productId: string;
+    optionId?: string;
+    dateNotAvailable: string[];
+    dateFrom: string;
+    dateTo: string;
+    availabilityType: AvailabilityType;
+  }) {
+    this.productId = productId;
+    this.optionId = optionId ?? null;
+    this.dateNotAvailable = dateNotAvailable;
+    this.dateFrom = dateFrom;
+    this.dateTo = dateTo;
     this.availabilityType = availabilityType;
   }
 }

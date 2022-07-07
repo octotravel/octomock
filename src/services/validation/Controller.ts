@@ -1,7 +1,8 @@
-import { Product, Supplier } from "@octocloud/types";
+import { Availability, Product, Supplier } from "@octocloud/types";
 import { ApiClient } from "./ApiClient";
 import { Config } from "./config/Config";
 import { ScenarioResult } from "./Scenario";
+import { AvailabilityScenario } from "./Scenarios/Availability/Availability";
 import { ProductScenario } from "./Scenarios/Product/Product";
 import { ProductErrorScenario } from "./Scenarios/Product/ProductError";
 import { SupplierScenario } from "./Scenarios/Supplier/Supplier";
@@ -82,43 +83,41 @@ class ProductFlow {
   };
 }
 
-// class AvailabilityFlow {
-//   private config: Config;
-//   private apiClient: ApiClient;
-//   constructor({ config }: { config: Config }) {
-//     this.config = config;
-//     this.apiClient = new ApiClient({
-//       url: config.url,
-//       capabilities: config.capabilities,
-//     });
-//   }
-//   public validate = async (): Promise<ScenarioResult<any>[]> => {
-//     const product =  await Promise.all(await this.validateAvailability());
-//     const productError = await this.validateProductError();
-//     return [
-//       ...product,
-//       productError,
-//     ]
-//   };
+class AvailabilityFlow {
+  private config: Config;
+  private apiClient: ApiClient;
+  constructor({ config }: { config: Config }) {
+    this.config = config;
+    this.apiClient = new ApiClient({
+      url: config.url,
+      capabilities: config.capabilities,
+    });
+  }
+  public validate = async (): Promise<Flow> => {
+    const availability = await Promise.all(await this.validateAvailability());
+    const scenarios = [...availability];
+    return {
+      name: "Availability Flow",
+      success: scenarios.every((scenario) => scenario.success),
+      scenarios: scenarios,
+    };
+  };
 
-//   private validateAvailability = async (): Promise<
-//     Promise<ScenarioResult<Availability>>[]
-//   > => {
-//     return this.config.getProductConfigs().map((productConfig) => {
-//       return new ProductScenario({
-//         apiClient: this.apiClient,
-//         productId: productConfig.productId,
-//         capabilities: this.config.capabilities,
-//       }).validate();
-//     });
-//   };
-//   private validateProductError = async (): Promise<ScenarioResult<null>> => {
-//     return new ProductErrorScenario({
-//       apiClient: this.apiClient,
-//       productId: "badProductID",
-//     }).validate();
-//   };
-// }
+  private validateAvailability = async (): Promise<
+    Promise<ScenarioResult<Availability[]>>[]
+  > => {
+    return this.config.getAvailabilityConfigs().map((availabilityConfig) => {
+      return new AvailabilityScenario({
+        apiClient: this.apiClient,
+        productId: availabilityConfig.productId,
+        optionId: availabilityConfig.optionId,
+        localDateStart: availabilityConfig.dateFrom,
+        localDateEnd: availabilityConfig.dateTo,
+        capabilities: this.config.capabilities,
+      }).validate();
+    });
+  };
+}
 
 interface Flow {
   name: string;
@@ -134,8 +133,8 @@ class PrimiteFlows {
     const config = this.config;
     const supplierFlow = await new SupplierFlow({ config }).validate();
     const productFlow = await new ProductFlow({ config }).validate();
-    return [supplierFlow, productFlow];
-    // new AvailabilityFlow().validate()
+    const availabilityFlow = await new AvailabilityFlow({ config }).validate();
+    return [supplierFlow, productFlow, availabilityFlow];
   };
 }
 
