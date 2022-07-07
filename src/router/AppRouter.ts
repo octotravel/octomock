@@ -249,3 +249,17 @@ router.get("/validate", async (ctx, _) => {
   ctx.body = body;
   ctx.toJSON();
 });
+
+router.post("/validate", async (ctx, _) => {
+  // create some init class
+  const file = path.join(__dirname, "..", "..", `config.json`);
+  const config = new ConfigParser().parse(
+    JSON.parse(fs.readFileSync(file, "utf-8"))
+  );
+
+  const body = await new ValidationController({ config }).validate();
+
+  ctx.status = 201;
+  ctx.body = body;
+  ctx.toJSON();
+});

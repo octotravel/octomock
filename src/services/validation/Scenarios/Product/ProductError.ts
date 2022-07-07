@@ -3,7 +3,7 @@ import { InvalidProductIdErrorValidator } from "../../../../validators/backendVa
 import { ApiClient } from "../../ApiClient";
 import { Scenario, ScenarioResult } from "../../Scenario";
 
-export class ProductErrorScenario implements Scenario<null> {
+export class ProductErrorScenario implements Scenario<any> {
   private apiClient: ApiClient;
   private productId: string;
   constructor({
@@ -17,7 +17,7 @@ export class ProductErrorScenario implements Scenario<null> {
     this.productId = productId;
   }
 
-  public validate = async (): Promise<ScenarioResult<null>> => {
+  public validate = async (): Promise<ScenarioResult<any>> => {
     const { result, error } = await this.apiClient.getProduct({
       id: this.productId,
     });
@@ -28,7 +28,7 @@ export class ProductErrorScenario implements Scenario<null> {
         name,
         success: false,
         errors: [],
-        data: null,
+        data: result,
       };
     }
 
@@ -38,14 +38,14 @@ export class ProductErrorScenario implements Scenario<null> {
         name,
         success: false,
         errors: errors.map((error) => error.message),
-        data: null,
+        data: result,
       };
     }
     return {
       name,
       success: true,
       errors: [],
-      data: null,
+      data: result,
     };
   };
 }
