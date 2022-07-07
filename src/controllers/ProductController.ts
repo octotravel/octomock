@@ -20,7 +20,7 @@ export class ProductController implements IProductController {
 
     return {
       ...product,
-      allowFreesale: "asdasd" as any,
+      // allowFreesale: "asdasd" as any,
     };
     // return product;
   };

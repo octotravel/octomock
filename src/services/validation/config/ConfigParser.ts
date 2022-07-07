@@ -7,6 +7,7 @@ export class ConfigParser {
     return new Config({
       url: data.url,
       capabilities: data.capabilities ?? [],
+      supplierId: data.supplierId,
       productOpeningHours:
         data.productOpeningHours &&
         this.parseProduct(

@@ -8,22 +8,26 @@ import {
 export class Config {
   public url: string;
   public capabilities: CapabilityId[];
+  public supplierId: string;
   private productStartTimes: Nullable<ProductValidatorConfig>;
   private productOpeningHours: Nullable<ProductValidatorConfig>;
 
   constructor({
     url,
     capabilities,
+    supplierId,
     productStartTimes,
     productOpeningHours,
   }: {
     capabilities: CapabilityId[];
     url: string;
+    supplierId: string;
     productStartTimes?: ProductValidatorConfig;
     productOpeningHours?: ProductValidatorConfig;
   }) {
     this.url = url;
     this.capabilities = capabilities;
+    this.supplierId = supplierId;
     this.productStartTimes = productStartTimes ?? null;
     this.productOpeningHours = productOpeningHours ?? null;
   }
@@ -49,6 +53,14 @@ export class Config {
     }
     return configs;
   };
+}
+
+export class SupplierValidatorConfig {
+  public supplierId: string;
+
+  constructor({ supplierId }: { supplierId: string }) {
+    this.supplierId = supplierId;
+  }
 }
 
 export class ProductValidatorConfig {
