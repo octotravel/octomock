@@ -123,24 +123,21 @@ class AvailabilityFlow {
   private validateAvailabilityNotAvailable = async (): Promise<
     ScenarioResult<null>[]
   > => {
-    const result = this.config
-      .getAvailabilityConfigs()
-      .map((availabilityConfig) => {
-        const result = availabilityConfig.datesNotAvailable.map(
-          async (date) => {
-            const result = await new AvailabilityNotAvailableScenario({
+    return Promise.all(
+      this.config
+        .getAvailabilityConfigs()
+        .map((availabilityConfig) => {
+          return availabilityConfig.datesNotAvailable.map(async (date) => {
+            return await new AvailabilityNotAvailableScenario({
               apiClient: this.apiClient,
               productId: availabilityConfig.productId,
               optionId: availabilityConfig.optionId,
               localDate: date,
             }).validate();
-            return result;
-          }
-        );
-        return result;
-      })
-      .flat(1);
-    return Promise.all(result);
+          });
+        })
+        .flat(1)
+    );
   };
 }
 interface Flow {
