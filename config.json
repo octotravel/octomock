@@ -19,15 +19,13 @@
     "optionId": "DEFAULT",
     "dateFrom": "2022-07-12",
     "dateTo": "2022-07-27",
-    "dateAvailable": "2022-07-22",
-    "dateNotAvailable": "2022-07-24",
-    "deliveryMethods": ["VOUCHER", "TICKET"]
+    "datesNotAvailable": ["2022-07-24"]
   },
   "availabilityOpeningHours": {
     "productId": "2",
     "optionId": "DEFAULT",
     "dateFrom": "2022-07-12",
     "dateTo": "2022-07-27",
-    "datesNotAvailable": ["2022-07-24"]
+    "datesNotAvailable": ["2022-07-22"]
   }
 }

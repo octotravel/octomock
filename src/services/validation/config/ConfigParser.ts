@@ -57,7 +57,7 @@ export class ConfigParser {
     return new AvailabilityValidatorConfig({
       productId: data.productId,
       optionId: data.optionId,
-      dateNotAvailable: data.dateNotAvailable,
+      datesNotAvailable: data.datesNotAvailable,
       dateFrom: data.dateFrom,
       dateTo: data.dateTo,
       availabilityType,

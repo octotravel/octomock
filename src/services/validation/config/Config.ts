@@ -125,7 +125,7 @@ export class ProductValidatorConfig {
 export class AvailabilityValidatorConfig {
   public productId: string;
   public optionId: Nullable<string>;
-  public dateNotAvailable: string[];
+  public datesNotAvailable: string[];
   public dateFrom: string;
   public dateTo: string;
   public availabilityType: AvailabilityType;
@@ -133,21 +133,21 @@ export class AvailabilityValidatorConfig {
   constructor({
     productId,
     optionId,
-    dateNotAvailable,
+    datesNotAvailable,
     dateFrom,
     dateTo,
     availabilityType,
   }: {
     productId: string;
     optionId?: string;
-    dateNotAvailable: string[];
+    datesNotAvailable: string[];
     dateFrom: string;
     dateTo: string;
     availabilityType: AvailabilityType;
   }) {
     this.productId = productId;
     this.optionId = optionId ?? null;
-    this.dateNotAvailable = dateNotAvailable;
+    this.datesNotAvailable = datesNotAvailable;
     this.dateFrom = dateFrom;
     this.dateTo = dateTo;
     this.availabilityType = availabilityType;

@@ -1,9 +1,8 @@
 import * as R from "ramda";
-import { InvalidProductIdErrorValidator } from "../../../../validators/backendValidator/Error/InvalidProductIdErrorValidator";
 import { ApiClient } from "../../ApiClient";
 import { Scenario, ScenarioResult } from "../../Scenario";
 
-export class AvailabilityErrorScenario implements Scenario<null> {
+export class AvailabilityNotAvailableScenario implements Scenario<null> {
   private apiClient: ApiClient;
   private productId: string;
   private optionId: string;
@@ -31,23 +30,22 @@ export class AvailabilityErrorScenario implements Scenario<null> {
       optionId: this.optionId,
       localDate: this.localDate,
     });
-    const name = `availability with bad id`;
-    if (result) {
+    const name = `availability not available`;
+    if (!R.isEmpty(result)) {
       // test case failed
       return {
         name,
         success: false,
-        errors: [],
+        errors: ["Availability should be empty"],
         data: null,
       };
     }
 
-    const errors = new InvalidProductIdErrorValidator().validate(error);
-    if (!R.isEmpty(errors)) {
+    if (error) {
       return {
         name,
         success: false,
-        errors: errors.map((error) => error.message),
+        errors: [error.body.message[0]],
         data: null,
       };
     }

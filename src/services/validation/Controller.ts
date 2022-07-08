@@ -2,11 +2,12 @@ import { Availability, Product, Supplier } from "@octocloud/types";
 import { ApiClient } from "./ApiClient";
 import { Config } from "./config/Config";
 import { ScenarioResult } from "./Scenario";
-import { AvailabilityScenario } from "./Scenarios/Availability/Availability";
 import { ProductScenario } from "./Scenarios/Product/Product";
 import { ProductErrorScenario } from "./Scenarios/Product/ProductError";
 import { SupplierScenario } from "./Scenarios/Supplier/Supplier";
 import { SupplierErrorScenario } from "./Scenarios/Supplier/SupplierError";
+import { AvailabilityScenario } from "./Scenarios/Availability/Availability";
+import { AvailabilityNotAvailableScenario } from "./Scenarios/Availability/AvailabilityNotAvailable";
 
 class SupplierFlow {
   private config: Config;
@@ -95,7 +96,8 @@ class AvailabilityFlow {
   }
   public validate = async (): Promise<Flow> => {
     const availability = await Promise.all(await this.validateAvailability());
-    const scenarios = [...availability];
+    const availabilityError = await this.validateAvailabilityNotAvailable();
+    const scenarios = [...availability, ...availabilityError];
     return {
       name: "Availability Flow",
       success: scenarios.every((scenario) => scenario.success),
@@ -117,8 +119,30 @@ class AvailabilityFlow {
       }).validate();
     });
   };
-}
 
+  private validateAvailabilityNotAvailable = async (): Promise<
+    ScenarioResult<null>[]
+  > => {
+    const result = this.config
+      .getAvailabilityConfigs()
+      .map((availabilityConfig) => {
+        const result = availabilityConfig.datesNotAvailable.map(
+          async (date) => {
+            const result = await new AvailabilityNotAvailableScenario({
+              apiClient: this.apiClient,
+              productId: availabilityConfig.productId,
+              optionId: availabilityConfig.optionId,
+              localDate: date,
+            }).validate();
+            return result;
+          }
+        );
+        return result;
+      })
+      .flat(1);
+    return Promise.all(result);
+  };
+}
 interface Flow {
   name: string;
   success: boolean;
