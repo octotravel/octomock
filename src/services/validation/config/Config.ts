@@ -11,8 +11,6 @@ export class Config {
   public supplierId: string;
   private productStartTimes: Nullable<ProductValidatorConfig>;
   private productOpeningHours: Nullable<ProductValidatorConfig>;
-  private availabilityStartTimes: Nullable<AvailabilityValidatorConfig>;
-  private availabilityOpeningHours: Nullable<AvailabilityValidatorConfig>;
 
   constructor({
     url,
@@ -20,24 +18,18 @@ export class Config {
     supplierId,
     productStartTimes,
     productOpeningHours,
-    availabilityStartTimes,
-    availabilityOpeningHours,
   }: {
     capabilities: CapabilityId[];
     url: string;
     supplierId: string;
     productStartTimes?: ProductValidatorConfig;
     productOpeningHours?: ProductValidatorConfig;
-    availabilityStartTimes?: AvailabilityValidatorConfig;
-    availabilityOpeningHours?: AvailabilityValidatorConfig;
   }) {
     this.url = url;
     this.capabilities = capabilities;
     this.supplierId = supplierId;
     this.productStartTimes = productStartTimes ?? null;
     this.productOpeningHours = productOpeningHours ?? null;
-    this.availabilityStartTimes = availabilityStartTimes ?? null;
-    this.availabilityOpeningHours = availabilityOpeningHours ?? null;
   }
 
   public getAvailabilityTypes = (): AvailabilityType[] => {
@@ -61,17 +53,6 @@ export class Config {
     }
     return configs;
   };
-
-  public getAvailabilityConfigs = (): AvailabilityValidatorConfig[] => {
-    const configs: AvailabilityValidatorConfig[] = [];
-    if (this.availabilityStartTimes) {
-      configs.push(this.availabilityStartTimes);
-    }
-    if (this.availabilityOpeningHours) {
-      configs.push(this.availabilityOpeningHours);
-    }
-    return configs;
-  };
 }
 
 export class SupplierValidatorConfig {
@@ -85,8 +66,14 @@ export class SupplierValidatorConfig {
 export class ProductValidatorConfig {
   public productId: string;
   public optionId: Nullable<string>;
-  public dateAvailable: string;
-  public dateNotAvailable: string;
+  public available: {
+    from: string;
+    to: string;
+  };
+  public unavailable: {
+    from: string;
+    to: string;
+  };
   public startTime: Nullable<string>;
   public pricingPer: PricingPer;
   public deliveryMethods: DeliveryMethod[];
@@ -95,8 +82,8 @@ export class ProductValidatorConfig {
   constructor({
     productId,
     optionId,
-    dateAvailable,
-    dateNotAvailable,
+    available,
+    unavailable,
     startTime,
     availabilityType,
     pricingPer,
@@ -104,8 +91,14 @@ export class ProductValidatorConfig {
   }: {
     productId: string;
     optionId?: string;
-    dateAvailable: string;
-    dateNotAvailable: string;
+    available: {
+      from: string;
+      to: string;
+    };
+    unavailable: {
+      from: string;
+      to: string;
+    };
     startTime?: string;
     pricingPer?: PricingPer;
     deliveryMethods: DeliveryMethod[];
@@ -113,43 +106,11 @@ export class ProductValidatorConfig {
   }) {
     this.productId = productId;
     this.optionId = optionId ?? null;
-    this.dateAvailable = dateAvailable;
-    this.dateNotAvailable = dateNotAvailable;
+    this.available = available;
+    this.unavailable = unavailable;
     this.startTime = startTime ?? null;
     this.pricingPer = pricingPer ?? PricingPer.UNIT;
     this.deliveryMethods = deliveryMethods;
-    this.availabilityType = availabilityType;
-  }
-}
-
-export class AvailabilityValidatorConfig {
-  public productId: string;
-  public optionId: Nullable<string>;
-  public datesNotAvailable: string[];
-  public dateFrom: string;
-  public dateTo: string;
-  public availabilityType: AvailabilityType;
-
-  constructor({
-    productId,
-    optionId,
-    datesNotAvailable,
-    dateFrom,
-    dateTo,
-    availabilityType,
-  }: {
-    productId: string;
-    optionId?: string;
-    datesNotAvailable: string[];
-    dateFrom: string;
-    dateTo: string;
-    availabilityType: AvailabilityType;
-  }) {
-    this.productId = productId;
-    this.optionId = optionId ?? null;
-    this.datesNotAvailable = datesNotAvailable;
-    this.dateFrom = dateFrom;
-    this.dateTo = dateTo;
     this.availabilityType = availabilityType;
   }
 }

@@ -1,6 +1,4 @@
 import "isomorphic-fetch";
-import fs from "fs";
-import path from "path";
 import {
   CapabilityId,
   AvailabilityCalendarBodySchema,
@@ -236,26 +234,10 @@ router.get("/validateflow", async (ctx, _) => {
   ctx.toJSON();
 });
 
-router.get("/validate", async (ctx, _) => {
-  // create some init class
-  const file = path.join(__dirname, "..", "..", `config.json`);
-  const config = new ConfigParser().parse(
-    JSON.parse(fs.readFileSync(file, "utf-8"))
-  );
-
-  const body = await new ValidationController({ config }).validate();
-
-  ctx.status = 201;
-  ctx.body = body;
-  ctx.toJSON();
-});
-
 router.post("/validate", async (ctx, _) => {
   // create some init class
-  const file = path.join(__dirname, "..", "..", `config.json`);
-  const config = new ConfigParser().parse(
-    JSON.parse(fs.readFileSync(file, "utf-8"))
-  );
+
+  const config = await new ConfigParser().parse(JSON.parse(ctx.request.body));
 
   const body = await new ValidationController({ config }).validate();
 

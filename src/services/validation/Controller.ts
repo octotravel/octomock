@@ -108,13 +108,13 @@ class AvailabilityFlow {
   private validateAvailability = async (): Promise<
     Promise<ScenarioResult<Availability[]>>[]
   > => {
-    return this.config.getAvailabilityConfigs().map((availabilityConfig) => {
+    return this.config.getProductConfigs().map((availabilityConfig) => {
       return new AvailabilityScenario({
         apiClient: this.apiClient,
         productId: availabilityConfig.productId,
         optionId: availabilityConfig.optionId,
-        localDateStart: availabilityConfig.dateFrom,
-        localDateEnd: availabilityConfig.dateTo,
+        localDateStart: availabilityConfig.available.from,
+        localDateEnd: availabilityConfig.available.to,
         capabilities: this.config.capabilities,
       }).validate();
     });
@@ -125,16 +125,15 @@ class AvailabilityFlow {
   > => {
     return Promise.all(
       this.config
-        .getAvailabilityConfigs()
-        .map((availabilityConfig) => {
-          return availabilityConfig.datesNotAvailable.map(async (date) => {
-            return await new AvailabilityNotAvailableScenario({
-              apiClient: this.apiClient,
-              productId: availabilityConfig.productId,
-              optionId: availabilityConfig.optionId,
-              localDate: date,
-            }).validate();
-          });
+        .getProductConfigs()
+        .map(async (availabilityConfig) => {
+          return await new AvailabilityNotAvailableScenario({
+            apiClient: this.apiClient,
+            productId: availabilityConfig.productId,
+            optionId: availabilityConfig.optionId,
+            localDateStart: availabilityConfig.available.from,
+            localDateEnd: availabilityConfig.available.to,
+          }).validate();
         })
         .flat(1)
     );

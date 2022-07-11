@@ -6,29 +6,34 @@ export class AvailabilityNotAvailableScenario implements Scenario<null> {
   private apiClient: ApiClient;
   private productId: string;
   private optionId: string;
-  private localDate: string;
+  private localDateStart: string;
+  private localDateEnd: string;
   constructor({
     apiClient,
     productId,
     optionId,
-    localDate,
+    localDateStart,
+    localDateEnd,
   }: {
     apiClient: ApiClient;
     productId: string;
     optionId: string;
-    localDate: string;
+    localDateStart: string;
+    localDateEnd: string;
   }) {
     this.apiClient = apiClient;
     this.productId = productId;
     this.optionId = optionId;
-    this.localDate = localDate;
+    this.localDateStart = localDateStart;
+    this.localDateEnd = localDateEnd;
   }
 
   public validate = async (): Promise<ScenarioResult<null>> => {
     const { result, error } = await this.apiClient.getAvailability({
       productId: this.productId,
       optionId: this.optionId,
-      localDate: this.localDate,
+      localDateStart: this.localDateStart,
+      localDateEnd: this.localDateEnd,
     });
     const name = `availability not available`;
     if (!R.isEmpty(result)) {

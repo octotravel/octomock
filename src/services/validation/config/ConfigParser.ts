@@ -1,13 +1,14 @@
 import { AvailabilityType } from "@octocloud/types";
 import {
-  Config,
-  ProductValidatorConfig,
-  AvailabilityValidatorConfig,
-} from "./Config";
+  SchemaValidator,
+  validationConfigSchema,
+} from "../../../schemas/Validation";
+import { Config, ProductValidatorConfig } from "./Config";
 
 export class ConfigParser {
-  public parse = (data: any): Config => {
-    // TODO: create schema for validating the config
+  private schemaValidator = new SchemaValidator();
+  public parse = async (data: any): Promise<Config> => {
+    await this.schemaValidator.validateSchema(validationConfigSchema, data);
     return new Config({
       url: data.url,
       capabilities: data.capabilities ?? [],
@@ -21,18 +22,6 @@ export class ConfigParser {
       productStartTimes:
         data.productStartTimes &&
         this.parseProduct(data.productStartTimes, AvailabilityType.START_TIME),
-      availabilityOpeningHours:
-        data.availabilityOpeningHours &&
-        this.parseAvailability(
-          data.availabilityOpeningHours,
-          AvailabilityType.OPENING_HOURS
-        ),
-      availabilityStartTimes:
-        data.availabilityStartTimes &&
-        this.parseAvailability(
-          data.availabilityStartTimes,
-          AvailabilityType.START_TIME
-        ),
     });
   };
   private parseProduct = (
@@ -42,24 +31,11 @@ export class ConfigParser {
     return new ProductValidatorConfig({
       productId: data.productId,
       optionId: data.optionId,
-      dateAvailable: data.dateAvailable,
-      dateNotAvailable: data.dateNotAvailable,
+      available: data.available,
+      unavailable: data.unavailable,
       startTime: data.startTime,
       pricingPer: data.pricingPer,
       deliveryMethods: data.deliveryMethods,
-      availabilityType,
-    });
-  };
-  private parseAvailability = (
-    data: any,
-    availabilityType: AvailabilityType
-  ): AvailabilityValidatorConfig => {
-    return new AvailabilityValidatorConfig({
-      productId: data.productId,
-      optionId: data.optionId,
-      datesNotAvailable: data.datesNotAvailable,
-      dateFrom: data.dateFrom,
-      dateTo: data.dateTo,
       availabilityType,
     });
   };
