@@ -131,8 +131,8 @@ class AvailabilityFlow {
             apiClient: this.apiClient,
             productId: availabilityConfig.productId,
             optionId: availabilityConfig.optionId,
-            localDateStart: availabilityConfig.available.from,
-            localDateEnd: availabilityConfig.available.to,
+            localDateStart: availabilityConfig.unavailable.from,
+            localDateEnd: availabilityConfig.unavailable.to,
           }).validate();
         })
         .flat(1)
