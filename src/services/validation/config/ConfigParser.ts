@@ -1,14 +1,8 @@
 import { AvailabilityType } from "@octocloud/types";
-import {
-  SchemaValidator,
-  validationConfigSchema,
-} from "../../../schemas/Validation";
 import { Config, ProductValidatorConfig } from "./Config";
 
 export class ConfigParser {
-  private schemaValidator = new SchemaValidator();
   public parse = async (data: any): Promise<Config> => {
-    await this.schemaValidator.validateSchema(validationConfigSchema, data);
     return new Config({
       url: data.url,
       capabilities: data.capabilities ?? [],

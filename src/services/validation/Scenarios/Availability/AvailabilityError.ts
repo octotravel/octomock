@@ -1,5 +1,4 @@
 import * as R from "ramda";
-import { InvalidProductIdErrorValidator } from "../../../../validators/backendValidator/Error/InvalidProductIdErrorValidator";
 import { ApiClient } from "../../ApiClient";
 import { Scenario, ScenarioResult } from "../../Scenario";
 
@@ -7,47 +6,46 @@ export class AvailabilityErrorScenario implements Scenario<null> {
   private apiClient: ApiClient;
   private productId: string;
   private optionId: string;
-  private localDate: string;
+  private availabilityIds: string[];
   constructor({
     apiClient,
     productId,
     optionId,
-    localDate,
+    availabilityIds,
   }: {
     apiClient: ApiClient;
     productId: string;
     optionId: string;
-    localDate: string;
+    availabilityIds: string[];
   }) {
     this.apiClient = apiClient;
     this.productId = productId;
     this.optionId = optionId;
-    this.localDate = localDate;
+    this.availabilityIds = availabilityIds;
   }
 
   public validate = async (): Promise<ScenarioResult<null>> => {
     const { result, error } = await this.apiClient.getAvailability({
       productId: this.productId,
       optionId: this.optionId,
-      localDate: this.localDate,
+      availabilityIds: this.availabilityIds,
     });
-    const name = `availability with bad id`;
-    if (result) {
+    const name = `Availability with bad id`;
+    if (!R.isEmpty(result)) {
       // test case failed
       return {
         name,
         success: false,
-        errors: [],
+        errors: ["Availability should be empty"],
         data: null,
       };
     }
 
-    const errors = new InvalidProductIdErrorValidator().validate(error);
-    if (!R.isEmpty(errors)) {
+    if (error) {
       return {
         name,
         success: false,
-        errors: errors.map((error) => error.message),
+        errors: [error.body.message[0]],
         data: null,
       };
     }

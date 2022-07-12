@@ -35,7 +35,7 @@ export class AvailabilityNotAvailableScenario implements Scenario<null> {
       localDateStart: this.localDateStart,
       localDateEnd: this.localDateEnd,
     });
-    const name = `availability not available`;
+    const name = `Unavailable`;
     if (!R.isEmpty(result)) {
       // test case failed
       return {

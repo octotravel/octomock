@@ -27,6 +27,7 @@ import { BookingController } from "../controllers/BookingController";
 import { AvailabilityController } from "../controllers/AvailabilityController";
 import { ConfigParser } from "../services/validation/config/ConfigParser";
 import { ValidationController } from "../services/validation/Controller";
+import { validationConfigSchema } from "../schemas/Validation";
 // import { OctoFlowValidationService } from "../services/validation/OctoFlowValidation";
 
 export const router = new Router();
@@ -237,7 +238,10 @@ router.get("/validateflow", async (ctx, _) => {
 router.post("/validate", async (ctx, _) => {
   // create some init class
 
-  const config = await new ConfigParser().parse(JSON.parse(ctx.request.body));
+  await validationConfigSchema.validate(ctx.request.body);
+  const schema = confirmBookingSchema.cast(ctx.request.body);
+
+  const config = await new ConfigParser().parse(schema);
 
   const body = await new ValidationController({ config }).validate();
 

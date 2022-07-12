@@ -74,19 +74,3 @@ export const validationConfigSchema: yup.SchemaOf<ValidationConfig> = yup
       .required(),
   })
   .required();
-
-export class SchemaValidator {
-  public validateSchema = async <T>(
-    schema: yup.SchemaOf<T>,
-    data: T
-  ): Promise<void> => {
-    try {
-      await schema.validate(data);
-    } catch (err) {
-      if (err instanceof yup.ValidationError) {
-        throw new Error(err.message);
-      }
-      throw err;
-    }
-  };
-}
