@@ -22,32 +22,28 @@ interface Product {
   deliveryMethods: DeliveryMethod[];
 }
 
-const productSchema = yup
-  .object()
-  .shape({
-    productId: yup.string().required(),
-    optionId: yup.string().optional(),
-    available: yup
-      .object()
-      .shape({
-        from: yup.string().required(),
-        to: yup.string().required(),
-      })
-      .required(),
-    unavailable: yup
-      .object()
-      .shape({
-        from: yup.string().required(),
-        to: yup.string().required(),
-      })
-      .required(),
-    deliveryMethods: yup
-      .array(yup.mixed().oneOf(Object.values(DeliveryMethod)).required())
-      .min(1)
-      .ensure(),
-  })
-  .nullable(true)
-  .defined();
+const productSchema = yup.object().shape({
+  productId: yup.string().required(),
+  optionId: yup.string().nullable(true).defined(),
+  available: yup
+    .object()
+    .shape({
+      from: yup.string().required(),
+      to: yup.string().required(),
+    })
+    .required(),
+  unavailable: yup
+    .object()
+    .shape({
+      from: yup.string().required(),
+      to: yup.string().required(),
+    })
+    .required(),
+  deliveryMethods: yup
+    .array(yup.mixed().oneOf(Object.values(DeliveryMethod)).required())
+    .min(1)
+    .ensure(),
+});
 
 export const validationConfigSchema: yup.SchemaOf<ValidationConfig> = yup
   .object()
@@ -55,8 +51,8 @@ export const validationConfigSchema: yup.SchemaOf<ValidationConfig> = yup
     url: yup.string().required(),
     capabilities: yup.array().required(),
     supplierId: yup.string().required(),
-    productStartTimes: productSchema,
-    productOpeningHours: productSchema,
+    productStartTimes: productSchema.nullable(true).defined(),
+    productOpeningHours: productSchema.nullable(true).defined(),
   })
   .test(
     "not null",
