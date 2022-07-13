@@ -58,4 +58,10 @@ export const validationConfigSchema: yup.SchemaOf<ValidationConfig> = yup
     productStartTimes: productSchema,
     productOpeningHours: productSchema,
   })
+  .test(
+    "not null",
+    "at least one product must be provided",
+    (value) =>
+      value.productOpeningHours !== null || value.productStartTimes !== null
+  )
   .required();
