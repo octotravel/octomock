@@ -15,6 +15,17 @@ export class SupplierStorage implements InMemoryStorage<Supplier> {
         address: null,
       },
     },
+    {
+      id: "2",
+      name: "octo",
+      endpoint: "https://api.ventrata.com/api-octo",
+      contact: {
+        website: null,
+        email: null,
+        telephone: null,
+        address: null,
+      },
+    },
   ];
   public get(id: string): Nullable<Supplier> {
     let supplier: Nullable<Supplier> = null;

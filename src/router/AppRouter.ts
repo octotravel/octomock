@@ -64,7 +64,6 @@ router.post("/availability", async (ctx, _) => {
   const capabilities = getCapabilities(ctx);
 
   const data: AvailabilityBodySchema = ctx.request.body;
-
   await availabilityBodySchema.validate(data);
   const schema = availabilityBodySchema.cast(data) as AvailabilityBodySchema;
 
@@ -239,13 +238,13 @@ router.post("/validate", async (ctx, _) => {
   // create some init class
 
   await validationConfigSchema.validate(ctx.request.body);
-  const schema = confirmBookingSchema.cast(ctx.request.body);
+  const schema = validationConfigSchema.cast(ctx.request.body);
 
   const config = await new ConfigParser().parse(schema);
 
   const body = await new ValidationController({ config }).validate();
 
-  ctx.status = 201;
+  ctx.status = 200;
   ctx.body = body;
   ctx.toJSON();
 });
