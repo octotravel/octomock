@@ -100,6 +100,8 @@ router.post("/bookings", async (ctx, _) => {
 
   const data: CreateBookingSchema = ctx.request.body;
 
+  console.log(data);
+
   await createBookingSchema.validate(data);
   const booking = await bookingController.createBooking(
     {

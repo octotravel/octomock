@@ -41,7 +41,8 @@ export class BookingScenario implements Scenario<Booking> {
       availabilityId: this.availabilityId,
       unitItems: this.unitItems,
     });
-    const name = "Correct booking";
+    console.log(result, error);
+    const name = "Correct booking reservation";
     if (error) {
       return {
         name,

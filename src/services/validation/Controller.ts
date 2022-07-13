@@ -1,4 +1,4 @@
-import { Availability, Product, Supplier } from "@octocloud/types";
+import { Availability, Booking, Product, Supplier } from "@octocloud/types";
 import { ApiClient } from "./ApiClient";
 import { Config } from "./config/Config";
 import { ScenarioResult } from "./Scenario";
@@ -9,7 +9,7 @@ import { SupplierErrorScenario } from "./Scenarios/Supplier/SupplierError";
 import { AvailabilityScenario } from "./Scenarios/Availability/Availability";
 import { AvailabilityNotAvailableScenario } from "./Scenarios/Availability/AvailabilityNotAvailable";
 import { AvailabilityIdErrorScenario } from "./Scenarios/Availability/AvailabilityIdError";
-// import { BookingScenario } from "./Scenarios/Booking/Booking";
+import { BookingScenario } from "./Scenarios/Booking/Booking";
 import { SuppliersScenario } from "./Scenarios/Supplier/Suppliers";
 import { ProductsScenario } from "./Scenarios/Product/Products";
 import { AvailabilityProductIdErrorScenario } from "./Scenarios/Availability/AvailabilityProductIdError";
@@ -229,49 +229,61 @@ class AvailabilityFlow {
   };
 }
 
-// class BookingFlow {
-//   private config: Config;
-//   private apiClient: ApiClient;
-//   constructor({ config }: { config: Config }) {
-//     this.config = config;
-//     this.apiClient = new ApiClient({
-//       url: config.url,
-//       capabilities: config.capabilities,
-//     });
-//   }
-//   public validate = async (): Promise<Flow> => {
-//     const booking = await this.validateBooking();
-//     console.log(booking);
-//     const scenarios = [];
-//     return {
-//       name: "Booking Flow",
-//       success: scenarios.every((scenario) => scenario.success),
-//       scenarios: scenarios,
-//     };
-//   };
+class BookingFlow {
+  private config: Config;
+  private apiClient: ApiClient;
+  constructor({ config }: { config: Config }) {
+    this.config = config;
+    this.apiClient = new ApiClient({
+      url: config.url,
+      capabilities: config.capabilities,
+    });
+  }
+  public validate = async (): Promise<Flow> => {
+    const booking = await this.validateBooking();
+    const scenarios = [...booking];
+    return {
+      name: "Booking Flow",
+      success: scenarios.every((scenario) => scenario.success),
+      scenarios: scenarios,
+    };
+  };
 
-//   private validateBooking = async (): Promise<void> => {
-//     const res = this.config
-//       .getProductConfigs()
-//       .map(async (availabilityConfig) => {
-//         const availability = await this.apiClient.getAvailability({
-//           productId: availabilityConfig.productId,
-//           optionId: availabilityConfig.optionId,
-//           localDateStart: availabilityConfig.available.from,
-//           localDateEnd: availabilityConfig.available.to,
-//         });
-//         return new BookingScenario({
-//           apiClient: this.apiClient,
-//           productId: availabilityConfig.productId,
-//           optionId: availabilityConfig.optionId,
-//           availabilityId: availability.result[0].id,
-//           unitItems: [],
-//           capabilities: [],
-//         });
-//       });
-//     console.log(res);
-//   };
-// }
+  private validateBooking = async (): Promise<ScenarioResult<Booking>[]> => {
+    return Promise.all(
+      this.config.getProductConfigs().map(async (availabilityConfig) => {
+        const availability = await this.apiClient.getAvailability({
+          productId: availabilityConfig.productId,
+          optionId: availabilityConfig.optionId,
+          localDateStart: availabilityConfig.available.from,
+          localDateEnd: availabilityConfig.available.to,
+        });
+        const product = await this.apiClient.getProduct({
+          id: availabilityConfig.productId,
+        });
+        console.log(
+          availability.result[0].id,
+          product.result.options[0].units[0].id
+        );
+        return new BookingScenario({
+          apiClient: this.apiClient,
+          productId: availabilityConfig.productId,
+          optionId: availabilityConfig.optionId,
+          availabilityId: availability.result[0].id,
+          unitItems: [
+            {
+              unitId: product.result.options[0].units[0].id,
+            },
+            {
+              unitId: product.result.options[0].units[0].id,
+            },
+          ],
+          capabilities: this.config.capabilities,
+        }).validate();
+      })
+    );
+  };
+}
 
 interface Flow {
   name: string;
@@ -288,8 +300,8 @@ class PrimiteFlows {
     const supplierFlow = await new SupplierFlow({ config }).validate();
     const productFlow = await new ProductFlow({ config }).validate();
     const availabilityFlow = await new AvailabilityFlow({ config }).validate();
-    // const bookingFlow = await new BookingFlow({ config }).validate();
-    return [supplierFlow, productFlow, availabilityFlow];
+    const bookingFlow = await new BookingFlow({ config }).validate();
+    return [supplierFlow, productFlow, availabilityFlow, bookingFlow];
   };
 }
 
