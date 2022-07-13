@@ -26,7 +26,7 @@ const productSchema = yup
   .object()
   .shape({
     productId: yup.string().required(),
-    optionId: yup.string().required(),
+    optionId: yup.string().optional(),
     available: yup
       .object()
       .shape({
