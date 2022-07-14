@@ -1,23 +1,21 @@
 import * as R from "ramda";
-import { Booking, BookingUnitItemSchema, CapabilityId } from "@octocloud/types";
-import { ApiClient } from "../../ApiClient";
-import { Scenario } from "../../Scenario";
-import { BookingValidator } from "../../../../validators/backendValidator/Booking/BookingValidator";
+import { BookingUnitItemSchema, CapabilityId } from "@octocloud/types";
+import { ApiClient } from "../../../ApiClient";
+import { Scenario } from "../../../Scenario";
+import { UnprocessableEntityErrorValidator } from "../../../../../validators/backendValidator/Error/UnprocessableEntityErrorValidator";
 
-export class BookingScenario implements Scenario<Booking> {
+export class BookingReservationEntityErrorScenario implements Scenario<null> {
   private apiClient: ApiClient;
   private productId: string;
   private optionId: string;
   private availabilityId: string;
   private unitItems: BookingUnitItemSchema[];
-  private capabilities: CapabilityId[];
   constructor({
     apiClient,
     productId,
     optionId,
     availabilityId,
     unitItems,
-    capabilities,
   }: {
     apiClient: ApiClient;
     productId: string;
@@ -31,7 +29,6 @@ export class BookingScenario implements Scenario<Booking> {
     this.optionId = optionId;
     this.availabilityId = availabilityId;
     this.unitItems = unitItems;
-    this.capabilities = capabilities;
   }
 
   public validate = async () => {
@@ -41,32 +38,31 @@ export class BookingScenario implements Scenario<Booking> {
       availabilityId: this.availabilityId,
       unitItems: this.unitItems,
     });
-    console.log(result, error);
-    const name = "Correct booking reservation";
-    if (error) {
+
+    const name = "Booking reservation with less then minimum units";
+    if (result) {
       return {
         name,
         success: false,
         errors: [],
-        data: result,
+        data: null,
       };
     }
-    const errors = new BookingValidator({
-      capabilities: this.capabilities,
-    }).validate(result);
+
+    const errors = new UnprocessableEntityErrorValidator().validate(error);
     if (!R.isEmpty(errors)) {
       return {
         name,
         success: false,
         errors: errors.map((error) => error.message),
-        data: result,
+        data: null,
       };
     }
     return {
       name,
       success: true,
       errors: [],
-      data: result,
+      data: null,
     };
   };
 }

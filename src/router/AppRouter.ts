@@ -98,17 +98,10 @@ router.post("/availability/calendar", async (ctx, _) => {
 router.post("/bookings", async (ctx, _) => {
   const capabilities = getCapabilities(ctx);
 
-  const data: CreateBookingSchema = ctx.request.body;
-
-  console.log(data);
+  const data: CreateBookingSchema = JSON.parse(ctx.request.body);
 
   await createBookingSchema.validate(data);
-  const booking = await bookingController.createBooking(
-    {
-      ...data,
-    } as CreateBookingSchema,
-    capabilities
-  );
+  const booking = await bookingController.createBooking(data, capabilities);
   ctx.body = booking;
   ctx.toJSON();
 });

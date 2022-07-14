@@ -65,7 +65,6 @@ export class BookingController implements IBookingController {
       },
       capabilities
     );
-
     const option = product.getOption(schema.optionId);
     if (option.restrictions.minUnits > schema.unitItems.length) {
       throw new UnprocessableEntityError("minimal restrictions not met");
