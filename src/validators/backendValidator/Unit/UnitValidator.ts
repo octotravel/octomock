@@ -56,7 +56,7 @@ export class UnitValidator implements ModelValidator {
       pricingPer === PricingPer.UNIT
     ) {
       const pricingValidator = new UnitPricingValidator({
-        path: ``,
+        path: this.path,
       });
       return pricingValidator.validate(unit);
     }

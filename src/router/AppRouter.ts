@@ -19,7 +19,6 @@ import {
   extendBookingSchema,
   updateBookingSchema,
   createBookingSchema,
-  CreateBookingSchema,
 } from "./../schemas/Booking";
 import Router from "@koa/router";
 import { ProductController } from "../controllers/ProductController";
@@ -98,10 +97,11 @@ router.post("/availability/calendar", async (ctx, _) => {
 router.post("/bookings", async (ctx, _) => {
   const capabilities = getCapabilities(ctx);
 
-  const data: CreateBookingSchema = JSON.parse(ctx.request.body);
-
-  await createBookingSchema.validate(data);
-  const booking = await bookingController.createBooking(data, capabilities);
+  await createBookingSchema.validate(ctx.request.body);
+  const booking = await bookingController.createBooking(
+    ctx.request.body,
+    capabilities
+  );
   ctx.body = booking;
   ctx.toJSON();
 });
