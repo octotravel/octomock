@@ -14,11 +14,12 @@ export class SuppliersScenario implements Scenario<Supplier[]> {
     const { result, error } = await this.apiClient.getSuppliers();
     const name = "Correct suppliers";
     if (error) {
+      const data = error as unknown;
       return {
         name,
         success: false,
-        errors: [],
-        data: result,
+        errors: [error.body.errorMessage as string],
+        data: data as Supplier[],
       };
     }
 

@@ -53,11 +53,12 @@ export class AvailabilityScenario implements Scenario<Availability[]> {
     });
     const name = "Correct availability";
     if (error) {
+      const data = error as unknown;
       return {
         name,
         success: false,
-        errors: [],
-        data: result,
+        errors: [error.body.errorMessage as string],
+        data: data as Availability[],
       };
     }
     const errors = [];

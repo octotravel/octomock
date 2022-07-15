@@ -39,6 +39,8 @@ class SupplierFlow {
     return {
       name: "Supplier Flow",
       success: scenarios.every((scenario) => scenario.success),
+      totalScenarios: scenarios.length,
+      succesScenarios: scenarios.filter((scenario) => scenario.success).length,
       scenarios: scenarios,
     };
   };
@@ -57,7 +59,7 @@ class SupplierFlow {
   private validateSupplierError = async (): Promise<ScenarioResult<null>> => {
     return new SupplierErrorScenario({
       apiClient: this.apiClient,
-      supplierId: "badSupplierID",
+      supplierId: "bad supplierId",
     }).validate();
   };
 }
@@ -79,6 +81,8 @@ class ProductFlow {
     const scenarios = [...product, products, productError];
     return {
       name: "Product Flow",
+      totalScenarios: scenarios.length,
+      succesScenarios: scenarios.filter((scenario) => scenario.success).length,
       success: scenarios.every((scenario) => scenario.success),
       scenarios: scenarios,
     };
@@ -138,6 +142,8 @@ class AvailabilityFlow {
     ];
     return {
       name: "Availability Flow",
+      totalScenarios: scenarios.length,
+      succesScenarios: scenarios.filter((scenario) => scenario.success).length,
       success: scenarios.every((scenario) => scenario.success),
       scenarios: scenarios,
     };
@@ -262,6 +268,8 @@ class BookingReservationFlow {
     ];
     return {
       name: "Booking Reservation Flow",
+      totalScenarios: scenarios.length,
+      succesScenarios: scenarios.filter((scenario) => scenario.success).length,
       success: scenarios.every((scenario) => scenario.success),
       scenarios: scenarios,
     };
@@ -455,6 +463,8 @@ class BookingReservationFlow {
 interface Flow {
   name: string;
   success: boolean;
+  totalScenarios: number;
+  succesScenarios: number;
   scenarios: ScenarioResult<any>[];
 }
 class PrimiteFlows {
@@ -481,6 +491,7 @@ export class ValidationController {
   public validate = async (): Promise<Flow[]> => {
     const config = this.config;
     // validateProduct
+
     const primitiveFlows = await new PrimiteFlows({ config }).validate();
 
     // new ComplextFlows().validate()

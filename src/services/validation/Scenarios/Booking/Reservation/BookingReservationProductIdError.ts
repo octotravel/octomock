@@ -46,8 +46,8 @@ export class BookingReservationProductIdErrorScenario
       return {
         name,
         success: false,
-        errors: [],
-        data: null,
+        errors: ["Should return INVALID_PRODUCT_ID"],
+        data: result as null,
       };
     }
 
@@ -57,14 +57,14 @@ export class BookingReservationProductIdErrorScenario
         name,
         success: false,
         errors: errors.map((error) => error.message),
-        data: null,
+        data: error as null,
       };
     }
     return {
       name,
       success: true,
       errors: [],
-      data: null,
+      data: error as null,
     };
   };
 }

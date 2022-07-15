@@ -38,7 +38,7 @@ export class AvailabilityOptionIdErrorScenario implements Scenario<null> {
         name,
         success: false,
         errors: ["Should be invalid optionId error"],
-        data: null,
+        data: result as null,
       };
     }
 
@@ -48,14 +48,14 @@ export class AvailabilityOptionIdErrorScenario implements Scenario<null> {
         name,
         success: false,
         errors: errors.map((error) => error.message),
-        data: null,
+        data: error as null,
       };
     }
     return {
       name,
       success: true,
       errors: [],
-      data: null,
+      data: error as null,
     };
   };
 }

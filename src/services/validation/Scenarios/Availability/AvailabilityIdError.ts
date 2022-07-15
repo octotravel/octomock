@@ -37,7 +37,7 @@ export class AvailabilityIdErrorScenario implements Scenario<null> {
         name,
         success: false,
         errors: ["Availability should be empty"],
-        data: null,
+        data: result as null,
       };
     }
 
@@ -46,14 +46,14 @@ export class AvailabilityIdErrorScenario implements Scenario<null> {
         name,
         success: false,
         errors: [error.body.message[0]],
-        data: null,
+        data: error as null,
       };
     }
     return {
       name,
       success: true,
       errors: [],
-      data: null,
+      data: result as null,
     };
   };
 }

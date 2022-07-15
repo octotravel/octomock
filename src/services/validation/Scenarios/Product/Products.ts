@@ -22,11 +22,12 @@ export class ProductsScenario implements Scenario<Product[]> {
     const { result, error } = await this.apiClient.getProducts();
     const name = "Correct products";
     if (error) {
+      const data = error as unknown;
       return {
         name,
         success: false,
-        errors: [],
-        data: result,
+        errors: [error.body.errorMessage as string],
+        data: data as Product[],
       };
     }
     const errors = result

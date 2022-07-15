@@ -27,7 +27,7 @@ export class ProductErrorScenario implements Scenario<any> {
       return {
         name,
         success: false,
-        errors: [],
+        errors: ["Response should be INVALID_PRODUCT_ID"],
         data: result,
       };
     }
@@ -38,14 +38,14 @@ export class ProductErrorScenario implements Scenario<any> {
         name,
         success: false,
         errors: errors.map((error) => error.message),
-        data: result,
+        data: error as null,
       };
     }
     return {
       name,
       success: true,
       errors: [],
-      data: result,
+      data: error as null,
     };
   };
 }

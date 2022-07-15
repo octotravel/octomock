@@ -24,11 +24,12 @@ export class SupplierScenario implements Scenario<Supplier> {
     });
     const name = "Correct supplier";
     if (error) {
+      const data = error as unknown;
       return {
         name,
         success: false,
-        errors: [],
-        data: result,
+        errors: [error.body.errorMessage as string],
+        data: data as Supplier,
       };
     }
     const errors = new SupplierValidator().validate(result);

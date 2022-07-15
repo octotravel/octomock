@@ -34,7 +34,7 @@ export class AvailabilityErrorScenario implements Scenario<null> {
         name,
         success: false,
         errors: ["Should be bad request error"],
-        data: null,
+        data: result as null,
       };
     }
 
@@ -44,14 +44,14 @@ export class AvailabilityErrorScenario implements Scenario<null> {
         name,
         success: false,
         errors: [error.body.message[0]],
-        data: null,
+        data: error as null,
       };
     }
     return {
       name,
       success: true,
       errors: [],
-      data: null,
+      data: error as null,
     };
   };
 }

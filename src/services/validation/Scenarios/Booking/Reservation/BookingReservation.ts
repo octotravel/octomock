@@ -43,11 +43,12 @@ export class BookingReservationScenario implements Scenario<Booking> {
     });
     const name = "Correct booking reservation";
     if (error) {
+      const data = error as unknown;
       return {
         name,
         success: false,
-        errors: [],
-        data: result,
+        errors: [error.body.errorMessage as string],
+        data: data as Booking,
       };
     }
 

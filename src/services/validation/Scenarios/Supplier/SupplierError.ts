@@ -27,8 +27,8 @@ export class SupplierErrorScenario implements Scenario<null> {
       return {
         name,
         success: false,
-        errors: [],
-        data: null,
+        errors: ["Response should be BAD_REQUEST"],
+        data: result as null,
       };
     }
 
@@ -38,14 +38,14 @@ export class SupplierErrorScenario implements Scenario<null> {
         name,
         success: false,
         errors: errors.map((error) => error.message),
-        data: null,
+        data: error as null,
       };
     }
     return {
       name,
       success: true,
       errors: [],
-      data: null,
+      data: error as null,
     };
   };
 }

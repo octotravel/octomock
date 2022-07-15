@@ -28,11 +28,12 @@ export class ProductScenario implements Scenario<Product> {
     });
     const name = "Correct product";
     if (error) {
+      const data = error as unknown;
       return {
         name,
         success: false,
-        errors: [],
-        data: result,
+        errors: [error.body.errorMessage as string],
+        data: data as Product,
       };
     }
     const errors = new ProductValidator({

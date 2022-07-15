@@ -44,8 +44,8 @@ export class BookingReservationEntityErrorScenario implements Scenario<null> {
       return {
         name,
         success: false,
-        errors: [],
-        data: null,
+        errors: ["Should return UNPROCESSABLE_ENTITY"],
+        data: result as null,
       };
     }
 
@@ -55,14 +55,14 @@ export class BookingReservationEntityErrorScenario implements Scenario<null> {
         name,
         success: false,
         errors: errors.map((error) => error.message),
-        data: null,
+        data: error as null,
       };
     }
     return {
       name,
       success: true,
       errors: [],
-      data: null,
+      data: error as null,
     };
   };
 }
