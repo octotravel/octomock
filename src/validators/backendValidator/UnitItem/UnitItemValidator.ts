@@ -68,7 +68,7 @@ export class UnitItemValidator implements ModelValidator {
       ),
       ...this.contactValidator.validate(unitItem.contact),
 
-      ...this.validatePricingCapability(unitItem),
+      ...this.validatePricingCapability(unitItem, pricingPer),
     ];
 
     if (unitItem.ticket) {
@@ -111,9 +111,13 @@ export class UnitItemValidator implements ModelValidator {
   };
 
   private validatePricingCapability = (
-    unitItem: UnitItem
+    unitItem: UnitItem,
+    pricingPer: PricingPer
   ): ValidatorError[] => {
-    if (this.capabilities.includes(CapabilityId.Pricing)) {
+    if (
+      this.capabilities.includes(CapabilityId.Pricing) &&
+      pricingPer === PricingPer.UNIT
+    ) {
       const pricingValidator = new PricingValidator(`${this.path}.pricing`);
       return pricingValidator.validate(unitItem.pricing);
     }
