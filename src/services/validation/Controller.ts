@@ -20,6 +20,8 @@ import { BookingReservationOptionIdErrorScenario } from "./Scenarios/Booking/Res
 import { BookingReservationAvailabilityIdErrorScenario } from "./Scenarios/Booking/Reservation/BookingReservationAvailabilityIdError";
 import { BookingReservationEntityErrorScenario } from "./Scenarios/Booking/Reservation/BookingReservationEntityError";
 import { BookingReservationUnitIdErrorScenario } from "./Scenarios/Booking/Reservation/BookingReservationUnitIdError";
+import { BookingConfirmationScenario } from "./Scenarios/Booking/Confirmation/BookingConfirmation";
+import { BookingConfirmationUuidErrorScenario } from "./Scenarios/Booking/Confirmation/BookingConfirmationUuidError";
 
 class SupplierFlow {
   private config: Config;
@@ -460,6 +462,97 @@ class BookingReservationFlow {
   };
 }
 
+class BookingConfirmationFlow {
+  private config: Config;
+  private apiClient: ApiClient;
+  constructor({ config }: { config: Config }) {
+    this.config = config;
+    this.apiClient = new ApiClient({
+      url: config.url,
+      capabilities: config.capabilities,
+    });
+  }
+  public validate = async (): Promise<Flow> => {
+    const booking = await this.validateBooking();
+    const bookingUuidError = await this.validateBookingUuidError();
+    const scenarios = [...booking, ...bookingUuidError];
+    return {
+      name: "Booking Confirmation Flow",
+      totalScenarios: scenarios.length,
+      succesScenarios: scenarios.filter((scenario) => scenario.success).length,
+      success: scenarios.every((scenario) => scenario.success),
+      scenarios: scenarios,
+    };
+  };
+
+  private validateBooking = async (): Promise<ScenarioResult<Booking>[]> => {
+    return Promise.all(
+      this.config.getProductConfigs().map(async (availabilityConfig) => {
+        const availability = await this.apiClient.getAvailability({
+          productId: availabilityConfig.productId,
+          optionId: availabilityConfig.optionId,
+          localDateStart: availabilityConfig.available.from,
+          localDateEnd: availabilityConfig.available.to,
+        });
+        const product = await this.apiClient.getProduct({
+          id: availabilityConfig.productId,
+        });
+        const booking = await this.apiClient.bookingReservation({
+          productId: availabilityConfig.productId,
+          optionId: availabilityConfig.optionId,
+          availabilityId: availability.result[0].id,
+          unitItems: [
+            {
+              unitId: product.result.options[0].units[0].id,
+            },
+            {
+              unitId: product.result.options[0].units[0].id,
+            },
+          ],
+        });
+        return new BookingConfirmationScenario({
+          apiClient: this.apiClient,
+          uuid: booking.result.uuid,
+          unitItems: [
+            {
+              unitId: product.result.options[0].units[0].id,
+            },
+            {
+              unitId: product.result.options[0].units[0].id,
+            },
+          ],
+          capabilities: this.config.capabilities,
+        }).validate();
+      })
+    );
+  };
+
+  private validateBookingUuidError = async (): Promise<
+    ScenarioResult<null>[]
+  > => {
+    return Promise.all(
+      this.config.getProductConfigs().map(async (availabilityConfig) => {
+        const product = await this.apiClient.getProduct({
+          id: availabilityConfig.productId,
+        });
+        return new BookingConfirmationUuidErrorScenario({
+          apiClient: this.apiClient,
+          uuid: "bad uuid",
+          unitItems: [
+            {
+              unitId: product.result.options[0].units[0].id,
+            },
+            {
+              unitId: product.result.options[0].units[0].id,
+            },
+          ],
+          capabilities: this.config.capabilities,
+        }).validate();
+      })
+    );
+  };
+}
+
 interface Flow {
   name: string;
   success: boolean;
@@ -477,8 +570,19 @@ class PrimiteFlows {
     const supplierFlow = await new SupplierFlow({ config }).validate();
     const productFlow = await new ProductFlow({ config }).validate();
     const availabilityFlow = await new AvailabilityFlow({ config }).validate();
-    const bookingFlow = await new BookingReservationFlow({ config }).validate();
-    return [supplierFlow, productFlow, availabilityFlow, bookingFlow];
+    const bookingReservationFlow = await new BookingReservationFlow({
+      config,
+    }).validate();
+    const bookingConfirmation = await new BookingConfirmationFlow({
+      config,
+    }).validate();
+    return [
+      supplierFlow,
+      productFlow,
+      availabilityFlow,
+      bookingReservationFlow,
+      bookingConfirmation,
+    ];
   };
 }
 

@@ -110,12 +110,13 @@ router.post("/bookings", async (ctx, _) => {
 
 router.post("/bookings/:uuid/confirm", async (ctx, _) => {
   const capabilities = getCapabilities(ctx);
-  ctx.body = {
+
+  const data = {
     ...ctx.request.body,
     uuid: ctx.params.uuid,
   };
-  await confirmBookingSchema.validate(ctx.body);
-  const schema = confirmBookingSchema.cast(ctx.body);
+  await confirmBookingSchema.validate(data);
+  const schema = confirmBookingSchema.cast(data);
   const booking = await bookingController.confirmBooking(schema, capabilities);
   ctx.body = booking;
   ctx.toJSON();
