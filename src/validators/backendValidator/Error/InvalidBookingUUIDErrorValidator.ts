@@ -18,7 +18,7 @@ export class InvalidBookingUUIDErrorValidator implements ModelValidator {
       }),
       StringValidator.validate(`errorMessage`, data.body.errorMessage),
       StringValidator.validate(`uuid`, data.body.uuid),
-      NumberValidator.validate(`status`, data.body.status, {
+      NumberValidator.validate(`status`, data.status, {
         integer: true,
         equalsTo: STATUS_BAD_REQUEST,
       }),

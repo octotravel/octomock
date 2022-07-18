@@ -2,7 +2,7 @@ import * as R from "ramda";
 import { BookingContactSchema, CapabilityId } from "@octocloud/types";
 import { ApiClient } from "../../../ApiClient";
 import { Scenario } from "../../../Scenario";
-import { InvalidProductIdErrorValidator } from "../../../../../validators/backendValidator/Error/InvalidProductIdErrorValidator";
+import { InvalidBookingUUIDErrorValidator } from "../../../../../validators/backendValidator/Error/InvalidBookingUUIDErrorValidator";
 
 export class BookingConfirmationUuidErrorScenario implements Scenario<null> {
   private apiClient: ApiClient;
@@ -39,7 +39,7 @@ export class BookingConfirmationUuidErrorScenario implements Scenario<null> {
       };
     }
 
-    const errors = new InvalidProductIdErrorValidator().validate(error);
+    const errors = new InvalidBookingUUIDErrorValidator().validate(error);
     if (!R.isEmpty(errors)) {
       return {
         name,
