@@ -43,7 +43,7 @@ export class UnitItemModel implements Capable {
     this.uuid = uuid;
     this.resellerReference = resellerReference;
     this.supplierReference = supplierReference;
-    this.unitModel = unitModel;
+    this.unitModel = unitModel.setOnBooking();
     this.status = status;
     this.utcRedeemedAt = utcRedeemedAt ?? null;
     this.contact = contact ?? {
