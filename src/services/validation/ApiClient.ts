@@ -125,7 +125,9 @@ export class ApiClient {
     _?: ApiParams
   ): Promise<Result<Booking>> => {
     const url = `${this.url}/bookings/${data.uuid}/confirm`;
-    const body = JSON.stringify(data);
+    const body = JSON.stringify({
+      contact: data.contact,
+    });
     const response = await fetch(url, {
       method: "POST",
       body,

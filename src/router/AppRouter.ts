@@ -5,6 +5,7 @@ import {
   availabilityCalendarBodySchema,
   availabilityBodySchema,
   AvailabilityBodySchema,
+  confirmBookingBodySchema,
 } from "@octocloud/types";
 import { AvailabilityCalendarController } from "./../controllers/AvailabilityCalendarController";
 import { CapabilityController } from "./../controllers/CapabilityController";
@@ -111,12 +112,17 @@ router.post("/bookings", async (ctx, _) => {
 router.post("/bookings/:uuid/confirm", async (ctx, _) => {
   const capabilities = getCapabilities(ctx);
 
+  await confirmBookingBodySchema.validate(ctx.request.body);
+  const reqBody = confirmBookingBodySchema.cast(ctx.request.body);
+
   const data = {
-    ...ctx.request.body,
+    ...reqBody,
     uuid: ctx.params.uuid,
   };
+
   await confirmBookingSchema.validate(data);
   const schema = confirmBookingSchema.cast(data);
+
   const booking = await bookingController.confirmBooking(schema, capabilities);
   ctx.body = booking;
   ctx.toJSON();

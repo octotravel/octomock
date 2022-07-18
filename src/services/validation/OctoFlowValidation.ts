@@ -172,16 +172,13 @@ export class OctoFlowValidationService {
 
   private validateConfirmBooking = async (
     uuid: string,
-    product: Product
+    _product: Product
   ): Promise<Booking> => {
     console.log("Validating confirm booking");
     const booking = await this.api.bookingConfirmation(
       {
         uuid,
-        unitItems: [
-          { unitId: product.options[0].units[0].id },
-          { unitId: product.options[0].units[0].id },
-        ],
+        contact: {},
       },
       this.params
     );

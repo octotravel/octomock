@@ -1,5 +1,5 @@
 import * as R from "ramda";
-import { Booking, BookingUnitItemSchema, CapabilityId } from "@octocloud/types";
+import { Booking, CapabilityId } from "@octocloud/types";
 import { ApiClient } from "../../../ApiClient";
 import { Scenario } from "../../../Scenario";
 import { BookingValidator } from "../../../../../validators/backendValidator/Booking/BookingValidator";
@@ -7,29 +7,27 @@ import { BookingValidator } from "../../../../../validators/backendValidator/Boo
 export class BookingConfirmationScenario implements Scenario<Booking> {
   private apiClient: ApiClient;
   private uuid: string;
-  private unitItems: BookingUnitItemSchema[];
   private capabilities: CapabilityId[];
   constructor({
     apiClient,
     uuid,
-    unitItems,
     capabilities,
   }: {
     apiClient: ApiClient;
     uuid: string;
-    unitItems: BookingUnitItemSchema[];
     capabilities: CapabilityId[];
   }) {
     this.apiClient = apiClient;
     this.uuid = uuid;
-    this.unitItems = unitItems;
     this.capabilities = capabilities;
   }
 
   public validate = async () => {
     const { result, error } = await this.apiClient.bookingConfirmation({
       uuid: this.uuid,
-      unitItems: this.unitItems,
+      contact: {
+        fullName: "John Doe",
+      },
     });
     const name = "Correct booking confirmation";
     if (error) {

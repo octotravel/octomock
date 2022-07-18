@@ -28,7 +28,7 @@
     "yup": "^0.32.11"
   },
   "devDependencies": {
-    "@octocloud/types": "^1.1.9",
+    "@octocloud/types": "^1.2.0",
     "@types/jest": "^28.1.1",
     "@types/koa": "^2.13.4",
     "@types/koa__router": "^8.0.11",

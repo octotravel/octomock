@@ -24,7 +24,7 @@ interface IBookingController {
     schema: ConfirmBookingSchema,
     capabilities: CapabilityId[]
   ): Promise<Booking>;
-  confirmBooking(
+  updateBooking(
     schema: UpdateBookingSchema,
     capabilities: CapabilityId[]
   ): Promise<Booking>;

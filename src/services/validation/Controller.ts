@@ -21,7 +21,6 @@ import { BookingReservationAvailabilityIdErrorScenario } from "./Scenarios/Booki
 import { BookingReservationEntityErrorScenario } from "./Scenarios/Booking/Reservation/BookingReservationEntityError";
 import { BookingReservationUnitIdErrorScenario } from "./Scenarios/Booking/Reservation/BookingReservationUnitIdError";
 import { BookingConfirmationScenario } from "./Scenarios/Booking/Confirmation/BookingConfirmation";
-import { BookingConfirmationUuidErrorScenario } from "./Scenarios/Booking/Confirmation/BookingConfirmationUuidError";
 
 class SupplierFlow {
   private config: Config;
@@ -473,9 +472,10 @@ class BookingConfirmationFlow {
     });
   }
   public validate = async (): Promise<Flow> => {
+    console.log("BOOKIGN CONFIRMATION");
     const booking = await this.validateBooking();
-    const bookingUuidError = await this.validateBookingUuidError();
-    const scenarios = [...booking, ...bookingUuidError];
+    // const bookingUuidError = await this.validateBookingUuidError();
+    const scenarios = [...booking];
     return {
       name: "Booking Confirmation Flow",
       totalScenarios: scenarios.length,
@@ -510,47 +510,24 @@ class BookingConfirmationFlow {
             },
           ],
         });
+        console.log("______________________________________\n");
         return new BookingConfirmationScenario({
           apiClient: this.apiClient,
           uuid: booking.result.uuid,
-          unitItems: [
-            {
-              unitId: product.result.options[0].units[0].id,
-            },
-            {
-              unitId: product.result.options[0].units[0].id,
-            },
-          ],
           capabilities: this.config.capabilities,
         }).validate();
       })
     );
   };
 
-  private validateBookingUuidError = async (): Promise<
-    ScenarioResult<null>[]
-  > => {
-    return Promise.all(
-      this.config.getProductConfigs().map(async (availabilityConfig) => {
-        const product = await this.apiClient.getProduct({
-          id: availabilityConfig.productId,
-        });
-        return new BookingConfirmationUuidErrorScenario({
-          apiClient: this.apiClient,
-          uuid: "bad uuid",
-          unitItems: [
-            {
-              unitId: product.result.options[0].units[0].id,
-            },
-            {
-              unitId: product.result.options[0].units[0].id,
-            },
-          ],
-          capabilities: this.config.capabilities,
-        }).validate();
-      })
-    );
-  };
+  // private validateBookingUuidError = async (): Promise<ScenarioResult<null>> => {
+  //     return new BookingConfirmationUuidErrorScenario({
+  //       apiClient: this.apiClient,
+  //       uuid: "bad uuid",
+  //       contact: {},
+  //       capabilities: this.config.capabilities,
+  //     }).validate();
+  // };
 }
 
 interface Flow {
