@@ -2,6 +2,8 @@ import { ValidatedError } from "../../validators/backendValidator/Error/index";
 import {
   Availability,
   AvailabilityBodySchema,
+  AvailabilityCalendar,
+  AvailabilityCalendarBodySchema,
   Booking,
   CancelBookingBodySchema,
   CancelBookingPathParamsSchema,
@@ -9,6 +11,7 @@ import {
   ConfirmBookingBodySchema,
   ConfirmBookingPathParamsSchema,
   GetBookingPathParamsSchema,
+  GetBookingsQueryParamsSchema,
   GetProductPathParamsSchema,
   GetSupplierPathParamsSchema,
   Product,
@@ -104,6 +107,22 @@ export class ApiClient {
     return await this.setResponse(response);
   };
 
+  public getAvailabilityCalendar = async (
+    data: AvailabilityCalendarBodySchema,
+    _?: ApiParams
+  ): Promise<Result<AvailabilityCalendar[]>> => {
+    const url = `${this.url}/availability/calendar`;
+    const body = JSON.stringify(data);
+    const response = await fetch(url, {
+      method: "POST",
+      body,
+      headers: {
+        ...this.mapCapabilities(),
+      },
+    });
+    return await this.setResponse(response);
+  };
+
   public bookingReservation = async (
     data: CreateBookingSchema,
     _?: ApiParams
@@ -130,6 +149,22 @@ export class ApiClient {
     });
     const response = await fetch(url, {
       method: "POST",
+      body,
+      headers: {
+        ...this.mapCapabilities(),
+      },
+    });
+    return await this.setResponse(response);
+  };
+
+  public getBookings = async (
+    data: GetBookingsQueryParamsSchema,
+    _?: ApiParams
+  ): Promise<Result<Booking[]>> => {
+    const url = `${this.url}/bookings`;
+    const body = JSON.stringify(data);
+    const response = await fetch(url, {
+      method: "GET",
       body,
       headers: {
         ...this.mapCapabilities(),

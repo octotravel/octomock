@@ -6,9 +6,9 @@ import {
 } from "@octocloud/types";
 import { ApiClient } from "../../../ApiClient";
 import { Scenario } from "../../../Scenario";
-import { InvalidUnitIdErrorValidator } from "../../../../../validators/backendValidator/Error/InvalidUnitIdErrorValidator";
+import { UnprocessableEntityErrorValidator } from "../../../../../validators/backendValidator/Error/UnprocessableEntityErrorValidator";
 
-export class BookingConfirmationUnitIdErrorScenario implements Scenario<null> {
+export class BookingConfirmationEntityErrorScenario implements Scenario<null> {
   private apiClient: ApiClient;
   private uuid: string;
   private unitItems: BookingUnitItemSchema[];
@@ -38,17 +38,17 @@ export class BookingConfirmationUnitIdErrorScenario implements Scenario<null> {
       contact: this.contact,
     });
 
-    const name = "Booking confirmation with bad unit";
+    const name = "Booking confirmation with less than minimum units";
     if (result) {
       return {
         name,
         success: false,
-        errors: ["Should return INVALID_UNIT_ID"],
+        errors: ["Should return UNPROCESSABLE_ENTITY"],
         data: result as null,
       };
     }
 
-    const errors = new InvalidUnitIdErrorValidator().validate(error);
+    const errors = new UnprocessableEntityErrorValidator().validate(error);
     if (!R.isEmpty(errors)) {
       return {
         name,
