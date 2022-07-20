@@ -4,29 +4,29 @@ import { ApiClient } from "../../../ApiClient";
 import { Scenario } from "../../../Scenario";
 import { BookingValidator } from "../../../../../validators/backendValidator/Booking/BookingValidator";
 
-export class BookingListResellerScenario implements Scenario<Booking[]> {
+export class BookingListSupplierScenario implements Scenario<Booking[]> {
   private apiClient: ApiClient;
-  private resellerReference: string;
+  private supplierReference: string;
   private capabilities: CapabilityId[];
   constructor({
     apiClient,
-    resellerReference,
+    supplierReference,
     capabilities,
   }: {
     apiClient: ApiClient;
-    resellerReference: string;
+    supplierReference: string;
     capabilities: CapabilityId[];
   }) {
     this.apiClient = apiClient;
-    this.resellerReference = resellerReference;
+    this.supplierReference = supplierReference;
     this.capabilities = capabilities;
   }
 
   public validate = async () => {
     const { result, error } = await this.apiClient.getBookings({
-      resellerReference: this.resellerReference,
+      supplierReference: this.supplierReference,
     });
-    const name = "Correct list booking by reseller reference";
+    const name = "Correct list booking by supplier reference";
     if (error) {
       const data = error as unknown;
       return {
@@ -37,16 +37,18 @@ export class BookingListResellerScenario implements Scenario<Booking[]> {
       };
     }
 
-    result.map((booking) => {
-      if (booking.resellerReference !== this.resellerReference) {
-        return {
-          name,
-          success: false,
-          errors: ["Returned booking with wrong resellerReference"],
-          data: result,
-        };
-      }
-    });
+    if (
+      result.some(
+        (booking) => booking.supplierReference !== this.supplierReference
+      )
+    ) {
+      return {
+        name,
+        success: false,
+        errors: [`SupplierReference should be ${this.supplierReference}`],
+        data: result,
+      };
+    }
 
     const errors = [];
     result.map((result) => {

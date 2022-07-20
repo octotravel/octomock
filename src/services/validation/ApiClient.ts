@@ -161,11 +161,11 @@ export class ApiClient {
     data: GetBookingsQueryParamsSchema,
     _?: ApiParams
   ): Promise<Result<Booking[]>> => {
-    const url = `${this.url}/bookings`;
-    const body = JSON.stringify(data);
+    const params = new URLSearchParams(data);
+    const url = `${this.url}/bookings?` + params;
     const response = await fetch(url, {
       method: "GET",
-      body,
+
       headers: {
         ...this.mapCapabilities(),
       },
