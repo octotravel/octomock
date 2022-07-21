@@ -19,6 +19,7 @@ import { AvailabilityService } from "./../services/AvailabilityService";
 import { ProductService } from "./../services/ProductService";
 import { BookingService } from "../services/BookingService";
 import { BookingBuilder } from "../builders/BookingBuilder";
+import R from "ramda";
 
 interface IBookingController {
   createBooking(
@@ -186,12 +187,14 @@ export class BookingController implements IBookingController {
     unitItems: BookingUnitItemSchema[]
   ): void => {
     const minUnits = option.restrictions.minUnits;
-    if (minUnits > unitItems.length) {
-      throw new UnprocessableEntityError("minimal restrictions not met");
-    }
-    const maxUnits = option.restrictions.maxUnits;
-    if (maxUnits !== null && maxUnits < unitItems.length) {
-      throw new UnprocessableEntityError("maximal restrictions not met");
+    if (unitItems) {
+      if (minUnits > unitItems.length || R.isEmpty(unitItems)) {
+        throw new UnprocessableEntityError("minimal restrictions not met");
+      }
+      const maxUnits = option.restrictions.maxUnits;
+      if (maxUnits !== null && maxUnits < unitItems.length) {
+        throw new UnprocessableEntityError("maximal restrictions not met");
+      }
     }
   };
 }
