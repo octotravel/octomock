@@ -1,19 +1,21 @@
-import {
-  OctoError,
-  InternalServerError,
-  BadRequestError,
-} from "./models/Error";
 import Koa from "koa";
 import koaBody from "koa-body";
+import cors from "@koa/cors";
 import { router } from "./router/AppRouter";
 import { parseCapabilities } from "./router/middlewares";
 import { DB } from "./storage/Database";
 import { DataGenerator } from "./generators/DataGenerator";
 import { ValidationError } from "yup";
+import {
+  OctoError,
+  InternalServerError,
+  BadRequestError,
+} from "./models/Error";
 
 const app = new Koa();
 
 DB.getInstance().open();
+app.use(cors());
 app.use(koaBody());
 app.use(async (ctx, next) => {
   try {
