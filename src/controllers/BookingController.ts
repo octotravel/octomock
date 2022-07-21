@@ -100,6 +100,10 @@ export class BookingController implements IBookingController {
     if (booking.status === BookingStatus.CONFIRMED) {
       return booking.toPOJO({ useCapabilities: true, capabilities });
     }
+    const option = booking.option;
+    if (option.restrictions.minUnits > schema.unitItems.length) {
+      throw new UnprocessableEntityError("minimal restrictions not met");
+    }
     const confirmedBooking = this.bookingBuilder.confirmBooking(
       booking,
       schema
@@ -117,6 +121,10 @@ export class BookingController implements IBookingController {
     const booking = await this.bookingService.getBooking(schema);
     if (booking.cancellable === false) {
       throw new UnprocessableEntityError("booking cannot be updated");
+    }
+    const option = booking.option;
+    if (option.restrictions.minUnits > schema.unitItems.length) {
+      throw new UnprocessableEntityError("minimal restrictions not met");
     }
     const confirmedBooking = this.bookingBuilder.updateBooking(booking, schema);
     const bookingModel = await this.bookingService.updateBooking(
