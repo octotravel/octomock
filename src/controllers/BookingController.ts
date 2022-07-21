@@ -1,5 +1,10 @@
-// import { BookingValidator } from "./../validators/backendValidator/BookingValidator";
-import { CapabilityId, Booking, BookingStatus } from "@octocloud/types";
+import {
+  CapabilityId,
+  Booking,
+  BookingStatus,
+  BookingUnitItemSchema,
+} from "@octocloud/types";
+import { OptionModel } from "./../models/Option";
 import { UnprocessableEntityError } from "./../models/Error";
 import {
   CancelBookingSchema,
@@ -66,9 +71,7 @@ export class BookingController implements IBookingController {
       capabilities
     );
     const option = product.getOption(schema.optionId);
-    if (option.restrictions.minUnits > schema.unitItems.length) {
-      throw new UnprocessableEntityError("minimal restrictions not met");
-    }
+    this.checkRestricitons(option, schema.unitItems);
 
     const bookingModel = this.bookingBuilder.createBooking(
       {
@@ -84,8 +87,6 @@ export class BookingController implements IBookingController {
       schema
     );
 
-    // new BookingValidator(capabilities).validate(bookingModel.toPOJO({}));
-
     const createdBookingModel = await this.bookingService.createBooking(
       bookingModel
     );
@@ -100,10 +101,8 @@ export class BookingController implements IBookingController {
     if (booking.status === BookingStatus.CONFIRMED) {
       return booking.toPOJO({ useCapabilities: true, capabilities });
     }
-    const option = booking.option;
-    if (option.restrictions.minUnits > schema.unitItems.length) {
-      throw new UnprocessableEntityError("minimal restrictions not met");
-    }
+    this.checkRestricitons(booking.option, schema.unitItems);
+
     const confirmedBooking = this.bookingBuilder.confirmBooking(
       booking,
       schema
@@ -122,10 +121,8 @@ export class BookingController implements IBookingController {
     if (booking.cancellable === false) {
       throw new UnprocessableEntityError("booking cannot be updated");
     }
-    const option = booking.option;
-    if (option.restrictions.minUnits > schema.unitItems.length) {
-      throw new UnprocessableEntityError("minimal restrictions not met");
-    }
+    this.checkRestricitons(booking.option, schema.unitItems);
+
     const confirmedBooking = this.bookingBuilder.updateBooking(booking, schema);
     const bookingModel = await this.bookingService.updateBooking(
       confirmedBooking
@@ -182,5 +179,19 @@ export class BookingController implements IBookingController {
     return bookingModels.map((b) =>
       b.toPOJO({ useCapabilities: true, capabilities })
     );
+  };
+
+  private checkRestricitons = (
+    option: OptionModel,
+    unitItems: BookingUnitItemSchema[]
+  ): void => {
+    const minUnits = option.restrictions.minUnits;
+    if (minUnits > unitItems.length) {
+      throw new UnprocessableEntityError("minimal restrictions not met");
+    }
+    const maxUnits = option.restrictions.maxUnits;
+    if (maxUnits !== null && maxUnits < unitItems.length) {
+      throw new UnprocessableEntityError("maximal restrictions not met");
+    }
   };
 }
