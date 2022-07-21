@@ -34,6 +34,7 @@ export class DB {
     CREATE TABLE IF NOT EXISTS booking  (
       id TEXT NOT NULL PRIMARY KEY,
       status TEXT,
+      createdAt DATE,
       resellerReference TEXT,
       supplierReference TEXT,
       data TEXT
