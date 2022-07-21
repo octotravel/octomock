@@ -62,11 +62,16 @@ export class AvailabilityService implements IAvailabilityService {
   ): Promise<AvailabilityModel> => {
     const optionId = data.optionId;
 
+    const date = new Date(data.availabilityId);
+    if (!date.getTime()) {
+      throw new InvalidAvailabilityIdError(data.availabilityId);
+    }
+
     const availabilities = this.generator.generate({
       product: data.product,
       optionId,
       capabilities,
-      date: DateHelper.availabilityDateFormat(new Date(data.availabilityId)),
+      date: DateHelper.availabilityDateFormat(date),
     });
     const availability =
       availabilities.find(

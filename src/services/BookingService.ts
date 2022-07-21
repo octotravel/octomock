@@ -25,13 +25,15 @@ export class BookingService implements IBookingService {
         status,
         resellerReference,
         supplierReference,
+        createdAt,
         data
-      ) VALUES (?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?)
     `,
         bookingModel.uuid,
         bookingModel.status,
         bookingModel.resellerReference,
         bookingModel.supplierReference,
+        DateHelper.getDate(bookingModel.utcCreatedAt),
         JSON.stringify(bookingModel.toPOJO({}))
       );
     return bookingModel;
@@ -83,29 +85,30 @@ export class BookingService implements IBookingService {
   public getBookings = async (
     data: GetBookingsSchema
   ): Promise<BookingModel[]> => {
+    const selectQuery = "SELECT * FROM booking WHERE ";
+    const query = [];
+    const params = [];
     if (data.resellerReference) {
-      const result = await DB.getInstance()
-        .getDB()
-        .all(
-          `SELECT * FROM booking WHERE resellerReference = ?`,
-          data.resellerReference
-        );
-      return result.map((r) =>
-        BookingModel.fromPOJO(JSON.parse(r.data) as Booking)
-      );
+      query.push("resellerReference = ?");
+      params.push(data.resellerReference);
     }
     if (data.supplierReference) {
-      const result = await DB.getInstance()
-        .getDB()
-        .all(
-          `SELECT * FROM booking WHERE supplierReference = ?`,
-          data.supplierReference
-        );
-      return result.map((r) =>
-        BookingModel.fromPOJO(JSON.parse(r.data) as Booking)
-      );
+      query.push("supplierReference = ?");
+      params.push(data.supplierReference);
     }
-    const result = await DB.getInstance().getDB().all(`SELECT * FROM booking`);
+
+    if (data.localDateStart && data.localDateEnd) {
+      query.push("createdAt BETWEEN ? AND ?");
+      params.push(data.localDateStart);
+      params.push(data.localDateEnd);
+    } else if (data.localDate) {
+      query.push("createdAt = ? ");
+      params.push(data.localDate);
+    }
+
+    const result = await DB.getInstance()
+      .getDB()
+      .all(selectQuery + query.join(" AND "), ...params);
     return result.map((r) =>
       BookingModel.fromPOJO(JSON.parse(r.data) as Booking)
     );

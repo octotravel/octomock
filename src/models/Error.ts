@@ -1,7 +1,7 @@
 // const STATUS_SUCCESS = 200;
-const STATUS_BAD_REQUEST = 400;
-const STATUS_UNAUTHORIZED = 401;
-const STATUS_FORBIDDEN = 403;
+export const STATUS_BAD_REQUEST = 400;
+// const STATUS_UNAUTHORIZED = 401;
+// const STATUS_FORBIDDEN = 403;
 // const STATUS_NOT_FOUD = 404;
 const STATUS_INTERNAL_SERVER_ERROR = 500;
 // const MESSAGE_BAD_REQUEST = "Bad Request";
@@ -9,16 +9,16 @@ const STATUS_INTERNAL_SERVER_ERROR = 500;
 // const MESSAGE_UNAUTHORIZED = "Unauthorized";
 // const MESSAGE_INTERNAL_SERVER_ERROR = "Internal Server Error";
 
-const INVALID_PRODUCT_ID = "INVALID_PRODUCT_ID";
-const INVALID_OPTION_ID = "INVALID_OPTION_ID";
-const INVALID_UNIT_ID = "INVALID_UNIT_ID";
-const INVALID_AVAILABILITY_ID = "INVALID_AVAILABILITY_ID";
-const INVALID_BOOKING_UUID = "INVALID_BOOKING_UUID";
-const BAD_REQUEST = "BAD_REQUEST";
-const UNPROCESSABLE_ENTITY = "UNPROCESSABLE_ENTITY";
-const INTERNAL_SERVER_ERROR = "INTERNAL_SERVER_ERROR";
-const UNAUTHORIZED = "UNAUTHORIZED";
-const FORBIDDEN = "FORBIDDEN";
+export const INVALID_PRODUCT_ID = "INVALID_PRODUCT_ID";
+export const INVALID_OPTION_ID = "INVALID_OPTION_ID";
+export const INVALID_UNIT_ID = "INVALID_UNIT_ID";
+export const INVALID_AVAILABILITY_ID = "INVALID_AVAILABILITY_ID";
+export const INVALID_BOOKING_UUID = "INVALID_BOOKING_UUID";
+export const BAD_REQUEST = "BAD_REQUEST";
+export const UNPROCESSABLE_ENTITY = "UNPROCESSABLE_ENTITY";
+export const INTERNAL_SERVER_ERROR = "INTERNAL_SERVER_ERROR";
+export const UNAUTHORIZED = "UNAUTHORIZED";
+export const FORBIDDEN = "FORBIDDEN";
 
 const ERROR_MESSAGE_INVALID_PRODUCT_ID = `The productId was missing or invalid'`;
 const ERROR_MESSAGE_INVALID_OPTION_ID = `The optionId was missing or invalid'`;
@@ -160,7 +160,7 @@ export class InternalServerError extends OctoError {
 export class UnauthorizedError extends OctoError {
   constructor() {
     super({
-      status: STATUS_UNAUTHORIZED,
+      status: STATUS_BAD_REQUEST,
       error: UNAUTHORIZED,
       errorMessage: ERROR_MESSAGE_UNAUTHORIZED,
     });
@@ -170,7 +170,7 @@ export class UnauthorizedError extends OctoError {
 export class OctoForbiddenError extends OctoError {
   constructor() {
     super({
-      status: STATUS_FORBIDDEN,
+      status: STATUS_BAD_REQUEST,
       error: FORBIDDEN,
       errorMessage: ERROR_MESSAGE_FORBIDDEN,
     });

@@ -1,0 +1,18 @@
+test scenarios:
+
+
+
+
+Fetch Supplier
+
+Fetch Suppliers
+- Fetch Suppliers and validate each supplier
+Fetch Supplier
+- Fetch Supplier with id from Fetch Suppliers and validate the supplier
+- Fetch Supplier with invalid id and validate the error message
+
+Fetch Product (start times || opening hours)
+
+- Fetch Product with provided id - should fetch product and validate it if it's ok
+- Fetch Product with invalid id - should fetch product and validate the INVALID_PRODUCT_ID error
+

@@ -1,5 +1,4 @@
 import { CapabilityId, Product } from "@octocloud/types";
-import { ProductValidator } from "./../validators/backendValidator/ProductValidator";
 import { ProductService } from "./../services/ProductService";
 
 interface IProductController {
@@ -19,7 +18,10 @@ export class ProductController implements IProductController {
       .getProduct(id)
       .toPOJO({ useCapabilities: true, capabilities });
 
-    new ProductValidator("", capabilities).validate(product);
-    return product;
+    return {
+      ...product,
+      // allowFreesale: "asdasd" as any,
+    };
+    // return product;
   };
 }
