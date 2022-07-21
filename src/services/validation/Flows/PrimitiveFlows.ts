@@ -1,4 +1,5 @@
 import { Config } from "../config/Config";
+import { Flow } from "./Flow";
 import { AvailabilityCalendarFlow } from "./Availability/AvailabilityCalendarFlow";
 import { AvailabilityFlow } from "./Availability/AvailabilityFlow";
 import { BookingCancellationFlow } from "./Booking/BookingCancellationFlow";
@@ -6,7 +7,6 @@ import { BookingConfirmationFlow } from "./Booking/BookingConfirmationFlow";
 import { BookingGetFlow } from "./Booking/BookingGetFlow";
 import { BookingListFlow } from "./Booking/BookingListFlow";
 import { BookingReservationFlow } from "./Booking/BookingReservationFlow";
-import { Flow } from "./Flow";
 import { ProductFlow } from "./Product/ProductFlow";
 import { SupplierFlow } from "./Supplier/SupplierFlow";
 

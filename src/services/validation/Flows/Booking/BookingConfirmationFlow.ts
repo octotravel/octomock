@@ -1,4 +1,6 @@
 import { Booking } from "@octocloud/types";
+import R from "ramda";
+import { BadRequestError } from "../../../../models/Error";
 import { ApiClient } from "../../ApiClient";
 import { Config } from "../../config/Config";
 import { ScenarioResult } from "../../Scenario";
@@ -47,6 +49,9 @@ export class BookingConfirmationFlow {
           localDateStart: availabilityConfig.available.from,
           localDateEnd: availabilityConfig.available.to,
         });
+        if (R.isEmpty(availability.result) && !availability.error) {
+          throw new BadRequestError("Invalid available dates!");
+        }
         const product = await this.apiClient.getProduct({
           id: availabilityConfig.productId,
         });
@@ -92,6 +97,9 @@ export class BookingConfirmationFlow {
           localDateStart: availabilityConfig.available.from,
           localDateEnd: availabilityConfig.available.to,
         });
+        if (R.isEmpty(availability.result) && !availability.error) {
+          throw new BadRequestError("Invalid available dates!");
+        }
         const product = await this.apiClient.getProduct({
           id: availabilityConfig.productId,
         });
@@ -135,6 +143,9 @@ export class BookingConfirmationFlow {
           localDateStart: availabilityConfig.available.from,
           localDateEnd: availabilityConfig.available.to,
         });
+        if (R.isEmpty(availability.result) && !availability.error) {
+          throw new BadRequestError("Invalid available dates!");
+        }
         const product = await this.apiClient.getProduct({
           id: availabilityConfig.productId,
         });
@@ -154,12 +165,10 @@ export class BookingConfirmationFlow {
         return new BookingConfirmationEntityErrorScenario({
           apiClient: this.apiClient,
           uuid: booking.result.uuid,
-          unitItems: [
-            {
-              unitId: "adult",
-            },
-          ],
-          contact: {},
+          unitItems: [],
+          contact: {
+            fullName: "John Doe",
+          },
           capabilities: this.config.capabilities,
         }).validate();
       })

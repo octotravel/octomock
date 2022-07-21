@@ -23,7 +23,7 @@ export type ApiParams = {
   headers?: Record<string, string>;
 };
 
-type Result<T> = {
+export type Result<T> = {
   result: Nullable<T>;
   error: Nullable<ValidatedError>;
 };
@@ -144,9 +144,8 @@ export class ApiClient {
     _?: ApiParams
   ): Promise<Result<Booking>> => {
     const url = `${this.url}/bookings/${data.uuid}/confirm`;
-    const body = JSON.stringify({
-      contact: data.contact,
-    });
+    delete data.uuid;
+    const body = JSON.stringify(data);
     const response = await fetch(url, {
       method: "POST",
       body,

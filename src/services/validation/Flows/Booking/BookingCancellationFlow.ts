@@ -1,4 +1,6 @@
 import { Booking } from "@octocloud/types";
+import R from "ramda";
+import { BadRequestError } from "../../../../models/Error";
 import { ApiClient } from "../../ApiClient";
 import { Config } from "../../config/Config";
 import { ScenarioResult } from "../../Scenario";
@@ -36,6 +38,9 @@ export class BookingCancellationFlow {
           localDateStart: availabilityConfig.available.from,
           localDateEnd: availabilityConfig.available.to,
         });
+        if (R.isEmpty(availability.result) && !availability.error) {
+          throw new BadRequestError("Invalid available dates!");
+        }
         const product = await this.apiClient.getProduct({
           id: availabilityConfig.productId,
         });

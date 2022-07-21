@@ -188,13 +188,18 @@ export class BookingController implements IBookingController {
   ): void => {
     const minUnits = option.restrictions.minUnits;
     if (unitItems) {
-      if (minUnits > unitItems.length || R.isEmpty(unitItems)) {
+      if (minUnits > unitItems.length) {
         throw new UnprocessableEntityError("minimal restrictions not met");
       }
       const maxUnits = option.restrictions.maxUnits;
       if (maxUnits !== null && maxUnits < unitItems.length) {
         throw new UnprocessableEntityError("maximal restrictions not met");
       }
+    }
+    if (R.isEmpty(unitItems)) {
+      throw new UnprocessableEntityError(
+        "Validation failed: Tickets at least one ticket is required"
+      );
     }
   };
 }

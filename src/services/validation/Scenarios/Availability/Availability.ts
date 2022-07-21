@@ -61,6 +61,7 @@ export class AvailabilityScenario implements Scenario<Availability[]> {
         data: data as Availability[],
       };
     }
+
     const errors = [];
     result.map((result) => {
       errors.push(
