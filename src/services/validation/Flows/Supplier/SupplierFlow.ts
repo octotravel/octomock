@@ -1,10 +1,10 @@
 import { Supplier } from "@octocloud/types";
 import { ApiClient } from "../../ApiClient";
 import { Config } from "../../config/Config";
-import { ScenarioResult } from "../../Scenario";
-import { SupplierScenario } from "../../Scenarios/Supplier/Supplier";
-import { SupplierErrorScenario } from "../../Scenarios/Supplier/SupplierError";
-import { SuppliersScenario } from "../../Scenarios/Supplier/Suppliers";
+import { ScenarioResult } from "../../Scenarios/Scenario";
+import { GetSupplierScenario } from "../../Scenarios/Supplier/GetSupplier";
+import { GetSuppliersScenario } from "../../Scenarios/Supplier/GetSuppliers";
+import { GetSupplierInvalidScenario } from "../../Scenarios/Supplier/GetSupplierInvalid";
 import { Flow } from "../Flow";
 
 export class SupplierFlow {
@@ -18,12 +18,12 @@ export class SupplierFlow {
     });
   }
   public validate = async (): Promise<Flow> => {
-    const supplier = await this.validateSupplier();
-    const suppliers = await this.validateSuppliers();
-    const supplierError = await this.validateSupplierError();
-    const scenarios = [supplier, suppliers, supplierError];
+    const getSupplier = await this.validateGetSupplier();
+    const getSuppliers = await this.validateGetSuppliers();
+    const getSupplierInvalid = await this.validateGetSupplierInvalid();
+    const scenarios = [getSupplier, getSuppliers, getSupplierInvalid];
     return {
-      name: "Supplier Flow",
+      name: "Get Suppliers",
       success: scenarios.every((scenario) => scenario.success),
       totalScenarios: scenarios.length,
       succesScenarios: scenarios.filter((scenario) => scenario.success).length,
@@ -31,19 +31,23 @@ export class SupplierFlow {
     };
   };
 
-  private validateSupplier = async (): Promise<ScenarioResult<Supplier>> => {
-    return new SupplierScenario({
+  private validateGetSupplier = async (): Promise<ScenarioResult<Supplier>> => {
+    return new GetSupplierScenario({
       apiClient: this.apiClient,
       supplierId: this.config.supplierId,
     }).validate();
   };
-  private validateSuppliers = async (): Promise<ScenarioResult<Supplier[]>> => {
-    return new SuppliersScenario({
+  private validateGetSuppliers = async (): Promise<
+    ScenarioResult<Supplier[]>
+  > => {
+    return new GetSuppliersScenario({
       apiClient: this.apiClient,
     }).validate();
   };
-  private validateSupplierError = async (): Promise<ScenarioResult<null>> => {
-    return new SupplierErrorScenario({
+  private validateGetSupplierInvalid = async (): Promise<
+    ScenarioResult<null>
+  > => {
+    return new GetSupplierInvalidScenario({
       apiClient: this.apiClient,
       supplierId: "bad supplierId",
     }).validate();

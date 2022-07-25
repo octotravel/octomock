@@ -1,9 +1,9 @@
 import * as R from "ramda";
 import { InvalidProductIdErrorValidator } from "../../../../validators/backendValidator/Error/InvalidProductIdErrorValidator";
 import { ApiClient } from "../../ApiClient";
-import { Scenario, ScenarioResult } from "../../Scenario";
+import { Scenario, ScenarioResult } from "../Scenario";
 
-export class ProductErrorScenario implements Scenario<any> {
+export class GetProductInvalidScenario implements Scenario<any> {
   private apiClient: ApiClient;
   private productId: string;
   constructor({
@@ -18,34 +18,54 @@ export class ProductErrorScenario implements Scenario<any> {
   }
 
   public validate = async (): Promise<ScenarioResult<any>> => {
-    const { result, error } = await this.apiClient.getProduct({
+    const { request, response } = await this.apiClient.getProduct({
       id: this.productId,
     });
-    const name = `Product with bad id`;
-    if (result) {
-      // test case failed
+    const name = `Get Product Invalid`;
+    if (response.data) {
       return {
         name,
         success: false,
+        request,
+        response: {
+          body: response.data.status,
+          status: response.data.status,
+          error: null,
+        },
         errors: ["Response should be INVALID_PRODUCT_ID"],
-        data: result,
       };
     }
 
-    const errors = new InvalidProductIdErrorValidator().validate(error);
+    const errors = new InvalidProductIdErrorValidator().validate(
+      response.error
+    );
     if (!R.isEmpty(errors)) {
       return {
         name,
         success: false,
+        request,
+        response: {
+          body: null,
+          status: response.error.status,
+          error: {
+            body: response.error.body,
+          },
+        },
         errors: errors.map((error) => error.message),
-        data: error as null,
       };
     }
     return {
       name,
       success: true,
+      request,
+      response: {
+        body: null,
+        status: response.error.status,
+        error: {
+          body: response.error.body,
+        },
+      },
       errors: [],
-      data: error as null,
     };
   };
 }

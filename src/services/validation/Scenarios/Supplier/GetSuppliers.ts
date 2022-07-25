@@ -1,29 +1,35 @@
 import * as R from "ramda";
 import { Supplier } from "@octocloud/types";
 import { ApiClient } from "../../ApiClient";
-import { Scenario } from "../../Scenario";
+import { Scenario } from "../Scenario";
 import { SupplierValidator } from "../../../../validators/backendValidator/Supplier/SupplierValidator";
 
-export class SuppliersScenario implements Scenario<Supplier[]> {
+export class GetSuppliersScenario implements Scenario<Supplier[]> {
   private apiClient: ApiClient;
   constructor({ apiClient }: { apiClient: ApiClient }) {
     this.apiClient = apiClient;
   }
 
   public validate = async () => {
-    const { result, error } = await this.apiClient.getSuppliers();
-    const name = "Correct suppliers";
-    if (error) {
-      const data = error as unknown;
+    const { request, response } = await this.apiClient.getSuppliers();
+    const name = "Get Suppliers";
+    if (response.error) {
       return {
         name,
         success: false,
-        errors: [error.body.errorMessage as string],
-        data: data as Supplier[],
+        request,
+        response: {
+          body: null,
+          status: response.error.status,
+          error: {
+            body: response.error.body,
+          },
+        },
+        errors: [],
       };
     }
 
-    const errors = result
+    const errors = response.data.body
       .map((supplier) => {
         return new SupplierValidator().validate(supplier);
       })
@@ -32,15 +38,25 @@ export class SuppliersScenario implements Scenario<Supplier[]> {
       return {
         name,
         success: false,
+        request,
+        response: {
+          body: response.data.body,
+          status: response.data.status,
+          error: null,
+        },
         errors: errors.map((error) => error.message),
-        data: result,
       };
     }
     return {
       name,
       success: true,
+      request,
+      response: {
+        body: response.data.body,
+        status: response.data.status,
+        error: null,
+      },
       errors: [],
-      data: result,
     };
   };
 }

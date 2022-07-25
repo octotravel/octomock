@@ -1,10 +1,10 @@
 import * as R from "ramda";
 import { Supplier } from "@octocloud/types";
 import { ApiClient } from "../../ApiClient";
-import { Scenario } from "../../Scenario";
+import { Scenario } from "../Scenario";
 import { SupplierValidator } from "../../../../validators/backendValidator/Supplier/SupplierValidator";
 
-export class SupplierScenario implements Scenario<Supplier> {
+export class GetSupplierScenario implements Scenario<Supplier> {
   private apiClient: ApiClient;
   private supplierId: string;
   constructor({
@@ -19,33 +19,51 @@ export class SupplierScenario implements Scenario<Supplier> {
   }
 
   public validate = async () => {
-    const { result, error } = await this.apiClient.getSupplier({
+    const { request, response } = await this.apiClient.getSupplier({
       id: this.supplierId,
     });
-    const name = "Correct supplier";
-    if (error) {
-      const data = error as unknown;
+    const name = "Get Supplier";
+
+    if (response.error) {
       return {
         name,
         success: false,
-        errors: [error.body.errorMessage as string],
-        data: data as Supplier,
+        request,
+        response: {
+          body: null,
+          status: response.error.status,
+          error: {
+            body: response.error.body,
+          },
+        },
+        errors: [],
       };
     }
-    const errors = new SupplierValidator().validate(result);
+
+    const errors = new SupplierValidator().validate(response.data.body);
     if (!R.isEmpty(errors)) {
       return {
         name,
         success: false,
+        request,
+        response: {
+          body: response.data.body,
+          status: response.data.status,
+          error: null,
+        },
         errors: errors.map((error) => error.message),
-        data: result,
       };
     }
     return {
       name,
       success: true,
+      request,
+      response: {
+        body: response.data.body,
+        status: response.data.status,
+        error: null,
+      },
       errors: [],
-      data: result,
     };
   };
 }

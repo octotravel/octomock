@@ -1,10 +1,10 @@
 import { Product } from "@octocloud/types";
 import { ApiClient } from "../../ApiClient";
 import { Config } from "../../config/Config";
-import { ScenarioResult } from "../../Scenario";
-import { ProductScenario } from "../../Scenarios/Product/Product";
-import { ProductErrorScenario } from "../../Scenarios/Product/ProductError";
-import { ProductsScenario } from "../../Scenarios/Product/Products";
+import { ScenarioResult } from "../../Scenarios/Scenario";
+import { GetProductScenario } from "../../Scenarios/Product/GetProduct";
+import { GetProductInvalidScenario } from "../../Scenarios/Product/GetProductInvalid";
+import { GetProductsScenario } from "../../Scenarios/Product/GetProducts";
 import { Flow } from "../Flow";
 
 export class ProductFlow {
@@ -18,12 +18,12 @@ export class ProductFlow {
     });
   }
   public validate = async (): Promise<Flow> => {
-    const product = await Promise.all(await this.validateProduct());
-    const products = await this.validateProducts();
-    const productError = await this.validateProductError();
-    const scenarios = [...product, products, productError];
+    const getProduct = await Promise.all(await this.validateGetProduct());
+    const getProducts = await this.validateGetProducts();
+    const getProductInvalid = await this.validateGetProductInvalid();
+    const scenarios = [...getProduct, getProducts, getProductInvalid];
     return {
-      name: "Product Flow",
+      name: "Get Products",
       totalScenarios: scenarios.length,
       succesScenarios: scenarios.filter((scenario) => scenario.success).length,
       success: scenarios.every((scenario) => scenario.success),
@@ -31,25 +31,29 @@ export class ProductFlow {
     };
   };
 
-  private validateProduct = async (): Promise<
+  private validateGetProduct = async (): Promise<
     Promise<ScenarioResult<Product>>[]
   > => {
     return this.config.getProductConfigs().map((productConfig) => {
-      return new ProductScenario({
+      return new GetProductScenario({
         apiClient: this.apiClient,
         productId: productConfig.productId,
         capabilities: this.config.capabilities,
       }).validate();
     });
   };
-  private validateProducts = async (): Promise<ScenarioResult<Product[]>> => {
-    return new ProductsScenario({
+  private validateGetProducts = async (): Promise<
+    ScenarioResult<Product[]>
+  > => {
+    return new GetProductsScenario({
       apiClient: this.apiClient,
       capabilities: this.config.capabilities,
     }).validate();
   };
-  private validateProductError = async (): Promise<ScenarioResult<null>> => {
-    return new ProductErrorScenario({
+  private validateGetProductInvalid = async (): Promise<
+    ScenarioResult<null>
+  > => {
+    return new GetProductInvalidScenario({
       apiClient: this.apiClient,
       productId: "badProductID",
     }).validate();

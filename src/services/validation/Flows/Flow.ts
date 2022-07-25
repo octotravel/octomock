@@ -1,4 +1,4 @@
-import { ScenarioResult } from "../Scenario";
+import { ScenarioResult } from "../Scenarios/Scenario";
 
 export interface Flow {
   name: string;

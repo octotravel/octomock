@@ -24,8 +24,17 @@ export type ApiParams = {
 };
 
 export type Result<T> = {
-  result: Nullable<T>;
-  error: Nullable<ValidatedError>;
+  request: {
+    url: string;
+    body: Nullable<T>;
+  };
+  response: {
+    data: Nullable<{
+      status: number;
+      body: T;
+    }>;
+    error: Nullable<ValidatedError>;
+  };
 };
 
 export class ApiClient {
@@ -49,7 +58,7 @@ export class ApiClient {
         ...this.mapCapabilities(),
       },
     });
-    return await this.setResponse(response);
+    return await this.setResponse({ url, body: null }, response);
   };
 
   public getSupplier = async (
@@ -63,7 +72,7 @@ export class ApiClient {
         ...this.mapCapabilities(),
       },
     });
-    return await this.setResponse(response);
+    return await this.setResponse({ url, body: null }, response);
   };
 
   public getProducts = async (_?: ApiParams): Promise<Result<Product[]>> => {
@@ -74,7 +83,7 @@ export class ApiClient {
         ...this.mapCapabilities(),
       },
     });
-    return await this.setResponse(response);
+    return await this.setResponse({ url, body: null }, response);
   };
 
   public getProduct = async (
@@ -88,7 +97,7 @@ export class ApiClient {
         ...this.mapCapabilities(),
       },
     });
-    return await this.setResponse(response);
+    return await this.setResponse({ url, body: null }, response);
   };
 
   public getAvailability = async (
@@ -104,7 +113,7 @@ export class ApiClient {
         ...this.mapCapabilities(),
       },
     });
-    return await this.setResponse(response);
+    return await this.setResponse({ url, body }, response);
   };
 
   public getAvailabilityCalendar = async (
@@ -120,7 +129,7 @@ export class ApiClient {
         ...this.mapCapabilities(),
       },
     });
-    return await this.setResponse(response);
+    return await this.setResponse({ url, body }, response);
   };
 
   public bookingReservation = async (
@@ -136,7 +145,7 @@ export class ApiClient {
         ...this.mapCapabilities(),
       },
     });
-    return await this.setResponse(response);
+    return await this.setResponse({ url, body }, response);
   };
 
   public bookingConfirmation = async (
@@ -153,7 +162,7 @@ export class ApiClient {
         ...this.mapCapabilities(),
       },
     });
-    return await this.setResponse(response);
+    return await this.setResponse({ url, body }, response);
   };
 
   public getBookings = async (
@@ -169,7 +178,7 @@ export class ApiClient {
         ...this.mapCapabilities(),
       },
     });
-    return await this.setResponse(response);
+    return await this.setResponse({ url, body: null }, response);
   };
 
   public getBooking = async (
@@ -183,7 +192,7 @@ export class ApiClient {
         ...this.mapCapabilities(),
       },
     });
-    return await this.setResponse(response);
+    return await this.setResponse({ url, body: null }, response);
   };
 
   public cancelBooking = async (
@@ -199,24 +208,42 @@ export class ApiClient {
         ...this.mapCapabilities(),
       },
     });
-    return await this.setResponse(response);
+    return await this.setResponse({ url, body }, response);
   };
 
-  private setResponse = async <T>(response: Response): Promise<Result<T>> => {
+  private setResponse = async <T>(
+    request: { url: string; body: Nullable<any> },
+    response: Response
+  ): Promise<Result<T>> => {
     const data = await response.json();
     const status = response.status;
 
     if (status === 200) {
       return {
-        result: data as T,
-        error: null,
+        request: {
+          url: request.url,
+          body: request.body as T,
+        },
+        response: {
+          data: {
+            status,
+            body: data as T,
+          },
+          error: null,
+        },
       };
     }
     return {
-      result: null,
-      error: {
-        status,
-        body: data,
+      request: {
+        url: request.url,
+        body: null,
+      },
+      response: {
+        data: null,
+        error: {
+          status: response.status,
+          body: data,
+        },
       },
     };
   };

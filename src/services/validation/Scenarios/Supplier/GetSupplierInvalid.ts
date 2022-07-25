@@ -1,9 +1,9 @@
 import * as R from "ramda";
 import { BadRequestErrorValidator } from "../../../../validators/backendValidator/Error/BadRequestErrorValidator";
 import { ApiClient } from "../../ApiClient";
-import { Scenario, ScenarioResult } from "../../Scenario";
+import { Scenario, ScenarioResult } from "../Scenario";
 
-export class SupplierErrorScenario implements Scenario<null> {
+export class GetSupplierInvalidScenario implements Scenario<null> {
   private apiClient: ApiClient;
   private supplierId: string;
   constructor({
@@ -18,34 +18,52 @@ export class SupplierErrorScenario implements Scenario<null> {
   }
 
   public validate = async (): Promise<ScenarioResult<null>> => {
-    const { result, error } = await this.apiClient.getSupplier({
+    const { request, response } = await this.apiClient.getSupplier({
       id: this.supplierId,
     });
-    const name = `Supplier with bad id`;
-    if (result) {
-      // test case failed
+    const name = `Get Supplier Invalid`;
+    if (response.data) {
       return {
         name,
         success: false,
+        request,
+        response: {
+          body: response.data.body as null,
+          status: response.data.status,
+          error: null,
+        },
         errors: ["Response should be BAD_REQUEST"],
-        data: result as null,
       };
     }
 
-    const errors = new BadRequestErrorValidator().validate(error);
+    const errors = new BadRequestErrorValidator().validate(response.error);
     if (!R.isEmpty(errors)) {
       return {
         name,
         success: false,
+        request,
+        response: {
+          body: null,
+          status: response.error.status,
+          error: {
+            body: response.error.body,
+          },
+        },
         errors: errors.map((error) => error.message),
-        data: error as null,
       };
     }
     return {
       name,
       success: true,
+      request,
+      response: {
+        body: null,
+        status: response.error.status,
+        error: {
+          body: response.error.body,
+        },
+      },
       errors: [],
-      data: error as null,
     };
   };
 }
