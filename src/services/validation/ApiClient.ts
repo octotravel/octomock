@@ -249,11 +249,6 @@ export class ApiClient {
   };
 
   private mapCapabilities = (): Record<string, string> => {
-    if (this.capabilities.length > 0) {
-      return {
-        "Octo-Capabilities": this.capabilities.join(", "),
-      };
-    }
     return { "Octo-Capabilities": this.capabilities.join(", ") };
   };
 }
