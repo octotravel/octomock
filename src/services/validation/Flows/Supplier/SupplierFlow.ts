@@ -49,7 +49,7 @@ export class SupplierFlow {
   > => {
     return new GetSupplierInvalidScenario({
       apiClient: this.apiClient,
-      supplierId: "bad supplierId",
+      supplierId: "Invalid supplierId",
     }).validate();
   };
 }

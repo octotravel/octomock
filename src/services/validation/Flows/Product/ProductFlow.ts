@@ -55,7 +55,7 @@ export class ProductFlow {
   > => {
     return new GetProductInvalidScenario({
       apiClient: this.apiClient,
-      productId: "badProductID",
+      productId: "Invalid productId",
     }).validate();
   };
 }

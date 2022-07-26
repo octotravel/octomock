@@ -3,7 +3,7 @@ import { Flow } from "./Flow";
 import { SupplierFlow } from "./Supplier/SupplierFlow";
 import { ProductFlow } from "./Product/ProductFlow";
 import { AvailabilityFlow } from "./Availability/AvailabilityFlow";
-// import { AvailabilityCalendarFlow } from "./Availability/AvailabilityCalendarFlow";
+import { AvailabilityCalendarFlow } from "./Availability/AvailabilityCalendarFlow";
 // import { BookingCancellationFlow } from "./Booking/BookingCancellationFlow";
 // import { BookingConfirmationFlow } from "./Booking/BookingConfirmationFlow";
 // import { BookingGetFlow } from "./Booking/BookingGetFlow";
@@ -20,9 +20,9 @@ export class PrimiteFlows {
     const supplierFlow = await new SupplierFlow({ config }).validate();
     const productFlow = await new ProductFlow({ config }).validate();
     const availabilityFlow = await new AvailabilityFlow({ config }).validate();
-    // const availabilityCalendarFlow = await new AvailabilityCalendarFlow({
-    //   config,
-    // }).validate();
+    const availabilityCalendarFlow = await new AvailabilityCalendarFlow({
+      config,
+    }).validate();
     // const bookingReservationFlow = await new BookingReservationFlow({
     //   config,
     // }).validate();
@@ -38,7 +38,7 @@ export class PrimiteFlows {
       supplierFlow,
       productFlow,
       availabilityFlow,
-      // availabilityCalendarFlow,
+      availabilityCalendarFlow,
       // bookingReservationFlow,
       // bookingConfirmation,
       // bookingListFlow,

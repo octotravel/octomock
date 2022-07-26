@@ -82,11 +82,12 @@ export class AvailabilityCheckIntervalScenario
       response.data.body
         .map((availability) => {
           return (
+            !availability.available ||
             availability.status === AvailabilityStatus.CLOSED ||
             availability.status === AvailabilityStatus.SOLD_OUT
           );
         })
-        .every((status) => status)
+        .some((status) => status)
     ) {
       return {
         name,
@@ -97,7 +98,7 @@ export class AvailabilityCheckIntervalScenario
           status: response.data.status,
           error: null,
         },
-        errors: ["Availability can not be SOLD_OUT or CLOSED"],
+        errors: ["Availability can not be SOLD_OUT or CLOSED or not available"],
       };
     }
 

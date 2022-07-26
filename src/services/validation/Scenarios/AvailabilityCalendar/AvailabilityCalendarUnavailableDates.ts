@@ -1,46 +1,59 @@
 import * as R from "ramda";
 import {
-  Availability,
+  AvailabilityCalendar,
   AvailabilityStatus,
+  AvailabilityUnit,
   CapabilityId,
 } from "@octocloud/types";
 import { ApiClient } from "../../ApiClient";
 import { Scenario } from "../Scenario";
-import { AvailabilityValidator } from "../../../../validators/backendValidator/Availability/AvailabilityValidator";
+import { AvailabilityCalendarValidator } from "../../../../validators/backendValidator/AvailabilityCalendar/AvailabilityCalendarValidator";
 
-export class AvailabilityCheckDateScenario implements Scenario<Availability[]> {
+export class AvailabilityCalendarUnavailableDatesScenario
+  implements Scenario<AvailabilityCalendar[]>
+{
   private apiClient: ApiClient;
   private productId: string;
   private optionId: string;
-  private localDate: string;
+  private localDateStart: string;
+  private localDateEnd: string;
+  private units: AvailabilityUnit[];
   private capabilities: CapabilityId[];
   constructor({
     apiClient,
     productId,
     optionId,
-    localDate,
+    localDateStart,
+    localDateEnd,
+    units,
     capabilities,
   }: {
     apiClient: ApiClient;
     productId: string;
     optionId: string;
-    localDate: string;
+    localDateStart: string;
+    localDateEnd: string;
+    units?: AvailabilityUnit[];
     capabilities: CapabilityId[];
   }) {
     this.apiClient = apiClient;
     this.productId = productId;
     this.optionId = optionId;
-    this.localDate = localDate;
+    this.localDateStart = localDateStart;
+    this.localDateEnd = localDateEnd;
+    this.units = units;
     this.capabilities = capabilities;
   }
 
   public validate = async () => {
-    const { request, response } = await this.apiClient.getAvailability({
+    const { request, response } = await this.apiClient.getAvailabilityCalendar({
       productId: this.productId,
       optionId: this.optionId,
-      localDate: this.localDate,
+      localDateStart: this.localDateStart,
+      localDateEnd: this.localDateEnd,
+      units: this.units,
     });
-    const name = "Availability Check Date";
+    const name = "Availability Calendar Interval";
     if (response.error) {
       return {
         name,
@@ -57,48 +70,38 @@ export class AvailabilityCheckDateScenario implements Scenario<Availability[]> {
       };
     }
 
-    if (R.isEmpty(response.data.body)) {
-      return {
-        name,
-        success: false,
-        request,
-        response: {
-          body: response.data.body,
-          status: response.data.status,
-          error: null,
-        },
-        errors: ["Availability has to be available"],
-      };
-    }
-
-    if (
-      response.data.body
-        .map((availability) => {
-          return (
-            !availability.available ||
-            availability.status === AvailabilityStatus.CLOSED ||
-            availability.status === AvailabilityStatus.SOLD_OUT
-          );
-        })
-        .some((status) => status)
-    ) {
-      return {
-        name,
-        success: false,
-        request,
-        response: {
-          body: response.data.body,
-          status: response.data.status,
-          error: null,
-        },
-        errors: ["Availability can not be SOLD_OUT or CLOSED or not available"],
-      };
+    if (!R.isEmpty(response.data.body)) {
+      if (
+        response.data.body
+          .map((availability) => {
+            return (
+              availability.status === AvailabilityStatus.CLOSED ||
+              (availability.status === AvailabilityStatus.SOLD_OUT &&
+                !availability.available)
+            );
+          })
+          .some((status) => !status)
+      ) {
+        return {
+          name,
+          success: false,
+          request,
+          response: {
+            body: response.data.body as null,
+            status: response.data.status,
+            error: null,
+          },
+          errors: [
+            "Availability should be empty or SOLD_OUT/CLOSED and not available",
+          ],
+        };
+      }
     }
 
     const errors = [];
     response.data.body.map((result) => {
       errors.push(
-        ...new AvailabilityValidator({
+        ...new AvailabilityCalendarValidator({
           capabilities: this.capabilities,
         }).validate(result)
       );

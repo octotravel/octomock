@@ -8,29 +8,31 @@ import { ApiClient } from "../../ApiClient";
 import { Scenario } from "../Scenario";
 import { AvailabilityValidator } from "../../../../validators/backendValidator/Availability/AvailabilityValidator";
 
-export class AvailabilityCheckDateScenario implements Scenario<Availability[]> {
+export class AvailabilityCheckAvailabilityIdScenario
+  implements Scenario<Availability[]>
+{
   private apiClient: ApiClient;
   private productId: string;
   private optionId: string;
-  private localDate: string;
+  private availabilityIds: string[];
   private capabilities: CapabilityId[];
   constructor({
     apiClient,
     productId,
     optionId,
-    localDate,
+    availabilityIds,
     capabilities,
   }: {
     apiClient: ApiClient;
     productId: string;
     optionId: string;
-    localDate: string;
+    availabilityIds: string[];
     capabilities: CapabilityId[];
   }) {
     this.apiClient = apiClient;
     this.productId = productId;
     this.optionId = optionId;
-    this.localDate = localDate;
+    this.availabilityIds = availabilityIds;
     this.capabilities = capabilities;
   }
 
@@ -38,9 +40,9 @@ export class AvailabilityCheckDateScenario implements Scenario<Availability[]> {
     const { request, response } = await this.apiClient.getAvailability({
       productId: this.productId,
       optionId: this.optionId,
-      localDate: this.localDate,
+      availabilityIds: this.availabilityIds,
     });
-    const name = "Availability Check Date";
+    const name = "Availability Check AvailabilityId";
     if (response.error) {
       return {
         name,
