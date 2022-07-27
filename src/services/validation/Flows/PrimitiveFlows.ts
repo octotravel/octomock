@@ -17,12 +17,26 @@ export class PrimiteFlows {
   }
   public validate = async (): Promise<Flow[]> => {
     const config = this.config;
+    const flows = [];
+
     const supplierFlow = await new SupplierFlow({ config }).validate();
+    flows.push(supplierFlow);
+    if (!supplierFlow.success) return flows;
+
     const productFlow = await new ProductFlow({ config }).validate();
+    flows.push(productFlow);
+    if (!productFlow.success) return flows;
+
     const availabilityFlow = await new AvailabilityFlow({ config }).validate();
+    flows.push(availabilityFlow);
+    if (!availabilityFlow.success) return flows;
+
     const availabilityCalendarFlow = await new AvailabilityCalendarFlow({
       config,
     }).validate();
+    flows.push(availabilityCalendarFlow);
+    if (!availabilityCalendarFlow.success) return flows;
+
     // const bookingReservationFlow = await new BookingReservationFlow({
     //   config,
     // }).validate();

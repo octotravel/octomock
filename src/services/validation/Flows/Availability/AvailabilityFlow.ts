@@ -22,38 +22,85 @@ export class AvailabilityFlow {
       capabilities: config.capabilities,
     });
   }
+
+  private setFlow = (scenarios: ScenarioResult<any>[]): Flow => {
+    const noProducts = this.config.getProductConfigs().length;
+    return {
+      name: "Availability Check",
+      success: scenarios.every((scenario) => scenario.success),
+      totalScenarios: noProducts * 9,
+      succesScenarios: scenarios.filter((scenario) => scenario.success).length,
+      scenarios: scenarios,
+    };
+  };
+
   public validate = async (): Promise<Flow> => {
+    const scenarios = [];
     const availabilityCheckInterval = await Promise.all(
       await this.validateAvailabilityCheckInterval()
     );
+    scenarios.push(...availabilityCheckInterval);
+    if (
+      !availabilityCheckInterval
+        .map((scenario) => scenario.success)
+        .some((status) => status)
+    )
+      return this.setFlow(scenarios);
+
     const availabilityCheckDate = await Promise.all(
       await this.validateAvailabilityCheckDate()
     );
+    scenarios.push(...availabilityCheckDate);
+    if (
+      !availabilityCheckDate
+        .map((scenario) => scenario.success)
+        .some((status) => status)
+    )
+      return this.setFlow(scenarios);
+
     // const availabilityCheckAvailabilityId = await Promise.all(await this.validateAvailabilityCheckAvailabilityId());
+
     const availabilityCheckUnavailableDates =
       await this.validateAvailabilityCheckUnavailableDates();
+    scenarios.push(...availabilityCheckUnavailableDates);
+    if (
+      !availabilityCheckUnavailableDates
+        .map((scenario) => scenario.success)
+        .some((status) => status)
+    )
+      return this.setFlow(scenarios);
+
     const availabilityCheckInvalidProduct =
       await this.validateAvailabilityCheckInvalidProduct();
+    scenarios.push(...availabilityCheckInvalidProduct);
+    if (
+      !availabilityCheckInvalidProduct
+        .map((scenario) => scenario.success)
+        .some((status) => status)
+    )
+      return this.setFlow(scenarios);
+
     const availabilityCheckInvalidOption =
       await this.validateAvailabilityCheckInvalidOption();
+    scenarios.push(...availabilityCheckInvalidOption);
+    if (
+      !availabilityCheckInvalidOption
+        .map((scenario) => scenario.success)
+        .some((status) => status)
+    )
+      return this.setFlow(scenarios);
+
     const availabilityCheckBadRequest =
       await this.validateAvailabilityCheckBadRequest();
-    const scenarios = [
-      ...availabilityCheckInterval,
-      ...availabilityCheckDate,
-      // ...availabilityCheckAvailabilityId,
-      ...availabilityCheckUnavailableDates,
-      ...availabilityCheckInvalidProduct,
-      ...availabilityCheckInvalidOption,
-      ...availabilityCheckBadRequest,
-    ];
-    return {
-      name: "Availability Check",
-      totalScenarios: scenarios.length,
-      succesScenarios: scenarios.filter((scenario) => scenario.success).length,
-      success: scenarios.every((scenario) => scenario.success),
-      scenarios: scenarios,
-    };
+    scenarios.push(...availabilityCheckBadRequest);
+    if (
+      !availabilityCheckBadRequest
+        .map((scenario) => scenario.success)
+        .some((status) => status)
+    )
+      return this.setFlow(scenarios);
+
+    return this.setFlow(scenarios);
   };
 
   private getOptionId = async (productId: string): Promise<string> => {
@@ -149,8 +196,8 @@ export class AvailabilityFlow {
           optionId: availabilityConfig.optionId
             ? availabilityConfig.optionId
             : await this.getOptionId(availabilityConfig.productId),
-          localDateStart: availabilityConfig.available.from,
-          localDateEnd: availabilityConfig.available.to,
+          localDateStart: availabilityConfig.unavailable.from,
+          localDateEnd: availabilityConfig.unavailable.to,
           availabilityType: availabilityConfig.availabilityType,
         }).validate();
       })

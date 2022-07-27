@@ -19,37 +19,77 @@ export class AvailabilityCalendarFlow {
       capabilities: config.capabilities,
     });
   }
+
+  private setFlow = (scenarios: ScenarioResult<any>[]): Flow => {
+    const noProducts = this.config.getProductConfigs().length;
+    return {
+      name: "Availability Calendar",
+      success: scenarios.every((scenario) => scenario.success),
+      totalScenarios: noProducts * 6,
+      succesScenarios: scenarios.filter((scenario) => scenario.success).length,
+      scenarios: scenarios,
+    };
+  };
+
   public validate = async (): Promise<Flow> => {
+    const scenarios = [];
+
     const availabilityCalendarInterval = await Promise.all(
       await this.validateAvailabilityCalendarInterval()
     );
+    scenarios.push(...availabilityCalendarInterval);
+    if (
+      !availabilityCalendarInterval
+        .map((scenario) => scenario.success)
+        .some((status) => status)
+    )
+      return this.setFlow(scenarios);
+
     const availabilityCalendarUnavailableDates = await Promise.all(
       await this.validateAvailabilityCalendarUnavailableDates()
     );
+    scenarios.push(...availabilityCalendarUnavailableDates);
+    if (
+      !availabilityCalendarUnavailableDates
+        .map((scenario) => scenario.success)
+        .some((status) => status)
+    )
+      return this.setFlow(scenarios);
+
     const availabilityCalendarInvalidProduct = await Promise.all(
       await this.validateAvailabilityCalendarInvalidProduct()
     );
+    scenarios.push(...availabilityCalendarInvalidProduct);
+    if (
+      !availabilityCalendarInvalidProduct
+        .map((scenario) => scenario.success)
+        .some((status) => status)
+    )
+      return this.setFlow(scenarios);
+
     const availabilityCalendarInvalidOption = await Promise.all(
       await this.validateAvailabilityCalendarInvalidOption()
     );
+    scenarios.push(...availabilityCalendarInvalidOption);
+    if (
+      !availabilityCalendarInvalidOption
+        .map((scenario) => scenario.success)
+        .some((status) => status)
+    )
+      return this.setFlow(scenarios);
+
     const availabilityCalendarBadRequest = await Promise.all(
       await this.validateAvailabilityCheckBadRequest()
     );
+    scenarios.push(...availabilityCalendarBadRequest);
+    if (
+      !availabilityCalendarBadRequest
+        .map((scenario) => scenario.success)
+        .some((status) => status)
+    )
+      return this.setFlow(scenarios);
 
-    const scenarios = [
-      ...availabilityCalendarInterval,
-      ...availabilityCalendarUnavailableDates,
-      ...availabilityCalendarInvalidProduct,
-      ...availabilityCalendarInvalidOption,
-      ...availabilityCalendarBadRequest,
-    ];
-    return {
-      name: "Availability Calendar",
-      totalScenarios: scenarios.length,
-      succesScenarios: scenarios.filter((scenario) => scenario.success).length,
-      success: scenarios.every((scenario) => scenario.success),
-      scenarios: scenarios,
-    };
+    return this.setFlow(scenarios);
   };
 
   private getOptionId = async (productId: string): Promise<string> => {

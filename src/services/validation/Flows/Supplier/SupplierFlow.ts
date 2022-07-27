@@ -17,18 +17,32 @@ export class SupplierFlow {
       capabilities: config.capabilities,
     });
   }
-  public validate = async (): Promise<Flow> => {
-    const getSupplier = await this.validateGetSupplier();
-    const getSuppliers = await this.validateGetSuppliers();
-    const getSupplierInvalid = await this.validateGetSupplierInvalid();
-    const scenarios = [getSupplier, getSuppliers, getSupplierInvalid];
+
+  private setFlow = (scenarios: ScenarioResult<any>[]): Flow => {
     return {
       name: "Get Suppliers",
       success: scenarios.every((scenario) => scenario.success),
-      totalScenarios: scenarios.length,
+      totalScenarios: 3,
       succesScenarios: scenarios.filter((scenario) => scenario.success).length,
       scenarios: scenarios,
     };
+  };
+
+  public validate = async (): Promise<Flow> => {
+    const scenarios = [];
+    const getSupplier = await this.validateGetSupplier();
+    scenarios.push(getSupplier);
+    if (!getSupplier.success) return this.setFlow(scenarios);
+
+    const getSuppliers = await this.validateGetSuppliers();
+    scenarios.push(getSuppliers);
+    if (!getSuppliers.success) return this.setFlow(scenarios);
+
+    const getSupplierInvalid = await this.validateGetSupplierInvalid();
+    scenarios.push(getSupplierInvalid);
+    if (!getSupplierInvalid.success) return this.setFlow(scenarios);
+
+    return this.setFlow(scenarios);
   };
 
   private validateGetSupplier = async (): Promise<ScenarioResult<Supplier>> => {

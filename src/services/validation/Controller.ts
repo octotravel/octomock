@@ -11,7 +11,6 @@ export class ValidationController {
   public validate = async (): Promise<Flow[]> => {
     const config = this.config;
     // validateProduct
-
     const primitiveFlows = await new PrimiteFlows({ config }).validate();
 
     // new ComplextFlows().validate()

@@ -17,18 +17,37 @@ export class ProductFlow {
       capabilities: config.capabilities,
     });
   }
-  public validate = async (): Promise<Flow> => {
-    const getProduct = await Promise.all(await this.validateGetProduct());
-    const getProducts = await this.validateGetProducts();
-    const getProductInvalid = await this.validateGetProductInvalid();
-    const scenarios = [...getProduct, getProducts, getProductInvalid];
+
+  private setFlow = (scenarios: ScenarioResult<any>[]): Flow => {
+    const noProducts = this.config.getProductConfigs().length;
     return {
       name: "Get Products",
-      totalScenarios: scenarios.length,
-      succesScenarios: scenarios.filter((scenario) => scenario.success).length,
       success: scenarios.every((scenario) => scenario.success),
+      totalScenarios: noProducts + 2,
+      succesScenarios: scenarios.filter((scenario) => scenario.success).length,
       scenarios: scenarios,
     };
+  };
+
+  public validate = async (): Promise<Flow> => {
+    const scenarios = [];
+
+    const getProduct = await Promise.all(await this.validateGetProduct());
+    scenarios.push(...getProduct);
+    if (
+      !getProduct.map((scenario) => scenario.success).some((status) => status)
+    )
+      return this.setFlow(scenarios);
+
+    const getProducts = await this.validateGetProducts();
+    scenarios.push(getProducts);
+    if (!getProducts.success) return this.setFlow(scenarios);
+
+    const getProductInvalid = await this.validateGetProductInvalid();
+    scenarios.push(getProductInvalid);
+    if (!getProductInvalid.success) return this.setFlow(scenarios);
+
+    return this.setFlow(scenarios);
   };
 
   private validateGetProduct = async (): Promise<
