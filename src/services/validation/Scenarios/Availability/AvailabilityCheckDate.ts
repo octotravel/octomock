@@ -13,24 +13,28 @@ export class AvailabilityCheckDateScenario implements Scenario<Availability[]> {
   private productId: string;
   private optionId: string;
   private localDate: string;
+  private availabilityType: string;
   private capabilities: CapabilityId[];
   constructor({
     apiClient,
     productId,
     optionId,
     localDate,
+    availabilityType,
     capabilities,
   }: {
     apiClient: ApiClient;
     productId: string;
     optionId: string;
     localDate: string;
+    availabilityType: string;
     capabilities: CapabilityId[];
   }) {
     this.apiClient = apiClient;
     this.productId = productId;
     this.optionId = optionId;
     this.localDate = localDate;
+    this.availabilityType = availabilityType;
     this.capabilities = capabilities;
   }
 
@@ -40,7 +44,7 @@ export class AvailabilityCheckDateScenario implements Scenario<Availability[]> {
       optionId: this.optionId,
       localDate: this.localDate,
     });
-    const name = "Availability Check Date";
+    const name = `Availability Check Date (${this.availabilityType})`;
     if (response.error) {
       return {
         name,

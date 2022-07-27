@@ -7,18 +7,22 @@ import { Scenario } from "../Scenario";
 export class GetProductScenario implements Scenario<Product> {
   private apiClient: ApiClient;
   private productId: string;
+  private availabilityType: string;
   private capabilities: CapabilityId[];
   constructor({
     apiClient,
     productId,
+    availabilityType,
     capabilities,
   }: {
     apiClient: ApiClient;
     productId: string;
+    availabilityType: string;
     capabilities: CapabilityId[];
   }) {
     this.apiClient = apiClient;
     this.productId = productId;
+    this.availabilityType = availabilityType;
     this.capabilities = capabilities;
   }
 
@@ -26,7 +30,7 @@ export class GetProductScenario implements Scenario<Product> {
     const { request, response } = await this.apiClient.getProduct({
       id: this.productId,
     });
-    const name = "Get Product";
+    const name = `Get Product (${this.availabilityType})`;
     if (response.error) {
       return {
         name,

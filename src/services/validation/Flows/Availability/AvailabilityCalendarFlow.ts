@@ -73,6 +73,7 @@ export class AvailabilityCalendarFlow {
           : await this.getOptionId(availabilityConfig.productId),
         localDateStart: availabilityConfig.available.from,
         localDateEnd: availabilityConfig.available.to,
+        availabilityType: availabilityConfig.availabilityType,
         capabilities: this.config.capabilities,
       }).validate();
     });
@@ -90,6 +91,7 @@ export class AvailabilityCalendarFlow {
           : await this.getOptionId(availabilityConfig.productId),
         localDateStart: availabilityConfig.unavailable.from,
         localDateEnd: availabilityConfig.unavailable.to,
+        availabilityType: availabilityConfig.availabilityType,
         capabilities: this.config.capabilities,
       }).validate();
     });

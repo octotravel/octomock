@@ -45,7 +45,7 @@ export class AvailabilityCalendarInvalidProductScenario
       units: this.units,
     });
 
-    const name = `Availability Calendar Invalid Product`;
+    const name = `Availability Calendar Invalid Product (400 INVALID_PRODUCT_ID)`;
     if (response.data) {
       return {
         name,

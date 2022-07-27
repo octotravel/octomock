@@ -15,24 +15,28 @@ export class AvailabilityCheckAvailabilityIdScenario
   private productId: string;
   private optionId: string;
   private availabilityIds: string[];
+  private availabilityType: string;
   private capabilities: CapabilityId[];
   constructor({
     apiClient,
     productId,
     optionId,
     availabilityIds,
+    availabilityType,
     capabilities,
   }: {
     apiClient: ApiClient;
     productId: string;
     optionId: string;
     availabilityIds: string[];
+    availabilityType: string;
     capabilities: CapabilityId[];
   }) {
     this.apiClient = apiClient;
     this.productId = productId;
     this.optionId = optionId;
     this.availabilityIds = availabilityIds;
+    this.availabilityType = availabilityType;
     this.capabilities = capabilities;
   }
 
@@ -42,7 +46,7 @@ export class AvailabilityCheckAvailabilityIdScenario
       optionId: this.optionId,
       availabilityIds: this.availabilityIds,
     });
-    const name = "Availability Check AvailabilityId";
+    const name = `Availability Check AvailabilityId (${this.availabilityType})`;
     if (response.error) {
       return {
         name,

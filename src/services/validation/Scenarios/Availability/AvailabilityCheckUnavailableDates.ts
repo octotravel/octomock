@@ -11,24 +11,28 @@ export class AvailabilityCheckUnavailableDatesScenario
   private optionId: string;
   private localDateStart: string;
   private localDateEnd: string;
+  private availabilityType: string;
   constructor({
     apiClient,
     productId,
     optionId,
     localDateStart,
     localDateEnd,
+    availabilityType,
   }: {
     apiClient: ApiClient;
     productId: string;
     optionId: string;
     localDateStart: string;
     localDateEnd: string;
+    availabilityType: string;
   }) {
     this.apiClient = apiClient;
     this.productId = productId;
     this.optionId = optionId;
     this.localDateStart = localDateStart;
     this.localDateEnd = localDateEnd;
+    this.availabilityType = availabilityType;
   }
 
   public validate = async (): Promise<ScenarioResult<null>> => {
@@ -38,7 +42,7 @@ export class AvailabilityCheckUnavailableDatesScenario
       localDateStart: this.localDateStart,
       localDateEnd: this.localDateEnd,
     });
-    const name = `Availability Check Unavailable Dates`;
+    const name = `Availability Check Unavailable Dates (${this.availabilityType})`;
     if (!R.isEmpty(response.data.body)) {
       if (
         response.data.body

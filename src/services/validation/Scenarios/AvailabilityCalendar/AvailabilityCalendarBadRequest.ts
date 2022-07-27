@@ -43,7 +43,7 @@ export class AvailabilityCalendarBadRequestScenario implements Scenario<null> {
       units: this.units,
     });
 
-    const name = `Availability Calendar BAD_REQUEST`;
+    const name = `Availability Calendar BAD_REQUEST (400 BAD_REQUEST)`;
     if (response.data) {
       return {
         name,

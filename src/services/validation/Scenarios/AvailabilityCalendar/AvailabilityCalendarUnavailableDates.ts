@@ -18,6 +18,7 @@ export class AvailabilityCalendarUnavailableDatesScenario
   private localDateStart: string;
   private localDateEnd: string;
   private units: AvailabilityUnit[];
+  private availabilityType: string;
   private capabilities: CapabilityId[];
   constructor({
     apiClient,
@@ -26,6 +27,7 @@ export class AvailabilityCalendarUnavailableDatesScenario
     localDateStart,
     localDateEnd,
     units,
+    availabilityType,
     capabilities,
   }: {
     apiClient: ApiClient;
@@ -34,6 +36,7 @@ export class AvailabilityCalendarUnavailableDatesScenario
     localDateStart: string;
     localDateEnd: string;
     units?: AvailabilityUnit[];
+    availabilityType: string;
     capabilities: CapabilityId[];
   }) {
     this.apiClient = apiClient;
@@ -42,6 +45,7 @@ export class AvailabilityCalendarUnavailableDatesScenario
     this.localDateStart = localDateStart;
     this.localDateEnd = localDateEnd;
     this.units = units;
+    this.availabilityType = availabilityType;
     this.capabilities = capabilities;
   }
 
@@ -53,7 +57,7 @@ export class AvailabilityCalendarUnavailableDatesScenario
       localDateEnd: this.localDateEnd,
       units: this.units,
     });
-    const name = "Availability Calendar Interval";
+    const name = `Availability Calendar Interval (${this.availabilityType})`;
     if (response.error) {
       return {
         name,

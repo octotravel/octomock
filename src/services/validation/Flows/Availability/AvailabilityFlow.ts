@@ -77,6 +77,7 @@ export class AvailabilityFlow {
           : await this.getOptionId(availabilityConfig.productId),
         localDateStart: availabilityConfig.available.from,
         localDateEnd: availabilityConfig.available.to,
+        availabilityType: availabilityConfig.availabilityType,
         capabilities: this.config.capabilities,
       }).validate();
     });
@@ -99,6 +100,7 @@ export class AvailabilityFlow {
           ? availabilityConfig.optionId
           : await this.getOptionId(availabilityConfig.productId),
         localDate: dates[Math.floor(Math.random() * dates.length)],
+        availabilityType: availabilityConfig.availabilityType,
         capabilities: this.config.capabilities,
       }).validate();
     });
@@ -149,6 +151,7 @@ export class AvailabilityFlow {
             : await this.getOptionId(availabilityConfig.productId),
           localDateStart: availabilityConfig.available.from,
           localDateEnd: availabilityConfig.available.to,
+          availabilityType: availabilityConfig.availabilityType,
         }).validate();
       })
     );

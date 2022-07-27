@@ -47,7 +47,7 @@ export class AvailabilityCheckBadRequestScenario implements Scenario<null> {
       availabilityIds: this.availabilityIds,
     });
 
-    const name = `Availability Check BAD_REQUEST`;
+    const name = `Availability Check BAD_REQUEST (400 BAD_REQUEST)`;
     if (response.data) {
       return {
         name,

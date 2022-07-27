@@ -21,7 +21,7 @@ export class GetSupplierInvalidScenario implements Scenario<null> {
     const { request, response } = await this.apiClient.getSupplier({
       id: this.supplierId,
     });
-    const name = `Get Supplier Invalid`;
+    const name = `Get Supplier Invalid (400 BAD_REQUEST)`;
     if (response.data) {
       return {
         name,

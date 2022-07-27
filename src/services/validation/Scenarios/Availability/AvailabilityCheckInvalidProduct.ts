@@ -32,7 +32,7 @@ export class AvailabilityCheckInvalidProductScenario implements Scenario<null> {
       localDate: this.localDate,
     });
 
-    const name = `Availability Check Invalid Product`;
+    const name = `Availability Check Invalid Product (400 INVALID_PRODUCT_ID)`;
     if (response.data) {
       return {
         name,

@@ -38,6 +38,7 @@ export class ProductFlow {
       return new GetProductScenario({
         apiClient: this.apiClient,
         productId: productConfig.productId,
+        availabilityType: productConfig.availabilityType,
         capabilities: this.config.capabilities,
       }).validate();
     });

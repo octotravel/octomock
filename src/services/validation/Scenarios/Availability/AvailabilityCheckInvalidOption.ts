@@ -31,7 +31,7 @@ export class AvailabilityCheckInvalidOptionScenario implements Scenario<null> {
       optionId: this.optionId,
       localDate: this.localDate,
     });
-    const name = `Availability Check Invalid Option`;
+    const name = `Availability Check Invalid Option (400 INVALID_OPTION_ID)`;
     if (response.data) {
       return {
         name,

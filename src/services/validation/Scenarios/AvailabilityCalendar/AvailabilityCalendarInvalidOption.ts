@@ -44,7 +44,7 @@ export class AvailabilityCalendarInvalidOptionScenario
       localDateEnd: this.localDateEnd,
       units: this.units,
     });
-    const name = `Availability Calendar Invalid Option`;
+    const name = `Availability Calendar Invalid Option (400 INVALID_OPTION_ID)`;
     if (response.data) {
       return {
         name,

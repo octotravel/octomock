@@ -21,7 +21,7 @@ export class GetProductInvalidScenario implements Scenario<any> {
     const { request, response } = await this.apiClient.getProduct({
       id: this.productId,
     });
-    const name = `Get Product Invalid`;
+    const name = `Get Product Invalid (400 INVALID_PRODUCT_ID)`;
     if (response.data) {
       return {
         name,

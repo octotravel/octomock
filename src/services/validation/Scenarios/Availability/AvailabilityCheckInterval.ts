@@ -16,6 +16,7 @@ export class AvailabilityCheckIntervalScenario
   private optionId: string;
   private localDateStart: string;
   private localDateEnd: string;
+  private availabilityType: string;
   private capabilities: CapabilityId[];
   constructor({
     apiClient,
@@ -23,6 +24,7 @@ export class AvailabilityCheckIntervalScenario
     optionId,
     localDateStart,
     localDateEnd,
+    availabilityType,
     capabilities,
   }: {
     apiClient: ApiClient;
@@ -30,6 +32,7 @@ export class AvailabilityCheckIntervalScenario
     optionId: string;
     localDateStart: string;
     localDateEnd: string;
+    availabilityType: string;
     capabilities: CapabilityId[];
   }) {
     this.apiClient = apiClient;
@@ -37,6 +40,7 @@ export class AvailabilityCheckIntervalScenario
     this.optionId = optionId;
     this.localDateStart = localDateStart;
     this.localDateEnd = localDateEnd;
+    this.availabilityType = availabilityType;
     this.capabilities = capabilities;
   }
 
@@ -47,7 +51,7 @@ export class AvailabilityCheckIntervalScenario
       localDateStart: this.localDateStart,
       localDateEnd: this.localDateEnd,
     });
-    const name = "Availability Check Interval";
+    const name = `Availability Check Interval (${this.availabilityType})`;
     if (response.error) {
       return {
         name,

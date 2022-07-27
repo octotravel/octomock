@@ -222,7 +222,7 @@ export class ApiClient {
       return {
         request: {
           url: request.url,
-          body: request.body as T,
+          body: JSON.parse(request.body),
         },
         response: {
           data: {
@@ -236,7 +236,7 @@ export class ApiClient {
     return {
       request: {
         url: request.url,
-        body: null,
+        body: JSON.parse(request.body),
       },
       response: {
         data: null,
