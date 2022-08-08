@@ -21,11 +21,10 @@ export class AvailabilityCalendarFlow {
   }
 
   private setFlow = (scenarios: ScenarioResult<any>[]): Flow => {
-    const noProducts = this.config.getProductConfigs().length;
     return {
       name: "Availability Calendar",
       success: scenarios.every((scenario) => scenario.success),
-      totalScenarios: noProducts * 6,
+      totalScenarios: scenarios.length,
       succesScenarios: scenarios.filter((scenario) => scenario.success).length,
       scenarios: scenarios,
     };

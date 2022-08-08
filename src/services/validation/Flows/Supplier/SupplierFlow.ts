@@ -22,7 +22,7 @@ export class SupplierFlow {
     return {
       name: "Get Suppliers",
       success: scenarios.every((scenario) => scenario.success),
-      totalScenarios: 3,
+      totalScenarios: scenarios.length,
       succesScenarios: scenarios.filter((scenario) => scenario.success).length,
       scenarios: scenarios,
     };

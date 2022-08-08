@@ -19,11 +19,10 @@ export class ProductFlow {
   }
 
   private setFlow = (scenarios: ScenarioResult<any>[]): Flow => {
-    const noProducts = this.config.getProductConfigs().length;
     return {
       name: "Get Products",
       success: scenarios.every((scenario) => scenario.success),
-      totalScenarios: noProducts + 2,
+      totalScenarios: scenarios.length,
       succesScenarios: scenarios.filter((scenario) => scenario.success).length,
       scenarios: scenarios,
     };
