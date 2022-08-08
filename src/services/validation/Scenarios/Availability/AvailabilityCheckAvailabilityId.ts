@@ -101,37 +101,24 @@ export class AvailabilityCheckAvailabilityIdScenario
       };
     }
 
-    const errors = [];
-    response.data.body.map((result) => {
-      errors.push(
+    const errors = response.data.body.reduce((acc, result) => {
+      return [
+        ...acc,
         ...new AvailabilityValidator({
           capabilities: this.capabilities,
-        }).validate(result)
-      );
-    });
-    if (!R.isEmpty(errors)) {
-      return {
-        name,
-        success: false,
-        request,
-        response: {
-          body: response.data.body,
-          status: response.data.status,
-          error: null,
-        },
-        errors: errors.map((error) => error.message),
-      };
-    }
+        }).validate(result),
+      ];
+    }, []);
     return {
       name,
-      success: true,
+      success: R.isEmpty(errors),
       request,
       response: {
         body: response.data.body,
         status: response.data.status,
         error: null,
       },
-      errors: [],
+      errors: errors.map((error) => error.message),
     };
   };
 }
