@@ -1,12 +1,13 @@
 import * as R from "ramda";
 import {
   Availability,
-  AvailabilityStatus,
   CapabilityId,
 } from "@octocloud/types";
 import { ApiClient } from "../../ApiClient";
 import { Scenario } from "../Scenario";
 import { AvailabilityValidator } from "../../../../validators/backendValidator/Availability/AvailabilityValidator";
+import { ScenarioHelper } from "../../helpers/ScenarioHelper";
+import { AvailabilityScenarioHelper } from "../../helpers/AvailabilityScenarioHelper";
 
 export class AvailabilityCheckAvailabilityIdScenario
   implements Scenario<Availability[]>
@@ -17,6 +18,8 @@ export class AvailabilityCheckAvailabilityIdScenario
   private availabilityIds: string[];
   private availabilityType: string;
   private capabilities: CapabilityId[];
+  private scenarioHelper = new ScenarioHelper();
+  private availabilityScenarioHelper = new AvailabilityScenarioHelper();
   constructor({
     apiClient,
     productId,
@@ -48,57 +51,35 @@ export class AvailabilityCheckAvailabilityIdScenario
     });
     const name = `Availability Check AvailabilityId (${this.availabilityType})`;
     if (response.error) {
-      return {
+      return this.scenarioHelper.handleErrorResult(
         name,
-        success: false,
         request,
-        response: {
-          body: null,
-          status: response.error.status,
-          error: {
-            body: response.error.body,
-          },
-        },
-        errors: [],
-      };
+        response.error
+      );
     }
 
     if (R.isEmpty(response.data.body)) {
-      return {
+      return this.scenarioHelper.handleResult(
         name,
-        success: false,
+        false,
         request,
-        response: {
-          body: response.data.body,
-          status: response.data.status,
-          error: null,
-        },
-        errors: ["Availability has to be available"],
-      };
+        response.data,
+        ["Availability has to be available"]
+      );
     }
 
     if (
-      response.data.body
-        .map((availability) => {
-          return (
-            !availability.available ||
-            availability.status === AvailabilityStatus.CLOSED ||
-            availability.status === AvailabilityStatus.SOLD_OUT
-          );
-        })
-        .some((status) => status)
+      this.availabilityScenarioHelper.checkAvailabilityStatus(
+        response.data.body
+      )
     ) {
-      return {
+      return this.scenarioHelper.handleResult(
         name,
-        success: false,
+        false,
         request,
-        response: {
-          body: response.data.body,
-          status: response.data.status,
-          error: null,
-        },
-        errors: ["Availability can not be SOLD_OUT or CLOSED or not available"],
-      };
+        response.data,
+        ["Availability can not be SOLD_OUT or CLOSED or not available"]
+      );
     }
 
     const errors = response.data.body.reduce((acc, result) => {
@@ -109,16 +90,12 @@ export class AvailabilityCheckAvailabilityIdScenario
         }).validate(result),
       ];
     }, []);
-    return {
+    return this.scenarioHelper.handleResult(
       name,
-      success: R.isEmpty(errors),
+      R.isEmpty(errors),
       request,
-      response: {
-        body: response.data.body,
-        status: response.data.status,
-        error: null,
-      },
-      errors: errors.map((error) => error.message),
-    };
+      response.data,
+      errors
+    );
   };
 }
