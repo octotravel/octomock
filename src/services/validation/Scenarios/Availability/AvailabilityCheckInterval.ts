@@ -1,12 +1,7 @@
-import * as R from "ramda";
-import {
-  Availability,
-  AvailabilityStatus,
-  CapabilityId,
-} from "@octocloud/types";
+import { Availability, CapabilityId } from "@octocloud/types";
 import { ApiClient } from "../../ApiClient";
 import { Scenario } from "../Scenario";
-import { AvailabilityValidator } from "../../../../validators/backendValidator/Availability/AvailabilityValidator";
+import { AvailabilityScenarioHelper } from "../../helpers/AvailabilityScenarioHelper";
 
 export class AvailabilityCheckIntervalScenario
   implements Scenario<Availability[]>
@@ -18,6 +13,7 @@ export class AvailabilityCheckIntervalScenario
   private localDateEnd: string;
   private availabilityType: string;
   private capabilities: CapabilityId[];
+  private availabilityScenarioHelper = new AvailabilityScenarioHelper();
   constructor({
     apiClient,
     productId,
@@ -52,91 +48,14 @@ export class AvailabilityCheckIntervalScenario
       localDateEnd: this.localDateEnd,
     });
     const name = `Availability Check Interval (${this.availabilityType})`;
-    if (response.error) {
-      return {
-        name,
-        success: false,
-        request,
-        response: {
-          body: null,
-          status: response.error.status,
-          error: {
-            body: response.error.body,
-          },
-        },
-        errors: [],
-      };
-    }
 
-    if (R.isEmpty(response.data.body)) {
-      return {
+    return this.availabilityScenarioHelper.validateAvailability(
+      {
         name,
-        success: false,
         request,
-        response: {
-          body: response.data.body,
-          status: response.data.status,
-          error: null,
-        },
-        errors: ["Availability has to be available"],
-      };
-    }
-
-    if (
-      response.data.body
-        .map((availability) => {
-          return (
-            !availability.available ||
-            availability.status === AvailabilityStatus.CLOSED ||
-            availability.status === AvailabilityStatus.SOLD_OUT
-          );
-        })
-        .some((status) => status)
-    ) {
-      return {
-        name,
-        success: false,
-        request,
-        response: {
-          body: response.data.body,
-          status: response.data.status,
-          error: null,
-        },
-        errors: ["Availability can not be SOLD_OUT or CLOSED or not available"],
-      };
-    }
-
-    const errors = [];
-    response.data.body.map((result) => {
-      errors.push(
-        ...new AvailabilityValidator({
-          capabilities: this.capabilities,
-        }).validate(result)
-      );
-    });
-    if (!R.isEmpty(errors)) {
-      return {
-        name,
-        success: false,
-        request,
-        response: {
-          body: response.data.body,
-          status: response.data.status,
-          error: null,
-        },
-        errors: errors.map((error) => error.message),
-      };
-    }
-    return {
-      name,
-      success: true,
-      request,
-      response: {
-        body: response.data.body,
-        status: response.data.status,
-        error: null,
+        response,
       },
-      errors: [],
-    };
+      this.capabilities
+    );
   };
 }

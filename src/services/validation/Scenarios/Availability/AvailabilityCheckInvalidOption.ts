@@ -1,6 +1,6 @@
-import * as R from "ramda";
 import { InvalidOptionIdErrorValidator } from "../../../../validators/backendValidator/Error/InvalidOptionIdErrorValidator";
 import { ApiClient } from "../../ApiClient";
+import { AvailabilityScenarioHelper } from "../../helpers/AvailabilityScenarioHelper";
 import { Scenario, ScenarioResult } from "../Scenario";
 
 export class AvailabilityCheckInvalidOptionScenario implements Scenario<null> {
@@ -24,56 +24,24 @@ export class AvailabilityCheckInvalidOptionScenario implements Scenario<null> {
     this.optionId = optionId;
     this.localDate = localDate;
   }
+  private availabilityScenarioHelper = new AvailabilityScenarioHelper();
 
   public validate = async (): Promise<ScenarioResult<null>> => {
-    const { request, response } = await this.apiClient.getAvailability({
+    const result = await this.apiClient.getAvailability({
       productId: this.productId,
       optionId: this.optionId,
       localDate: this.localDate,
     });
     const name = `Availability Check Invalid Option (400 INVALID_OPTION_ID)`;
-    if (response.data) {
-      return {
-        name,
-        success: false,
-        request,
-        response: {
-          body: response.data.body as null,
-          status: response.data.status,
-          error: null,
-        },
-        errors: ["Response should be INVALID_OPTION_ID"],
-      };
-    }
+    const error = "Response should be INVALID_OPTION_ID";
 
-    const errors = new InvalidOptionIdErrorValidator().validate(response.error);
-    if (!R.isEmpty(errors)) {
-      return {
+    return this.availabilityScenarioHelper.validateAvailabilityError(
+      {
         name,
-        success: false,
-        request,
-        response: {
-          body: null,
-          status: response.error.status,
-          error: {
-            body: response.error.body,
-          },
-        },
-        errors: errors.map((error) => error.message),
-      };
-    }
-    return {
-      name,
-      success: true,
-      request,
-      response: {
-        body: null,
-        status: response.error.status,
-        error: {
-          body: response.error.body,
-        },
+        ...result,
       },
-      errors: [],
-    };
+      error,
+      new InvalidOptionIdErrorValidator()
+    );
   };
 }

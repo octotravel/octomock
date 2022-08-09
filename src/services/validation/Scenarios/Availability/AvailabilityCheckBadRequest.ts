@@ -1,6 +1,6 @@
-import * as R from "ramda";
 import { BadRequestErrorValidator } from "../../../../validators/backendValidator/Error/BadRequestErrorValidator";
 import { ApiClient } from "../../ApiClient";
+import { AvailabilityScenarioHelper } from "../../helpers/AvailabilityScenarioHelper";
 import { Scenario, ScenarioResult } from "../Scenario";
 
 export class AvailabilityCheckBadRequestScenario implements Scenario<null> {
@@ -11,6 +11,7 @@ export class AvailabilityCheckBadRequestScenario implements Scenario<null> {
   private localDateStart: string;
   private localDateEnd: string;
   private availabilityIds: string[];
+
   constructor({
     apiClient,
     productId,
@@ -36,9 +37,10 @@ export class AvailabilityCheckBadRequestScenario implements Scenario<null> {
     this.localDateEnd = localDateEnd;
     this.availabilityIds = availabilityIds;
   }
+  private availabilityScenarioHelper = new AvailabilityScenarioHelper();
 
   public validate = async (): Promise<ScenarioResult<null>> => {
-    const { request, response } = await this.apiClient.getAvailability({
+    const result = await this.apiClient.getAvailability({
       productId: this.productId,
       optionId: this.optionId,
       localDate: this.localDate,
@@ -48,48 +50,14 @@ export class AvailabilityCheckBadRequestScenario implements Scenario<null> {
     });
 
     const name = `Availability Check BAD_REQUEST (400 BAD_REQUEST)`;
-    if (response.data) {
-      return {
+    const error = "Response should be BAD_REQUEST";
+    return this.availabilityScenarioHelper.validateAvailabilityError(
+      {
         name,
-        success: false,
-        request,
-        response: {
-          body: response.data.body as null,
-          status: response.data.status,
-          error: null,
-        },
-        errors: ["Response should be BAD_REQUEST"],
-      };
-    }
-
-    const errors = new BadRequestErrorValidator().validate(response.error);
-    if (!R.isEmpty(errors)) {
-      return {
-        name,
-        success: false,
-        request,
-        response: {
-          body: null,
-          status: response.error.status,
-          error: {
-            body: response.error.body,
-          },
-        },
-        errors: errors.map((error) => error.message),
-      };
-    }
-    return {
-      name,
-      success: true,
-      request,
-      response: {
-        body: null,
-        status: response.error.status,
-        error: {
-          body: response.error.body,
-        },
+        ...result,
       },
-      errors: [],
-    };
+      error,
+      new BadRequestErrorValidator()
+    );
   };
 }

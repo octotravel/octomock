@@ -1,6 +1,6 @@
-import * as R from "ramda";
 import { InvalidProductIdErrorValidator } from "../../../../validators/backendValidator/Error/InvalidProductIdErrorValidator";
 import { ApiClient } from "../../ApiClient";
+import { AvailabilityScenarioHelper } from "../../helpers/AvailabilityScenarioHelper";
 import { Scenario, ScenarioResult } from "../Scenario";
 
 export class AvailabilityCheckInvalidProductScenario implements Scenario<null> {
@@ -24,59 +24,25 @@ export class AvailabilityCheckInvalidProductScenario implements Scenario<null> {
     this.optionId = optionId;
     this.localDate = localDate;
   }
+  private availabilityScenarioHelper = new AvailabilityScenarioHelper();
 
   public validate = async (): Promise<ScenarioResult<null>> => {
-    const { request, response } = await this.apiClient.getAvailability({
+    const result = await this.apiClient.getAvailability({
       productId: this.productId,
       optionId: this.optionId,
       localDate: this.localDate,
     });
 
     const name = `Availability Check Invalid Product (400 INVALID_PRODUCT_ID)`;
-    if (response.data) {
-      return {
-        name,
-        success: false,
-        request,
-        response: {
-          body: response.data.body as null,
-          status: response.data.status,
-          error: null,
-        },
-        errors: ["Response should be INVALID_PRODUCT_ID"],
-      };
-    }
+    const error = "Response should be INVALID_PRODUCT_ID";
 
-    const errors = new InvalidProductIdErrorValidator().validate(
-      response.error
-    );
-    if (!R.isEmpty(errors)) {
-      return {
+    return this.availabilityScenarioHelper.validateAvailabilityError(
+      {
         name,
-        success: false,
-        request,
-        response: {
-          body: null,
-          status: response.error.status,
-          error: {
-            body: response.error.body,
-          },
-        },
-        errors: errors.map((error) => error.message),
-      };
-    }
-    return {
-      name,
-      success: true,
-      request,
-      response: {
-        body: null,
-        status: response.error.status,
-        error: {
-          body: response.error.body,
-        },
+        ...result,
       },
-      errors: [],
-    };
+      error,
+      new InvalidProductIdErrorValidator()
+    );
   };
 }

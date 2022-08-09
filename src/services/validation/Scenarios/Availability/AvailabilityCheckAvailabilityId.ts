@@ -12,7 +12,6 @@ export class AvailabilityCheckAvailabilityIdScenario
   private availabilityIds: string[];
   private availabilityType: string;
   private capabilities: CapabilityId[];
-  private availabilityScenarioHelper = new AvailabilityScenarioHelper();
   constructor({
     apiClient,
     productId,
@@ -35,6 +34,7 @@ export class AvailabilityCheckAvailabilityIdScenario
     this.availabilityType = availabilityType;
     this.capabilities = capabilities;
   }
+  private availabilityScenarioHelper = new AvailabilityScenarioHelper();
 
   public validate = async () => {
     const { request, response } = await this.apiClient.getAvailability({
@@ -45,11 +45,13 @@ export class AvailabilityCheckAvailabilityIdScenario
 
     const name = `Availability Check AvailabilityId (${this.availabilityType})`;
 
-    return this.availabilityScenarioHelper.validateAvailability({
-      name,
-      request,
-      response,
-      capabilities: this.capabilities,
-    });
+    return this.availabilityScenarioHelper.validateAvailability(
+      {
+        name,
+        request,
+        response,
+      },
+      this.capabilities
+    );
   };
 }
