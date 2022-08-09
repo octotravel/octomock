@@ -1,23 +1,25 @@
 import { ValidatedError } from "../../../validators/backendValidator/Error";
 
+interface ScenarioData {
+  name: string;
+  success: boolean;
+  request: any;
+  response: any;
+  errors: any[];
+}
+
 export class ScenarioHelper {
-  public handleResult = (
-    name: string,
-    success: boolean,
-    request: any,
-    data: any,
-    errors: any[]
-  ) => {
+  public handleResult = (data: ScenarioData) => {
     return {
-      name,
-      success,
-      request,
+      name: data.name,
+      success: data.success,
+      request: data.request,
       response: {
-        body: data.body,
-        status: data.status,
+        body: data.response.body,
+        status: data.response.status,
         error: null,
       },
-      errors: errors.map((error) => error.message),
+      errors: data.errors.map((error) => error.message),
     };
   };
 
