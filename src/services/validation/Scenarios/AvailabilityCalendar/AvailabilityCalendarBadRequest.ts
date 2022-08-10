@@ -1,7 +1,7 @@
 import { AvailabilityUnit } from "@octocloud/types";
-import * as R from "ramda";
 import { BadRequestErrorValidator } from "../../../../validators/backendValidator/Error/BadRequestErrorValidator";
 import { ApiClient } from "../../ApiClient";
+import { AvailabilityCalendarScenarioHelper } from "../../helpers/AvailabilityCalendarScenarioHelper";
 import { Scenario, ScenarioResult } from "../Scenario";
 
 export class AvailabilityCalendarBadRequestScenario implements Scenario<null> {
@@ -33,9 +33,11 @@ export class AvailabilityCalendarBadRequestScenario implements Scenario<null> {
     this.localDateEnd = localDateEnd;
     this.units = units;
   }
+  private availabilityCalendarScenarioHelper =
+    new AvailabilityCalendarScenarioHelper();
 
   public validate = async (): Promise<ScenarioResult<null>> => {
-    const { request, response } = await this.apiClient.getAvailabilityCalendar({
+    const result = await this.apiClient.getAvailabilityCalendar({
       productId: this.productId,
       optionId: this.optionId,
       localDateStart: this.localDateStart,
@@ -44,48 +46,15 @@ export class AvailabilityCalendarBadRequestScenario implements Scenario<null> {
     });
 
     const name = `Availability Calendar BAD_REQUEST (400 BAD_REQUEST)`;
-    if (response.data) {
-      return {
-        name,
-        success: false,
-        request,
-        response: {
-          body: response.data.body as null,
-          status: response.data.status,
-          error: null,
-        },
-        errors: ["Response should be BAD_REQUEST"],
-      };
-    }
+    const error = "Response should be BAD_REQUEST";
 
-    const errors = new BadRequestErrorValidator().validate(response.error);
-    if (!R.isEmpty(errors)) {
-      return {
+    return this.availabilityCalendarScenarioHelper.validateAvailabilityError(
+      {
+        ...result,
         name,
-        success: false,
-        request,
-        response: {
-          body: null,
-          status: response.error.status,
-          error: {
-            body: response.error.body,
-          },
-        },
-        errors: errors.map((error) => error.message),
-      };
-    }
-    return {
-      name,
-      success: true,
-      request,
-      response: {
-        body: null,
-        status: response.error.status,
-        error: {
-          body: response.error.body,
-        },
       },
-      errors: [],
-    };
+      error,
+      new BadRequestErrorValidator()
+    );
   };
 }

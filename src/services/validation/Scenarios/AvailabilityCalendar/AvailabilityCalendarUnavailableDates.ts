@@ -1,13 +1,11 @@
-import * as R from "ramda";
 import {
   AvailabilityCalendar,
-  AvailabilityStatus,
   AvailabilityUnit,
   CapabilityId,
 } from "@octocloud/types";
 import { ApiClient } from "../../ApiClient";
 import { Scenario } from "../Scenario";
-import { AvailabilityCalendarValidator } from "../../../../validators/backendValidator/AvailabilityCalendar/AvailabilityCalendarValidator";
+import { AvailabilityCalendarScenarioHelper } from "../../helpers/AvailabilityCalendarScenarioHelper";
 
 export class AvailabilityCalendarUnavailableDatesScenario
   implements Scenario<AvailabilityCalendar[]>
@@ -48,91 +46,25 @@ export class AvailabilityCalendarUnavailableDatesScenario
     this.availabilityType = availabilityType;
     this.capabilities = capabilities;
   }
+  private availabilityCalendarScenarioHelper =
+    new AvailabilityCalendarScenarioHelper();
 
   public validate = async () => {
-    const { request, response } = await this.apiClient.getAvailabilityCalendar({
+    const result = await this.apiClient.getAvailabilityCalendar({
       productId: this.productId,
       optionId: this.optionId,
       localDateStart: this.localDateStart,
       localDateEnd: this.localDateEnd,
       units: this.units,
     });
-    const name = `Availability Calendar Interval (${this.availabilityType})`;
-    if (response.error) {
-      return {
-        name,
-        success: false,
-        request,
-        response: {
-          body: null,
-          status: response.error.status,
-          error: {
-            body: response.error.body,
-          },
-        },
-        errors: [],
-      };
-    }
+    const name = `Availability Calendar Unavailable Dates (${this.availabilityType})`;
 
-    if (!R.isEmpty(response.data.body)) {
-      if (
-        response.data.body
-          .map((availability) => {
-            return (
-              availability.status === AvailabilityStatus.CLOSED ||
-              (availability.status === AvailabilityStatus.SOLD_OUT &&
-                !availability.available)
-            );
-          })
-          .some((status) => !status)
-      ) {
-        return {
-          name,
-          success: false,
-          request,
-          response: {
-            body: response.data.body as null,
-            status: response.data.status,
-            error: null,
-          },
-          errors: [
-            "Availability should be empty or SOLD_OUT/CLOSED and not available",
-          ],
-        };
-      }
-    }
-
-    const errors = [];
-    response.data.body.map((result) => {
-      errors.push(
-        ...new AvailabilityCalendarValidator({
-          capabilities: this.capabilities,
-        }).validate(result)
-      );
-    });
-    if (!R.isEmpty(errors)) {
-      return {
+    return this.availabilityCalendarScenarioHelper.validateUnavailability(
+      {
+        ...result,
         name,
-        success: false,
-        request,
-        response: {
-          body: response.data.body,
-          status: response.data.status,
-          error: null,
-        },
-        errors: errors.map((error) => error.message),
-      };
-    }
-    return {
-      name,
-      success: true,
-      request,
-      response: {
-        body: response.data.body,
-        status: response.data.status,
-        error: null,
       },
-      errors: [],
-    };
+      this.capabilities
+    );
   };
 }

@@ -1,7 +1,6 @@
-import * as R from "ramda";
 import { CapabilityId, Product } from "@octocloud/types";
-import { ProductValidator } from "../../../../validators/backendValidator/Product/ProductValidator";
 import { ApiClient } from "../../ApiClient";
+import { ProductScenarioHelper } from "../../helpers/ProductScenarioHelper";
 import { Scenario } from "../Scenario";
 
 export class GetProductScenario implements Scenario<Product> {
@@ -25,53 +24,20 @@ export class GetProductScenario implements Scenario<Product> {
     this.availabilityType = availabilityType;
     this.capabilities = capabilities;
   }
+  private productScenarioHelper = new ProductScenarioHelper();
 
   public validate = async () => {
-    const { request, response } = await this.apiClient.getProduct({
+    const result = await this.apiClient.getProduct({
       id: this.productId,
     });
     const name = `Get Product (${this.availabilityType})`;
-    if (response.error) {
-      return {
+
+    return this.productScenarioHelper.validateProduct(
+      {
+        ...result,
         name,
-        success: false,
-        request,
-        response: {
-          body: null,
-          status: response.error.status,
-          error: {
-            body: response.error.body,
-          },
-        },
-        errors: [],
-      };
-    }
-    const errors = new ProductValidator({
-      capabilities: this.capabilities,
-    }).validate(response.data.body);
-    if (!R.isEmpty(errors)) {
-      return {
-        name,
-        success: false,
-        request,
-        response: {
-          body: response.data.body,
-          status: response.data.status,
-          error: null,
-        },
-        errors: errors.map((error) => error.message),
-      };
-    }
-    return {
-      name,
-      success: true,
-      request,
-      response: {
-        body: response.data.body,
-        status: response.data.status,
-        error: null,
       },
-      errors: [],
-    };
+      this.capabilities
+    );
   };
 }

@@ -44,7 +44,7 @@ export class AvailabilityFlow {
         .map((scenario) => scenario.success)
         .some((status) => status)
     )
-      return this.setFlow(scenarios);
+      {return this.setFlow(scenarios);}
 
     const availabilityCheckDate = await Promise.all(
       await this.validateAvailabilityCheckDate()
@@ -55,7 +55,7 @@ export class AvailabilityFlow {
         .map((scenario) => scenario.success)
         .some((status) => status)
     )
-      return this.setFlow(scenarios);
+      {return this.setFlow(scenarios);}
 
     // const availabilityCheckAvailabilityId = await Promise.all(await this.validateAvailabilityCheckAvailabilityId());
 
@@ -67,7 +67,7 @@ export class AvailabilityFlow {
         .map((scenario) => scenario.success)
         .some((status) => status)
     )
-      return this.setFlow(scenarios);
+      {return this.setFlow(scenarios);}
 
     const availabilityCheckInvalidProduct =
       await this.validateAvailabilityCheckInvalidProduct();
@@ -77,7 +77,7 @@ export class AvailabilityFlow {
         .map((scenario) => scenario.success)
         .some((status) => status)
     )
-      return this.setFlow(scenarios);
+      {return this.setFlow(scenarios);}
 
     const availabilityCheckInvalidOption =
       await this.validateAvailabilityCheckInvalidOption();
@@ -87,7 +87,7 @@ export class AvailabilityFlow {
         .map((scenario) => scenario.success)
         .some((status) => status)
     )
-      return this.setFlow(scenarios);
+      {return this.setFlow(scenarios);}
 
     const availabilityCheckBadRequest =
       await this.validateAvailabilityCheckBadRequest();
@@ -97,7 +97,7 @@ export class AvailabilityFlow {
         .map((scenario) => scenario.success)
         .some((status) => status)
     )
-      return this.setFlow(scenarios);
+      {return this.setFlow(scenarios);}
 
     return this.setFlow(scenarios);
   };
@@ -198,6 +198,7 @@ export class AvailabilityFlow {
           localDateStart: availabilityConfig.unavailable.from,
           localDateEnd: availabilityConfig.unavailable.to,
           availabilityType: availabilityConfig.availabilityType,
+          capabilities: this.config.capabilities,
         }).validate();
       })
     );

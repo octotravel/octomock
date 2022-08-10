@@ -1,7 +1,7 @@
 import { AvailabilityUnit } from "@octocloud/types";
-import * as R from "ramda";
 import { InvalidProductIdErrorValidator } from "../../../../validators/backendValidator/Error/InvalidProductIdErrorValidator";
 import { ApiClient } from "../../ApiClient";
+import { AvailabilityCalendarScenarioHelper } from "../../helpers/AvailabilityCalendarScenarioHelper";
 import { Scenario, ScenarioResult } from "../Scenario";
 
 export class AvailabilityCalendarInvalidProductScenario
@@ -35,9 +35,11 @@ export class AvailabilityCalendarInvalidProductScenario
     this.localDateEnd = localDateEnd;
     this.units = units;
   }
+  private availabilityCalendarScenarioHelper =
+    new AvailabilityCalendarScenarioHelper();
 
   public validate = async (): Promise<ScenarioResult<null>> => {
-    const { request, response } = await this.apiClient.getAvailabilityCalendar({
+    const result = await this.apiClient.getAvailabilityCalendar({
       productId: this.productId,
       optionId: this.optionId,
       localDateStart: this.localDateStart,
@@ -46,50 +48,15 @@ export class AvailabilityCalendarInvalidProductScenario
     });
 
     const name = `Availability Calendar Invalid Product (400 INVALID_PRODUCT_ID)`;
-    if (response.data) {
-      return {
-        name,
-        success: false,
-        request,
-        response: {
-          body: response.data.body as null,
-          status: response.data.status,
-          error: null,
-        },
-        errors: ["Response should be INVALID_PRODUCT_ID"],
-      };
-    }
+    const error = "Response should be INVALID_PRODUCT_ID";
 
-    const errors = new InvalidProductIdErrorValidator().validate(
-      response.error
-    );
-    if (!R.isEmpty(errors)) {
-      return {
+    return this.availabilityCalendarScenarioHelper.validateAvailabilityError(
+      {
+        ...result,
         name,
-        success: false,
-        request,
-        response: {
-          body: null,
-          status: response.error.status,
-          error: {
-            body: response.error.body,
-          },
-        },
-        errors: errors.map((error) => error.message),
-      };
-    }
-    return {
-      name,
-      success: true,
-      request,
-      response: {
-        body: null,
-        status: response.error.status,
-        error: {
-          body: response.error.body,
-        },
       },
-      errors: [],
-    };
+      error,
+      new InvalidProductIdErrorValidator()
+    );
   };
 }

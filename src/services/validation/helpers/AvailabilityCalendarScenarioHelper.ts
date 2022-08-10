@@ -4,9 +4,9 @@ import {
   CapabilityId,
 } from "@octocloud/types";
 import R from "ramda";
-import { AvailabilityValidator } from "../../../validators/backendValidator/Availability/AvailabilityValidator";
 import { ScenarioHelper } from "./ScenarioHelper";
 import { ModelValidator } from "./../../../validators/backendValidator/ValidatorHelpers";
+import { AvailabilityCalendarValidator } from "../../../validators/backendValidator/AvailabilityCalendar/AvailabilityCalendarValidator";
 
 export interface AvailabilityScenarioData {
   name: string;
@@ -14,7 +14,7 @@ export interface AvailabilityScenarioData {
   response: any;
 }
 
-export class AvailabilityScenarioHelper {
+export class AvailabilityCalendarScenarioHelper {
   private scenarioHelper = new ScenarioHelper();
 
   private checkAvailabilityStatus = (availability: Availability[]) => {
@@ -45,7 +45,7 @@ export class AvailabilityScenarioHelper {
     return response.data.body.reduce((acc, result) => {
       return [
         ...acc,
-        ...new AvailabilityValidator({
+        ...new AvailabilityCalendarValidator({
           capabilities,
         }).validate(result),
       ];
@@ -65,7 +65,7 @@ export class AvailabilityScenarioHelper {
     }
 
     if (R.isEmpty(data.response.data.body)) {
-      return this.scenarioHelper.handleResult({
+      const rtest = this.scenarioHelper.handleResult({
         ...data,
         success: false,
         errors: [
@@ -74,6 +74,8 @@ export class AvailabilityScenarioHelper {
           },
         ],
       });
+      console.log(rtest);
+      return rtest;
     }
     if (this.checkAvailabilityStatus(data.response.data.body)) {
       return this.scenarioHelper.handleResult({
@@ -105,7 +107,11 @@ export class AvailabilityScenarioHelper {
       return this.scenarioHelper.handleResult({
         ...data,
         success: false,
-        errors: [error],
+        errors: [
+          {
+            message: error,
+          },
+        ],
       });
     }
 

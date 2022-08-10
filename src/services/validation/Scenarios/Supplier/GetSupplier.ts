@@ -1,8 +1,7 @@
-import * as R from "ramda";
 import { Supplier } from "@octocloud/types";
 import { ApiClient } from "../../ApiClient";
 import { Scenario } from "../Scenario";
-import { SupplierValidator } from "../../../../validators/backendValidator/Supplier/SupplierValidator";
+import { SupplierScenarioHelper } from "../../helpers/SupplierScenarioHelper";
 
 export class GetSupplierScenario implements Scenario<Supplier> {
   private apiClient: ApiClient;
@@ -17,53 +16,17 @@ export class GetSupplierScenario implements Scenario<Supplier> {
     this.apiClient = apiClient;
     this.supplierId = supplierId;
   }
+  private supplierScenarioHelper = new SupplierScenarioHelper();
 
   public validate = async () => {
-    const { request, response } = await this.apiClient.getSupplier({
+    const result = await this.apiClient.getSupplier({
       id: this.supplierId,
     });
     const name = "Get Supplier";
 
-    if (response.error) {
-      return {
-        name,
-        success: false,
-        request,
-        response: {
-          body: null,
-          status: response.error.status,
-          error: {
-            body: response.error.body,
-          },
-        },
-        errors: [],
-      };
-    }
-
-    const errors = new SupplierValidator().validate(response.data.body);
-    if (!R.isEmpty(errors)) {
-      return {
-        name,
-        success: false,
-        request,
-        response: {
-          body: response.data.body,
-          status: response.data.status,
-          error: null,
-        },
-        errors: errors.map((error) => error.message),
-      };
-    }
-    return {
+    return this.supplierScenarioHelper.validateSupplier({
+      ...result,
       name,
-      success: true,
-      request,
-      response: {
-        body: response.data.body,
-        status: response.data.status,
-        error: null,
-      },
-      errors: [],
-    };
+    });
   };
 }

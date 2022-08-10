@@ -1,6 +1,6 @@
-import * as R from "ramda";
 import { BadRequestErrorValidator } from "../../../../validators/backendValidator/Error/BadRequestErrorValidator";
 import { ApiClient } from "../../ApiClient";
+import { SupplierScenarioHelper } from "../../helpers/SupplierScenarioHelper";
 import { Scenario, ScenarioResult } from "../Scenario";
 
 export class GetSupplierInvalidScenario implements Scenario<null> {
@@ -16,54 +16,22 @@ export class GetSupplierInvalidScenario implements Scenario<null> {
     this.apiClient = apiClient;
     this.supplierId = supplierId;
   }
+  private supplierScenarioHelper = new SupplierScenarioHelper();
 
   public validate = async (): Promise<ScenarioResult<null>> => {
-    const { request, response } = await this.apiClient.getSupplier({
+    const result = await this.apiClient.getSupplier({
       id: this.supplierId,
     });
     const name = `Get Supplier Invalid (400 BAD_REQUEST)`;
-    if (response.data) {
-      return {
-        name,
-        success: false,
-        request,
-        response: {
-          body: response.data.body as null,
-          status: response.data.status,
-          error: null,
-        },
-        errors: ["Response should be BAD_REQUEST"],
-      };
-    }
+    const error = "Response should be BAD_REQUEST";
 
-    const errors = new BadRequestErrorValidator().validate(response.error);
-    if (!R.isEmpty(errors)) {
-      return {
+    return this.supplierScenarioHelper.validateSupplierError(
+      {
+        ...result,
         name,
-        success: false,
-        request,
-        response: {
-          body: null,
-          status: response.error.status,
-          error: {
-            body: response.error.body,
-          },
-        },
-        errors: errors.map((error) => error.message),
-      };
-    }
-    return {
-      name,
-      success: true,
-      request,
-      response: {
-        body: null,
-        status: response.error.status,
-        error: {
-          body: response.error.body,
-        },
       },
-      errors: [],
-    };
+      error,
+      new BadRequestErrorValidator()
+    );
   };
 }

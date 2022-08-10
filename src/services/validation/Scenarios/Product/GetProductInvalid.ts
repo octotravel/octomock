@@ -1,6 +1,6 @@
-import * as R from "ramda";
 import { InvalidProductIdErrorValidator } from "../../../../validators/backendValidator/Error/InvalidProductIdErrorValidator";
 import { ApiClient } from "../../ApiClient";
+import { ProductScenarioHelper } from "../../helpers/ProductScenarioHelper";
 import { Scenario, ScenarioResult } from "../Scenario";
 
 export class GetProductInvalidScenario implements Scenario<any> {
@@ -16,56 +16,22 @@ export class GetProductInvalidScenario implements Scenario<any> {
     this.apiClient = apiClient;
     this.productId = productId;
   }
+  private productScenarioHelper = new ProductScenarioHelper();
 
   public validate = async (): Promise<ScenarioResult<any>> => {
-    const { request, response } = await this.apiClient.getProduct({
+    const result = await this.apiClient.getProduct({
       id: this.productId,
     });
     const name = `Get Product Invalid (400 INVALID_PRODUCT_ID)`;
-    if (response.data) {
-      return {
-        name,
-        success: false,
-        request,
-        response: {
-          body: response.data.status,
-          status: response.data.status,
-          error: null,
-        },
-        errors: ["Response should be INVALID_PRODUCT_ID"],
-      };
-    }
+    const error = "Response should be INVALID_PRODUCT_ID";
 
-    const errors = new InvalidProductIdErrorValidator().validate(
-      response.error
-    );
-    if (!R.isEmpty(errors)) {
-      return {
+    return this.productScenarioHelper.validateProductError(
+      {
+        ...result,
         name,
-        success: false,
-        request,
-        response: {
-          body: null,
-          status: response.error.status,
-          error: {
-            body: response.error.body,
-          },
-        },
-        errors: errors.map((error) => error.message),
-      };
-    }
-    return {
-      name,
-      success: true,
-      request,
-      response: {
-        body: null,
-        status: response.error.status,
-        error: {
-          body: response.error.body,
-        },
       },
-      errors: [],
-    };
+      error,
+      new InvalidProductIdErrorValidator()
+    );
   };
 }
