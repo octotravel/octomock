@@ -1,5 +1,6 @@
 import { AvailabilityType } from "@octocloud/types";
-import { Config, ProductValidatorConfig } from "./Config";
+import { Config } from "./Config";
+import { ProductValidatorConfig } from "./ProductValidatorConfig";
 
 export class ConfigParser {
   public parse = async (data: any): Promise<Config> => {

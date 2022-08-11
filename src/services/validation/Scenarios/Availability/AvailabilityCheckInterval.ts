@@ -41,7 +41,7 @@ export class AvailabilityCheckIntervalScenario
   }
 
   public validate = async () => {
-    const { request, response } = await this.apiClient.getAvailability({
+    const result = await this.apiClient.getAvailability({
       productId: this.productId,
       optionId: this.optionId,
       localDateStart: this.localDateStart,
@@ -51,9 +51,8 @@ export class AvailabilityCheckIntervalScenario
 
     return this.availabilityScenarioHelper.validateAvailability(
       {
+        ...result,
         name,
-        request,
-        response,
       },
       this.capabilities
     );

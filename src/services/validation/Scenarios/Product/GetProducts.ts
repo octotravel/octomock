@@ -22,7 +22,7 @@ export class GetProductsScenario implements Scenario<Product[]> {
     const result = await this.apiClient.getProducts();
     const name = "Get Products";
 
-    return this.productScenarioHelper.validateProducts(
+    return this.productScenarioHelper.validateProduct(
       {
         ...result,
         name,

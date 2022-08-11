@@ -14,7 +14,7 @@ export class GetSuppliersScenario implements Scenario<Supplier[]> {
     const result = await this.apiClient.getSuppliers();
     const name = "Get Suppliers";
 
-    return this.supplierScenarioHelper.validateSuppliers({
+    return this.supplierScenarioHelper.validateSupplier({
       ...result,
       name,
     });

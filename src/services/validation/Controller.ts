@@ -1,5 +1,5 @@
 import { Config } from "./config/Config";
-import { Flow } from "./Flows/Flow";
+import { FlowResult } from "./Flows/Flow";
 import { PrimiteFlows } from "./Flows/PrimitiveFlows";
 
 export class ValidationController {
@@ -8,7 +8,7 @@ export class ValidationController {
     this.config = config;
   }
 
-  public validate = async (): Promise<Flow[]> => {
+  public validate = async (): Promise<FlowResult[]> => {
     const config = this.config;
     // validateProduct
     const primitiveFlows = await new PrimiteFlows({ config }).validate();

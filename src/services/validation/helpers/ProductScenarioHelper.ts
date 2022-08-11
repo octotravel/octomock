@@ -14,36 +14,20 @@ export class ProductScenarioHelper {
   private scenarioHelper = new ScenarioHelper();
 
   private getErrors = (products: any, capabilities: CapabilityId[]) => {
-    return products.reduce((acc, result) => {
-      return [
-        ...acc,
-        ...new ProductValidator({
-          capabilities,
-        }).validate(result),
-      ];
-    }, []);
+    if (Array.isArray(products)) {
+      return products.reduce((acc, result) => {
+        return [
+          ...acc,
+          ...new ProductValidator({
+            capabilities,
+          }).validate(result),
+        ];
+      }, []);
+    }
+    return new ProductValidator({ capabilities }).validate(products);
   };
 
   public validateProduct = (
-    data: ProductScenarioData,
-    capabilities: CapabilityId[]
-  ) => {
-    if (data.response.error) {
-      return this.scenarioHelper.handleResult({
-        ...data,
-        success: false,
-        errors: [],
-      });
-    }
-    const errors = this.getErrors([data.response.data.body], capabilities);
-    return this.scenarioHelper.handleResult({
-      ...data,
-      success: R.isEmpty(errors),
-      errors,
-    });
-  };
-
-  public validateProducts = (
     data: ProductScenarioData,
     capabilities: CapabilityId[]
   ) => {

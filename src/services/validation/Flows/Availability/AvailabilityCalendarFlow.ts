@@ -1,8 +1,8 @@
-import { AvailabilityCalendar } from "@octocloud/types";
+import { AvailabilityType } from "@octocloud/types";
 import { ApiClient } from "../../ApiClient";
 import { Config } from "../../config/Config";
 import { ScenarioResult } from "../../Scenarios/Scenario";
-import { Flow } from "../Flow";
+import { FlowResult } from "../Flow";
 import { AvailabilityCalendarIntervalScenario } from "../../Scenarios/AvailabilityCalendar/AvailabilityCalendarInterval";
 import { AvailabilityCalendarUnavailableDatesScenario } from "../../Scenarios/AvailabilityCalendar/AvailabilityCalendarUnavailableDates";
 import { AvailabilityCalendarInvalidProductScenario } from "../../Scenarios/AvailabilityCalendar/AvailabilityCalendarInvalidProduct";
@@ -12,15 +12,52 @@ import { AvailabilityCalendarBadRequestScenario } from "../../Scenarios/Availabi
 export class AvailabilityCalendarFlow {
   private config: Config;
   private apiClient: ApiClient;
+  private optionIdStartTimes: Nullable<string>;
+  private optionIdOpeningHours: Nullable<string>;
   constructor({ config }: { config: Config }) {
     this.config = config;
     this.apiClient = new ApiClient({
       url: config.url,
       capabilities: config.capabilities,
     });
+    this.optionIdStartTimes = null;
+    this.optionIdStartTimes = null;
   }
 
-  private setFlow = (scenarios: ScenarioResult<any>[]): Flow => {
+  private setOptionIds = async (): Promise<void> => {
+    const productStartTimes = {
+      productId: null,
+      optionId: null,
+    };
+    const productOpeningHours = {
+      productId: null,
+      optionId: null,
+    };
+    this.config.getProductConfigs().map((availabilityConfig) => {
+      if (availabilityConfig.availabilityType === AvailabilityType.START_TIME) {
+        productStartTimes.productId = availabilityConfig.productId;
+        productStartTimes.optionId = availabilityConfig.optionId;
+      }
+      if (
+        availabilityConfig.availabilityType === AvailabilityType.OPENING_HOURS
+      ) {
+        productOpeningHours.productId = availabilityConfig.productId;
+        productOpeningHours.optionId = availabilityConfig.optionId;
+      }
+    });
+    this.optionIdStartTimes =
+      productStartTimes.optionId ??
+      (
+        await this.apiClient.getProduct({ id: productStartTimes.productId })
+      ).response.data.body.options.find((option) => option.default).id;
+    this.optionIdOpeningHours =
+      productOpeningHours.optionId ??
+      (
+        await this.apiClient.getProduct({ id: productOpeningHours.productId })
+      ).response.data.body.options.find((option) => option.default).id;
+  };
+
+  private setFlow = (scenarios: ScenarioResult<any>[]): FlowResult => {
     return {
       name: "Availability Calendar",
       success: scenarios.every((scenario) => scenario.success),
@@ -30,171 +67,129 @@ export class AvailabilityCalendarFlow {
     };
   };
 
-  public validate = async (): Promise<Flow> => {
-    const scenarios = [];
+  public validate = async (): Promise<FlowResult> => {
+    await this.setOptionIds();
 
-    const availabilityCalendarInterval = await Promise.all(
-      await this.validateAvailabilityCalendarInterval()
-    );
-    scenarios.push(...availabilityCalendarInterval);
-    if (
-      !availabilityCalendarInterval
-        .map((scenario) => scenario.success)
-        .some((status) => status)
-    )
-      return this.setFlow(scenarios);
+    const scenarios = [
+      ...(await this.validateAvailabilityCalendarInterval()),
+      ...(await this.validateAvailabilityCalendarUnavailableDates()),
+      ...(await this.validateAvailabilityCalendarInvalidProduct()),
+      ...(await this.validateAvailabilityCalendarInvalidOption()),
+      ...(await this.validateAvailabilityCheckBadRequest()),
+    ];
 
-    const availabilityCalendarUnavailableDates = await Promise.all(
-      await this.validateAvailabilityCalendarUnavailableDates()
-    );
-    scenarios.push(...availabilityCalendarUnavailableDates);
-    if (
-      !availabilityCalendarUnavailableDates
-        .map((scenario) => scenario.success)
-        .some((status) => status)
-    )
-      return this.setFlow(scenarios);
-
-    const availabilityCalendarInvalidProduct = await Promise.all(
-      await this.validateAvailabilityCalendarInvalidProduct()
-    );
-    scenarios.push(...availabilityCalendarInvalidProduct);
-    if (
-      !availabilityCalendarInvalidProduct
-        .map((scenario) => scenario.success)
-        .some((status) => status)
-    )
-      return this.setFlow(scenarios);
-
-    const availabilityCalendarInvalidOption = await Promise.all(
-      await this.validateAvailabilityCalendarInvalidOption()
-    );
-    scenarios.push(...availabilityCalendarInvalidOption);
-    if (
-      !availabilityCalendarInvalidOption
-        .map((scenario) => scenario.success)
-        .some((status) => status)
-    )
-      return this.setFlow(scenarios);
-
-    const availabilityCalendarBadRequest = await Promise.all(
-      await this.validateAvailabilityCheckBadRequest()
-    );
-    scenarios.push(...availabilityCalendarBadRequest);
-    if (
-      !availabilityCalendarBadRequest
-        .map((scenario) => scenario.success)
-        .some((status) => status)
-    )
-      return this.setFlow(scenarios);
-
-    return this.setFlow(scenarios);
-  };
-
-  private getOptionId = async (productId: string): Promise<string> => {
-    const product = (
-      await this.apiClient.getProduct({
-        id: productId,
-      })
-    ).response.data.body;
-    return product.options.find((option) => option.default).id;
+    const results = [];
+    for await (const scenario of scenarios) {
+      const result = await scenario.validate();
+      results.push(result);
+      if (!result.success) {
+        break;
+      }
+    }
+    return this.setFlow(results);
   };
 
   private validateAvailabilityCalendarInterval = async (): Promise<
-    Promise<ScenarioResult<AvailabilityCalendar[]>>[]
+    AvailabilityCalendarIntervalScenario[]
   > => {
-    return this.config.getProductConfigs().map(async (availabilityConfig) => {
+    return this.config.getProductConfigs().map((availabilityConfig) => {
       return new AvailabilityCalendarIntervalScenario({
         apiClient: this.apiClient,
         productId: availabilityConfig.productId,
-        optionId: availabilityConfig.optionId
-          ? availabilityConfig.optionId
-          : await this.getOptionId(availabilityConfig.productId),
+        optionId:
+          availabilityConfig.availabilityType === AvailabilityType.OPENING_HOURS
+            ? this.optionIdOpeningHours
+            : this.optionIdStartTimes,
         localDateStart: availabilityConfig.available.from,
         localDateEnd: availabilityConfig.available.to,
         availabilityType: availabilityConfig.availabilityType,
         capabilities: this.config.capabilities,
-      }).validate();
+      });
     });
   };
 
   private validateAvailabilityCalendarUnavailableDates = async (): Promise<
-    Promise<ScenarioResult<AvailabilityCalendar[]>>[]
+    AvailabilityCalendarUnavailableDatesScenario[]
   > => {
-    return this.config.getProductConfigs().map(async (availabilityConfig) => {
+    return this.config.getProductConfigs().map((availabilityConfig) => {
       return new AvailabilityCalendarUnavailableDatesScenario({
         apiClient: this.apiClient,
         productId: availabilityConfig.productId,
-        optionId: availabilityConfig.optionId
-          ? availabilityConfig.optionId
-          : await this.getOptionId(availabilityConfig.productId),
+        optionId:
+          availabilityConfig.availabilityType === AvailabilityType.OPENING_HOURS
+            ? this.optionIdOpeningHours
+            : this.optionIdStartTimes,
         localDateStart: availabilityConfig.unavailable.from,
         localDateEnd: availabilityConfig.unavailable.to,
         availabilityType: availabilityConfig.availabilityType,
         capabilities: this.config.capabilities,
-      }).validate();
+      });
     });
   };
 
   private validateAvailabilityCalendarInvalidProduct = async (): Promise<
-    ScenarioResult<null>[]
+    AvailabilityCalendarInvalidProductScenario[]
   > => {
     return Promise.all(
       this.config.getProductConfigs().map(async (availabilityConfig) => {
-        return await new AvailabilityCalendarInvalidProductScenario({
+        return new AvailabilityCalendarInvalidProductScenario({
           apiClient: this.apiClient,
           productId: "Invalid productId",
-          optionId: availabilityConfig.optionId
-            ? availabilityConfig.optionId
-            : await this.getOptionId(availabilityConfig.productId),
+          optionId:
+            availabilityConfig.availabilityType ===
+            AvailabilityType.OPENING_HOURS
+              ? this.optionIdOpeningHours
+              : this.optionIdStartTimes,
           localDateStart: availabilityConfig.available.from,
           localDateEnd: availabilityConfig.available.to,
-        }).validate();
+        });
       })
     );
   };
 
   private validateAvailabilityCalendarInvalidOption = async (): Promise<
-    ScenarioResult<null>[]
+    AvailabilityCalendarInvalidOptionScenario[]
   > => {
     return Promise.all(
       this.config.getProductConfigs().map(async (availabilityConfig) => {
-        return await new AvailabilityCalendarInvalidOptionScenario({
+        return new AvailabilityCalendarInvalidOptionScenario({
           apiClient: this.apiClient,
           productId: availabilityConfig.productId,
           optionId: "Invalid optionId",
           localDateStart: availabilityConfig.available.from,
           localDateEnd: availabilityConfig.available.to,
-        }).validate();
+        });
       })
     );
   };
 
   private validateAvailabilityCheckBadRequest = async (): Promise<
-    ScenarioResult<null>[]
+    AvailabilityCalendarBadRequestScenario[]
   > => {
     const response = this.config
       .getProductConfigs()
       .map(async (availabilityConfig) => {
-        const localDateStartBody =
-          await new AvailabilityCalendarBadRequestScenario({
-            apiClient: this.apiClient,
-            productId: availabilityConfig.productId,
-            optionId: availabilityConfig.optionId
-              ? availabilityConfig.optionId
-              : await this.getOptionId(availabilityConfig.productId),
-            localDateStart: availabilityConfig.available.to,
-          }).validate();
+        const localDateStartBody = new AvailabilityCalendarBadRequestScenario({
+          apiClient: this.apiClient,
+          productId: availabilityConfig.productId,
+          optionId:
+            availabilityConfig.availabilityType ===
+            AvailabilityType.OPENING_HOURS
+              ? this.optionIdOpeningHours
+              : this.optionIdStartTimes,
+          localDateStart: availabilityConfig.available.to,
+        });
 
-        const localDateEndBody =
-          await new AvailabilityCalendarBadRequestScenario({
-            apiClient: this.apiClient,
-            productId: availabilityConfig.productId,
-            optionId: availabilityConfig.optionId
-              ? availabilityConfig.optionId
-              : await this.getOptionId(availabilityConfig.productId),
-            localDateEnd: availabilityConfig.available.from,
-          }).validate();
+        const localDateEndBody = new AvailabilityCalendarBadRequestScenario({
+          apiClient: this.apiClient,
+          productId: availabilityConfig.productId,
+          optionId:
+            availabilityConfig.availabilityType ===
+            AvailabilityType.OPENING_HOURS
+              ? this.optionIdOpeningHours
+              : this.optionIdStartTimes,
+          localDateEnd: availabilityConfig.available.from,
+        });
 
         return [localDateStartBody, localDateEndBody];
       });

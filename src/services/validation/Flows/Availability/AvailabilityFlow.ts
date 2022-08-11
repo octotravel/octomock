@@ -1,11 +1,11 @@
-import { Availability } from "@octocloud/types";
+import { AvailabilityType } from "@octocloud/types";
 import { eachDayOfInterval } from "date-fns";
 import { ApiClient } from "../../ApiClient";
 import { Config } from "../../config/Config";
 import { ScenarioResult } from "../../Scenarios/Scenario";
 import { AvailabilityCheckIntervalScenario } from "../../Scenarios/Availability/AvailabilityCheckInterval";
 import { AvailabilityCheckDateScenario } from "../../Scenarios/Availability/AvailabilityCheckDate";
-import { Flow } from "../Flow";
+import { FlowResult } from "../Flow";
 import { DateHelper } from "../../../../helpers/DateHelper";
 import { AvailabilityCheckUnavailableDatesScenario } from "../../Scenarios/Availability/AvailabilityCheckUnavailableDates";
 import { AvailabilityCheckInvalidProductScenario } from "../../Scenarios/Availability/AvailabilityCheckInvalidProduct";
@@ -15,15 +15,52 @@ import { AvailabilityCheckBadRequestScenario } from "../../Scenarios/Availabilit
 export class AvailabilityFlow {
   private config: Config;
   private apiClient: ApiClient;
+  private optionIdStartTimes: Nullable<string>;
+  private optionIdOpeningHours: Nullable<string>;
   constructor({ config }: { config: Config }) {
     this.config = config;
     this.apiClient = new ApiClient({
       url: config.url,
       capabilities: config.capabilities,
     });
+    this.optionIdStartTimes = null;
+    this.optionIdStartTimes = null;
   }
 
-  private setFlow = (scenarios: ScenarioResult<any>[]): Flow => {
+  private setOptionIds = async (): Promise<void> => {
+    const productStartTimes = {
+      productId: null,
+      optionId: null,
+    };
+    const productOpeningHours = {
+      productId: null,
+      optionId: null,
+    };
+    this.config.getProductConfigs().map((availabilityConfig) => {
+      if (availabilityConfig.availabilityType === AvailabilityType.START_TIME) {
+        productStartTimes.productId = availabilityConfig.productId;
+        productStartTimes.optionId = availabilityConfig.optionId;
+      }
+      if (
+        availabilityConfig.availabilityType === AvailabilityType.OPENING_HOURS
+      ) {
+        productOpeningHours.productId = availabilityConfig.productId;
+        productOpeningHours.optionId = availabilityConfig.optionId;
+      }
+    });
+    this.optionIdStartTimes =
+      productStartTimes.optionId ??
+      (
+        await this.apiClient.getProduct({ id: productStartTimes.productId })
+      ).response.data.body.options.find((option) => option.default).id;
+    this.optionIdOpeningHours =
+      productOpeningHours.optionId ??
+      (
+        await this.apiClient.getProduct({ id: productOpeningHours.productId })
+      ).response.data.body.options.find((option) => option.default).id;
+  };
+
+  private setFlow = (scenarios: ScenarioResult<any>[]): FlowResult => {
     return {
       name: "Availability Check",
       success: scenarios.every((scenario) => scenario.success),
@@ -33,106 +70,52 @@ export class AvailabilityFlow {
     };
   };
 
-  public validate = async (): Promise<Flow> => {
-    const scenarios = [];
-    const availabilityCheckInterval = await Promise.all(
-      await this.validateAvailabilityCheckInterval()
-    );
-    scenarios.push(...availabilityCheckInterval);
-    if (
-      !availabilityCheckInterval
-        .map((scenario) => scenario.success)
-        .some((status) => status)
-    )
-      {return this.setFlow(scenarios);}
+  public validate = async (): Promise<FlowResult> => {
+    await this.setOptionIds();
 
-    const availabilityCheckDate = await Promise.all(
-      await this.validateAvailabilityCheckDate()
-    );
-    scenarios.push(...availabilityCheckDate);
-    if (
-      !availabilityCheckDate
-        .map((scenario) => scenario.success)
-        .some((status) => status)
-    )
-      {return this.setFlow(scenarios);}
+    const scenarios = [
+      ...(await this.validateAvailabilityCheckInterval()),
+      ...(await this.validateAvailabilityCheckDate()),
+      ...(await this.validateAvailabilityCheckUnavailableDates()),
+      ...(await this.validateAvailabilityCheckInvalidProduct()),
+      ...(await this.validateAvailabilityCheckInvalidOption()),
+      ...(await this.validateAvailabilityCheckBadRequest()),
+    ];
 
-    // const availabilityCheckAvailabilityId = await Promise.all(await this.validateAvailabilityCheckAvailabilityId());
-
-    const availabilityCheckUnavailableDates =
-      await this.validateAvailabilityCheckUnavailableDates();
-    scenarios.push(...availabilityCheckUnavailableDates);
-    if (
-      !availabilityCheckUnavailableDates
-        .map((scenario) => scenario.success)
-        .some((status) => status)
-    )
-      {return this.setFlow(scenarios);}
-
-    const availabilityCheckInvalidProduct =
-      await this.validateAvailabilityCheckInvalidProduct();
-    scenarios.push(...availabilityCheckInvalidProduct);
-    if (
-      !availabilityCheckInvalidProduct
-        .map((scenario) => scenario.success)
-        .some((status) => status)
-    )
-      {return this.setFlow(scenarios);}
-
-    const availabilityCheckInvalidOption =
-      await this.validateAvailabilityCheckInvalidOption();
-    scenarios.push(...availabilityCheckInvalidOption);
-    if (
-      !availabilityCheckInvalidOption
-        .map((scenario) => scenario.success)
-        .some((status) => status)
-    )
-      {return this.setFlow(scenarios);}
-
-    const availabilityCheckBadRequest =
-      await this.validateAvailabilityCheckBadRequest();
-    scenarios.push(...availabilityCheckBadRequest);
-    if (
-      !availabilityCheckBadRequest
-        .map((scenario) => scenario.success)
-        .some((status) => status)
-    )
-      {return this.setFlow(scenarios);}
-
-    return this.setFlow(scenarios);
-  };
-
-  private getOptionId = async (productId: string): Promise<string> => {
-    const product = (
-      await this.apiClient.getProduct({
-        id: productId,
-      })
-    ).response.data.body;
-    return product.options.find((option) => option.default).id;
+    const results = [];
+    for await (const scenario of scenarios) {
+      const result = await scenario.validate();
+      results.push(result);
+      if (!result.success) {
+        break;
+      }
+    }
+    return this.setFlow(results);
   };
 
   private validateAvailabilityCheckInterval = async (): Promise<
-    Promise<ScenarioResult<Availability[]>>[]
+    AvailabilityCheckIntervalScenario[]
   > => {
-    return this.config.getProductConfigs().map(async (availabilityConfig) => {
+    return this.config.getProductConfigs().map((availabilityConfig) => {
       return new AvailabilityCheckIntervalScenario({
         apiClient: this.apiClient,
         productId: availabilityConfig.productId,
-        optionId: availabilityConfig.optionId
-          ? availabilityConfig.optionId
-          : await this.getOptionId(availabilityConfig.productId),
+        optionId:
+          availabilityConfig.availabilityType === AvailabilityType.OPENING_HOURS
+            ? this.optionIdOpeningHours
+            : this.optionIdStartTimes,
         localDateStart: availabilityConfig.available.from,
         localDateEnd: availabilityConfig.available.to,
         availabilityType: availabilityConfig.availabilityType,
         capabilities: this.config.capabilities,
-      }).validate();
+      });
     });
   };
 
   private validateAvailabilityCheckDate = async (): Promise<
-    Promise<ScenarioResult<Availability[]>>[]
+    AvailabilityCheckDateScenario[]
   > => {
-    return this.config.getProductConfigs().map(async (availabilityConfig) => {
+    return this.config.getProductConfigs().map((availabilityConfig) => {
       const dates = eachDayOfInterval({
         start: new Date(availabilityConfig.available.from),
         end: new Date(availabilityConfig.available.to),
@@ -142,13 +125,14 @@ export class AvailabilityFlow {
       return new AvailabilityCheckDateScenario({
         apiClient: this.apiClient,
         productId: availabilityConfig.productId,
-        optionId: availabilityConfig.optionId
-          ? availabilityConfig.optionId
-          : await this.getOptionId(availabilityConfig.productId),
+        optionId:
+          availabilityConfig.availabilityType === AvailabilityType.OPENING_HOURS
+            ? this.optionIdOpeningHours
+            : this.optionIdStartTimes,
         localDate: dates[Math.floor(Math.random() * dates.length)],
         availabilityType: availabilityConfig.availabilityType,
         capabilities: this.config.capabilities,
-      }).validate();
+      });
     });
   };
 
@@ -185,104 +169,116 @@ export class AvailabilityFlow {
   // };
 
   private validateAvailabilityCheckUnavailableDates = async (): Promise<
-    ScenarioResult<null>[]
+    AvailabilityCheckUnavailableDatesScenario[]
   > => {
     return Promise.all(
-      this.config.getProductConfigs().map(async (availabilityConfig) => {
-        return await new AvailabilityCheckUnavailableDatesScenario({
+      this.config.getProductConfigs().map((availabilityConfig) => {
+        return new AvailabilityCheckUnavailableDatesScenario({
           apiClient: this.apiClient,
           productId: availabilityConfig.productId,
-          optionId: availabilityConfig.optionId
-            ? availabilityConfig.optionId
-            : await this.getOptionId(availabilityConfig.productId),
+          optionId:
+            availabilityConfig.availabilityType ===
+            AvailabilityType.OPENING_HOURS
+              ? this.optionIdOpeningHours
+              : this.optionIdStartTimes,
           localDateStart: availabilityConfig.unavailable.from,
           localDateEnd: availabilityConfig.unavailable.to,
           availabilityType: availabilityConfig.availabilityType,
           capabilities: this.config.capabilities,
-        }).validate();
+        });
       })
     );
   };
 
   private validateAvailabilityCheckInvalidProduct = async (): Promise<
-    ScenarioResult<null>[]
+    AvailabilityCheckInvalidProductScenario[]
   > => {
     return Promise.all(
       this.config.getProductConfigs().map(async (availabilityConfig) => {
         return await new AvailabilityCheckInvalidProductScenario({
           apiClient: this.apiClient,
           productId: "Invalid productId",
-          optionId: availabilityConfig.optionId
-            ? availabilityConfig.optionId
-            : await this.getOptionId(availabilityConfig.productId),
+          optionId:
+            availabilityConfig.availabilityType ===
+            AvailabilityType.OPENING_HOURS
+              ? this.optionIdOpeningHours
+              : this.optionIdStartTimes,
           localDate: availabilityConfig.available.from,
-        }).validate();
+        });
       })
     );
   };
 
   private validateAvailabilityCheckInvalidOption = async (): Promise<
-    ScenarioResult<null>[]
+    AvailabilityCheckInvalidOptionScenario[]
   > => {
     return Promise.all(
       this.config.getProductConfigs().map(async (availabilityConfig) => {
-        return await new AvailabilityCheckInvalidOptionScenario({
+        return new AvailabilityCheckInvalidOptionScenario({
           apiClient: this.apiClient,
           productId: availabilityConfig.productId,
           optionId: "Invalid optionId",
           localDate: availabilityConfig.available.from,
-        }).validate();
+        });
       })
     );
   };
 
   private validateAvailabilityCheckBadRequest = async (): Promise<
-    ScenarioResult<null>[]
+    AvailabilityCheckBadRequestScenario[]
   > => {
     const response = this.config
       .getProductConfigs()
       .map(async (availabilityConfig) => {
-        const emptyBody = await new AvailabilityCheckBadRequestScenario({
+        const emptyBody = new AvailabilityCheckBadRequestScenario({
           apiClient: this.apiClient,
           productId: availabilityConfig.productId,
-          optionId: availabilityConfig.optionId
-            ? availabilityConfig.optionId
-            : await this.getOptionId(availabilityConfig.productId),
-        }).validate();
+          optionId:
+            availabilityConfig.availabilityType ===
+            AvailabilityType.OPENING_HOURS
+              ? this.optionIdOpeningHours
+              : this.optionIdStartTimes,
+        });
 
-        const allDatesBody = await new AvailabilityCheckBadRequestScenario({
+        const allDatesBody = new AvailabilityCheckBadRequestScenario({
           apiClient: this.apiClient,
           productId: availabilityConfig.productId,
-          optionId: availabilityConfig.optionId
-            ? availabilityConfig.optionId
-            : await this.getOptionId(availabilityConfig.productId),
+          optionId:
+            availabilityConfig.availabilityType ===
+            AvailabilityType.OPENING_HOURS
+              ? this.optionIdOpeningHours
+              : this.optionIdStartTimes,
           localDate: availabilityConfig.available.from,
           localDateStart: availabilityConfig.available.to,
           localDateEnd: availabilityConfig.available.from,
-        }).validate();
+        });
 
         const localDateAvailabilityIdsBody =
-          await new AvailabilityCheckBadRequestScenario({
+          new AvailabilityCheckBadRequestScenario({
             apiClient: this.apiClient,
             productId: availabilityConfig.productId,
-            optionId: availabilityConfig.optionId
-              ? availabilityConfig.optionId
-              : await this.getOptionId(availabilityConfig.productId),
+            optionId:
+              availabilityConfig.availabilityType ===
+              AvailabilityType.OPENING_HOURS
+                ? this.optionIdOpeningHours
+                : this.optionIdStartTimes,
             localDate: availabilityConfig.available.from,
             availabilityIds: ["Random availability ids"],
-          }).validate();
+          });
 
         const datesAvailabilityIdsBody =
-          await new AvailabilityCheckBadRequestScenario({
+          new AvailabilityCheckBadRequestScenario({
             apiClient: this.apiClient,
             productId: availabilityConfig.productId,
-            optionId: availabilityConfig.optionId
-              ? availabilityConfig.optionId
-              : await this.getOptionId(availabilityConfig.productId),
+            optionId:
+              availabilityConfig.availabilityType ===
+              AvailabilityType.OPENING_HOURS
+                ? this.optionIdOpeningHours
+                : this.optionIdStartTimes,
             localDateStart: availabilityConfig.available.from,
             localDateEnd: availabilityConfig.available.to,
             availabilityIds: ["Random availability ids"],
-          }).validate();
+          });
 
         return [
           emptyBody,

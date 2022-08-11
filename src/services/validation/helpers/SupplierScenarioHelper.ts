@@ -13,9 +13,12 @@ export class SupplierScenarioHelper {
   private scenarioHelper = new ScenarioHelper();
 
   private getErrors = (suppliers: any) => {
-    return suppliers.reduce((acc, result) => {
-      return [...acc, ...new SupplierValidator().validate(result)];
-    }, []);
+    if (Array.isArray(suppliers)) {
+      return suppliers.reduce((acc, result) => {
+        return [...acc, ...new SupplierValidator().validate(result)];
+      }, []);
+    }
+    return new SupplierValidator().validate(suppliers);
   };
 
   public validateSupplier = (data: SupplierScenarioData) => {
@@ -26,22 +29,7 @@ export class SupplierScenarioHelper {
         errors: [],
       });
     }
-    const errors = this.getErrors([data.response.data.body]);
-    return this.scenarioHelper.handleResult({
-      ...data,
-      success: R.isEmpty(errors),
-      errors,
-    });
-  };
 
-  public validateSuppliers = (data: SupplierScenarioData) => {
-    if (data.response.error) {
-      return this.scenarioHelper.handleResult({
-        ...data,
-        success: false,
-        errors: [],
-      });
-    }
     const errors = this.getErrors(data.response.data.body);
     return this.scenarioHelper.handleResult({
       ...data,

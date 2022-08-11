@@ -1,11 +1,10 @@
-import { Supplier } from "@octocloud/types";
 import { ApiClient } from "../../ApiClient";
 import { Config } from "../../config/Config";
 import { ScenarioResult } from "../../Scenarios/Scenario";
 import { GetSupplierScenario } from "../../Scenarios/Supplier/GetSupplier";
 import { GetSuppliersScenario } from "../../Scenarios/Supplier/GetSuppliers";
 import { GetSupplierInvalidScenario } from "../../Scenarios/Supplier/GetSupplierInvalid";
-import { Flow } from "../Flow";
+import { FlowResult } from "../Flow";
 
 export class SupplierFlow {
   private config: Config;
@@ -18,7 +17,7 @@ export class SupplierFlow {
     });
   }
 
-  private setFlow = (scenarios: ScenarioResult<any>[]): Flow => {
+  private setFlow = (scenarios: ScenarioResult<any>[]): FlowResult => {
     return {
       name: "Get Suppliers",
       success: scenarios.every((scenario) => scenario.success),
@@ -28,42 +27,40 @@ export class SupplierFlow {
     };
   };
 
-  public validate = async (): Promise<Flow> => {
-    const scenarios = [];
-    const getSupplier = await this.validateGetSupplier();
-    scenarios.push(getSupplier);
-    if (!getSupplier.success) return this.setFlow(scenarios);
+  public validate = async (): Promise<FlowResult> => {
+    const scenarios = [
+      await this.validateGetSupplier(),
+      await this.validateGetSuppliers(),
+      await this.validateGetSupplierInvalid(),
+    ];
 
-    const getSuppliers = await this.validateGetSuppliers();
-    scenarios.push(getSuppliers);
-    if (!getSuppliers.success) return this.setFlow(scenarios);
-
-    const getSupplierInvalid = await this.validateGetSupplierInvalid();
-    scenarios.push(getSupplierInvalid);
-    if (!getSupplierInvalid.success) return this.setFlow(scenarios);
-
-    return this.setFlow(scenarios);
+    const results = [];
+    for await (const scenario of scenarios) {
+      const result = await scenario.validate();
+      results.push(result);
+      if (!result.success) {
+        break;
+      }
+    }
+    return this.setFlow(results);
   };
 
-  private validateGetSupplier = async (): Promise<ScenarioResult<Supplier>> => {
+  private validateGetSupplier = async (): Promise<GetSupplierScenario> => {
     return new GetSupplierScenario({
       apiClient: this.apiClient,
       supplierId: this.config.supplierId,
-    }).validate();
+    });
   };
-  private validateGetSuppliers = async (): Promise<
-    ScenarioResult<Supplier[]>
-  > => {
+  private validateGetSuppliers = async (): Promise<GetSuppliersScenario> => {
     return new GetSuppliersScenario({
       apiClient: this.apiClient,
-    }).validate();
+    });
   };
-  private validateGetSupplierInvalid = async (): Promise<
-    ScenarioResult<null>
-  > => {
-    return new GetSupplierInvalidScenario({
-      apiClient: this.apiClient,
-      supplierId: "Invalid supplierId",
-    }).validate();
-  };
+  private validateGetSupplierInvalid =
+    async (): Promise<GetSupplierInvalidScenario> => {
+      return new GetSupplierInvalidScenario({
+        apiClient: this.apiClient,
+        supplierId: "Invalid supplierId",
+      });
+    };
 }
