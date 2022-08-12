@@ -2,20 +2,23 @@ export interface Scenario<T> {
   validate: () => Promise<ScenarioResult<T>>;
 }
 
+export interface ScenarioRequest {
+  url: string;
+  body: Nullable<any>;
+}
+
+export interface ScenarioResponse<T> {
+  body: Nullable<T>;
+  status: number;
+  error: Nullable<{
+    body: any;
+  }>;
+}
+
 export interface ScenarioResult<T> {
   name: string;
   success: boolean;
-  request: {
-    url: string;
-    body: Nullable<any>; // json
-  };
-  response: {
-    body: Nullable<T>; // json
-    status: number;
-    error: Nullable<{
-      // error that tested api returns
-      body: any; // json
-    }>;
-  };
+  request: ScenarioRequest;
+  response: ScenarioResponse<T>;
   errors: string[]; // validation errors
 }

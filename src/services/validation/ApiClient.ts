@@ -24,17 +24,21 @@ export type ApiParams = {
 };
 
 export type Result<T> = {
-  request: {
-    url: string;
-    body: Nullable<T>;
-  };
-  response: {
-    data: Nullable<{
-      status: number;
-      body: T;
-    }>;
-    error: Nullable<ValidatedError>;
-  };
+  request: ResultRequest<T>;
+  response: ResultResponse<T>;
+};
+
+export type ResultRequest<T> = {
+  url: string;
+  body: Nullable<T>;
+};
+
+export type ResultResponse<T> = {
+  data: Nullable<{
+    status: number;
+    body: T;
+  }>;
+  error: Nullable<ValidatedError>;
 };
 
 export class ApiClient {

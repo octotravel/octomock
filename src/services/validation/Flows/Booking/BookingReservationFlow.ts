@@ -6,6 +6,12 @@ import { Config } from "../../config/Config";
 import { ScenarioResult } from "../../Scenarios/Scenario";
 import { BookingReservationScenario } from "../../Scenarios/Booking/Reservation/BookingReservation";
 import { FlowResult } from "../Flow";
+import { BookingReservationInvalidProductScenario } from "../../Scenarios/Booking/Reservation/BookingReservationInvalidProduct";
+import { BookingReservationInvalidOptionScenario } from "../../Scenarios/Booking/Reservation/BookingReservationInvalidOption";
+import { BookingReservationInvalidAvailabilityIdScenario } from "../../Scenarios/Booking/Reservation/BookingReservationInvalidAvailabilityId";
+import { BookingReservationMissingUnitItemsScenario } from "../../Scenarios/Booking/Reservation/BookingReservationMissingUnitItems";
+import { BookingReservationEmptyUnitItemsScenario } from "../../Scenarios/Booking/Reservation/BookingReservationEmptyUnitItems";
+import { BookingReservationInvalidUnitIdScenario } from "../../Scenarios/Booking/Reservation/BookingReservationInvalidUnitId";
 
 export class BookingReservationFlow {
   private config: Config;
@@ -68,14 +74,15 @@ export class BookingReservationFlow {
   public validate = async (): Promise<FlowResult> => {
     await this.setOptionIds();
 
-    const scenarios = [...(await this.validateBooking())];
-
-    // const bookingProductIdError = await this.validateBookingProductIdError();
-    // const bookingOptionIdError = await this.validateBookingOptionIdError();
-    // const bookingAvailabilityIdError =
-    //   await this.validateBookingAvailabilityIdError();
-    // const bookingEntityError = await this.validateBookingEntityError();
-    // const bookingUnitIdError = await this.validateBookingUnitIdError();
+    const scenarios = [
+      ...(await this.validateBooking()),
+      ...(await this.validateBookingInvalidProduct()),
+      ...(await this.validateBookingInvalidOption()),
+      ...(await this.validateBookingInvalidAvailabilityId()),
+      ...(await this.validateBookingnMissingUnitItems()),
+      ...(await this.validateBookingEmptyUnitItems()),
+      ...(await this.validateBookingInvalidUnitId()),
+    ];
 
     const results = [];
     for await (const scenario of scenarios) {
@@ -107,10 +114,30 @@ export class BookingReservationFlow {
         ) {
           throw new BadRequestError("Invalid available dates!");
         }
-        const product = await this.apiClient.getProduct({
-          id: availabilityConfig.productId,
-        });
-        console.log(availability.response.data.body[0].id);
+        const product = (
+          await this.apiClient.getProduct({
+            id: availabilityConfig.productId,
+          })
+        ).response.data.body;
+        let unitItems = [
+          {
+            unitId: product.options[0].units[0].id,
+          },
+          {
+            unitId: product.options[0].units[0].id,
+          },
+          {
+            unitId: product.options[0].units[0].id,
+          },
+        ];
+        if (product.options[0].units[1]) {
+          unitItems = [
+            ...unitItems,
+            {
+              unitId: product.options[0].units[1].id,
+            },
+          ];
+        }
         return new BookingReservationScenario({
           apiClient: this.apiClient,
           productId: availabilityConfig.productId,
@@ -121,12 +148,55 @@ export class BookingReservationFlow {
               : this.optionIdStartTimes,
           availabilityId: availability.response.data.body[0].id,
           availabilityType: availabilityConfig.availabilityType,
+          unitItems,
+          notes: "Test note",
+          capabilities: this.config.capabilities,
+          deliveryMethods: availabilityConfig.deliveryMethods,
+        });
+      })
+    );
+  };
+
+  private validateBookingInvalidProduct = async (): Promise<
+    BookingReservationInvalidProductScenario[]
+  > => {
+    return Promise.all(
+      this.config.getProductConfigs().map(async (availabilityConfig) => {
+        const availability = (
+          await this.apiClient.getAvailability({
+            productId: availabilityConfig.productId,
+            optionId:
+              availabilityConfig.availabilityType ===
+              AvailabilityType.OPENING_HOURS
+                ? this.optionIdOpeningHours
+                : this.optionIdStartTimes,
+            localDateStart: availabilityConfig.available.from,
+            localDateEnd: availabilityConfig.available.to,
+          })
+        ).response;
+        if (R.isEmpty(availability.data.body) && !availability.error) {
+          throw new BadRequestError("Invalid available dates!");
+        }
+        const product = (
+          await this.apiClient.getProduct({
+            id: availabilityConfig.productId,
+          })
+        ).response.data.body;
+        return new BookingReservationInvalidProductScenario({
+          apiClient: this.apiClient,
+          productId: "Invalid productId",
+          optionId:
+            availabilityConfig.availabilityType ===
+            AvailabilityType.OPENING_HOURS
+              ? this.optionIdOpeningHours
+              : this.optionIdStartTimes,
+          availabilityId: availability.data.body[0].id,
           unitItems: [
             {
-              unitId: product.response.data.body.options[0].units[0].id,
+              unitId: product.options[0].units[0].id,
             },
             {
-              unitId: product.response.data.body.options[0].units[0].id,
+              unitId: product.options[0].units[0].id,
             },
           ],
           capabilities: this.config.capabilities,
@@ -135,161 +205,195 @@ export class BookingReservationFlow {
     );
   };
 
-  //   private validateBookingProductIdError = async (): Promise<
-  //     ScenarioResult<null>[]
-  //   > => {
-  //     return Promise.all(
-  //       this.config.getProductConfigs().map(async (availabilityConfig) => {
-  //         const availability = await this.apiClient.getAvailability({
-  //           productId: availabilityConfig.productId,
-  //           optionId: availabilityConfig.optionId,
-  //           localDateStart: availabilityConfig.available.from,
-  //           localDateEnd: availabilityConfig.available.to,
-  //         });
-  //         if (R.isEmpty(availability.result) && !availability.error) {
-  //           throw new BadRequestError("Invalid available dates!");
-  //         }
-  //         const product = await this.apiClient.getProduct({
-  //           id: availabilityConfig.productId,
-  //         });
-  //         return new BookingReservationProductIdErrorScenario({
-  //           apiClient: this.apiClient,
-  //           productId: "bad product Id",
-  //           optionId: availabilityConfig.optionId,
-  //           availabilityId: availability.result[0].id,
-  //           unitItems: [
-  //             {
-  //               unitId: product.result.options[0].units[0].id,
-  //             },
-  //             {
-  //               unitId: product.result.options[0].units[0].id,
-  //             },
-  //           ],
-  //           capabilities: this.config.capabilities,
-  //         }).validate();
-  //       })
-  //     );
-  //   };
+  private validateBookingInvalidOption = async (): Promise<
+    BookingReservationInvalidOptionScenario[]
+  > => {
+    return Promise.all(
+      this.config.getProductConfigs().map(async (availabilityConfig) => {
+        const availability = (
+          await this.apiClient.getAvailability({
+            productId: availabilityConfig.productId,
+            optionId:
+              availabilityConfig.availabilityType ===
+              AvailabilityType.OPENING_HOURS
+                ? this.optionIdOpeningHours
+                : this.optionIdStartTimes,
+            localDateStart: availabilityConfig.available.from,
+            localDateEnd: availabilityConfig.available.to,
+          })
+        ).response;
+        if (R.isEmpty(availability.data.body) && !availability.error) {
+          throw new BadRequestError("Invalid available dates!");
+        }
+        const product = (
+          await this.apiClient.getProduct({
+            id: availabilityConfig.productId,
+          })
+        ).response.data.body;
+        return new BookingReservationInvalidOptionScenario({
+          apiClient: this.apiClient,
+          productId: availabilityConfig.productId,
+          optionId: "Invalid optionId",
+          availabilityId: availability.data.body[0].id,
+          unitItems: [
+            {
+              unitId: product.options[0].units[0].id,
+            },
+            {
+              unitId: product.options[0].units[0].id,
+            },
+          ],
+          capabilities: this.config.capabilities,
+        });
+      })
+    );
+  };
 
-  //   private validateBookingOptionIdError = async (): Promise<
-  //     ScenarioResult<null>[]
-  //   > => {
-  //     return Promise.all(
-  //       this.config.getProductConfigs().map(async (availabilityConfig) => {
-  //         const availability = await this.apiClient.getAvailability({
-  //           productId: availabilityConfig.productId,
-  //           optionId: availabilityConfig.optionId,
-  //           localDateStart: availabilityConfig.available.from,
-  //           localDateEnd: availabilityConfig.available.to,
-  //         });
-  //         if (R.isEmpty(availability.result) && !availability.error) {
-  //           throw new BadRequestError("Invalid available dates!");
-  //         }
-  //         const product = await this.apiClient.getProduct({
-  //           id: availabilityConfig.productId,
-  //         });
-  //         return new BookingReservationOptionIdErrorScenario({
-  //           apiClient: this.apiClient,
-  //           productId: availabilityConfig.productId,
-  //           optionId: "bad optionId",
-  //           availabilityId: availability.result[0].id,
-  //           unitItems: [
-  //             {
-  //               unitId: product.result.options[0].units[0].id,
-  //             },
-  //             {
-  //               unitId: product.result.options[0].units[0].id,
-  //             },
-  //           ],
-  //           capabilities: this.config.capabilities,
-  //         }).validate();
-  //       })
-  //     );
-  //   };
+  private validateBookingInvalidAvailabilityId = async (): Promise<
+    BookingReservationInvalidAvailabilityIdScenario[]
+  > => {
+    return Promise.all(
+      this.config.getProductConfigs().map(async (availabilityConfig) => {
+        const product = (
+          await this.apiClient.getProduct({
+            id: availabilityConfig.productId,
+          })
+        ).response.data.body;
+        return new BookingReservationInvalidAvailabilityIdScenario({
+          apiClient: this.apiClient,
+          productId: availabilityConfig.productId,
+          optionId:
+            availabilityConfig.availabilityType ===
+            AvailabilityType.OPENING_HOURS
+              ? this.optionIdOpeningHours
+              : this.optionIdStartTimes,
+          availabilityId: "Invalid availabilityId",
+          unitItems: [
+            {
+              unitId: product.options[0].units[0].id,
+            },
+            {
+              unitId: product.options[0].units[0].id,
+            },
+          ],
+          capabilities: this.config.capabilities,
+        });
+      })
+    );
+  };
 
-  //   private validateBookingAvailabilityIdError = async (): Promise<
-  //     ScenarioResult<null>[]
-  //   > => {
-  //     return Promise.all(
-  //       this.config.getProductConfigs().map(async (availabilityConfig) => {
-  //         const product = await this.apiClient.getProduct({
-  //           id: availabilityConfig.productId,
-  //         });
-  //         return new BookingReservationAvailabilityIdErrorScenario({
-  //           apiClient: this.apiClient,
-  //           productId: availabilityConfig.productId,
-  //           optionId: availabilityConfig.optionId,
-  //           availabilityId: "bad availability id",
-  //           unitItems: [
-  //             {
-  //               unitId: product.result.options[0].units[0].id,
-  //             },
-  //             {
-  //               unitId: product.result.options[0].units[0].id,
-  //             },
-  //           ],
-  //           capabilities: this.config.capabilities,
-  //         }).validate();
-  //       })
-  //     );
-  //   };
+  private validateBookingnMissingUnitItems = async (): Promise<
+    BookingReservationMissingUnitItemsScenario[]
+  > => {
+    return Promise.all(
+      this.config.getProductConfigs().map(async (availabilityConfig) => {
+        const availability = (
+          await this.apiClient.getAvailability({
+            productId: availabilityConfig.productId,
+            optionId:
+              availabilityConfig.availabilityType ===
+              AvailabilityType.OPENING_HOURS
+                ? this.optionIdOpeningHours
+                : this.optionIdStartTimes,
+            localDateStart: availabilityConfig.available.from,
+            localDateEnd: availabilityConfig.available.to,
+          })
+        ).response;
+        if (R.isEmpty(availability.data.body) && !availability.error) {
+          throw new BadRequestError("Invalid available dates!");
+        }
+        return new BookingReservationMissingUnitItemsScenario({
+          apiClient: this.apiClient,
+          productId: availabilityConfig.productId,
+          optionId:
+            availabilityConfig.availabilityType ===
+            AvailabilityType.OPENING_HOURS
+              ? this.optionIdOpeningHours
+              : this.optionIdStartTimes,
+          availabilityId: availability.data.body[0].id,
+          unitItems: [],
+          capabilities: this.config.capabilities,
+        });
+      })
+    );
+  };
 
-  //   private validateBookingEntityError = async (): Promise<
-  //     ScenarioResult<null>[]
-  //   > => {
-  //     return Promise.all(
-  //       this.config.getProductConfigs().map(async (availabilityConfig) => {
-  //         const availability = await this.apiClient.getAvailability({
-  //           productId: availabilityConfig.productId,
-  //           optionId: availabilityConfig.optionId,
-  //           localDateStart: availabilityConfig.available.from,
-  //           localDateEnd: availabilityConfig.available.to,
-  //         });
-  //         if (R.isEmpty(availability.result) && !availability.error) {
-  //           throw new BadRequestError("Invalid available dates!");
-  //         }
-  //         return new BookingReservationEntityErrorScenario({
-  //           apiClient: this.apiClient,
-  //           productId: availabilityConfig.productId,
-  //           optionId: availabilityConfig.optionId,
-  //           availabilityId: availability.result[0].id,
-  //           unitItems: [],
-  //           capabilities: this.config.capabilities,
-  //         }).validate();
-  //       })
-  //     );
-  //   };
+  private validateBookingEmptyUnitItems = async (): Promise<
+    BookingReservationEmptyUnitItemsScenario[]
+  > => {
+    return Promise.all(
+      this.config.getProductConfigs().map(async (availabilityConfig) => {
+        const availability = (
+          await this.apiClient.getAvailability({
+            productId: availabilityConfig.productId,
+            optionId:
+              availabilityConfig.availabilityType ===
+              AvailabilityType.OPENING_HOURS
+                ? this.optionIdOpeningHours
+                : this.optionIdStartTimes,
+            localDateStart: availabilityConfig.available.from,
+            localDateEnd: availabilityConfig.available.to,
+          })
+        ).response;
+        if (R.isEmpty(availability.data.body) && !availability.error) {
+          throw new BadRequestError("Invalid available dates!");
+        }
+        return new BookingReservationEmptyUnitItemsScenario({
+          apiClient: this.apiClient,
+          productId: availabilityConfig.productId,
+          optionId:
+            availabilityConfig.availabilityType ===
+            AvailabilityType.OPENING_HOURS
+              ? this.optionIdOpeningHours
+              : this.optionIdStartTimes,
+          availabilityId: availability.data.body[0].id,
+          unitItems: [],
+          capabilities: this.config.capabilities,
+        });
+      })
+    );
+  };
 
-  //   private validateBookingUnitIdError = async (): Promise<
-  //     ScenarioResult<null>[]
-  //   > => {
-  //     return Promise.all(
-  //       this.config.getProductConfigs().map(async (availabilityConfig) => {
-  //         const availability = await this.apiClient.getAvailability({
-  //           productId: availabilityConfig.productId,
-  //           optionId: availabilityConfig.optionId,
-  //           localDateStart: availabilityConfig.available.from,
-  //           localDateEnd: availabilityConfig.available.to,
-  //         });
-  //         if (R.isEmpty(availability.result) && !availability.error) {
-  //           throw new BadRequestError("Invalid available dates!");
-  //         }
-  //         return new BookingReservationUnitIdErrorScenario({
-  //           apiClient: this.apiClient,
-  //           productId: availabilityConfig.productId,
-  //           optionId: availabilityConfig.optionId,
-  //           availabilityId: availability.result[0].id,
-  //           unitItems: [
-  //             {
-  //               unitId: "bad unitId",
-  //             },
-  //             {
-  //               unitId: "bad unitId",
-  //             },
-  //           ],
-  //           capabilities: this.config.capabilities,
-  //         }).validate();
-  //       })
-  //     );
-  //   };
+  private validateBookingInvalidUnitId = async (): Promise<
+    BookingReservationInvalidUnitIdScenario[]
+  > => {
+    return Promise.all(
+      this.config.getProductConfigs().map(async (availabilityConfig) => {
+        const availability = (
+          await this.apiClient.getAvailability({
+            productId: availabilityConfig.productId,
+            optionId:
+              availabilityConfig.availabilityType ===
+              AvailabilityType.OPENING_HOURS
+                ? this.optionIdOpeningHours
+                : this.optionIdStartTimes,
+            localDateStart: availabilityConfig.available.from,
+            localDateEnd: availabilityConfig.available.to,
+          })
+        ).response;
+        if (R.isEmpty(availability.data.body) && !availability.error) {
+          throw new BadRequestError("Invalid available dates!");
+        }
+        return new BookingReservationInvalidUnitIdScenario({
+          apiClient: this.apiClient,
+          productId: availabilityConfig.productId,
+          optionId:
+            availabilityConfig.availabilityType ===
+            AvailabilityType.OPENING_HOURS
+              ? this.optionIdOpeningHours
+              : this.optionIdStartTimes,
+          availabilityId: availability.data.body[0].id,
+          unitItems: [
+            {
+              unitId: "invalid unitId",
+            },
+            {
+              unitId: "invalid unitId",
+            },
+          ],
+          capabilities: this.config.capabilities,
+        });
+      })
+    );
+  };
 }

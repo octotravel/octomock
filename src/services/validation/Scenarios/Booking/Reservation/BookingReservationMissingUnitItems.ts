@@ -1,42 +1,29 @@
-import {
-  Booking,
-  BookingUnitItemSchema,
-  CapabilityId,
-  DeliveryMethod,
-} from "@octocloud/types";
+import { BookingUnitItemSchema, CapabilityId } from "@octocloud/types";
 import { ApiClient } from "../../../ApiClient";
 import { Scenario } from "../../Scenario";
+import { UnprocessableEntityErrorValidator } from "../../../../../validators/backendValidator/Error/UnprocessableEntityErrorValidator";
 import { BookingReservationScenarioHelper } from "../../../helpers/BookingReservationScenarioHelper";
 
-export class BookingReservationScenario implements Scenario<Booking> {
+export class BookingReservationMissingUnitItemsScenario
+  implements Scenario<null>
+{
   private apiClient: ApiClient;
   private productId: string;
   private optionId: string;
   private availabilityId: string;
   private unitItems: BookingUnitItemSchema[];
-  private notes: string;
-  private availabilityType: string;
-  private deliveryMethods: DeliveryMethod[];
-  private capabilities: CapabilityId[];
   constructor({
     apiClient,
     productId,
     optionId,
     availabilityId,
     unitItems,
-    notes,
-    availabilityType,
-    deliveryMethods,
-    capabilities,
   }: {
     apiClient: ApiClient;
     productId: string;
     optionId: string;
     availabilityId: string;
     unitItems: BookingUnitItemSchema[];
-    notes: string;
-    availabilityType: string;
-    deliveryMethods: DeliveryMethod[];
     capabilities: CapabilityId[];
   }) {
     this.apiClient = apiClient;
@@ -44,10 +31,6 @@ export class BookingReservationScenario implements Scenario<Booking> {
     this.optionId = optionId;
     this.availabilityId = availabilityId;
     this.unitItems = unitItems;
-    this.notes = notes;
-    this.availabilityType = availabilityType;
-    this.deliveryMethods = deliveryMethods;
-    this.capabilities = capabilities;
   }
   private bookingReservationScenarioHelper =
     new BookingReservationScenarioHelper();
@@ -58,19 +41,19 @@ export class BookingReservationScenario implements Scenario<Booking> {
       optionId: this.optionId,
       availabilityId: this.availabilityId,
       unitItems: this.unitItems,
-      notes: this.notes,
     });
-    const name = `Booking Reservation (${this.availabilityType})`;
 
-    return this.bookingReservationScenarioHelper.validateBookingReservation(
+    const name =
+      "Booking Reservation Missing UnitItems (400 UNPROCESSABLE_ENTITY)";
+    const error = "Response should be UNPROCESSABLE_ENTITY";
+
+    return this.bookingReservationScenarioHelper.validateBookingReservationError(
       {
         ...result,
         name,
       },
-      {
-        capabilities: this.capabilities,
-        deliveryMethods: this.deliveryMethods,
-      }
+      error,
+      new UnprocessableEntityErrorValidator()
     );
   };
 }
