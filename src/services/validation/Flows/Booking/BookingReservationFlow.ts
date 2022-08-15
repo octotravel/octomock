@@ -25,7 +25,7 @@ export class BookingReservationFlow {
       capabilities: config.capabilities,
     });
     this.optionIdStartTimes = null;
-    this.optionIdStartTimes = null;
+    this.optionIdOpeningHours = null;
   }
 
   private setOptionIds = async (): Promise<void> => {
@@ -49,16 +49,26 @@ export class BookingReservationFlow {
         productOpeningHours.optionId = availabilityConfig.optionId;
       }
     });
-    this.optionIdStartTimes =
-      productStartTimes.optionId ??
-      (
-        await this.apiClient.getProduct({ id: productStartTimes.productId })
-      ).response.data.body.options.find((option) => option.default).id;
-    this.optionIdOpeningHours =
-      productOpeningHours.optionId ??
-      (
-        await this.apiClient.getProduct({ id: productOpeningHours.productId })
-      ).response.data.body.options.find((option) => option.default).id;
+    if (productStartTimes.productId) {
+      this.optionIdStartTimes = productStartTimes.productId
+        ? (
+            await this.apiClient.getProduct({ id: productStartTimes.productId })
+          ).response.data.body.options.find((option) => option.default).id
+        : null;
+    } else {
+      this.optionIdStartTimes = null;
+    }
+    if (productOpeningHours.productId) {
+      this.optionIdOpeningHours = productOpeningHours.productId
+        ? (
+            await this.apiClient.getProduct({
+              id: productOpeningHours.productId,
+            })
+          ).response.data.body.options.find((option) => option.default).id
+        : null;
+    } else {
+      this.optionIdOpeningHours = null;
+    }
   };
 
   private setFlow = (scenarios: ScenarioResult<any>[]): FlowResult => {

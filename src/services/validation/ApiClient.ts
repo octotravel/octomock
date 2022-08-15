@@ -10,6 +10,8 @@ import {
   CapabilityId,
   ConfirmBookingBodySchema,
   ConfirmBookingPathParamsSchema,
+  ExtendBookingBodySchema,
+  ExtendBookingPathParamsSchema,
   GetBookingPathParamsSchema,
   GetBookingsQueryParamsSchema,
   GetProductPathParamsSchema,
@@ -177,7 +179,6 @@ export class ApiClient {
     const url = `${this.url}/bookings?` + params;
     const response = await fetch(url, {
       method: "GET",
-
       headers: {
         ...this.mapCapabilities(),
       },
@@ -207,6 +208,23 @@ export class ApiClient {
     const body = JSON.stringify(data);
     const response = await fetch(url, {
       method: "DELETE",
+      body,
+      headers: {
+        ...this.mapCapabilities(),
+      },
+    });
+    return await this.setResponse({ url, body }, response);
+  };
+
+  public bookingExtend = async (
+    data: ExtendBookingBodySchema & ExtendBookingPathParamsSchema,
+    _?: ApiParams
+  ): Promise<Result<Booking>> => {
+    const url = `${this.url}/bookings/${data.uuid}/extend`;
+    delete data.uuid;
+    const body = JSON.stringify(data);
+    const response = await fetch(url, {
+      method: "POST",
       body,
       headers: {
         ...this.mapCapabilities(),

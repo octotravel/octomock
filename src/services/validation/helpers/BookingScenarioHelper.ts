@@ -1,54 +1,54 @@
 import { Booking, DeliveryMethod } from "@octocloud/types";
-import { ScenarioConfigData, ScenarioHelperData } from "./ScenarioHelper";
+import { ScenarioConfigData } from "./ScenarioHelper";
 
 export class BookingScenarioHelper {
   public bookingCheck = (
-    data: ScenarioHelperData<Booking>,
+    newBooking: Booking,
+    oldBooking: Booking,
     configData: ScenarioConfigData
   ): string[] => {
-    const booking = data.response.data.body;
     const deliveryMethodsMatch =
-      configData.deliveryMethods.length === booking.deliveryMethods.length
+      configData.deliveryMethods.length === newBooking.deliveryMethods.length
         ? configData.deliveryMethods
             .map((method) => {
-              return booking.deliveryMethods.includes(method);
+              return newBooking.deliveryMethods.includes(method);
             })
             .every((status) => status)
         : false;
     const ticketCheck = configData.deliveryMethods.includes(
       DeliveryMethod.TICKET
     )
-      ? booking.unitItems.map((unitItem) => unitItem.ticket).length ===
-        data.request.body.unitItems.length
+      ? newBooking.unitItems.map((unitItem) => unitItem.ticket).length ===
+        oldBooking.unitItems.length
       : true;
     const unitIdCheck =
-      booking.unitItems.length === data.request.body.unitItems.length
-        ? booking.unitItems
+      newBooking.unitItems.length === oldBooking.unitItems.length
+        ? newBooking.unitItems
             .map((unitItem) => {
-              return data.request.body.unitItems
+              return oldBooking.unitItems
                 .map((item) => item.unitId)
                 .includes(unitItem.unitId);
             })
             .every((status) => status)
         : false;
     return [
-      booking.productId === data.request.body.productId
+      newBooking.productId === oldBooking.productId
         ? null
         : "ProductId is not matching request",
-      booking.optionId === data.request.body.optionId
+      newBooking.optionId === oldBooking.optionId
         ? null
         : "OptionId is not matching request",
-      booking.availabilityId === data.request.body.availabilityId
+      newBooking.availabilityId === oldBooking.availabilityId
         ? null
         : "AvailabilityId is not matching request",
       deliveryMethodsMatch
         ? null
         : "DeliveryMethods are not matching provided ones",
-      booking.voucher &&
+      newBooking.voucher &&
       configData.deliveryMethods.includes(DeliveryMethod.VOUCHER)
         ? null
         : "Voucher is missing",
-      booking.unitItems.length === data.request.body.unitItems.length
+      newBooking.unitItems.length === oldBooking.unitItems.length
         ? null
         : "UnitItems count is not matching",
       ticketCheck ? null : "Some/all tickets are missing",

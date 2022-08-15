@@ -1,5 +1,8 @@
 import Router from "@koa/router";
-import { confirmBookingBodySchema } from "@octocloud/types";
+import {
+  confirmBookingBodySchema,
+  extendBookingBodySchema,
+} from "@octocloud/types";
 import { BookingController } from "./../../controllers/BookingController";
 import { getCapabilities } from "../common";
 import {
@@ -67,12 +70,17 @@ bookingRouter.patch("/bookings/:uuid", async (ctx, _) => {
 
 bookingRouter.post("/bookings/:uuid/extend", async (ctx, _) => {
   const capabilities = getCapabilities(ctx);
-  ctx.body = {
-    ...ctx.request.body,
+
+  await extendBookingBodySchema.validate(ctx.request.body);
+  const reqBody = extendBookingBodySchema.cast(ctx.request.body);
+
+  const data = {
+    ...reqBody,
     uuid: ctx.params.uuid,
   };
-  await extendBookingSchema.validate(ctx.body);
-  const schema = extendBookingSchema.cast(ctx.body);
+
+  await extendBookingSchema.validate(data);
+  const schema = extendBookingSchema.cast(data);
 
   const booking = await bookingController.extendBooking(schema, capabilities);
   ctx.body = booking;

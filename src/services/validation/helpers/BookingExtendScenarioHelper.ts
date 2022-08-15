@@ -12,7 +12,7 @@ import {
   ScenarioHelperData,
 } from "./ScenarioHelper";
 
-export class BookingReservationScenarioHelper {
+export class BookingExtendScenarioHelper {
   private scenarioHelper = new ScenarioHelper();
   private bookingScenarioHelper = new BookingScenarioHelper();
 
@@ -23,21 +23,24 @@ export class BookingReservationScenarioHelper {
     return new BookingValidator({ capabilities }).validate(booking);
   };
 
-  private reservationCheck = (data: ScenarioHelperData<Booking>): string[] => {
-    const booking = data.response.data.body;
+  private extendCheck = (
+    createdBooking: Booking,
+    extendedBooking: Booking
+  ): string[] => {
     return [
-      booking.notes === data.request.body.notes
+      extendedBooking.status === BookingStatus.ON_HOLD
         ? null
-        : "Notes are not matching request",
-      booking.status === BookingStatus.ON_HOLD
+        : "Booking status is not ON_HOLD",
+      createdBooking.utcExpiresAt < extendedBooking.utcExpiresAt
         ? null
-        : `Booking status should be ON_HOLD. Returned value was ${booking.status}`,
+        : "Booking expire time was not extended",
     ].filter(Boolean);
   };
 
-  public validateBookingReservation = (
+  public validateBookingExtend = (
     data: ScenarioHelperData<Booking>,
-    configData: ScenarioConfigData
+    configData: ScenarioConfigData,
+    createdBooking: Booking
   ) => {
     if (data.response.error) {
       return this.scenarioHelper.handleResult({
@@ -48,10 +51,10 @@ export class BookingReservationScenarioHelper {
     }
 
     const checkErrors = [
-      ...this.reservationCheck(data),
+      ...this.extendCheck(createdBooking, data.response.data.body),
       ...this.bookingScenarioHelper.bookingCheck(
+        createdBooking,
         data.response.data.body,
-        data.request.body,
         configData
       ),
     ];
