@@ -158,7 +158,7 @@ export class OptionModel implements Capable {
       units: option.units.map((unit) => UnitModel.fromPOJO(unit)),
       durationAmount: option.durationAmount,
       durationUnit: option.durationUnit,
-      pricing: option.pricingFrom,
+      pricing: option.pricingFrom ?? option.pricing,
     });
   };
 }
