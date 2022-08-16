@@ -57,7 +57,9 @@ export class UnitItemModel implements Capable {
       notes: null,
     };
     this.ticket = ticket;
-    this.pricing = unitModel.pricingFrom[0];
+    if (this.unitModel.pricingFrom) {
+      this.pricing = this.unitModel.pricingFrom[0];
+    }
   }
 
   public toPOJO = ({
