@@ -7,6 +7,8 @@ import { AvailabilityCalendarFlow } from "./Availability/AvailabilityCalendarFlo
 import { BookingReservationFlow } from "./Booking/BookingReservationFlow";
 import { BookingExtendFlow } from "./Booking/BookingExtendFlow";
 import { BookingConfirmationFlow } from "./Booking/BookingConfirmationFlow";
+import { BookingUpdateFlow } from "./Booking/BookingUpdateFlow";
+import { BookingCancellationFlow } from "./Booking/BookingCancellationFlow";
 
 export class PrimiteFlows {
   private config: Config;
@@ -23,6 +25,8 @@ export class PrimiteFlows {
       new BookingReservationFlow({ config }),
       new BookingExtendFlow({ config }),
       new BookingConfirmationFlow({ config }),
+      new BookingUpdateFlow({ config }),
+      new BookingCancellationFlow({ config }),
     ];
     const results = [];
     for await (const flow of flows) {

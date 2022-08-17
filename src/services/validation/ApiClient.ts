@@ -18,6 +18,8 @@ import {
   GetSupplierPathParamsSchema,
   Product,
   Supplier,
+  UpdateBookingBodySchema,
+  UpdateBookingPathParamsSchema,
 } from "@octocloud/types";
 import { CreateBookingSchema } from "../../schemas/Booking";
 
@@ -204,10 +206,11 @@ export class ApiClient {
     data: CancelBookingBodySchema & CancelBookingPathParamsSchema,
     _?: ApiParams
   ): Promise<Result<Booking>> => {
-    const url = `${this.url}/bookings/${data.uuid}`;
+    const url = `${this.url}/bookings/${data.uuid}/cancel`;
+    delete data.uuid;
     const body = JSON.stringify(data);
     const response = await fetch(url, {
-      method: "DELETE",
+      method: "POST",
       body,
       headers: {
         ...this.mapCapabilities(),
@@ -225,6 +228,23 @@ export class ApiClient {
     const body = JSON.stringify(data);
     const response = await fetch(url, {
       method: "POST",
+      body,
+      headers: {
+        ...this.mapCapabilities(),
+      },
+    });
+    return await this.setResponse({ url, body }, response);
+  };
+
+  public bookingUpdate = async (
+    data: UpdateBookingBodySchema & UpdateBookingPathParamsSchema,
+    _?: ApiParams
+  ): Promise<Result<Booking>> => {
+    const url = `${this.url}/bookings/${data.uuid}`;
+    delete data.uuid;
+    const body = JSON.stringify(data);
+    const response = await fetch(url, {
+      method: "PATCH",
       body,
       headers: {
         ...this.mapCapabilities(),

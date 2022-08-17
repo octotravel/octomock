@@ -22,7 +22,7 @@ app.use(async (ctx, next) => {
   try {
     await next();
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     if (err instanceof OctoError) {
       ctx.status = err.status;
       ctx.body = err.body;

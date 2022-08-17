@@ -151,7 +151,7 @@ export class BookingBuilder {
       utcUpdatedAt: DateHelper.utcDateFormat(new Date()),
       utcExpiresAt: utcExpiresAt,
       utcRedeemedAt: null,
-      utcConfirmedAt: DateHelper.utcDateFormat(new Date()),
+      utcConfirmedAt: booking.utcConfirmedAt,
       notes: schema.notes ?? booking.notes,
       voucher: booking.voucher,
     });
@@ -194,6 +194,7 @@ export class BookingBuilder {
     booking: BookingModel,
     schema: CancelBookingSchema
   ): BookingModel {
+    console.log(schema);
     const status = BookingStatus.CANCELLED;
     const cancellation = {
       refund: "FULL",
@@ -227,7 +228,7 @@ export class BookingBuilder {
       utcUpdatedAt: DateHelper.utcDateFormat(new Date()),
       utcExpiresAt: null,
       utcRedeemedAt: null,
-      utcConfirmedAt: null,
+      utcConfirmedAt: booking.utcConfirmedAt,
       notes: booking.notes,
       voucher,
       cancellation,

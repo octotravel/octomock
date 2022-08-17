@@ -12,7 +12,7 @@ import {
   ScenarioHelperData,
 } from "./ScenarioHelper";
 
-export class BookingExtendScenarioHelper {
+export class BookingCancellationScenarioHelper {
   private scenarioHelper = new ScenarioHelper();
   private bookingScenarioHelper = new BookingScenarioHelper();
 
@@ -23,21 +23,21 @@ export class BookingExtendScenarioHelper {
     return new BookingValidator({ capabilities }).validate(booking);
   };
 
-  private extendCheck = (
-    createdBooking: Booking,
-    extendedBooking: Booking
-  ): string[] => {
-    return [
-      extendedBooking.status === BookingStatus.ON_HOLD
+  private cancellationCheck = (data: ScenarioHelperData<Booking>): string[] => {
+    const booking = data.response.data.body;
+    const reqBody = data.request.body as any;
+    const errors = [
+      booking.cancellation.reason === reqBody.reason
         ? null
-        : "Booking status is not ON_HOLD",
-      createdBooking.utcExpiresAt < extendedBooking.utcExpiresAt
+        : "Reason was not provided",
+      booking.status === BookingStatus.CANCELLED
         ? null
-        : "Booking expire time was not extended",
-    ].filter(Boolean);
+        : `Booking status should be CANCELLED. Returned value was ${booking.status}`,
+    ];
+    return errors.filter(Boolean);
   };
 
-  public validateBookingExtend = (
+  public validateBookingCancellation = (
     data: ScenarioHelperData<Booking>,
     configData: ScenarioConfigData,
     createdBooking: Booking
@@ -51,10 +51,10 @@ export class BookingExtendScenarioHelper {
     }
 
     const checkErrors = [
-      ...this.extendCheck(createdBooking, data.response.data.body),
+      ...this.cancellationCheck(data),
       ...this.bookingScenarioHelper.bookingCheck({
-        newBooking: createdBooking,
-        oldBooking: data.response.data.body,
+        newBooking: data.response.data.body,
+        oldBooking: createdBooking,
         configData,
       }),
     ];
@@ -82,7 +82,7 @@ export class BookingExtendScenarioHelper {
     });
   };
 
-  public validateBookingReservationError = (
+  public validateBookingConfirmationError = (
     data: ScenarioHelperData<Booking>,
     error: string,
     validator: ModelValidator

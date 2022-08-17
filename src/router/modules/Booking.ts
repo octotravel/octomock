@@ -1,7 +1,9 @@
 import Router from "@koa/router";
 import {
+  cancelBookingBodySchema,
   confirmBookingBodySchema,
   extendBookingBodySchema,
+  updateBookingBodySchema,
 } from "@octocloud/types";
 import { BookingController } from "./../../controllers/BookingController";
 import { getCapabilities } from "../common";
@@ -56,12 +58,17 @@ bookingRouter.post("/bookings/:uuid/confirm", async (ctx, _) => {
 
 bookingRouter.patch("/bookings/:uuid", async (ctx, _) => {
   const capabilities = getCapabilities(ctx);
-  ctx.body = {
-    ...ctx.request.body,
+
+  await updateBookingBodySchema.validate(ctx.request.body);
+  const reqBody = updateBookingBodySchema.cast(ctx.request.body);
+
+  const data = {
+    ...reqBody,
     uuid: ctx.params.uuid,
   };
-  await updateBookingSchema.validate(ctx.body);
-  const schema = updateBookingSchema.cast(ctx.body);
+
+  await updateBookingSchema.validate(data);
+  const schema = updateBookingSchema.cast(data);
 
   const booking = await bookingController.updateBooking(schema, capabilities);
   ctx.body = booking;
@@ -89,12 +96,18 @@ bookingRouter.post("/bookings/:uuid/extend", async (ctx, _) => {
 
 bookingRouter.post("/bookings/:uuid/cancel", async (ctx, _) => {
   const capabilities = getCapabilities(ctx);
-  ctx.body = {
-    ...ctx.request.body,
+
+  await cancelBookingBodySchema.validate(ctx.request.body);
+  const reqBody = cancelBookingBodySchema.cast(ctx.request.body);
+
+  const data = {
+    ...reqBody,
     uuid: ctx.params.uuid,
   };
-  await cancelBookingSchema.validate(ctx.body);
-  const schema = cancelBookingSchema.cast(ctx.body);
+
+  await cancelBookingSchema.validate(data);
+  const schema = cancelBookingSchema.cast(data);
+
   const booking = await bookingController.cancelBooking(schema, capabilities);
   ctx.body = booking;
   ctx.toJSON();
@@ -102,12 +115,17 @@ bookingRouter.post("/bookings/:uuid/cancel", async (ctx, _) => {
 
 bookingRouter.delete("/bookings/:uuid", async (ctx, _) => {
   const capabilities = getCapabilities(ctx);
-  ctx.body = {
-    ...ctx.request.body,
+
+  await cancelBookingBodySchema.validate(ctx.request.body);
+  const reqBody = cancelBookingBodySchema.cast(ctx.request.body);
+
+  const data = {
+    ...reqBody,
     uuid: ctx.params.uuid,
   };
-  await cancelBookingSchema.validate(ctx.body);
-  const schema = cancelBookingSchema.cast(ctx.body);
+
+  await cancelBookingSchema.validate(data);
+  const schema = cancelBookingSchema.cast(data);
 
   const booking = await bookingController.cancelBooking(schema, capabilities);
   ctx.body = booking;

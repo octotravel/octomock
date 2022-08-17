@@ -1,44 +1,57 @@
-import { Booking, CapabilityId, DeliveryMethod } from "@octocloud/types";
+import {
+  Booking,
+  BookingContactSchema,
+  CapabilityId,
+  DeliveryMethod,
+} from "@octocloud/types";
 import { ApiClient } from "../../../ApiClient";
 import { Scenario } from "../../Scenario";
-import { BookingCancellationScenarioHelper } from "../../../helpers/BookingCancellationScenarioHelper";
+import { BookingUpdateScenarioHelper } from "../../../helpers/BookingUpdateScenarioHelper";
 
-export class BookingCancellationScenario implements Scenario<Booking> {
+export class BookingUpdateContactScenario implements Scenario<Booking> {
   private apiClient: ApiClient;
   private uuid: string;
   private capabilities: CapabilityId[];
   private deliveryMethods: DeliveryMethod[];
   private booking: Booking;
+  private contact: BookingContactSchema;
+  private notes: string;
   constructor({
     apiClient,
     uuid,
     capabilities,
     deliveryMethods,
     booking,
+    contact,
+    notes,
   }: {
     apiClient: ApiClient;
     uuid: string;
     capabilities: CapabilityId[];
     deliveryMethods: DeliveryMethod[];
     booking: Booking;
+    contact: BookingContactSchema;
+    notes: string;
   }) {
     this.apiClient = apiClient;
     this.uuid = uuid;
     this.capabilities = capabilities;
     this.deliveryMethods = deliveryMethods;
     this.booking = booking;
+    this.contact = contact;
+    this.notes = notes;
   }
-  private bookingCancellationScenarioHelper =
-    new BookingCancellationScenarioHelper();
+  private bookingUpdateScenarioHelper = new BookingUpdateScenarioHelper();
 
   public validate = async () => {
-    const result = await this.apiClient.cancelBooking({
+    const result = await this.apiClient.bookingUpdate({
       uuid: this.uuid,
-      reason: "Reason for cancellation",
+      contact: this.contact,
+      notes: this.notes,
     });
-    const name = `Booking Cancellation - Reservation`;
+    const name = `Booking Update - Contact`;
 
-    return this.bookingCancellationScenarioHelper.validateBookingCancellation(
+    return this.bookingUpdateScenarioHelper.validateBookingUpdate(
       {
         ...result,
         name,

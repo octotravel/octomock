@@ -65,7 +65,7 @@ export class AvailabilityCalendarScenarioHelper {
     }
 
     if (R.isEmpty(data.response.data.body)) {
-      const rtest = this.scenarioHelper.handleResult({
+      return this.scenarioHelper.handleResult({
         ...data,
         success: false,
         errors: [
@@ -74,8 +74,6 @@ export class AvailabilityCalendarScenarioHelper {
           },
         ],
       });
-      console.log(rtest);
-      return rtest;
     }
     if (this.checkAvailabilityStatus(data.response.data.body)) {
       return this.scenarioHelper.handleResult({

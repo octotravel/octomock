@@ -24,6 +24,17 @@ export class BookingReservationScenarioHelper {
   };
 
   private reservationCheck = (data: ScenarioHelperData<Booking>): string[] => {
+    const unitIdCheck =
+      data.response.data.body.unitItems.length ===
+      data.request.body.unitItems.length
+        ? data.response.data.body.unitItems
+            .map((unitItem) => {
+              return data.request.body.unitItems
+                .map((item) => item.unitId)
+                .includes(unitItem.unitId);
+            })
+            .every((status) => status)
+        : false;
     const booking = data.response.data.body;
     return [
       booking.notes === data.request.body.notes
@@ -32,6 +43,7 @@ export class BookingReservationScenarioHelper {
       booking.status === BookingStatus.ON_HOLD
         ? null
         : `Booking status should be ON_HOLD. Returned value was ${booking.status}`,
+      unitIdCheck ? null : "UnitIds are not matching",
     ].filter(Boolean);
   };
 
@@ -49,11 +61,11 @@ export class BookingReservationScenarioHelper {
 
     const checkErrors = [
       ...this.reservationCheck(data),
-      ...this.bookingScenarioHelper.bookingCheck(
-        data.response.data.body,
-        data.request.body,
-        configData
-      ),
+      ...this.bookingScenarioHelper.bookingCheck({
+        newBooking: data.response.data.body,
+        oldBooking: data.request.body,
+        configData,
+      }),
     ];
 
     if (!R.isEmpty(checkErrors)) {

@@ -1,9 +1,4 @@
-import {
-  Booking,
-  BookingStatus,
-  CapabilityId,
-  DeliveryMethod,
-} from "@octocloud/types";
+import { Booking, CapabilityId, DeliveryMethod } from "@octocloud/types";
 import R from "ramda";
 import { BookingValidator } from "../../../validators/backendValidator/Booking/BookingValidator";
 import {
@@ -17,7 +12,7 @@ import {
   ScenarioHelperData,
 } from "./ScenarioHelper";
 
-export class BookingConfirmationScenarioHelper {
+export class BookingUpdateScenarioHelper {
   private scenarioHelper = new ScenarioHelper();
   private bookingScenarioHelper = new BookingScenarioHelper();
 
@@ -28,57 +23,92 @@ export class BookingConfirmationScenarioHelper {
     return new BookingValidator({ capabilities }).validate(booking);
   };
 
-  private confirmationCheck = (
+  private updateCheck = (
     data: ScenarioHelperData<Booking>,
     oldBooking: Booking,
-    deliveryMethods: DeliveryMethod[]
+    _deliveryMethods: DeliveryMethod[]
   ): string[] => {
     const booking = data.response.data.body;
     const reqBody = data.request.body;
-    const checkContact =
-      booking.contact.firstName === reqBody.contact.firstName &&
-      booking.contact.fullName === reqBody.contact.fullName &&
-      booking.contact.lastName === reqBody.contact.lastName &&
-      booking.contact.emailAddress === reqBody.contact.emailAddress &&
-      booking.contact.notes === reqBody.contact.notes;
+    let errors = [];
 
-    let errors = [
-      checkContact ? null : "Contact was not updated",
-      booking.status === BookingStatus.CONFIRMED
-        ? null
-        : `Booking status should be CONFIRMED. Returned value was ${booking.status}`,
-      booking.resellerReference === reqBody.resellerReference
-        ? null
-        : "Reseller reference was not updated",
-    ];
-
-    if (!data.request.body.unitItems) {
+    if (!reqBody.unitItems) {
       errors = [
         ...errors,
         booking.unitItems.length === oldBooking.unitItems.length
           ? null
           : "UnitItems count is not matching",
       ];
+    } else {
+      const unitIdCheck =
+        booking.unitItems.length === reqBody.unitItems.length
+          ? booking.unitItems
+              .map((unitItem) => {
+                return reqBody.unitItems
+                  .map((item) => item.unitId)
+                  .includes(unitItem.unitId);
+              })
+              .every((status) => status)
+          : false;
+      errors = [...errors, unitIdCheck ? null : "UnitIds are not matching"];
     }
 
-    if (deliveryMethods.includes(DeliveryMethod.VOUCHER)) {
+    if (reqBody.availabilityId) {
       errors = [
         ...errors,
-        !R.isEmpty(booking.voucher.deliveryOptions)
+        booking.availabilityId === reqBody.availabilityId
           ? null
-          : "Voucher is missing",
+          : "AvailabilityId was not updated",
+        booking.availability.id === reqBody.availabilityId
+          ? null
+          : "Availability was not updated",
       ];
     }
-    if (deliveryMethods.includes(DeliveryMethod.TICKET)) {
-      const tickets = booking.unitItems.reduce((acc, unit) => {
-        return [...acc, ...unit.ticket.deliveryOptions];
-      }, []);
-      errors = [...errors, !R.isEmpty(tickets) ? null : "Tickets are missing"];
+
+    if (reqBody.contact) {
+      const contactCheck = [
+        reqBody.contact.fullName
+          ? reqBody.contact.fullName === booking.contact.fullName
+          : null,
+        reqBody.contact.firstName
+          ? reqBody.contact.firstName === booking.contact.firstName
+          : null,
+        reqBody.contact.lastName
+          ? reqBody.contact.lastName === booking.contact.lastName
+          : null,
+        reqBody.contact.emailAddress
+          ? reqBody.contact.emailAddress === booking.contact.emailAddress
+          : null,
+        reqBody.contact.phoneNumber
+          ? reqBody.contact.phoneNumber === booking.contact.phoneNumber
+          : null,
+        reqBody.contact.country
+          ? reqBody.contact.country === booking.contact.country
+          : null,
+        reqBody.contact.notes
+          ? reqBody.contact.notes === booking.contact.notes
+          : null,
+        reqBody.contact.locales
+          ? reqBody.contact.locales
+              .map((locale) => booking.contact.locales.includes(locale))
+              .every((status) => status)
+          : null,
+      ]
+        .filter((field) => field !== null)
+        .every((status) => status);
+      errors = [...errors, contactCheck ? null : "Contact was not updated"];
+    }
+
+    if (reqBody.notes) {
+      errors = [
+        ...errors,
+        reqBody.notes === booking.notes ? null : "Notes was not updated",
+      ];
     }
     return errors.filter(Boolean);
   };
 
-  public validateBookingConfirmation = (
+  public validateBookingUpdate = (
     data: ScenarioHelperData<Booking>,
     configData: ScenarioConfigData,
     createdBooking: Booking
@@ -92,11 +122,7 @@ export class BookingConfirmationScenarioHelper {
     }
 
     const checkErrors = [
-      ...this.confirmationCheck(
-        data,
-        createdBooking,
-        configData.deliveryMethods
-      ),
+      ...this.updateCheck(data, createdBooking, configData.deliveryMethods),
       ...this.bookingScenarioHelper.bookingCheck({
         newBooking: data.response.data.body,
         oldBooking: createdBooking,
