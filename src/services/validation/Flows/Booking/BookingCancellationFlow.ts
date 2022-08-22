@@ -5,7 +5,9 @@ import { ApiClient } from "../../ApiClient";
 import { Config } from "../../config/Config";
 import { ScenarioResult } from "../../Scenarios/Scenario";
 import { FlowResult } from "../Flow";
-import { BookingCancellationScenario } from "../../Scenarios/Booking/Cancellation/BookingCancellation";
+import { BookingCancellationReservationScenario } from "../../Scenarios/Booking/Cancellation/BookingCancellationReservation";
+import { BookingCancellationBookingScenario } from "../../Scenarios/Booking/Cancellation/BookingCancellationBooking";
+import { BookingCancellationInvalidUUIDScenario } from "../../Scenarios/Booking/Cancellation/BookingCancellationInvalidUUID";
 
 export class BookingCancellationFlow {
   private config: Config;
@@ -79,7 +81,11 @@ export class BookingCancellationFlow {
   public validate = async (): Promise<FlowResult> => {
     await this.setOptionIds();
 
-    const scenarios = [...(await this.validateBookingCancellation())];
+    const scenarios = [
+      ...(await this.validateBookingCancellationReservation()),
+      ...(await this.validateBookingCancellationBooking()),
+      await this.validateBookingCancellationInvalidUUID(),
+    ];
 
     const results = [];
     for await (const scenario of scenarios) {
@@ -92,8 +98,8 @@ export class BookingCancellationFlow {
     return this.setFlow(results);
   };
 
-  private validateBookingCancellation = async (): Promise<
-    BookingCancellationScenario[]
+  private validateBookingCancellationReservation = async (): Promise<
+    BookingCancellationReservationScenario[]
   > => {
     return Promise.all(
       this.config.getProductConfigs().map(async (availabilityConfig) => {
@@ -136,7 +142,7 @@ export class BookingCancellationFlow {
             ],
           })
         ).response.data.body;
-        return new BookingCancellationScenario({
+        return new BookingCancellationReservationScenario({
           apiClient: this.apiClient,
           uuid: booking.uuid,
           capabilities: this.config.capabilities,
@@ -147,82 +153,76 @@ export class BookingCancellationFlow {
     );
   };
 
-  //   private validateBookingConfirmationUnitItemsUpdate = async (): Promise<
-  //   BookingConfirmationUnitItemUpdateScenario[]
-  // > => {
-  //   return Promise.all(
-  //     this.config.getProductConfigs().map(async (availabilityConfig) => {
-  //       const availability = (
-  //         await this.apiClient.getAvailability({
-  //           productId: availabilityConfig.productId,
-  //           optionId:
-  //             availabilityConfig.availabilityType ===
-  //             AvailabilityType.OPENING_HOURS
-  //               ? this.optionIdOpeningHours
-  //               : this.optionIdStartTimes,
-  //           localDateStart: availabilityConfig.available.from,
-  //           localDateEnd: availabilityConfig.available.to,
-  //         })
-  //       ).response;
-  //       if (R.isEmpty(availability.data) && !availability.error) {
-  //         throw new BadRequestError("Invalid available dates!");
-  //       }
-  //       const product = (
-  //         await this.apiClient.getProduct({
-  //           id: availabilityConfig.productId,
-  //         })
-  //       ).response.data.body;
-  //       const booking = (
-  //         await this.apiClient.bookingReservation({
-  //           productId: availabilityConfig.productId,
-  //           optionId:
-  //             availabilityConfig.availabilityType ===
-  //             AvailabilityType.OPENING_HOURS
-  //               ? this.optionIdOpeningHours
-  //               : this.optionIdStartTimes,
-  //           availabilityId: availability.data.body[0].id,
-  //           unitItems: [
-  //             {
-  //               unitId: product.options[0].units[0].id,
-  //             },
-  //             {
-  //               unitId: product.options[0].units[0].id,
-  //             },
-  //           ],
-  //         })
-  //       ).response.data.body;
-  //       return new BookingConfirmationUnitItemUpdateScenario({
-  //         apiClient: this.apiClient,
-  //         uuid: booking.uuid,
-  //         capabilities: this.config.capabilities,
-  //         availabilityType: availabilityConfig.availabilityType,
-  //         deliveryMethods: availabilityConfig.deliveryMethods,
-  //         unitItems: [
-  //           {
-  //             unitId: product.options[0].units[0].id,
-  //           },
-  //           {
-  //             unitId: product.options[0].units[0].id,
-  //           },
-  //           {
-  //             unitId: product.options[0].units[0].id,
-  //           },
-  //           {
-  //             unitId: product.options[0].units[0].id,
-  //           },
-  //         ],
-  //         booking,
-  //       });
-  //     }))
-  //   };
+  private validateBookingCancellationBooking = async (): Promise<
+    BookingCancellationBookingScenario[]
+  > => {
+    return Promise.all(
+      this.config.getProductConfigs().map(async (availabilityConfig) => {
+        const availability = (
+          await this.apiClient.getAvailability({
+            productId: availabilityConfig.productId,
+            optionId:
+              availabilityConfig.availabilityType ===
+              AvailabilityType.OPENING_HOURS
+                ? this.optionIdOpeningHours
+                : this.optionIdStartTimes,
+            localDateStart: availabilityConfig.available.from,
+            localDateEnd: availabilityConfig.available.to,
+          })
+        ).response;
+        if (R.isEmpty(availability.data) && !availability.error) {
+          throw new BadRequestError("Invalid available dates!");
+        }
+        const product = (
+          await this.apiClient.getProduct({
+            id: availabilityConfig.productId,
+          })
+        ).response.data.body;
+        const booking = (
+          await this.apiClient.bookingReservation({
+            productId: availabilityConfig.productId,
+            optionId:
+              availabilityConfig.availabilityType ===
+              AvailabilityType.OPENING_HOURS
+                ? this.optionIdOpeningHours
+                : this.optionIdStartTimes,
+            availabilityId: availability.data.body[0].id,
+            unitItems: [
+              {
+                unitId: product.options[0].units[0].id,
+              },
+              {
+                unitId: product.options[0].units[0].id,
+              },
+            ],
+          })
+        ).response.data.body;
+        const bookingConfirmed = (
+          await this.apiClient.bookingConfirmation({
+            uuid: booking.uuid,
+            contact: {
+              fullName: "John Doe",
+            },
+          })
+        ).response.data.body;
+        return new BookingCancellationBookingScenario({
+          apiClient: this.apiClient,
+          uuid: bookingConfirmed.uuid,
+          capabilities: this.config.capabilities,
+          deliveryMethods: availabilityConfig.deliveryMethods,
+          booking: bookingConfirmed,
+        });
+      })
+    );
+  };
 
-  //   private validateBookingInvalidUUIDError = async (): Promise<BookingConfirmationInvalidUUIDScenario
-  //   > => {
-  //     return new BookingConfirmationInvalidUUIDScenario({
-  //       apiClient: this.apiClient,
-  //       uuid: "Invalid UUID",
-  //       contact: {},
-  //       capabilities: this.config.capabilities,
-  //     });
-  //   };
+  private validateBookingCancellationInvalidUUID =
+    async (): Promise<BookingCancellationInvalidUUIDScenario> => {
+      return new BookingCancellationInvalidUUIDScenario({
+        apiClient: this.apiClient,
+        uuid: "Invalid UUID",
+        contact: {},
+        capabilities: this.config.capabilities,
+      });
+    };
 }

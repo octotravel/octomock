@@ -194,7 +194,6 @@ export class BookingBuilder {
     booking: BookingModel,
     schema: CancelBookingSchema
   ): BookingModel {
-    console.log(schema);
     const status = BookingStatus.CANCELLED;
     const cancellation = {
       refund: "FULL",

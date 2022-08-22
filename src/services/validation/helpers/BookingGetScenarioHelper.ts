@@ -1,20 +1,18 @@
-import { Booking, BookingStatus, CapabilityId } from "@octocloud/types";
+import { Booking, CapabilityId } from "@octocloud/types";
 import R from "ramda";
 import { BookingValidator } from "../../../validators/backendValidator/Booking/BookingValidator";
 import {
   ModelValidator,
   ValidatorError,
 } from "../../../validators/backendValidator/ValidatorHelpers";
-import { BookingScenarioHelper } from "./BookingScenarioHelper";
 import {
   ScenarioConfigData,
   ScenarioHelper,
   ScenarioHelperData,
 } from "./ScenarioHelper";
 
-export class BookingCancellationScenarioHelper {
+export class BookingGetScenarioHelper {
   private scenarioHelper = new ScenarioHelper();
-  private bookingScenarioHelper = new BookingScenarioHelper();
 
   private getErrors = (
     booking: any,
@@ -23,52 +21,15 @@ export class BookingCancellationScenarioHelper {
     return new BookingValidator({ capabilities }).validate(booking);
   };
 
-  private cancellationCheck = (data: ScenarioHelperData<Booking>): string[] => {
-    const booking = data.response.data.body;
-    const reqBody = data.request.body as any;
-    const errors = [
-      booking.cancellation.reason === reqBody.reason
-        ? null
-        : "Reason was not provided",
-      booking.status === BookingStatus.CANCELLED
-        ? null
-        : `Booking status should be CANCELLED. Returned value was ${booking.status}`,
-      R.isEmpty(booking.unitItems) ? null : "UnitItems should be empty",
-    ];
-    return errors.filter(Boolean);
-  };
-
-  public validateBookingCancellation = (
+  public validateBookingGet = (
     data: ScenarioHelperData<Booking>,
-    configData: ScenarioConfigData,
-    createdBooking: Booking
+    configData: ScenarioConfigData
   ) => {
     if (data.response.error) {
       return this.scenarioHelper.handleResult({
         ...data,
         success: false,
         errors: [],
-      });
-    }
-
-    const checkErrors = [
-      ...this.cancellationCheck(data),
-      ...this.bookingScenarioHelper.bookingCheck({
-        newBooking: data.response.data.body,
-        oldBooking: createdBooking,
-        configData,
-      }),
-    ];
-
-    if (!R.isEmpty(checkErrors)) {
-      return this.scenarioHelper.handleResult({
-        ...data,
-        success: false,
-        errors: checkErrors.map((error) => {
-          return {
-            message: error,
-          };
-        }),
       });
     }
 
@@ -83,7 +44,7 @@ export class BookingCancellationScenarioHelper {
     });
   };
 
-  public validateBookingCancellationError = (
+  public validateBookingGetError = (
     data: ScenarioHelperData<Booking>,
     error: string,
     validator: ModelValidator

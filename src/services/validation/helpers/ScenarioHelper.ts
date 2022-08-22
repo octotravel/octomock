@@ -18,6 +18,8 @@ export interface ScenarioHelperData<T> {
 export interface ScenarioConfigData {
   capabilities?: CapabilityId[];
   deliveryMethods?: DeliveryMethod[];
+  supplierReference?: string;
+  resellerReference?: string;
 }
 
 export class ScenarioHelper {

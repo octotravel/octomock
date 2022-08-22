@@ -3,7 +3,7 @@ import { ApiClient } from "../../../ApiClient";
 import { Scenario } from "../../Scenario";
 import { BookingCancellationScenarioHelper } from "../../../helpers/BookingCancellationScenarioHelper";
 
-export class BookingCancellationScenario implements Scenario<Booking> {
+export class BookingCancellationBookingScenario implements Scenario<Booking> {
   private apiClient: ApiClient;
   private uuid: string;
   private capabilities: CapabilityId[];
@@ -36,7 +36,7 @@ export class BookingCancellationScenario implements Scenario<Booking> {
       uuid: this.uuid,
       reason: "Reason for cancellation",
     });
-    const name = `Booking Cancellation - Reservation`;
+    const name = `Booking Cancellation - Booking`;
 
     return this.bookingCancellationScenarioHelper.validateBookingCancellation(
       {

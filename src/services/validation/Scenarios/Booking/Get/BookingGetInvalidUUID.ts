@@ -2,9 +2,9 @@ import { BookingContactSchema, CapabilityId } from "@octocloud/types";
 import { ApiClient } from "../../../ApiClient";
 import { Scenario } from "../../Scenario";
 import { InvalidBookingUUIDErrorValidator } from "../../../../../validators/backendValidator/Error/InvalidBookingUUIDErrorValidator";
-import { BookingConfirmationScenarioHelper } from "../../../helpers/BookingConfirmationScenarioHelper";
+import { BookingGetScenarioHelper } from "../../../helpers/BookingGetScenarioHelper";
 
-export class BookingConfirmationInvalidUUIDScenario implements Scenario<null> {
+export class BookingGetInvalidUUIDScenario implements Scenario<null> {
   private apiClient: ApiClient;
   private uuid: string;
   private contact: BookingContactSchema;
@@ -22,8 +22,7 @@ export class BookingConfirmationInvalidUUIDScenario implements Scenario<null> {
     this.contact = contact;
     this.uuid = uuid;
   }
-  private bookingConfirmationScenarioHelper =
-    new BookingConfirmationScenarioHelper();
+  private bookingGetScenarioHelper = new BookingGetScenarioHelper();
 
   public validate = async () => {
     const result = await this.apiClient.bookingConfirmation({
@@ -31,11 +30,10 @@ export class BookingConfirmationInvalidUUIDScenario implements Scenario<null> {
       contact: this.contact,
     });
 
-    const name =
-      "Booking Confirmation Invalid Booking UUID (400 INVALID_BOOKING_UUID)";
+    const name = "Get Booking Invalid Booking UUID (400 INVALID_BOOKING_UUID)";
     const error = "Response should be INVALID_BOOKING_UUID";
 
-    return this.bookingConfirmationScenarioHelper.validateBookingConfirmationError(
+    return this.bookingGetScenarioHelper.validateBookingGetError(
       {
         ...result,
         name,
