@@ -132,18 +132,19 @@ export class BookingController implements IBookingController {
     }
 
     if (
-      schema.productId &&
-      schema.optionId &&
-      schema.availabilityId &&
-      schema.unitItems
+      schema.availabilityId ||
+      (schema.productId &&
+        schema.optionId &&
+        schema.availabilityId &&
+        schema.unitItems)
     ) {
       const rebookedBookingModel = await this.createBookingModel(
         {
           ...schema,
-          productId: schema.productId,
-          optionId: schema.optionId,
+          productId: schema.productId ?? booking.product.id,
+          optionId: schema.optionId ?? booking.option.id,
           availabilityId: schema.availabilityId,
-          unitItems: schema.unitItems,
+          unitItems: schema.unitItems ?? booking.getUnitItems(),
         },
         capabilities
       );
