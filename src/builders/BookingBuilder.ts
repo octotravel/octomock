@@ -48,16 +48,7 @@ export class BookingBuilder {
       );
     }
 
-    const voucherAvailabile = data.product.deliveryMethods.includes(
-      DeliveryMethod.VOUCHER
-    );
-    const voucher = voucherAvailabile
-      ? {
-          redemptionMethod: data.product.redemptionMethod,
-          utcRedeemedAt: null,
-          deliveryOptions: [],
-        }
-      : null;
+    const voucher = this.createVoucher(data.product);
 
     const bookingModel = new BookingModel({
       id: DataGenerator.generateUUID(),
@@ -100,14 +91,14 @@ export class BookingBuilder {
       option: booking.option.setOnBooking(),
       availability: booking.availability,
       contact: this.updateContact({ booking, contact: schema.contact }),
-      unitItemModels: this.generateTickets(booking, schema),
+      unitItemModels: this.generateTickets(booking, schema.unitItems),
       utcCreatedAt: booking.utcCreatedAt,
       utcUpdatedAt: DateHelper.utcDateFormat(new Date()),
       utcExpiresAt: null,
       utcRedeemedAt: null,
       utcConfirmedAt: DateHelper.utcDateFormat(new Date()),
       notes: schema.notes ?? booking.notes,
-      voucher: this.generateVoucher(booking),
+      voucher: this.getVoucher(booking, status),
     });
 
     return bookingModel;
@@ -115,7 +106,8 @@ export class BookingBuilder {
 
   updateBooking(
     booking: BookingModel,
-    schema: UpdateBookingSchema
+    schema: UpdateBookingSchema,
+    rebookedBooking?: BookingModel
   ): BookingModel {
     const status = booking.status;
 
@@ -126,26 +118,27 @@ export class BookingBuilder {
       );
     }
 
-    const unitItemModels = schema.unitItems
-      ? schema.unitItems.map((item) =>
-          this.buildUnitItem(
-            item,
-            status,
-            booking.option,
-            booking.deliveryMethods
-          )
-        )
-      : booking.unitItemModels;
+    const unitItemModels = this.updateUnitItems(
+      booking,
+      schema,
+      rebookedBooking
+    );
     const bookingModel = new BookingModel({
       id: booking.id,
       uuid: booking.uuid,
       resellerReference: schema.resellerReference ?? booking.resellerReference,
       supplierReference: booking.supplierReference,
       status,
-      product: booking.product.setOnBooking(),
-      option: booking.option.setOnBooking(),
-      availability: booking.availability,
-      contact: this.updateContact({ booking, contact: schema.contact }),
+      product:
+        rebookedBooking?.product.setOnBooking() ??
+        booking.product.setOnBooking(),
+      option:
+        rebookedBooking?.option.setOnBooking() ?? booking.option.setOnBooking(),
+      availability: rebookedBooking?.availability ?? booking.availability,
+      contact: this.updateContact({
+        booking: rebookedBooking ?? booking,
+        contact: schema.contact,
+      }),
       unitItemModels,
       utcCreatedAt: booking.utcCreatedAt,
       utcUpdatedAt: DateHelper.utcDateFormat(new Date()),
@@ -153,11 +146,25 @@ export class BookingBuilder {
       utcRedeemedAt: null,
       utcConfirmedAt: booking.utcConfirmedAt,
       notes: schema.notes ?? booking.notes,
-      voucher: booking.voucher,
+      voucher: this.getVoucher(rebookedBooking ?? booking, status),
     });
 
     return bookingModel;
   }
+
+  private updateUnitItems = (
+    booking: BookingModel,
+    schema: UpdateBookingSchema,
+    rebookedBooking?: BookingModel
+  ): UnitItemModel[] => {
+    if (schema.unitItems) {
+      return booking.status === BookingStatus.CONFIRMED
+        ? this.generateTickets(rebookedBooking ?? booking, schema.unitItems)
+        : this.buildUnitItems(booking, schema.unitItems);
+    }
+
+    return rebookedBooking.unitItemModels ?? booking.unitItemModels;
+  };
 
   extendBooking(
     booking: BookingModel,
@@ -184,11 +191,38 @@ export class BookingBuilder {
       utcRedeemedAt: null,
       utcConfirmedAt: null,
       notes: booking.notes,
-      voucher: booking.voucher,
+      voucher: this.getVoucher(booking, status),
     });
 
     return bookingModel;
   }
+
+  private getVoucher = (
+    booking: BookingModel,
+    status: BookingStatus
+  ): Ticket => {
+    if (status === BookingStatus.CONFIRMED) {
+      return this.generateVoucher(booking);
+    }
+    if (status === BookingStatus.CANCELLED) {
+      return this.createVoucher(booking.product);
+    }
+
+    return booking.voucher;
+  };
+
+  private createVoucher = (product: ProductModel): Nullable<Ticket> => {
+    const voucherAvailabile = product.deliveryMethods.includes(
+      DeliveryMethod.VOUCHER
+    );
+    return voucherAvailabile
+      ? {
+          redemptionMethod: product.redemptionMethod,
+          utcRedeemedAt: null,
+          deliveryOptions: [],
+        }
+      : null;
+  };
 
   cancelBooking(
     booking: BookingModel,
@@ -200,17 +234,6 @@ export class BookingBuilder {
       reason: schema.reason ?? null,
       utcCancelledAt: DateHelper.utcDateFormat(new Date()),
     };
-
-    const voucherAvailabile = booking.product.deliveryMethods.includes(
-      DeliveryMethod.VOUCHER
-    );
-    const voucher = voucherAvailabile
-      ? {
-          redemptionMethod: booking.product.redemptionMethod,
-          utcRedeemedAt: null,
-          deliveryOptions: [],
-        }
-      : null;
 
     const bookingModel = new BookingModel({
       id: booking.id,
@@ -229,7 +252,7 @@ export class BookingBuilder {
       utcRedeemedAt: null,
       utcConfirmedAt: booking.utcConfirmedAt,
       notes: booking.notes,
-      voucher,
+      voucher: this.getVoucher(booking, status),
       cancellation,
       cancellable: false,
     });
@@ -239,18 +262,9 @@ export class BookingBuilder {
 
   private generateTickets = (
     booking: BookingModel,
-    schema: ConfirmBookingSchema
+    unitItems: BookingUnitItemSchema[]
   ): UnitItemModel[] => {
-    const unitItemModel = schema.unitItems
-      ? schema.unitItems.map((item) =>
-          this.buildUnitItem(
-            item,
-            booking.status,
-            booking.option,
-            booking.deliveryMethods
-          )
-        )
-      : booking.unitItemModels;
+    const unitItemModel = this.buildUnitItems(booking, unitItems);
     if (booking.deliveryMethods.includes(DeliveryMethod.TICKET)) {
       return unitItemModel.map((item) => {
         const deliveryOptions = [];
@@ -274,6 +288,22 @@ export class BookingBuilder {
         return item.updateTicket(ticket);
       });
     }
+  };
+
+  private buildUnitItems = (
+    booking: BookingModel,
+    unitItems: BookingUnitItemSchema[]
+  ) => {
+    return unitItems
+      ? unitItems.map((item) =>
+          this.buildUnitItem(
+            item,
+            booking.status,
+            booking.option,
+            booking.deliveryMethods
+          )
+        )
+      : booking.unitItemModels;
   };
 
   private generateVoucher = (booking: BookingModel): Nullable<Ticket> => {

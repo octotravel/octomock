@@ -20,6 +20,7 @@ import { ProductService } from "./../services/ProductService";
 import { BookingService } from "../services/BookingService";
 import { BookingBuilder } from "../builders/BookingBuilder";
 import R from "ramda";
+import { BookingModel } from "../models/Booking";
 
 interface IBookingController {
   createBooking(
@@ -62,6 +63,17 @@ export class BookingController implements IBookingController {
     schema: CreateBookingSchema,
     capabilities: CapabilityId[]
   ): Promise<Booking> => {
+    const bookingModel = await this.createBookingModel(schema, capabilities);
+    const createdBookingModel = await this.bookingService.createBooking(
+      bookingModel
+    );
+    return createdBookingModel.toPOJO({ useCapabilities: true, capabilities });
+  };
+
+  private createBookingModel = async (
+    schema: CreateBookingSchema,
+    capabilities: CapabilityId[]
+  ): Promise<BookingModel> => {
     const product = this.productService.getProduct(schema.productId);
     const availability = await this.availabilityService.findBookingAvailability(
       {
@@ -87,11 +99,7 @@ export class BookingController implements IBookingController {
       },
       schema
     );
-
-    const createdBookingModel = await this.bookingService.createBooking(
-      bookingModel
-    );
-    return createdBookingModel.toPOJO({ useCapabilities: true, capabilities });
+    return bookingModel;
   };
 
   public confirmBooking = async (
@@ -122,11 +130,40 @@ export class BookingController implements IBookingController {
     if (booking.cancellable === false) {
       throw new UnprocessableEntityError("booking cannot be updated");
     }
+
+    if (
+      schema.productId &&
+      schema.optionId &&
+      schema.availabilityId &&
+      schema.unitItems
+    ) {
+      const rebookedBookingModel = await this.createBookingModel(
+        {
+          ...schema,
+          productId: schema.productId,
+          optionId: schema.optionId,
+          availabilityId: schema.availabilityId,
+          unitItems: schema.unitItems,
+        },
+        capabilities
+      );
+
+      const updatedBooking = this.bookingBuilder.updateBooking(
+        booking,
+        schema,
+        rebookedBookingModel
+      );
+      const bookingModel = await this.bookingService.updateBooking(
+        updatedBooking
+      );
+      return bookingModel.toPOJO({ useCapabilities: true, capabilities });
+    }
+
     this.checkRestricitons(booking.option, schema.unitItems);
 
-    const confirmedBooking = this.bookingBuilder.updateBooking(booking, schema);
+    const updatedBooking = this.bookingBuilder.updateBooking(booking, schema);
     const bookingModel = await this.bookingService.updateBooking(
-      confirmedBooking
+      updatedBooking
     );
     return bookingModel.toPOJO({ useCapabilities: true, capabilities });
   };
