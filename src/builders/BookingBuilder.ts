@@ -163,7 +163,7 @@ export class BookingBuilder {
         : this.buildUnitItems(booking, schema.unitItems);
     }
 
-    return rebookedBooking.unitItemModels ?? booking.unitItemModels;
+    return rebookedBooking?.unitItemModels ?? booking.unitItemModels;
   };
 
   extendBooking(
