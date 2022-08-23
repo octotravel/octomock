@@ -63,6 +63,13 @@ export class BookingUpdateScenarioHelper {
           ? null
           : "Availability was not updated",
       ];
+    } else {
+      errors = [
+        ...errors,
+        booking.availabilityId === oldBooking.availabilityId
+          ? null
+          : "AvailabilityId is not matching request",
+      ];
     }
 
     if (reqBody.contact) {

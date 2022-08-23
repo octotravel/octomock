@@ -9,7 +9,7 @@ import {
   ScenarioResult,
 } from "../../Scenarios/Scenario";
 import { FlowResult } from "../Flow";
-// import { BookingUpdateDateScenario } from "../../Scenarios/Booking/Update/BookingUpdateDate";
+import { BookingUpdateDateScenario } from "../../Scenarios/Booking/Update/BookingUpdateDate";
 import { BookingUpdateUnitItemsScenario } from "../../Scenarios/Booking/Update/BookingUpdateUnitItems";
 import { BookingUpdateContactScenario } from "../../Scenarios/Booking/Update/BookingUpdateContact";
 import { BookingUpdateProductScenario } from "../../Scenarios/Booking/Update/BookingUpdateProduct";
@@ -112,7 +112,7 @@ export class BookingUpdateFlow {
     await this.fetchData();
 
     let scenarios: Scenario<Booking>[] = [
-      // ...(await this.validateBookingUpdateDate()),
+      ...(await this.validateBookingUpdateDate()),
       ...(await this.validateBookingUpdateUnitItems()),
       ...(await this.validateBookingUpdateContact()),
     ];
@@ -132,41 +132,42 @@ export class BookingUpdateFlow {
     return this.setFlow(results);
   };
 
-  // private validateBookingUpdateDate = async (): Promise<BookingUpdateDateScenario[]
-  // > => {
-  //   return Promise.all(
-  //     this.config.getProductConfigs().map(async (productConfig) => {
-  //       const validateData =
-  //         productConfig.availabilityType === AvailabilityType.OPENING_HOURS
-  //           ? this.openingHours
-  //           : this.startTimes;
+  private validateBookingUpdateDate = async (): Promise<
+    BookingUpdateDateScenario[]
+  > => {
+    return Promise.all(
+      this.config.getProductConfigs().map(async (productConfig) => {
+        const validateData =
+          productConfig.availabilityType === AvailabilityType.OPENING_HOURS
+            ? this.openingHours
+            : this.startTimes;
 
-  //       const booking = (
-  //         await this.apiClient.bookingReservation({
-  //           productId: validateData.productId,
-  //           optionId: validateData.optionId,
-  //           availabilityId: validateData.availabilityFrom[0].id,
-  //           unitItems: [
-  //             {
-  //               unitId: validateData.product.options[0].units[0].id,
-  //             },
-  //             {
-  //               unitId: validateData.product.options[0].units[0].id,
-  //             },
-  //           ],
-  //         })
-  //       ).response.data.body;
-  //       return new BookingUpdateDateScenario({
-  //         apiClient: this.apiClient,
-  //         uuid: booking.uuid,
-  //         availabilityId: validateData.availabilityTo[0].id,
-  //         capabilities: this.config.capabilities,
-  //         deliveryMethods: productConfig.deliveryMethods,
-  //         booking,
-  //       });
-  //     })
-  //   );
-  // };
+        const booking = (
+          await this.apiClient.bookingReservation({
+            productId: validateData.productId,
+            optionId: validateData.optionId,
+            availabilityId: validateData.availabilityFrom[0].id,
+            unitItems: [
+              {
+                unitId: validateData.product.options[0].units[0].id,
+              },
+              {
+                unitId: validateData.product.options[0].units[0].id,
+              },
+            ],
+          })
+        ).response.data.body;
+        return new BookingUpdateDateScenario({
+          apiClient: this.apiClient,
+          uuid: booking.uuid,
+          availabilityId: validateData.availabilityTo[0].id,
+          capabilities: this.config.capabilities,
+          deliveryMethods: productConfig.deliveryMethods,
+          booking,
+        });
+      })
+    );
+  };
 
   private validateBookingUpdateUnitItems = async (): Promise<
     BookingUpdateUnitItemsScenario[]

@@ -39,9 +39,6 @@ export class BookingScenarioHelper {
         data.newBooking.optionId === data.oldBooking.optionId
           ? null
           : "OptionId is not matching request",
-        data.newBooking.availabilityId === data.oldBooking.availabilityId
-          ? null
-          : "AvailabilityId is not matching request",
       ];
     }
 
