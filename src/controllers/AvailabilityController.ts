@@ -25,11 +25,6 @@ export class AvailabilityController implements IAvailabilityController {
     const availability = models.map((m) => {
       return m.toPOJO({ useCapabilities: true, capabilities });
     });
-
-    // const validator = new AvailabilityValidator('', capabilities)
-    // availability.forEach(a => {
-    //   validator.validate(a)
-    // })
     return availability;
   };
 }

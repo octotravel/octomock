@@ -53,6 +53,9 @@ export class AvailabilityService implements IAvailabilityService {
         availabilities
       );
     }
+    if (schema.availabilityIds) {
+      return this.getAvailabilityIDs(schema.availabilityIds, availabilities);
+    }
     return [];
   };
 
@@ -84,6 +87,13 @@ export class AvailabilityService implements IAvailabilityService {
       throw new BadRequestError("not available");
     }
     return availability;
+  };
+
+  private getAvailabilityIDs = (
+    availabilityIds: string[],
+    availabilities: AvailabilityModel[]
+  ) => {
+    return availabilities.filter((a) => availabilityIds.includes(a.id));
   };
 
   private getSingleDate = (
