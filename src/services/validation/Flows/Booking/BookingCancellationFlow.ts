@@ -3,7 +3,7 @@ import R from "ramda";
 import { BadRequestError } from "../../../../models/Error";
 import { ApiClient } from "../../ApiClient";
 import { Config } from "../../config/Config";
-import { ScenarioResult } from "../../Scenarios/Scenario";
+import { BookingValidateData, ScenarioResult } from "../../Scenarios/Scenario";
 import { FlowResult } from "../Flow";
 import { BookingCancellationReservationScenario } from "../../Scenarios/Booking/Cancellation/BookingCancellationReservation";
 import { BookingCancellationBookingScenario } from "../../Scenarios/Booking/Cancellation/BookingCancellationBooking";
@@ -12,60 +12,59 @@ import { BookingCancellationInvalidUUIDScenario } from "../../Scenarios/Booking/
 export class BookingCancellationFlow {
   private config: Config;
   private apiClient: ApiClient;
-  private optionIdStartTimes: Nullable<string>;
-  private optionIdOpeningHours: Nullable<string>;
-
+  private startTimes: Nullable<BookingValidateData>;
+  private openingHours: Nullable<BookingValidateData>;
   constructor({ config }: { config: Config }) {
     this.config = config;
     this.apiClient = new ApiClient({
       url: config.url,
       capabilities: config.capabilities,
     });
-    this.optionIdStartTimes = null;
-    this.optionIdOpeningHours = null;
   }
 
-  private setOptionIds = async (): Promise<void> => {
-    const productStartTimes = {
-      productId: null,
-      optionId: null,
-    };
-    const productOpeningHours = {
-      productId: null,
-      optionId: null,
-    };
-    this.config.getProductConfigs().map((availabilityConfig) => {
-      if (availabilityConfig.availabilityType === AvailabilityType.START_TIME) {
-        productStartTimes.productId = availabilityConfig.productId;
-        productStartTimes.optionId = availabilityConfig.optionId;
-      }
-      if (
-        availabilityConfig.availabilityType === AvailabilityType.OPENING_HOURS
-      ) {
-        productOpeningHours.productId = availabilityConfig.productId;
-        productOpeningHours.optionId = availabilityConfig.optionId;
-      }
-    });
-    if (productStartTimes.productId) {
-      this.optionIdStartTimes = productStartTimes.productId
-        ? (
-            await this.apiClient.getProduct({ id: productStartTimes.productId })
-          ).response.data.body.options.find((option) => option.default).id
-        : null;
-    } else {
-      this.optionIdStartTimes = null;
-    }
-    if (productOpeningHours.productId) {
-      this.optionIdOpeningHours = productOpeningHours.productId
-        ? (
-            await this.apiClient.getProduct({
-              id: productOpeningHours.productId,
-            })
-          ).response.data.body.options.find((option) => option.default).id
-        : null;
-    } else {
-      this.optionIdOpeningHours = null;
-    }
+  private fetchData = async (): Promise<void> => {
+    await Promise.all(
+      this.config.getProductConfigs().map(async (productConfig) => {
+        const optionId =
+          productConfig.optionId ??
+          (
+            await this.apiClient.getProduct({ id: productConfig.productId })
+          ).response.data.body.options.find((option) => option.default).id;
+        const availability = await this.apiClient.getAvailability({
+          productId: productConfig.productId,
+          optionId: optionId,
+          localDateStart: productConfig.available.from,
+          localDateEnd: productConfig.available.to,
+        });
+        if (
+          R.isEmpty(availability.response.data.body) &&
+          !availability.response.error
+        ) {
+          throw new BadRequestError("Invalid available dates!");
+        }
+        const product = (
+          await this.apiClient.getProduct({
+            id: productConfig.productId,
+          })
+        ).response.data.body;
+
+        if (productConfig.availabilityType === AvailabilityType.START_TIME) {
+          this.startTimes = {
+            productId: productConfig.productId,
+            optionId,
+            availability: availability.response.data.body,
+            product,
+          };
+        } else {
+          this.openingHours = {
+            productId: productConfig.productId,
+            optionId,
+            availability: availability.response.data.body,
+            product,
+          };
+        }
+      })
+    );
   };
 
   private setFlow = (scenarios: ScenarioResult<any>[]): FlowResult => {
@@ -79,7 +78,7 @@ export class BookingCancellationFlow {
   };
 
   public validate = async (): Promise<FlowResult> => {
-    await this.setOptionIds();
+    await this.fetchData();
 
     const scenarios = [
       ...(await this.validateBookingCancellationReservation()),
@@ -102,42 +101,22 @@ export class BookingCancellationFlow {
     BookingCancellationReservationScenario[]
   > => {
     return Promise.all(
-      this.config.getProductConfigs().map(async (availabilityConfig) => {
-        const availability = (
-          await this.apiClient.getAvailability({
-            productId: availabilityConfig.productId,
-            optionId:
-              availabilityConfig.availabilityType ===
-              AvailabilityType.OPENING_HOURS
-                ? this.optionIdOpeningHours
-                : this.optionIdStartTimes,
-            localDateStart: availabilityConfig.available.from,
-            localDateEnd: availabilityConfig.available.to,
-          })
-        ).response;
-        if (R.isEmpty(availability.data) && !availability.error) {
-          throw new BadRequestError("Invalid available dates!");
-        }
-        const product = (
-          await this.apiClient.getProduct({
-            id: availabilityConfig.productId,
-          })
-        ).response.data.body;
+      this.config.getProductConfigs().map(async (productConfig) => {
+        const validateData =
+          productConfig.availabilityType === AvailabilityType.OPENING_HOURS
+            ? this.openingHours
+            : this.startTimes;
         const booking = (
           await this.apiClient.bookingReservation({
-            productId: availabilityConfig.productId,
-            optionId:
-              availabilityConfig.availabilityType ===
-              AvailabilityType.OPENING_HOURS
-                ? this.optionIdOpeningHours
-                : this.optionIdStartTimes,
-            availabilityId: availability.data.body[0].id,
+            productId: validateData.productId,
+            optionId: validateData.optionId,
+            availabilityId: validateData.availability[0].id,
             unitItems: [
               {
-                unitId: product.options[0].units[0].id,
+                unitId: validateData.product.options[0].units[0].id,
               },
               {
-                unitId: product.options[0].units[0].id,
+                unitId: validateData.product.options[0].units[0].id,
               },
             ],
           })
@@ -146,7 +125,7 @@ export class BookingCancellationFlow {
           apiClient: this.apiClient,
           uuid: booking.uuid,
           capabilities: this.config.capabilities,
-          deliveryMethods: availabilityConfig.deliveryMethods,
+          deliveryMethods: productConfig.deliveryMethods,
           booking,
         });
       })
@@ -157,42 +136,22 @@ export class BookingCancellationFlow {
     BookingCancellationBookingScenario[]
   > => {
     return Promise.all(
-      this.config.getProductConfigs().map(async (availabilityConfig) => {
-        const availability = (
-          await this.apiClient.getAvailability({
-            productId: availabilityConfig.productId,
-            optionId:
-              availabilityConfig.availabilityType ===
-              AvailabilityType.OPENING_HOURS
-                ? this.optionIdOpeningHours
-                : this.optionIdStartTimes,
-            localDateStart: availabilityConfig.available.from,
-            localDateEnd: availabilityConfig.available.to,
-          })
-        ).response;
-        if (R.isEmpty(availability.data) && !availability.error) {
-          throw new BadRequestError("Invalid available dates!");
-        }
-        const product = (
-          await this.apiClient.getProduct({
-            id: availabilityConfig.productId,
-          })
-        ).response.data.body;
+      this.config.getProductConfigs().map(async (productConfig) => {
+        const validateData =
+          productConfig.availabilityType === AvailabilityType.OPENING_HOURS
+            ? this.openingHours
+            : this.startTimes;
         const booking = (
           await this.apiClient.bookingReservation({
-            productId: availabilityConfig.productId,
-            optionId:
-              availabilityConfig.availabilityType ===
-              AvailabilityType.OPENING_HOURS
-                ? this.optionIdOpeningHours
-                : this.optionIdStartTimes,
-            availabilityId: availability.data.body[0].id,
+            productId: validateData.productId,
+            optionId: validateData.optionId,
+            availabilityId: validateData.availability[0].id,
             unitItems: [
               {
-                unitId: product.options[0].units[0].id,
+                unitId: validateData.product.options[0].units[0].id,
               },
               {
-                unitId: product.options[0].units[0].id,
+                unitId: validateData.product.options[0].units[0].id,
               },
             ],
           })
@@ -209,7 +168,7 @@ export class BookingCancellationFlow {
           apiClient: this.apiClient,
           uuid: bookingConfirmed.uuid,
           capabilities: this.config.capabilities,
-          deliveryMethods: availabilityConfig.deliveryMethods,
+          deliveryMethods: productConfig.deliveryMethods,
           booking: bookingConfirmed,
         });
       })

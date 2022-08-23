@@ -1,3 +1,5 @@
+import { Availability, Product } from "@octocloud/types";
+
 export interface Scenario<T> {
   validate: () => Promise<ScenarioResult<T>>;
 }
@@ -21,4 +23,11 @@ export interface ScenarioResult<T> {
   request: ScenarioRequest;
   response: ScenarioResponse<T>;
   errors: string[]; // validation errors
+}
+
+export interface BookingValidateData {
+  productId: string;
+  optionId: string;
+  availability: Availability[];
+  product: Product;
 }
