@@ -37,7 +37,7 @@ export class AvailabilityCheckAvailabilityIdScenario
   private availabilityScenarioHelper = new AvailabilityScenarioHelper();
 
   public validate = async () => {
-    const { request, response } = await this.apiClient.getAvailability({
+    const result = await this.apiClient.getAvailability({
       productId: this.productId,
       optionId: this.optionId,
       availabilityIds: this.availabilityIds,
@@ -48,8 +48,7 @@ export class AvailabilityCheckAvailabilityIdScenario
     return this.availabilityScenarioHelper.validateAvailability(
       {
         name,
-        request,
-        response,
+        ...result,
       },
       this.capabilities
     );

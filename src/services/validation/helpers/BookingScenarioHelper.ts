@@ -5,6 +5,7 @@ interface BookingCheckData {
   newBooking: Booking;
   oldBooking: Booking;
   configData: ScenarioConfigData;
+  rebooked?: boolean;
 }
 
 export class BookingScenarioHelper {
@@ -20,15 +21,6 @@ export class BookingScenarioHelper {
         : false;
 
     let errors = [
-      data.newBooking.productId === data.oldBooking.productId
-        ? null
-        : "ProductId is not matching request",
-      data.newBooking.optionId === data.oldBooking.optionId
-        ? null
-        : "OptionId is not matching request",
-      data.newBooking.availabilityId === data.oldBooking.availabilityId
-        ? null
-        : "AvailabilityId is not matching request",
       deliveryMethodsMatch
         ? null
         : "DeliveryMethods are not matching provided ones",
@@ -37,6 +29,21 @@ export class BookingScenarioHelper {
         ? null
         : "Voucher is missing",
     ];
+
+    if (!data.rebooked) {
+      errors = [
+        ...errors,
+        data.newBooking.productId === data.oldBooking.productId
+          ? null
+          : "ProductId is not matching request",
+        data.newBooking.optionId === data.oldBooking.optionId
+          ? null
+          : "OptionId is not matching request",
+        data.newBooking.availabilityId === data.oldBooking.availabilityId
+          ? null
+          : "AvailabilityId is not matching request",
+      ];
+    }
 
     if (data.configData.deliveryMethods.includes(DeliveryMethod.TICKET)) {
       const ticketCheck =

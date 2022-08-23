@@ -127,6 +127,7 @@ export class BookingUpdateScenarioHelper {
         newBooking: data.response.data.body,
         oldBooking: createdBooking,
         configData,
+        rebooked: data.request.body.productId !== undefined,
       }),
     ];
 

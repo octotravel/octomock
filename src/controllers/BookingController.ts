@@ -137,6 +137,7 @@ export class BookingController implements IBookingController {
       schema.availabilityId &&
       schema.unitItems
     ) {
+      console.log("test");
       const rebookedBookingModel = await this.createBookingModel(
         {
           ...schema,

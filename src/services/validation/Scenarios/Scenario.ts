@@ -30,4 +30,6 @@ export interface BookingValidateData {
   optionId: string;
   availability: Availability[];
   product: Product;
+  availabilityTo?: Availability[];
+  availabilityFrom?: Availability[];
 }
