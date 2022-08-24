@@ -24,11 +24,11 @@ router.get("/capabilities", async (ctx, _) => {
 
 router.post("/validate", async (ctx, _) => {
   // create some init class
-
+  const apiKey = ctx.request.header.authorization;
   await validationConfigSchema.validate(ctx.request.body);
   const schema = validationConfigSchema.cast(ctx.request.body);
 
-  const config = await new ConfigParser().parse(schema);
+  const config = await new ConfigParser().parse(schema, apiKey);
 
   const body = await new ValidationController({ config }).validate();
 

@@ -7,6 +7,7 @@ export class Config {
   public supplierId: string;
   private productStartTimes: Nullable<ProductValidatorConfig>;
   private productOpeningHours: Nullable<ProductValidatorConfig>;
+  public apiKey: string;
 
   constructor({
     url,
@@ -14,18 +15,21 @@ export class Config {
     supplierId,
     productStartTimes,
     productOpeningHours,
+    apiKey,
   }: {
     capabilities: CapabilityId[];
     url: string;
     supplierId: string;
     productStartTimes?: ProductValidatorConfig;
     productOpeningHours?: ProductValidatorConfig;
+    apiKey: string;
   }) {
     this.url = url;
     this.capabilities = capabilities;
     this.supplierId = supplierId;
     this.productStartTimes = productStartTimes ?? null;
     this.productOpeningHours = productOpeningHours ?? null;
+    this.apiKey = apiKey;
   }
 
   public getAvailabilityTypes = (): AvailabilityType[] => {

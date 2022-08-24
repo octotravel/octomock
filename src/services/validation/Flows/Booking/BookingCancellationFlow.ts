@@ -19,6 +19,7 @@ export class BookingCancellationFlow {
     this.apiClient = new ApiClient({
       url: config.url,
       capabilities: config.capabilities,
+      apiKey: this.config.apiKey,
     });
   }
 

@@ -19,6 +19,7 @@ export class AvailabilityCalendarFlow {
     this.apiClient = new ApiClient({
       url: config.url,
       capabilities: config.capabilities,
+      apiKey: this.config.apiKey,
     });
     this.optionIdStartTimes = null;
     this.optionIdOpeningHours = null;

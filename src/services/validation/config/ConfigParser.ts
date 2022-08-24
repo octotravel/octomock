@@ -3,7 +3,7 @@ import { Config } from "./Config";
 import { ProductValidatorConfig } from "./ProductValidatorConfig";
 
 export class ConfigParser {
-  public parse = async (data: any): Promise<Config> => {
+  public parse = async (data: any, apiKey: string): Promise<Config> => {
     return new Config({
       url: data.url,
       capabilities: data.capabilities ?? [],
@@ -17,6 +17,7 @@ export class ConfigParser {
       productStartTimes:
         data.productStartTimes &&
         this.parseProduct(data.productStartTimes, AvailabilityType.START_TIME),
+      apiKey,
     });
   };
   private parseProduct = (

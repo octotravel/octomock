@@ -48,22 +48,26 @@ export type ResultResponse<T> = {
 export class ApiClient {
   private capabilities: CapabilityId[];
   private url: string;
+  private apiKey: string;
   constructor({
     capabilities,
     url,
+    apiKey,
   }: {
     capabilities: CapabilityId[];
     url: string;
+    apiKey: string;
   }) {
     this.capabilities = capabilities;
     this.url = url;
+    this.apiKey = apiKey;
   }
   public getSuppliers = async (_?: ApiParams): Promise<Result<Supplier[]>> => {
     const url = `${this.url}/suppliers`;
     const response = await fetch(url, {
       method: "GET",
       headers: {
-        ...this.mapCapabilities(),
+        ...this.mapHeaders(),
       },
     });
     return await this.setResponse({ url, body: null }, response);
@@ -77,7 +81,7 @@ export class ApiClient {
     const response = await fetch(url, {
       method: "GET",
       headers: {
-        ...this.mapCapabilities(),
+        ...this.mapHeaders(),
       },
     });
     return await this.setResponse({ url, body: null }, response);
@@ -88,7 +92,7 @@ export class ApiClient {
     const response = await fetch(url, {
       method: "GET",
       headers: {
-        ...this.mapCapabilities(),
+        ...this.mapHeaders(),
       },
     });
     return await this.setResponse({ url, body: null }, response);
@@ -102,7 +106,7 @@ export class ApiClient {
     const response = await fetch(url, {
       method: "GET",
       headers: {
-        ...this.mapCapabilities(),
+        ...this.mapHeaders(),
       },
     });
     return await this.setResponse({ url, body: null }, response);
@@ -118,7 +122,7 @@ export class ApiClient {
       method: "POST",
       body,
       headers: {
-        ...this.mapCapabilities(),
+        ...this.mapHeaders(),
       },
     });
     return await this.setResponse({ url, body }, response);
@@ -134,7 +138,7 @@ export class ApiClient {
       method: "POST",
       body,
       headers: {
-        ...this.mapCapabilities(),
+        ...this.mapHeaders(),
       },
     });
     return await this.setResponse({ url, body }, response);
@@ -150,7 +154,7 @@ export class ApiClient {
       method: "POST",
       body,
       headers: {
-        ...this.mapCapabilities(),
+        ...this.mapHeaders(),
       },
     });
     return await this.setResponse({ url, body }, response);
@@ -167,7 +171,7 @@ export class ApiClient {
       method: "POST",
       body,
       headers: {
-        ...this.mapCapabilities(),
+        ...this.mapHeaders(),
       },
     });
     return await this.setResponse({ url, body }, response);
@@ -182,7 +186,7 @@ export class ApiClient {
     const response = await fetch(url, {
       method: "GET",
       headers: {
-        ...this.mapCapabilities(),
+        ...this.mapHeaders(),
       },
     });
     return await this.setResponse({ url, body: null }, response);
@@ -196,7 +200,7 @@ export class ApiClient {
     const response = await fetch(url, {
       method: "GET",
       headers: {
-        ...this.mapCapabilities(),
+        ...this.mapHeaders(),
       },
     });
     return await this.setResponse({ url, body: null }, response);
@@ -213,7 +217,7 @@ export class ApiClient {
       method: "POST",
       body,
       headers: {
-        ...this.mapCapabilities(),
+        ...this.mapHeaders(),
       },
     });
     return await this.setResponse({ url, body }, response);
@@ -230,7 +234,7 @@ export class ApiClient {
       method: "POST",
       body,
       headers: {
-        ...this.mapCapabilities(),
+        ...this.mapHeaders(),
       },
     });
     return await this.setResponse({ url, body }, response);
@@ -247,7 +251,7 @@ export class ApiClient {
       method: "PATCH",
       body,
       headers: {
-        ...this.mapCapabilities(),
+        ...this.mapHeaders(),
       },
     });
     return await this.setResponse({ url, body }, response);
@@ -290,7 +294,10 @@ export class ApiClient {
     };
   };
 
-  private mapCapabilities = (): Record<string, string> => {
-    return { "Octo-Capabilities": this.capabilities.join(", ") };
+  private mapHeaders = (): Record<string, string> => {
+    return {
+      "Octo-Capabilities": this.capabilities.join(", "),
+      Authorization: this.apiKey,
+    };
   };
 }

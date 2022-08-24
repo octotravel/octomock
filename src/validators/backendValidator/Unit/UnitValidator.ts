@@ -10,9 +10,9 @@ import {
   BooleanValidator,
   EnumArrayValidator,
   NumberValidator,
-  NumberArrayValidator,
   ModelValidator,
   ValidatorError,
+  StringArrayValidator,
 } from "../ValidatorHelpers";
 import { UnitPricingValidator } from "./UnitPricingValidator";
 
@@ -33,7 +33,9 @@ export class UnitValidator implements ModelValidator {
     return [
       StringValidator.validate(`${this.path}.id`, unit.id),
       StringValidator.validate(`${this.path}.internalName`, unit.internalName),
-      StringValidator.validate(`${this.path}.reference`, unit.reference),
+      StringValidator.validate(`${this.path}.reference`, unit.reference, {
+        nullable: true,
+      }),
       StringValidator.validate(`${this.path}.type`, unit.type, {
         nullable: true,
       }),
@@ -100,10 +102,9 @@ export class UnitValidator implements ModelValidator {
         restrictions.paxCount,
         { integer: true }
       ),
-      NumberArrayValidator.validate(
+      StringArrayValidator.validate(
         `${this.path}.restrictions.accompaniedBy`,
-        restrictions.accompaniedBy,
-        { integer: true }
+        restrictions.accompaniedBy
       ),
     ].filter(Boolean);
   };
