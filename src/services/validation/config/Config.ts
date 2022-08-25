@@ -8,6 +8,7 @@ export class Config {
   private productStartTimes: Nullable<ProductValidatorConfig>;
   private productOpeningHours: Nullable<ProductValidatorConfig>;
   public apiKey: string;
+  public ignoreKill: boolean;
 
   constructor({
     url,
@@ -16,6 +17,7 @@ export class Config {
     productStartTimes,
     productOpeningHours,
     apiKey,
+    ignoreKill,
   }: {
     capabilities: CapabilityId[];
     url: string;
@@ -23,6 +25,7 @@ export class Config {
     productStartTimes?: ProductValidatorConfig;
     productOpeningHours?: ProductValidatorConfig;
     apiKey: string;
+    ignoreKill: boolean;
   }) {
     this.url = url;
     this.capabilities = capabilities;
@@ -30,6 +33,7 @@ export class Config {
     this.productStartTimes = productStartTimes ?? null;
     this.productOpeningHours = productOpeningHours ?? null;
     this.apiKey = apiKey;
+    this.ignoreKill = ignoreKill;
   }
 
   public getAvailabilityTypes = (): AvailabilityType[] => {

@@ -78,7 +78,7 @@ export class AvailabilityFlow {
       const result = await scenario.validate();
 
       results.push(result);
-      if (!result.success) {
+      if (!result.success && !this.config.ignoreKill) {
         break;
       }
     }

@@ -91,7 +91,7 @@ export class BookingGetFlow {
     for await (const scenario of scenarios) {
       const result = await scenario.validate();
       results.push(result);
-      if (!result.success) {
+      if (!result.success && !this.config.ignoreKill) {
         break;
       }
     }

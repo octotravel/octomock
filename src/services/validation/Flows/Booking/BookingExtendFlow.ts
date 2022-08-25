@@ -6,7 +6,7 @@ import { Config } from "../../config/Config";
 import { BookingValidateData, ScenarioResult } from "../../Scenarios/Scenario";
 import { FlowResult } from "../Flow";
 import { BookingReservationExtendScenario } from "../../Scenarios/Booking/Extend/BookingReservationExtend";
-// import { BookingReservationExtendInvalidUUIDScenario } from "../../Scenarios/Booking/Extend/BookingReservationExtendInvalidUUID";
+import { BookingReservationExtendInvalidUUIDScenario } from "../../Scenarios/Booking/Extend/BookingReservationExtendInvalidUUID";
 
 export class BookingExtendFlow {
   private config: Config;
@@ -82,14 +82,14 @@ export class BookingExtendFlow {
 
     const scenarios = [
       ...(await this.validateBookingExtend()),
-      // await this.validateBookingExtendInvalidUUID(),
+      await this.validateBookingExtendInvalidUUID(),
     ];
 
     const results = [];
     for await (const scenario of scenarios) {
       const result = await scenario.validate();
       results.push(result);
-      if (!result.success) {
+      if (!result.success && !this.config.ignoreKill) {
         break;
       }
     }
@@ -143,11 +143,11 @@ export class BookingExtendFlow {
     );
   };
 
-  // private validateBookingExtendInvalidUUID =
-  //   async (): Promise<BookingReservationExtendInvalidUUIDScenario> => {
-  //     return new BookingReservationExtendInvalidUUIDScenario({
-  //       apiClient: this.apiClient,
-  //       uuid: "Invalid booking UUID",
-  //     });
-  //   };
+  private validateBookingExtendInvalidUUID =
+    async (): Promise<BookingReservationExtendInvalidUUIDScenario> => {
+      return new BookingReservationExtendInvalidUUIDScenario({
+        apiClient: this.apiClient,
+        uuid: "Invalid booking UUID",
+      });
+    };
 }

@@ -18,6 +18,7 @@ export class ConfigParser {
         data.productStartTimes &&
         this.parseProduct(data.productStartTimes, AvailabilityType.START_TIME),
       apiKey,
+      ignoreKill: data.ignoreKill,
     });
   };
   private parseProduct = (
