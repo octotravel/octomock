@@ -249,7 +249,7 @@ export class BookingUpdateFlow {
             lastName: "Doe",
             emailAddress: "johndoe@mail.com",
             phoneNumber: "+00000000",
-            country: "France",
+            country: "GB",
             notes: "Test notes contact",
             locales: ["en"],
           },

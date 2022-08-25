@@ -57,7 +57,7 @@ export class BookingConfirmationUnitItemUpdateScenario
         fullName: "John Doe",
         notes: "Test note",
       },
-      resellerReference: "ResellerRef#1",
+      resellerReference: "RESELLERREF#1",
       unitItems: this.unitItems,
     });
     const name = `Booking Confirmation unitItems update (${this.availabilityType})`;

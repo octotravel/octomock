@@ -210,11 +210,11 @@ export class ApiClient {
     data: CancelBookingBodySchema & CancelBookingPathParamsSchema,
     _?: ApiParams
   ): Promise<Result<Booking>> => {
-    const url = `${this.url}/bookings/${data.uuid}/cancel`;
+    const url = `${this.url}/bookings/${data.uuid}`;
     delete data.uuid;
     const body = JSON.stringify(data);
     const response = await fetch(url, {
-      method: "POST",
+      method: "DELETE",
       body,
       headers: {
         ...this.mapHeaders(),
@@ -298,6 +298,7 @@ export class ApiClient {
     return {
       "Octo-Capabilities": this.capabilities.join(", "),
       Authorization: this.apiKey,
+      "content-type": "application/json",
     };
   };
 }

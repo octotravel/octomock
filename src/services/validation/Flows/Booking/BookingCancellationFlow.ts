@@ -82,8 +82,8 @@ export class BookingCancellationFlow {
     await this.fetchData();
 
     const scenarios = [
-      ...(await this.validateBookingCancellationReservation()),
-      ...(await this.validateBookingCancellationBooking()),
+      // ...(await this.validateBookingCancellationReservation()),
+      // ...(await this.validateBookingCancellationBooking()),
       await this.validateBookingCancellationInvalidUUID(),
     ];
 
@@ -98,7 +98,7 @@ export class BookingCancellationFlow {
     return this.setFlow(results);
   };
 
-  private validateBookingCancellationReservation = async (): Promise<
+  public validateBookingCancellationReservation = async (): Promise<
     BookingCancellationReservationScenario[]
   > => {
     return Promise.all(
@@ -133,7 +133,7 @@ export class BookingCancellationFlow {
     );
   };
 
-  private validateBookingCancellationBooking = async (): Promise<
+  public validateBookingCancellationBooking = async (): Promise<
     BookingCancellationBookingScenario[]
   > => {
     return Promise.all(

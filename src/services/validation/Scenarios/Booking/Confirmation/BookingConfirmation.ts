@@ -50,7 +50,7 @@ export class BookingConfirmationScenario implements Scenario<Booking> {
         fullName: "John Doe",
         notes: "Test note",
       },
-      resellerReference: "ResellerRef#1",
+      resellerReference: "RESELLERREF#1",
     });
     const name = `Booking Confirmation (${this.availabilityType})`;
 
