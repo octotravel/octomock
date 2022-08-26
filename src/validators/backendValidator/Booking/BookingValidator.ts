@@ -19,6 +19,7 @@ import { ContactValidator } from "../Contact/ContactValidator";
 import { UnitItemValidator } from "../UnitItem/UnitItemValidator";
 import { PricingValidator } from "../Pricing/PricingValidator";
 import { CommonValidator } from "../CommonValidator";
+import { BookingPickupValidator } from "./BookingPickupValidator";
 
 // TODO: add support for validating pricing
 // TODO: add support for validating delivery method related things
@@ -30,6 +31,7 @@ export class BookingValidator implements ModelValidator {
   private bookingStateValidator: BookingStateValidator;
   private contactValidator: ContactValidator;
   private pricingValidator: PricingValidator;
+  private pickupValidator: BookingPickupValidator;
   private capabilities: CapabilityId[];
   constructor({ capabilities }: { capabilities: CapabilityId[] }) {
     this.path = `booking`;
@@ -45,6 +47,7 @@ export class BookingValidator implements ModelValidator {
     this.bookingStateValidator = new BookingStateValidator({ path: this.path });
     this.contactValidator = new ContactValidator({ path: this.path });
     this.pricingValidator = new PricingValidator(`${this.path}.pricing`);
+    this.pickupValidator = new BookingPickupValidator({ path: this.path });
   }
 
   public validate = (booking: Booking): ValidatorError[] => {
@@ -89,6 +92,7 @@ export class BookingValidator implements ModelValidator {
       ),
       ...this.validateUnitItems(booking),
       ...this.validatePricingCapability(booking),
+      ...this.validatePickupCapability(booking),
     ].filter(Boolean);
   };
 
@@ -136,6 +140,13 @@ export class BookingValidator implements ModelValidator {
   private validatePricingCapability = (booking: Booking): ValidatorError[] => {
     if (this.capabilities.includes(CapabilityId.Pricing)) {
       return this.pricingValidator.validate(booking.pricing);
+    }
+    return [];
+  };
+
+  private validatePickupCapability = (booking: Booking): ValidatorError[] => {
+    if (this.capabilities.includes(CapabilityId.Pickups)) {
+      return this.pickupValidator.validate(booking);
     }
     return [];
   };

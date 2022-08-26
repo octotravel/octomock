@@ -348,6 +348,7 @@ export class BookingBuilder {
       locales: contact?.locales ?? booking?.contact?.locales ?? [],
       country: contact?.country ?? booking?.contact?.country ?? null,
       notes: contact?.notes ?? booking?.contact?.notes ?? null,
+      postalCode: contact?.postalCode ?? booking?.contact.postalCode ?? null,
     };
   };
 

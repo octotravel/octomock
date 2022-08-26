@@ -13,10 +13,12 @@ import {
   ModelValidator,
   ValidatorError,
 } from "../ValidatorHelpers";
+import { AvailabilityPickupValidator } from "./AvailabilityPickupValidator";
 import { AvailabilityPricingValidator } from "./AvailabilityPricingValidator";
 
 export class AvailabilityValidator implements ModelValidator {
   private pricingValidator: AvailabilityPricingValidator;
+  private pickupValidator: AvailabilityPickupValidator;
   private path: string;
   private capabilities: CapabilityId[];
   constructor({
@@ -29,6 +31,9 @@ export class AvailabilityValidator implements ModelValidator {
     this.path = `${path}availability`;
     this.capabilities = capabilities;
     this.pricingValidator = new AvailabilityPricingValidator({
+      path: this.path,
+    });
+    this.pickupValidator = new AvailabilityPickupValidator({
       path: this.path,
     });
   }
@@ -95,6 +100,7 @@ export class AvailabilityValidator implements ModelValidator {
       ),
 
       ...this.validatePricingCapability(availability),
+      ...this.validatePickupCapability(availability),
     ]
       .flat(1)
       .filter(Boolean);
@@ -105,6 +111,15 @@ export class AvailabilityValidator implements ModelValidator {
   ): ValidatorError[] => {
     if (this.capabilities.includes(CapabilityId.Pricing)) {
       return this.pricingValidator.validate(availability);
+    }
+    return [];
+  };
+
+  private validatePickupCapability = (
+    availability: Availability
+  ): ValidatorError[] => {
+    if (this.capabilities.includes(CapabilityId.Pickups)) {
+      return this.pickupValidator.validate(availability);
     }
     return [];
   };

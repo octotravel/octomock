@@ -55,6 +55,7 @@ export class UnitItemModel implements Capable {
       locales: [],
       country: null,
       notes: null,
+      postalCode: null,
     };
     this.ticket = ticket;
     if (this.unitModel.pricingFrom) {
