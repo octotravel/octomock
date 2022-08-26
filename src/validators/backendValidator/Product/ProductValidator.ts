@@ -15,10 +15,12 @@ import {
   ValidatorError,
   ModelValidator,
 } from "../ValidatorHelpers";
+import { ProductContentValidator } from "./ProductContentValidator";
 import { ProductPricingValidator } from "./ProductPricingValidator";
 
 export class ProductValidator implements ModelValidator {
   private pricingValidator: ProductPricingValidator;
+  private contentValidator: ProductContentValidator;
   private path: string;
   private capabilities: CapabilityId[];
 
@@ -32,6 +34,7 @@ export class ProductValidator implements ModelValidator {
     this.path = `${path}product`;
     this.capabilities = capabilities;
     this.pricingValidator = new ProductPricingValidator({ path: this.path });
+    this.contentValidator = new ProductContentValidator({ path: this.path });
   }
 
   public validate = (product: Product): ValidatorError[] => {
@@ -89,6 +92,7 @@ export class ProductValidator implements ModelValidator {
       ...this.validateOptions(product),
 
       ...this.validatePricingCapability(product),
+      ...this.validateContentCapability(product),
     ].filter(Boolean);
   };
 
@@ -112,9 +116,10 @@ export class ProductValidator implements ModelValidator {
     return [];
   };
 
-  // private validateContentCapability = (product: Product): void => {
-  //   if (this.capabilities.includes(CapabilityId.Content)) {
-  //     // this.contentValidator.validate(product);
-  //   }
-  // };
+  private validateContentCapability = (product: Product): ValidatorError[] => {
+    if (this.capabilities.includes(CapabilityId.Content)) {
+      return this.contentValidator.validate(product);
+    }
+    return [];
+  };
 }

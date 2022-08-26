@@ -2,12 +2,14 @@ import { Booking, BookingStatus } from "@octocloud/types";
 import { ModelValidator, ValidatorError } from "../../ValidatorHelpers";
 import { BookingStateCancelledValidator } from "./BookingStateCancelledValidator";
 import { BookingStateConfirmedValidator } from "./BookingStateConfirmedValidator";
+import { BookingStateExpiredValidator } from "./BookingStateExpiredValidator";
 import { BookingStateOnHoldValidator } from "./BookingStateOnHoldValidator";
 
 export class BookingStateValidator implements ModelValidator {
   private onHoldValidator: BookingStateOnHoldValidator;
   private confirmedValidator: BookingStateConfirmedValidator;
   private cancelledValidator: BookingStateCancelledValidator;
+  private expiredValidator: BookingStateExpiredValidator;
   private path: string;
   constructor({ path }: { path: string }) {
     this.path = path;
@@ -16,6 +18,9 @@ export class BookingStateValidator implements ModelValidator {
       path: this.path,
     });
     this.cancelledValidator = new BookingStateCancelledValidator({
+      path: this.path,
+    });
+    this.expiredValidator = new BookingStateExpiredValidator({
       path: this.path,
     });
   }
@@ -29,6 +34,9 @@ export class BookingStateValidator implements ModelValidator {
       }
       case BookingStatus.CANCELLED: {
         return this.cancelledValidator.validate(booking);
+      }
+      case BookingStatus.EXPIRED: {
+        return this.expiredValidator.validate(booking);
       }
       default:
         return [

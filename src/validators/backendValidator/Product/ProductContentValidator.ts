@@ -16,13 +16,22 @@ export class ProductContentValidator implements ModelValidator {
     return [
       StringValidator.validate(`${this.path}.title`, product.title),
       StringValidator.validate(`${this.path}.country`, product.country),
-      StringValidator.validate(`${this.path}.location`, product.location),
-      StringValidator.validate(`${this.path}.subtitle`, product.subtitle),
+      StringValidator.validate(`${this.path}.location`, product.location, {
+        nullable: true,
+      }),
+      StringValidator.validate(`${this.path}.subtitle`, product.subtitle, {
+        nullable: true,
+      }),
       StringValidator.validate(
         `${this.path}.shortDescription`,
-        product.shortDescription
+        product.shortDescription,
+        { nullable: true }
       ),
-      StringValidator.validate(`${this.path}.description`, product.description),
+      StringValidator.validate(
+        `${this.path}.description`,
+        product.description,
+        { nullable: true }
+      ),
       StringArrayValidator.validate(
         `${this.path}.highlights`,
         product.highlights
@@ -130,7 +139,8 @@ export class ProductContentValidator implements ModelValidator {
         ),
         StringValidator.validate(
           `${this.path}.categories[${i}].shortDescription`,
-          category.shortDescription
+          category.shortDescription,
+          { nullable: true }
         ),
         StringValidator.validate(
           `${this.path}.categories[${i}].coverImageUrl`,
@@ -169,11 +179,13 @@ export class ProductContentValidator implements ModelValidator {
         StringValidator.validate(`${this.path}.${label}[${i}].url`, image.url),
         StringValidator.validate(
           `${this.path}.${label}[${i}].title`,
-          image.title
+          image.title,
+          { nullable: true }
         ),
         StringValidator.validate(
           `${this.path}.${label}[${i}].caption`,
-          image.caption
+          image.caption,
+          { nullable: true }
         ),
       ])
       .flat(1)

@@ -50,11 +50,13 @@ export class SupplierFlow {
     return new GetSupplierScenario({
       apiClient: this.apiClient,
       supplierId: this.config.supplierId,
+      capabilities: this.config.capabilities,
     });
   };
   private validateGetSuppliers = async (): Promise<GetSuppliersScenario> => {
     return new GetSuppliersScenario({
       apiClient: this.apiClient,
+      capabilities: this.config.capabilities,
     });
   };
   private validateGetSupplierInvalid =

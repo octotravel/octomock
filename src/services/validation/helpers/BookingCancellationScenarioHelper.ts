@@ -23,18 +23,33 @@ export class BookingCancellationScenarioHelper {
     return new BookingValidator({ capabilities }).validate(booking);
   };
 
-  private cancellationCheck = (data: ScenarioHelperData<Booking>): string[] => {
+  private cancellationCheck = (
+    data: ScenarioHelperData<Booking>,
+    createdBooking: Booking
+  ): string[] => {
     const booking = data.response.data.body;
     const reqBody = data.request.body as any;
-    const errors = [
+    let errors = [
       booking.cancellation.reason === reqBody.reason
         ? null
         : "Reason was not provided",
-      booking.status === BookingStatus.CANCELLED
-        ? null
-        : `Booking status should be CANCELLED. Returned value was ${booking.status}`,
-      R.isEmpty(booking.unitItems) ? null : "UnitItems should be empty",
     ];
+    if (createdBooking.status === BookingStatus.ON_HOLD) {
+      errors = [
+        ...errors,
+        booking.status === BookingStatus.EXPIRED
+          ? null
+          : `Booking status should be EXPIRED. Returned value was ${booking.status}`,
+      ];
+    }
+    if (createdBooking.status === BookingStatus.CONFIRMED) {
+      errors = [
+        ...errors,
+        booking.status === BookingStatus.CANCELLED
+          ? null
+          : `Booking status should be CANCELLED. Returned value was ${booking.status}`,
+      ];
+    }
     return errors.filter(Boolean);
   };
 
@@ -52,7 +67,7 @@ export class BookingCancellationScenarioHelper {
     }
 
     const checkErrors = [
-      ...this.cancellationCheck(data),
+      ...this.cancellationCheck(data, createdBooking),
       ...this.bookingScenarioHelper.bookingCheck({
         newBooking: data.response.data.body,
         oldBooking: createdBooking,
