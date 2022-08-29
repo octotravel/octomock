@@ -1,4 +1,4 @@
-import { AvailabilityType } from "@octocloud/types";
+import { AvailabilityType, CapabilityId } from "@octocloud/types";
 import R from "ramda";
 import { BadRequestError } from "../../../../models/Error";
 import { ApiClient } from "../../ApiClient";
@@ -52,6 +52,12 @@ export class BookingReservationFlow {
             id: productConfig.productId,
           })
         ).response.data.body;
+
+        // if (this.config.capabilities.includes(CapabilityId.Pickups)) {
+        //   if (R.isEmpty(product.options.find(option => option.id === optionId).pickupPoints)) {
+        //     throw new BadRequestError(`No available Pickup Points for product ${product.id}`)
+        //   }
+        // }
 
         if (productConfig.availabilityType === AvailabilityType.START_TIME) {
           this.startTimes = {
@@ -115,34 +121,61 @@ export class BookingReservationFlow {
             : this.startTimes;
         let unitItems = [
           {
-            unitId: validateData.product.options[0].units[0].id,
+            unitId: validateData.product.options.find(
+              (option) => option.id === validateData.optionId
+            ).units[0].id,
           },
           {
-            unitId: validateData.product.options[0].units[0].id,
+            unitId: validateData.product.options.find(
+              (option) => option.id === validateData.optionId
+            ).units[0].id,
           },
           {
-            unitId: validateData.product.options[0].units[0].id,
+            unitId: validateData.product.options.find(
+              (option) => option.id === validateData.optionId
+            ).units[0].id,
           },
         ];
-        if (validateData.product.options[0].units[1]) {
+        if (
+          validateData.product.options.find(
+            (option) => option.id === validateData.optionId
+          ).units[1]
+        ) {
           unitItems = [
             ...unitItems,
             {
-              unitId: validateData.product.options[0].units[1].id,
+              unitId: validateData.product.options.find(
+                (option) => option.id === validateData.optionId
+              ).units[1].id,
             },
           ];
         }
-        return new BookingReservationScenario({
-          apiClient: this.apiClient,
+
+        const bookingData = {
           productId: validateData.productId,
           optionId: validateData.optionId,
           availabilityId: validateData.availability[0].id,
-          availabilityType: productConfig.availabilityType,
           unitItems,
           notes: "Test note",
-          capabilities: this.config.capabilities,
+          apiClient: this.apiClient,
           deliveryMethods: productConfig.deliveryMethods,
-        });
+          availabilityType: productConfig.availabilityType,
+          capabilities: this.config.capabilities,
+        };
+
+        if (this.config.capabilities.includes(CapabilityId.Pickups)) {
+          return new BookingReservationScenario({
+            ...bookingData,
+            pickupPointId: validateData.product.options.find(
+              (option) => option.id === validateData.optionId
+            ).pickupPoints[0]
+              ? validateData.product.options.find(
+                  (option) => option.id === validateData.optionId
+                ).pickupPoints[0].id
+              : "",
+          });
+        }
+        return new BookingReservationScenario(bookingData);
       })
     );
   };
@@ -163,10 +196,14 @@ export class BookingReservationFlow {
           availabilityId: validateData.availability[0].id,
           unitItems: [
             {
-              unitId: validateData.product.options[0].units[0].id,
+              unitId: validateData.product.options.find(
+                (option) => option.id === validateData.optionId
+              ).units[0].id,
             },
             {
-              unitId: validateData.product.options[0].units[0].id,
+              unitId: validateData.product.options.find(
+                (option) => option.id === validateData.optionId
+              ).units[0].id,
             },
           ],
           capabilities: this.config.capabilities,
@@ -191,10 +228,14 @@ export class BookingReservationFlow {
           availabilityId: validateData.availability[0].id,
           unitItems: [
             {
-              unitId: validateData.product.options[0].units[0].id,
+              unitId: validateData.product.options.find(
+                (option) => option.id === validateData.optionId
+              ).units[0].id,
             },
             {
-              unitId: validateData.product.options[0].units[0].id,
+              unitId: validateData.product.options.find(
+                (option) => option.id === validateData.optionId
+              ).units[0].id,
             },
           ],
           capabilities: this.config.capabilities,
@@ -219,10 +260,14 @@ export class BookingReservationFlow {
           availabilityId: "Invalid availabilityId",
           unitItems: [
             {
-              unitId: validateData.product.options[0].units[0].id,
+              unitId: validateData.product.options.find(
+                (option) => option.id === validateData.optionId
+              ).units[0].id,
             },
             {
-              unitId: validateData.product.options[0].units[0].id,
+              unitId: validateData.product.options.find(
+                (option) => option.id === validateData.optionId
+              ).units[0].id,
             },
           ],
           capabilities: this.config.capabilities,

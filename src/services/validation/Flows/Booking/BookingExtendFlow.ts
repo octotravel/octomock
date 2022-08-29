@@ -107,20 +107,32 @@ export class BookingExtendFlow {
             : this.startTimes;
         let unitItems = [
           {
-            unitId: validateData.product.options[0].units[0].id,
+            unitId: validateData.product.options.find(
+              (option) => option.id === validateData.optionId
+            ).units[0].id,
           },
           {
-            unitId: validateData.product.options[0].units[0].id,
+            unitId: validateData.product.options.find(
+              (option) => option.id === validateData.optionId
+            ).units[0].id,
           },
           {
-            unitId: validateData.product.options[0].units[0].id,
+            unitId: validateData.product.options.find(
+              (option) => option.id === validateData.optionId
+            ).units[0].id,
           },
         ];
-        if (validateData.product.options[0].units[1]) {
+        if (
+          validateData.product.options.find(
+            (option) => option.id === validateData.optionId
+          ).units[1]
+        ) {
           unitItems = [
             ...unitItems,
             {
-              unitId: validateData.product.options[0].units[1].id,
+              unitId: validateData.product.options.find(
+                (option) => option.id === validateData.optionId
+              ).units[1].id,
             },
           ];
         }

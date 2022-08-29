@@ -21,8 +21,7 @@ export class BookingPickupValidator implements ModelValidator {
       ),
       StringValidator.validate(
         `${this.path}.pickupPointId`,
-        booking.pickupPointId,
-        { nullable: true }
+        booking.pickupPointId
       ),
       StringValidator.validate(
         `${this.path}.pickupHotel`,
@@ -51,15 +50,22 @@ export class BookingPickupValidator implements ModelValidator {
         ),
         StringValidator.validate(
           `${this.path}.booking.pickupPoint.directions`,
-          booking.pickupPoint.direction
+          booking.pickupPoint.directions,
+          { nullable: true }
+        ),
+        StringValidator.validate(
+          `${this.path}.booking.pickupPoint.address`,
+          booking.pickupPoint.address
         ),
         NumberValidator.validate(
           `${this.path}.booking.pickupPoint.latitude`,
-          booking.pickupPoint.latitude
+          booking.pickupPoint.latitude,
+          { nullable: true }
         ),
         NumberValidator.validate(
           `${this.path}.booking.pickupPoint.longitude`,
-          booking.pickupPoint.longitude
+          booking.pickupPoint.longitude,
+          { nullable: true }
         ),
         // CommonValidator.validateLocalDateTime(
         //   `${this.path}.booking.pickupPoint.localDateTime`,
@@ -67,31 +73,38 @@ export class BookingPickupValidator implements ModelValidator {
         // ),
         StringValidator.validate(
           `${this.path}.booking.pickupPoint.googlePlaceId`,
-          booking.pickupPoint.googlePlaceId
+          booking.pickupPoint.googlePlaceId,
+          { nullable: true }
         ),
         StringValidator.validate(
           `${this.path}.booking.pickupPoint.street`,
-          booking.pickupPoint.street
+          booking.pickupPoint.street,
+          { nullable: true }
         ),
         StringValidator.validate(
           `${this.path}.booking.pickupPoint.postalCode`,
-          booking.pickupPoint.postalCode
+          booking.pickupPoint.postalCode,
+          { nullable: true }
         ),
         StringValidator.validate(
           `${this.path}.booking.pickupPoint.locality`,
-          booking.pickupPoint.locality
+          booking.pickupPoint.locality,
+          { nullable: true }
         ),
         StringValidator.validate(
           `${this.path}.booking.pickupPoint.region`,
-          booking.pickupPoint.region
+          booking.pickupPoint.region,
+          { nullable: true }
         ),
         StringValidator.validate(
           `${this.path}.booking.pickupPoint.state`,
-          booking.pickupPoint.state
+          booking.pickupPoint.state,
+          { nullable: true }
         ),
         StringValidator.validate(
           `${this.path}.booking.pickupPoint.country`,
-          booking.pickupPoint.country
+          booking.pickupPoint.country,
+          { nullable: true }
         ),
       ].filter(Boolean);
     }

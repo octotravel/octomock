@@ -6,6 +6,7 @@ import {
   UnitRestrictions,
   PricingPer,
 } from "@octocloud/types";
+import { OptionPickupValidator } from "./OptionPickupValidator";
 import { UnitValidator } from "../Unit/UnitValidator";
 import {
   StringValidator,
@@ -73,6 +74,7 @@ export class OptionValidator implements ModelValidator {
       ...this.validateUnits(option.units, pricingPer),
 
       ...this.validatePricingCapability(option, pricingPer),
+      ...this.validatePickupCapability(option),
     ].filter(Boolean);
   };
 
@@ -120,6 +122,16 @@ export class OptionValidator implements ModelValidator {
         path: `${this.path}`,
       });
       return pricingValidator.validate(option);
+    }
+    return [];
+  };
+
+  private validatePickupCapability = (option: Option): ValidatorError[] => {
+    if (this.capabilities.includes(CapabilityId.Pickups)) {
+      const pickupValidator = new OptionPickupValidator({
+        path: `${this.path}`,
+      });
+      return pickupValidator.validate(option);
     }
     return [];
   };

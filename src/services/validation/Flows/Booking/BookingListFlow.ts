@@ -114,10 +114,14 @@ export class BookingListFlow {
             availabilityId: validateData.availability[0].id,
             unitItems: [
               {
-                unitId: validateData.product.options[0].units[0].id,
+                unitId: validateData.product.options.find(
+                  (option) => option.id === validateData.optionId
+                ).units[0].id,
               },
               {
-                unitId: validateData.product.options[0].units[0].id,
+                unitId: validateData.product.options.find(
+                  (option) => option.id === validateData.optionId
+                ).units[0].id,
               },
             ],
           })
@@ -155,10 +159,14 @@ export class BookingListFlow {
             availabilityId: validateData.availability[0].id,
             unitItems: [
               {
-                unitId: validateData.product.options[0].units[0].id,
+                unitId: validateData.product.options.find(
+                  (option) => option.id === validateData.optionId
+                ).units[0].id,
               },
               {
-                unitId: validateData.product.options[0].units[0].id,
+                unitId: validateData.product.options.find(
+                  (option) => option.id === validateData.optionId
+                ).units[0].id,
               },
             ],
           })

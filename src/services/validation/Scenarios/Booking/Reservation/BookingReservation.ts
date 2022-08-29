@@ -15,6 +15,7 @@ export class BookingReservationScenario implements Scenario<Booking> {
   private availabilityId: string;
   private unitItems: BookingUnitItemSchema[];
   private notes: string;
+  private pickupPointId: string;
   private availabilityType: string;
   private deliveryMethods: DeliveryMethod[];
   private capabilities: CapabilityId[];
@@ -25,6 +26,7 @@ export class BookingReservationScenario implements Scenario<Booking> {
     availabilityId,
     unitItems,
     notes,
+    pickupPointId,
     availabilityType,
     deliveryMethods,
     capabilities,
@@ -34,7 +36,8 @@ export class BookingReservationScenario implements Scenario<Booking> {
     optionId: string;
     availabilityId: string;
     unitItems: BookingUnitItemSchema[];
-    notes: string;
+    notes?: string;
+    pickupPointId?: string;
     availabilityType: string;
     deliveryMethods: DeliveryMethod[];
     capabilities: CapabilityId[];
@@ -45,12 +48,22 @@ export class BookingReservationScenario implements Scenario<Booking> {
     this.availabilityId = availabilityId;
     this.unitItems = unitItems;
     this.notes = notes;
+    this.pickupPointId = pickupPointId;
     this.availabilityType = availabilityType;
     this.deliveryMethods = deliveryMethods;
     this.capabilities = capabilities;
   }
   private bookingReservationScenarioHelper =
     new BookingReservationScenarioHelper();
+  private addPickupsCapability = (pickupPointId?: string) => {
+    if (pickupPointId) {
+      return {
+        pickupRequested: true,
+        pickupPointId,
+      };
+    }
+    return {};
+  };
 
   public validate = async () => {
     const result = await this.apiClient.bookingReservation({
@@ -59,6 +72,7 @@ export class BookingReservationScenario implements Scenario<Booking> {
       availabilityId: this.availabilityId,
       unitItems: this.unitItems,
       notes: this.notes,
+      ...this.addPickupsCapability(this.pickupPointId),
     });
     const name = `Booking Reservation (${this.availabilityType})`;
 

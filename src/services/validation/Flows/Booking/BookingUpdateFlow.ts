@@ -150,10 +150,14 @@ export class BookingUpdateFlow {
             availabilityId: validateData.availabilityFrom[0].id,
             unitItems: [
               {
-                unitId: validateData.product.options[0].units[0].id,
+                unitId: validateData.product.options.find(
+                  (option) => option.id === validateData.optionId
+                ).units[0].id,
               },
               {
-                unitId: validateData.product.options[0].units[0].id,
+                unitId: validateData.product.options.find(
+                  (option) => option.id === validateData.optionId
+                ).units[0].id,
               },
             ],
           })
@@ -186,10 +190,14 @@ export class BookingUpdateFlow {
             availabilityId: validateData.availability[0].id,
             unitItems: [
               {
-                unitId: validateData.product.options[0].units[0].id,
+                unitId: validateData.product.options.find(
+                  (option) => option.id === validateData.optionId
+                ).units[0].id,
               },
               {
-                unitId: validateData.product.options[0].units[0].id,
+                unitId: validateData.product.options.find(
+                  (option) => option.id === validateData.optionId
+                ).units[0].id,
               },
             ],
           })
@@ -199,13 +207,19 @@ export class BookingUpdateFlow {
           uuid: booking.uuid,
           unitItems: [
             {
-              unitId: validateData.product.options[0].units[0].id,
+              unitId: validateData.product.options.find(
+                (option) => option.id === validateData.optionId
+              ).units[0].id,
             },
             {
-              unitId: validateData.product.options[0].units[0].id,
+              unitId: validateData.product.options.find(
+                (option) => option.id === validateData.optionId
+              ).units[0].id,
             },
             {
-              unitId: validateData.product.options[0].units[0].id,
+              unitId: validateData.product.options.find(
+                (option) => option.id === validateData.optionId
+              ).units[0].id,
             },
           ],
           capabilities: this.config.capabilities,
@@ -232,10 +246,14 @@ export class BookingUpdateFlow {
             availabilityId: validateData.availability[0].id,
             unitItems: [
               {
-                unitId: validateData.product.options[0].units[0].id,
+                unitId: validateData.product.options.find(
+                  (option) => option.id === validateData.optionId
+                ).units[0].id,
               },
               {
-                unitId: validateData.product.options[0].units[0].id,
+                unitId: validateData.product.options.find(
+                  (option) => option.id === validateData.optionId
+                ).units[0].id,
               },
             ],
           })
@@ -272,10 +290,14 @@ export class BookingUpdateFlow {
           availabilityId: this.startTimes.availabilityFrom[0].id,
           unitItems: [
             {
-              unitId: this.startTimes.product.options[0].units[0].id,
+              unitId: this.startTimes.product.options.find(
+                (option) => option.id === this.startTimes.optionId
+              ).units[0].id,
             },
             {
-              unitId: this.startTimes.product.options[0].units[0].id,
+              unitId: this.startTimes.product.options.find(
+                (option) => option.id === this.startTimes.optionId
+              ).units[0].id,
             },
           ],
         })
@@ -287,10 +309,14 @@ export class BookingUpdateFlow {
         optionId: this.openingHours.optionId,
         unitItems: [
           {
-            unitId: this.openingHours.product.options[0].units[0].id,
+            unitId: this.openingHours.product.options.find(
+              (option) => option.id === this.openingHours.optionId
+            ).units[0].id,
           },
           {
-            unitId: this.openingHours.product.options[0].units[0].id,
+            unitId: this.openingHours.product.options.find(
+              (option) => option.id === this.openingHours.optionId
+            ).units[0].id,
           },
         ],
         availabilityId: this.openingHours.availabilityTo[0].id,

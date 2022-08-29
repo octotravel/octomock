@@ -16,13 +16,11 @@ import {
   ModelValidator,
 } from "../ValidatorHelpers";
 import { ProductContentValidator } from "./ProductContentValidator";
-import { ProductPickupValidator } from "./ProductPickupValidator";
 import { ProductPricingValidator } from "./ProductPricingValidator";
 
 export class ProductValidator implements ModelValidator {
   private pricingValidator: ProductPricingValidator;
   private contentValidator: ProductContentValidator;
-  private pickupValidator: ProductPickupValidator;
   private path: string;
   private capabilities: CapabilityId[];
 
@@ -37,7 +35,6 @@ export class ProductValidator implements ModelValidator {
     this.capabilities = capabilities;
     this.pricingValidator = new ProductPricingValidator({ path: this.path });
     this.contentValidator = new ProductContentValidator({ path: this.path });
-    this.pickupValidator = new ProductPickupValidator({ path: this.path });
   }
 
   public validate = (product: Product): ValidatorError[] => {
@@ -96,7 +93,6 @@ export class ProductValidator implements ModelValidator {
 
       ...this.validatePricingCapability(product),
       ...this.validateContentCapability(product),
-      ...this.validatePickupCapability(product),
     ].filter(Boolean);
   };
 
@@ -123,13 +119,6 @@ export class ProductValidator implements ModelValidator {
   private validateContentCapability = (product: Product): ValidatorError[] => {
     if (this.capabilities.includes(CapabilityId.Content)) {
       return this.contentValidator.validate(product);
-    }
-    return [];
-  };
-
-  private validatePickupCapability = (product: Product): ValidatorError[] => {
-    if (this.capabilities.includes(CapabilityId.Pickups)) {
-      return this.pickupValidator.validate(product);
     }
     return [];
   };

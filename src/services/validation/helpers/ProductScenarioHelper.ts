@@ -38,6 +38,7 @@ export class ProductScenarioHelper {
         errors: [],
       });
     }
+
     const errors = this.getErrors(data.response.data.body, capabilities);
     return this.scenarioHelper.handleResult({
       ...data,
