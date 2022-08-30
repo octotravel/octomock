@@ -121,7 +121,7 @@ export class AvailabilityCalendarFlow {
       this.config.getProductConfigs().map(async (availabilityConfig) => {
         return new AvailabilityCalendarInvalidProductScenario({
           apiClient: this.apiClient,
-          productId: "Invalid productId",
+          productId: "invalid_productid",
           optionId:
             availabilityConfig.availabilityType ===
             AvailabilityType.OPENING_HOURS
@@ -142,7 +142,7 @@ export class AvailabilityCalendarFlow {
         return new AvailabilityCalendarInvalidOptionScenario({
           apiClient: this.apiClient,
           productId: availabilityConfig.productId,
-          optionId: "Invalid optionId",
+          optionId: "invalid_optionid",
           localDateStart: availabilityConfig.available.from,
           localDateEnd: availabilityConfig.available.to,
         });
