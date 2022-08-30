@@ -206,7 +206,7 @@ export class BookingConfirmationFlow {
     async (): Promise<BookingConfirmationInvalidUUIDScenario> => {
       return new BookingConfirmationInvalidUUIDScenario({
         apiClient: this.apiClient,
-        uuid: "Invalid UUID",
+        uuid: "invalid_UUID",
         contact: {},
         capabilities: this.config.capabilities,
       });
@@ -245,10 +245,10 @@ export class BookingConfirmationFlow {
           uuid: booking.uuid,
           unitItems: [
             {
-              unitId: "Invalid unitId",
+              unitId: "invalid_unitId",
             },
             {
-              unitId: "Invalid unitId",
+              unitId: "invalid_unitId",
             },
           ],
           contact: {},

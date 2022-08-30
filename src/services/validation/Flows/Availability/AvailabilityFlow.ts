@@ -197,7 +197,7 @@ export class AvailabilityFlow {
     return this.config.getProductConfigs().map((availabilityConfig) => {
       return new AvailabilityCheckInvalidProductScenario({
         apiClient: this.apiClient,
-        productId: "Invalid productId",
+        productId: "invalid_productid",
         optionId:
           availabilityConfig.availabilityType === AvailabilityType.OPENING_HOURS
             ? this.optionIdOpeningHours
@@ -214,7 +214,7 @@ export class AvailabilityFlow {
       return new AvailabilityCheckInvalidOptionScenario({
         apiClient: this.apiClient,
         productId: availabilityConfig.productId,
-        optionId: "Invalid optionId",
+        optionId: "invalid_optionid",
         localDate: availabilityConfig.available.from,
       });
     });
@@ -259,7 +259,7 @@ export class AvailabilityFlow {
                 ? this.optionIdOpeningHours
                 : this.optionIdStartTimes,
             localDate: availabilityConfig.available.from,
-            availabilityIds: ["Random availability ids"],
+            availabilityIds: ["random_availability_id"],
           });
 
         const datesAvailabilityIdsBody =
@@ -273,7 +273,7 @@ export class AvailabilityFlow {
                 : this.optionIdStartTimes,
             localDateStart: availabilityConfig.available.from,
             localDateEnd: availabilityConfig.available.to,
-            availabilityIds: ["Random availability ids"],
+            availabilityIds: ["random_availability_id"],
           });
 
         return [

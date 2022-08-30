@@ -188,8 +188,7 @@ export class BookingCancellationFlow {
     async (): Promise<BookingCancellationInvalidUUIDScenario> => {
       return new BookingCancellationInvalidUUIDScenario({
         apiClient: this.apiClient,
-        uuid: "Invalid UUID",
-        contact: {},
+        uuid: "invalid_UUID",
         capabilities: this.config.capabilities,
       });
     };

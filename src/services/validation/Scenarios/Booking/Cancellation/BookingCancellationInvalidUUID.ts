@@ -1,4 +1,4 @@
-import { BookingContactSchema, CapabilityId } from "@octocloud/types";
+import { CapabilityId } from "@octocloud/types";
 import { ApiClient } from "../../../ApiClient";
 import { Scenario } from "../../Scenario";
 import { InvalidBookingUUIDErrorValidator } from "../../../../../validators/backendValidator/Error/InvalidBookingUUIDErrorValidator";
@@ -7,28 +7,23 @@ import { BookingCancellationScenarioHelper } from "../../../helpers/BookingCance
 export class BookingCancellationInvalidUUIDScenario implements Scenario<null> {
   private apiClient: ApiClient;
   private uuid: string;
-  private contact: BookingContactSchema;
   constructor({
     apiClient,
     uuid,
-    contact,
   }: {
     apiClient: ApiClient;
     uuid: string;
-    contact: BookingContactSchema;
     capabilities: CapabilityId[];
   }) {
     this.apiClient = apiClient;
-    this.contact = contact;
     this.uuid = uuid;
   }
   private bookingCancellationScenarioHelper =
     new BookingCancellationScenarioHelper();
 
   public validate = async () => {
-    const result = await this.apiClient.bookingConfirmation({
+    const result = await this.apiClient.cancelBooking({
       uuid: this.uuid,
-      contact: this.contact,
     });
 
     const name =

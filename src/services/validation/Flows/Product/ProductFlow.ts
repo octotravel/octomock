@@ -66,7 +66,7 @@ export class ProductFlow {
     async (): Promise<GetProductInvalidScenario> => {
       return new GetProductInvalidScenario({
         apiClient: this.apiClient,
-        productId: "Invalid productId",
+        productId: "invalid_productid",
       });
     };
 }

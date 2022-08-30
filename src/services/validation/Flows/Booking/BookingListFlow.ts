@@ -171,7 +171,7 @@ export class BookingListFlow {
             ],
           })
         ).response.data.body;
-        const resellerReference = `TEST REFERENCE - ${DateHelper.getDate(
+        const resellerReference = `TEST_REFERENCE-${DateHelper.getDate(
           new Date().toISOString()
         )}`;
         await this.apiClient.bookingConfirmation({

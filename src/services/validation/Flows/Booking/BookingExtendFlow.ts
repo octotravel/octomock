@@ -159,7 +159,7 @@ export class BookingExtendFlow {
     async (): Promise<BookingReservationExtendInvalidUUIDScenario> => {
       return new BookingReservationExtendInvalidUUIDScenario({
         apiClient: this.apiClient,
-        uuid: "Invalid booking UUID",
+        uuid: "invalid_booking_UUID",
       });
     };
 }

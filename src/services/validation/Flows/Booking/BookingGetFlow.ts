@@ -184,8 +184,7 @@ export class BookingGetFlow {
     async (): Promise<BookingGetInvalidUUIDScenario> => {
       return new BookingGetInvalidUUIDScenario({
         apiClient: this.apiClient,
-        uuid: "Invalid UUID",
-        contact: {},
+        uuid: "invalid_UUID",
         capabilities: this.config.capabilities,
       });
     };

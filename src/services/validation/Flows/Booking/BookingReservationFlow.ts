@@ -191,7 +191,7 @@ export class BookingReservationFlow {
             : this.startTimes;
         return new BookingReservationInvalidProductScenario({
           apiClient: this.apiClient,
-          productId: "Invalid productId",
+          productId: "invalid_productId",
           optionId: validateData.optionId,
           availabilityId: validateData.availability[0].id,
           unitItems: [
@@ -224,7 +224,7 @@ export class BookingReservationFlow {
         return new BookingReservationInvalidOptionScenario({
           apiClient: this.apiClient,
           productId: validateData.productId,
-          optionId: "Invalid optionId",
+          optionId: "invalid_optionId",
           availabilityId: validateData.availability[0].id,
           unitItems: [
             {
@@ -257,7 +257,7 @@ export class BookingReservationFlow {
           apiClient: this.apiClient,
           productId: validateData.productId,
           optionId: validateData.optionId,
-          availabilityId: "Invalid availabilityId",
+          availabilityId: "invalid_availabilityId",
           unitItems: [
             {
               unitId: validateData.product.options.find(
@@ -334,10 +334,10 @@ export class BookingReservationFlow {
           availabilityId: validateData.availability[0].id,
           unitItems: [
             {
-              unitId: "invalid unitId",
+              unitId: "invalid_unitId",
             },
             {
-              unitId: "invalid unitId",
+              unitId: "invalid_unitId",
             },
           ],
           capabilities: this.config.capabilities,
