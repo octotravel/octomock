@@ -19,7 +19,7 @@ import { AvailabilityService } from "./../services/AvailabilityService";
 import { ProductService } from "./../services/ProductService";
 import { BookingService } from "../services/BookingService";
 import { BookingBuilder } from "../builders/BookingBuilder";
-import R from "ramda";
+import * as R from "ramda";
 import { BookingModel } from "../models/Booking";
 
 interface IBookingController {

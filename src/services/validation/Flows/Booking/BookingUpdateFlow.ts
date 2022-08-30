@@ -1,5 +1,5 @@
 import { AvailabilityType, Booking } from "@octocloud/types";
-import R from "ramda";
+import * as R from "ramda";
 import { BadRequestError } from "../../../../models/Error";
 import { ApiClient } from "../../ApiClient";
 import { Config } from "../../config/Config";

@@ -13,7 +13,7 @@ import { AvailabilityCheckInvalidOptionScenario } from "../../Scenarios/Availabi
 import { AvailabilityCheckBadRequestScenario } from "../../Scenarios/Availability/AvailabilityCheckBadRequest";
 import { AvailabilityCheckAvailabilityIdScenario } from "../../Scenarios/Availability/AvailabilityCheckAvailabilityId";
 import { BadRequestError } from "../../../../models/Error";
-import R from "ramda";
+import * as R from "ramda";
 
 export class AvailabilityFlow {
   public config: Config;

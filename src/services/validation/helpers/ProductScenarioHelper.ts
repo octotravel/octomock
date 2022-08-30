@@ -1,4 +1,4 @@
-import R from "ramda";
+import * as R from "ramda";
 import { ScenarioHelper } from "./ScenarioHelper";
 import { ModelValidator } from "./../../../validators/backendValidator/ValidatorHelpers";
 import { CapabilityId } from "@octocloud/types";

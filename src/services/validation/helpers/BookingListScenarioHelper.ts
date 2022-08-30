@@ -1,5 +1,5 @@
 import { Booking, CapabilityId } from "@octocloud/types";
-import R from "ramda";
+import * as R from "ramda";
 import { BookingValidator } from "../../../validators/backendValidator/Booking/BookingValidator";
 import { ModelValidator } from "../../../validators/backendValidator/ValidatorHelpers";
 import {

@@ -33,7 +33,10 @@ app.use(async (ctx, next) => {
     } else {
       const error = new InternalServerError(err.message);
       ctx.status = error.status;
-      ctx.body = error.body;
+      ctx.body = {
+        ...error.body,
+        stack: error.stack,
+      };
     }
   }
 });
