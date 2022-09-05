@@ -149,14 +149,10 @@ export class UnprocessableEntityError extends OctoError {
 
 export class InternalServerError extends OctoError {
   constructor(message?: string) {
-    super();
     super({
       status: STATUS_INTERNAL_SERVER_ERROR,
       error: INTERNAL_SERVER_ERROR,
       errorMessage: message ?? ERROR_MESSAGE_INTERNAL_SERVER_ERROR,
-      bodyParams: {
-        stack: this.stack,
-      },
     });
   }
 }

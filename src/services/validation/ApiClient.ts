@@ -297,7 +297,7 @@ export class ApiClient {
   private mapHeaders = (): Record<string, string> => {
     return {
       "Octo-Capabilities": this.capabilities.join(", "),
-      Authorization: this.apiKey,
+      Authorization: `Bearer ${this.apiKey}`,
       "content-type": "application/json",
     };
   };

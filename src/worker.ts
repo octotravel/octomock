@@ -18,11 +18,11 @@ export default {
       return new Response("Method Not Allowed", { status: 400 });
     }
     try {
-      const apiKey = request.headers.get("authorization") ?? null;
       const reqBody = await request.json();
       await validationConfigSchema.validate(reqBody);
       const schema = validationConfigSchema.cast(reqBody);
-      const config = await new ConfigParser().parse(schema, apiKey);
+      const config = await new ConfigParser().parse(schema);
+      console.log(config);
       const body = await new ValidationController({ config }).validate();
 
       return new Response(JSON.stringify(body), {
