@@ -1,11 +1,11 @@
 import { ApiClient } from "../../ApiClient";
 import { Config } from "../../config/Config";
 import { ScenarioResult } from "../../Scenarios/Scenario";
-import { GetSuppliersScenario } from "../../Scenarios/Supplier/GetSuppliers";
-import { GetSupplierInvalidScenario } from "../../Scenarios/Supplier/GetSupplierInvalid";
+import { GetCapabilitiesInvalidScenario } from "../../Scenarios/Capabilities/GetCapabilitiesInvalid";
 import { FlowResult } from "../Flow";
+import { GetCapabilitiesScenario } from "../../Scenarios/Capabilities/GetCapabilities";
 
-export class SupplierFlow {
+export class CapabilitiesFlow {
   private config: Config;
   private apiClient: ApiClient;
   constructor({ config }: { config: Config }) {
@@ -19,7 +19,7 @@ export class SupplierFlow {
 
   private setFlow = (scenarios: ScenarioResult<any>[]): FlowResult => {
     return {
-      name: "Get Suppliers",
+      name: "Get Capabilities",
       success: scenarios.every((scenario) => scenario.success),
       totalScenarios: scenarios.length,
       succesScenarios: scenarios.filter((scenario) => scenario.success).length,
@@ -29,8 +29,8 @@ export class SupplierFlow {
 
   public validate = async (): Promise<FlowResult> => {
     const scenarios = [
-      await this.validateGetSuppliers(),
-      await this.validateGetSupplierInvalid(),
+      await this.validateGetCapabilitiess(),
+      await this.validateGetCapabilitiesInvalid(),
     ];
 
     const results = [];
@@ -44,17 +44,16 @@ export class SupplierFlow {
     return this.setFlow(results);
   };
 
-  private validateGetSuppliers = async (): Promise<GetSuppliersScenario> => {
-    return new GetSuppliersScenario({
-      apiClient: this.apiClient,
-      capabilities: this.config.capabilities,
-    });
-  };
-  private validateGetSupplierInvalid =
-    async (): Promise<GetSupplierInvalidScenario> => {
-      return new GetSupplierInvalidScenario({
+  private validateGetCapabilitiess =
+    async (): Promise<GetCapabilitiesScenario> => {
+      return new GetCapabilitiesScenario({
         apiClient: this.apiClient,
-        supplierId: "Invalid supplierId",
+      });
+    };
+  private validateGetCapabilitiesInvalid =
+    async (): Promise<GetCapabilitiesInvalidScenario> => {
+      return new GetCapabilitiesInvalidScenario({
+        apiClient: this.apiClient,
       });
     };
 }

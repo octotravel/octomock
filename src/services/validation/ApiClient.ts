@@ -7,6 +7,7 @@ import {
   Booking,
   CancelBookingBodySchema,
   CancelBookingPathParamsSchema,
+  Capability,
   CapabilityId,
   ConfirmBookingBodySchema,
   ConfirmBookingPathParamsSchema,
@@ -62,6 +63,20 @@ export class ApiClient {
     this.url = url;
     this.apiKey = apiKey;
   }
+
+  public getCapabilities = async (
+    _?: ApiParams
+  ): Promise<Result<Capability[]>> => {
+    const url = `${this.url}/capabilities`;
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        ...this.mapHeaders(),
+      },
+    });
+    return await this.setResponse({ url, body: null }, response);
+  };
+
   public getSuppliers = async (_?: ApiParams): Promise<Result<Supplier[]>> => {
     const url = `${this.url}/suppliers`;
     const response = await fetch(url, {

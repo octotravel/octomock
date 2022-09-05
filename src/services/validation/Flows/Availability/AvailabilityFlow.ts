@@ -11,9 +11,9 @@ import { AvailabilityCheckUnavailableDatesScenario } from "../../Scenarios/Avail
 import { AvailabilityCheckInvalidProductScenario } from "../../Scenarios/Availability/AvailabilityCheckInvalidProduct";
 import { AvailabilityCheckInvalidOptionScenario } from "../../Scenarios/Availability/AvailabilityCheckInvalidOption";
 import { AvailabilityCheckBadRequestScenario } from "../../Scenarios/Availability/AvailabilityCheckBadRequest";
-import { AvailabilityCheckAvailabilityIdScenario } from "../../Scenarios/Availability/AvailabilityCheckAvailabilityId";
-import { BadRequestError } from "../../../../models/Error";
-import * as R from "ramda";
+// import { AvailabilityCheckAvailabilityIdScenario } from "../../Scenarios/Availability/AvailabilityCheckAvailabilityId";
+// import { BadRequestError } from "../../../../models/Error";
+// import * as R from "ramda";
 
 export class AvailabilityFlow {
   public config: Config;
@@ -127,46 +127,46 @@ export class AvailabilityFlow {
       });
     };
 
-  private validateAvailabilityCheckAvailabilityId = async (): Promise<
-    AvailabilityCheckAvailabilityIdScenario[]
-  > => {
-    return Promise.all(
-      this.config.getProductConfigs().map(async (availabilityConfig) => {
-        const dates = eachDayOfInterval({
-          start: new Date(availabilityConfig.available.from),
-          end: new Date(availabilityConfig.available.to),
-        }).map((date) => {
-          return DateHelper.availabilityDateFormat(date);
-        });
-        const availability = (
-          await this.apiClient.getAvailability({
-            productId: availabilityConfig.productId,
-            optionId:
-              availabilityConfig.availabilityType ===
-              AvailabilityType.OPENING_HOURS
-                ? this.optionIdOpeningHours
-                : this.optionIdStartTimes,
-            localDate: dates[Math.floor(Math.random() * dates.length)],
-          })
-        ).response.data.body;
-        if (R.isEmpty(availability)) {
-          throw new BadRequestError("Invalid available dates!");
-        }
-        return new AvailabilityCheckAvailabilityIdScenario({
-          apiClient: this.apiClient,
-          productId: availabilityConfig.productId,
-          optionId:
-            availabilityConfig.availabilityType ===
-            AvailabilityType.OPENING_HOURS
-              ? this.optionIdOpeningHours
-              : this.optionIdStartTimes,
-          availabilityType: availabilityConfig.availabilityType,
-          availabilityIds: [availability[0].id],
-          capabilities: this.config.capabilities,
-        });
-      })
-    );
-  };
+  // private validateAvailabilityCheckAvailabilityId = async (): Promise<
+  //   AvailabilityCheckAvailabilityIdScenario[]
+  // > => {
+  //   return Promise.all(
+  //     this.config.getProductConfigs().map(async (availabilityConfig) => {
+  //       const dates = eachDayOfInterval({
+  //         start: new Date(availabilityConfig.available.from),
+  //         end: new Date(availabilityConfig.available.to),
+  //       }).map((date) => {
+  //         return DateHelper.availabilityDateFormat(date);
+  //       });
+  //       const availability = (
+  //         await this.apiClient.getAvailability({
+  //           productId: availabilityConfig.productId,
+  //           optionId:
+  //             availabilityConfig.availabilityType ===
+  //             AvailabilityType.OPENING_HOURS
+  //               ? this.optionIdOpeningHours
+  //               : this.optionIdStartTimes,
+  //           localDate: dates[Math.floor(Math.random() * dates.length)],
+  //         })
+  //       ).response.data.body;
+  //       if (R.isEmpty(availability)) {
+  //         throw new BadRequestError("Invalid available dates!");
+  //       }
+  //       return new AvailabilityCheckAvailabilityIdScenario({
+  //         apiClient: this.apiClient,
+  //         productId: availabilityConfig.productId,
+  //         optionId:
+  //           availabilityConfig.availabilityType ===
+  //           AvailabilityType.OPENING_HOURS
+  //             ? this.optionIdOpeningHours
+  //             : this.optionIdStartTimes,
+  //         availabilityType: availabilityConfig.availabilityType,
+  //         availabilityIds: [availability[0].id],
+  //         capabilities: this.config.capabilities,
+  //       });
+  //     })
+  //   );
+  // };
 
   private validateAvailabilityCheckUnavailableDates =
     (): AvailabilityCheckUnavailableDatesScenario[] => {
