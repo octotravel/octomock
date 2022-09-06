@@ -21,9 +21,9 @@ export default {
       const reqBody = await request.json();
       await validationConfigSchema.validate(reqBody);
       const schema = validationConfigSchema.cast(reqBody);
-      const config = await new ConfigParser().parse(schema);
-      console.log(config);
-      const body = await new ValidationController({ config }).validate();
+      const preConfig = await new ConfigParser().parse(schema);
+      console.log(preConfig);
+      const body = await new ValidationController({ preConfig }).validate();
 
       return new Response(JSON.stringify(body), {
         status: 200,

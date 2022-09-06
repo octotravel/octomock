@@ -26,9 +26,9 @@ router.post("/validate", async (ctx, _) => {
   // create some init class
   await validationConfigSchema.validate(ctx.request.body);
   const schema = validationConfigSchema.cast(ctx.request.body);
-  const config = await new ConfigParser().parse(schema);
+  const preConfig = await new ConfigParser().parse(schema);
 
-  const body = await new ValidationController({ config }).validate();
+  const body = await new ValidationController({ preConfig }).validate();
 
   ctx.status = 200;
   ctx.body = body;

@@ -54,7 +54,7 @@ export class SupplierFlow {
     async (): Promise<GetSupplierInvalidScenario> => {
       return new GetSupplierInvalidScenario({
         apiClient: this.apiClient,
-        supplierId: "Invalid supplierId",
+        supplierId: "Invalid_supplierId",
       });
     };
 }

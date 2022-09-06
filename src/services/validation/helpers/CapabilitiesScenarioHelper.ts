@@ -1,7 +1,8 @@
 import * as R from "ramda";
 import { ScenarioHelper } from "./ScenarioHelper";
 import { ModelValidator } from "../../../validators/backendValidator/ValidatorHelpers";
-import { CapabilityId } from "@octocloud/types";
+import { Capability } from "@octocloud/types";
+import { CapabilityValidator } from "../../../validators/backendValidator/Capability/CapabilityValidator";
 
 export interface CapabilitiesScenarioData {
   name: string;
@@ -12,8 +13,10 @@ export interface CapabilitiesScenarioData {
 export class CapabilitiesScenarioHelper {
   private scenarioHelper = new ScenarioHelper();
 
-  private getErrors = (_capabilities: CapabilityId[]) => {
-    return [];
+  private getErrors = (capabilities: Capability[]) => {
+    return capabilities.reduce((acc, result) => {
+      return [...acc, ...new CapabilityValidator({}).validate(result)];
+    }, []);
   };
 
   public validateCapabilities = (data: CapabilitiesScenarioData) => {

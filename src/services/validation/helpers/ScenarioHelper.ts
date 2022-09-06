@@ -1,5 +1,6 @@
 import { CapabilityId, DeliveryMethod } from "@octocloud/types";
 import { ResultRequest, ResultResponse } from "../ApiClient";
+import { ScenarioResult } from "../Scenarios/Scenario";
 
 interface ScenarioData {
   name: string;
@@ -23,7 +24,7 @@ export interface ScenarioConfigData {
 }
 
 export class ScenarioHelper {
-  public handleResult = (data: ScenarioData) => {
+  public handleResult = (data: ScenarioData): ScenarioResult<any> => {
     return {
       name: data.name,
       success: data.success,

@@ -2,9 +2,10 @@ import { ApiClient } from "../../ApiClient";
 import { Config } from "../../config/Config";
 import { ScenarioResult } from "../../Scenarios/Scenario";
 import { GetProductScenario } from "../../Scenarios/Product/GetProduct";
-import { GetProductInvalidScenario } from "../../Scenarios/Product/GetProductInvalid";
-import { GetProductsScenario } from "../../Scenarios/Product/GetProducts";
+// import { GetProductInvalidScenario } from "../../Scenarios/Product/GetProductInvalid";
+// import { GetProductsScenario } from "../../Scenarios/Product/GetProducts";
 import { FlowResult } from "../Flow";
+import { AvailabilityType } from "@octocloud/types";
 
 export class ProductFlow {
   private config: Config;
@@ -31,8 +32,8 @@ export class ProductFlow {
   public validate = async (): Promise<FlowResult> => {
     const scenarios = [
       ...(await this.validateGetProduct()),
-      await this.validateGetProducts(),
-      await this.validateGetProductInvalid(),
+      // await this.validateGetProducts(),
+      // await this.validateGetProductInvalid(),
     ];
 
     const results = [];
@@ -47,26 +48,38 @@ export class ProductFlow {
   };
 
   private validateGetProduct = async (): Promise<GetProductScenario[]> => {
-    return this.config.getProductConfigs().map((productConfig) => {
-      return new GetProductScenario({
-        apiClient: this.apiClient,
-        productId: productConfig.productId,
-        availabilityType: productConfig.availabilityType,
-        capabilities: this.config.capabilities,
-      });
-    });
+    return [
+      this.config.startTimesProducts
+        ? new GetProductScenario({
+            apiClient: this.apiClient,
+            productId:
+              this.config.startTimesProducts.availabilityAvailable.productId,
+            availabilityType: AvailabilityType.START_TIME,
+            capabilities: this.config.capabilities,
+          })
+        : null,
+      this.config.openingHoursProducts
+        ? new GetProductScenario({
+            apiClient: this.apiClient,
+            productId:
+              this.config.openingHoursProducts.availabilityAvailable.productId,
+            availabilityType: AvailabilityType.OPENING_HOURS,
+            capabilities: this.config.capabilities,
+          })
+        : null,
+    ].filter(Boolean);
   };
-  private validateGetProducts = async (): Promise<GetProductsScenario> => {
-    return new GetProductsScenario({
-      apiClient: this.apiClient,
-      capabilities: this.config.capabilities,
-    });
-  };
-  private validateGetProductInvalid =
-    async (): Promise<GetProductInvalidScenario> => {
-      return new GetProductInvalidScenario({
-        apiClient: this.apiClient,
-        productId: "invalid_productid",
-      });
-    };
+  // private validateGetProducts = async (): Promise<GetProductsScenario> => {
+  //   return new GetProductsScenario({
+  //     apiClient: this.apiClient,
+  //     capabilities: this.config.capabilities,
+  //   });
+  // };
+  // private validateGetProductInvalid =
+  //   async (): Promise<GetProductInvalidScenario> => {
+  //     return new GetProductInvalidScenario({
+  //       apiClient: this.apiClient,
+  //       productId: "invalid_productid",
+  //     });
+  //   };
 }

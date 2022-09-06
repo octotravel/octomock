@@ -1,60 +1,47 @@
-import { AvailabilityType, CapabilityId } from "@octocloud/types";
-import { ProductValidatorConfig } from "./ProductValidatorConfig";
+import { CapabilityId } from "@octocloud/types";
+import { ProductValidatorData } from "./ProductValidatorData";
 
 export class Config {
   public url: string;
-  public capabilities: CapabilityId[];
-  public supplierId: string;
-  private productStartTimes: Nullable<ProductValidatorConfig>;
-  private productOpeningHours: Nullable<ProductValidatorConfig>;
   public apiKey: string;
+  public capabilities: CapabilityId[];
+
+  public startTimesProducts: ProductValidatorData;
+  public openingHoursProducts: ProductValidatorData;
+  public availabilityRequiredFalseProducts: ProductValidatorData;
+
   public ignoreKill: boolean;
 
   constructor({
     url,
-    capabilities,
-    supplierId,
-    productStartTimes,
-    productOpeningHours,
     apiKey,
+    capabilities,
+
+    startTimesProducts,
+    openingHoursProducts,
+    availabilityRequiredFalseProducts,
+
     ignoreKill,
   }: {
-    capabilities: CapabilityId[];
     url: string;
-    supplierId: string;
-    productStartTimes?: ProductValidatorConfig;
-    productOpeningHours?: ProductValidatorConfig;
     apiKey: string;
+    capabilities: CapabilityId[];
+
+    startTimesProducts?: ProductValidatorData;
+    openingHoursProducts?: ProductValidatorData;
+    availabilityRequiredFalseProducts?: ProductValidatorData;
+
     ignoreKill: boolean;
   }) {
     this.url = url;
-    this.capabilities = capabilities;
-    this.supplierId = supplierId;
-    this.productStartTimes = productStartTimes ?? null;
-    this.productOpeningHours = productOpeningHours ?? null;
     this.apiKey = apiKey;
+    this.capabilities = capabilities;
+
+    this.startTimesProducts = startTimesProducts ?? null;
+    this.openingHoursProducts = openingHoursProducts ?? null;
+    this.availabilityRequiredFalseProducts =
+      availabilityRequiredFalseProducts ?? null;
+
     this.ignoreKill = ignoreKill;
   }
-
-  public getAvailabilityTypes = (): AvailabilityType[] => {
-    const types: AvailabilityType[] = [];
-    if (this.productStartTimes) {
-      types.push(AvailabilityType.START_TIME);
-    }
-    if (this.productOpeningHours) {
-      types.push(AvailabilityType.OPENING_HOURS);
-    }
-    return types;
-  };
-
-  public getProductConfigs = (): ProductValidatorConfig[] => {
-    const configs: ProductValidatorConfig[] = [];
-    if (this.productStartTimes) {
-      configs.push(this.productStartTimes);
-    }
-    if (this.productOpeningHours) {
-      configs.push(this.productOpeningHours);
-    }
-    return configs;
-  };
 }

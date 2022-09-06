@@ -2,9 +2,8 @@ import { Config } from "../config/Config";
 import { Flow, FlowResult } from "./Flow";
 import { SupplierFlow } from "./Supplier/SupplierFlow";
 import { ProductFlow } from "./Product/ProductFlow";
-import { AvailabilityFlow } from "./Availability/AvailabilityFlow";
-import { AvailabilityCalendarFlow } from "./Availability/AvailabilityCalendarFlow";
-import { CapabilitiesFlow } from "./Capabilites/CapabilitiesFlow";
+// import { AvailabilityFlow } from "./Availability/AvailabilityFlow";
+// import { AvailabilityCalendarFlow } from "./Availability/AvailabilityCalendarFlow";
 // import { BookingReservationFlow } from "./Booking/BookingReservationFlow";
 // import { BookingExtendFlow } from "./Booking/BookingExtendFlow";
 // import { BookingConfirmationFlow } from "./Booking/BookingConfirmationFlow";
@@ -20,12 +19,12 @@ export class PrimiteFlows {
   }
   public validate = async (): Promise<FlowResult[]> => {
     const config = this.config;
+
     const flows: Flow[] = [
-      new CapabilitiesFlow({ config }),
       new SupplierFlow({ config }),
       new ProductFlow({ config }),
-      new AvailabilityFlow({ config }),
-      new AvailabilityCalendarFlow({ config }),
+      // new AvailabilityFlow({ config }),
+      // new AvailabilityCalendarFlow({ config }),
       // new BookingReservationFlow({ config }),
       // new BookingExtendFlow({ config }),
       // new BookingConfirmationFlow({ config }),

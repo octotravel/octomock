@@ -5,7 +5,14 @@ interface StringValidatorParams {
   equalsTo?: string;
 }
 
-export class ValidatorError extends Error {}
+enum ErrorType {
+  WARNING = "WARNING",
+  CRITICAL = "CRITICAL",
+}
+
+export class ValidatorError extends Error {
+  type: ErrorType;
+}
 
 export interface ModelValidator {
   validate(...args: any[]): ValidatorError[];

@@ -55,7 +55,7 @@ export class ApiClient {
     url,
     apiKey,
   }: {
-    capabilities: CapabilityId[];
+    capabilities?: CapabilityId[];
     url: string;
     apiKey: string;
   }) {
@@ -71,7 +71,8 @@ export class ApiClient {
     const response = await fetch(url, {
       method: "GET",
       headers: {
-        ...this.mapHeaders(),
+        Authorization: `Bearer ${this.apiKey}`,
+        "content-type": "application/json",
       },
     });
     return await this.setResponse({ url, body: null }, response);
