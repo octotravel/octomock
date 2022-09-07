@@ -2,7 +2,7 @@
 export const STATUS_BAD_REQUEST = 400;
 // const STATUS_UNAUTHORIZED = 401;
 // const STATUS_FORBIDDEN = 403;
-export const STATUS_NOT_FOUD = 404;
+export const STATUS_NOT_FOUND = 404;
 const STATUS_INTERNAL_SERVER_ERROR = 500;
 // const MESSAGE_BAD_REQUEST = "Bad Request";
 // const MESSAGE_UNAUTHORIZED = "Unauthorized";
@@ -141,7 +141,7 @@ export class BadRequestError extends OctoError {
 export class NotFoundError extends OctoError {
   constructor(message?: string) {
     super({
-      status: STATUS_NOT_FOUD,
+      status: STATUS_NOT_FOUND,
       error: NOT_FOUND,
       errorMessage: message ?? ERROR_MESSAGE_NOT_FOUND,
     });

@@ -1,5 +1,5 @@
 import { ValidatedError } from "./index";
-import { NOT_FOUND, STATUS_NOT_FOUD } from "../../../models/Error";
+import { NOT_FOUND, STATUS_NOT_FOUND } from "../../../models/Error";
 import {
   ModelValidator,
   NumberValidator,
@@ -16,7 +16,7 @@ export class NotFoundErrorValidator implements ModelValidator {
       StringValidator.validate(`errorMessage`, data.body.errorMessage),
       NumberValidator.validate(`status`, data.status, {
         integer: true,
-        equalsTo: STATUS_NOT_FOUD,
+        equalsTo: STATUS_NOT_FOUND,
       }),
     ].filter(Boolean);
   };
