@@ -15,7 +15,6 @@ export class ValidationController {
     const capabilitiesFlow = await new CapabilitiesFlow(preConfig).validate();
 
     const config = await new ConfigParser().fetch(preConfig, capabilitiesFlow);
-
     const primitiveFlows = await new PrimiteFlows({ config }).validate();
 
     // new ComplextFlows().validate()

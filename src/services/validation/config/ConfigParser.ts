@@ -1,4 +1,8 @@
-import { AvailabilityStatus, AvailabilityType } from "@octocloud/types";
+import {
+  AvailabilityStatus,
+  AvailabilityType,
+  Product,
+} from "@octocloud/types";
 import { DateHelper } from "../../../helpers/DateHelper";
 import { BadRequestError } from "../../../models/Error";
 import { ValidationConfig } from "../../../schemas/Validation";
@@ -6,7 +10,6 @@ import { ApiClient } from "../ApiClient";
 import { FlowResult } from "../Flows/Flow";
 import { Config } from "./Config";
 import { PreConfig } from "./PreConfig";
-import { ProductValidatorData } from "./ProductValidatorData";
 import { addDays } from "date-fns";
 
 export class ConfigParser {
@@ -18,15 +21,77 @@ export class ConfigParser {
     });
   };
 
+  private getAvailabilities = async (
+    apiClient: ApiClient,
+    products: Product[],
+    availabilityStatus: AvailabilityStatus
+  ) => {
+    for await (const product of products) {
+      const defaultOption = product.options.find((option) => option.default);
+      if (!defaultOption) {
+        throw new BadRequestError("Atleast one option must be default");
+      }
+      const availability = (
+        await apiClient.getAvailability({
+          productId: product.id,
+          optionId: defaultOption.id,
+          localDateStart: DateHelper.getDate(new Date().toISOString()),
+          localDateEnd: DateHelper.getDate(
+            addDays(new Date(), 30).toISOString()
+          ),
+        })
+      ).response.data.body.find(
+        (availability) => availability.status === availabilityStatus
+      );
+      if (availability) {
+        return {
+          productId: product.id,
+          optionId: defaultOption.id,
+          availabilityId: availability.id,
+        };
+      }
+    }
+  };
+
+  private getProducts = async (
+    apiClient: ApiClient,
+    products: Product[],
+    availabilityType: AvailabilityType
+  ) => {
+    const filteredProducts = products.filter(
+      (product) => product.availabilityType === availabilityType
+    );
+    const availabilityAvailable = await this.getAvailabilities(
+      apiClient,
+      filteredProducts,
+      AvailabilityStatus.AVAILABLE
+    );
+
+    const availabilitySoldOut = await this.getAvailabilities(
+      apiClient,
+      filteredProducts,
+      AvailabilityStatus.SOLD_OUT
+    );
+
+    return {
+      products: filteredProducts,
+      availabilityAvailable,
+      availabilitySoldOut,
+    };
+  };
+
   public fetch = async (
     data: PreConfig,
     capabilitiesFlow: FlowResult
   ): Promise<Config> => {
     const capabilities = capabilitiesFlow.scenarios[0].response.body.map(
       (capability) => {
-        return capability.id;
+        if (capability.id) {
+          return capability.id;
+        }
       }
     );
+
     const apiClient = new ApiClient({
       capabilities,
       url: data.url,
@@ -38,121 +103,19 @@ export class ConfigParser {
       throw new BadRequestError("Invalid products");
     }
 
-    const startTimesProductsOnly = products.data.body.filter(
-      (product) => product.availabilityType === AvailabilityType.START_TIME
+    const startTimesProducts = await this.getProducts(
+      apiClient,
+      products.data.body,
+      AvailabilityType.START_TIME
     );
-    let STavailabilityAvailable = null;
-    for await (const product of startTimesProductsOnly) {
-      const optionId = product.options.find((option) => option.default).id;
-      const availability = (
-        await apiClient.getAvailability({
-          productId: product.id,
-          optionId,
-          localDateStart: DateHelper.getDate(new Date().toISOString()),
-          localDateEnd: DateHelper.getDate(
-            addDays(new Date(), 30).toISOString()
-          ),
-        })
-      ).response.data.body.find(
-        (availability) => availability.status === AvailabilityStatus.AVAILABLE
-      );
-      if (availability) {
-        STavailabilityAvailable = {
-          product: product.id,
-          optionId,
-          availabilityId: availability.id,
-        };
-        break;
-      }
-    }
-    let STavailabilitySoldOut = null;
-    for await (const product of startTimesProductsOnly) {
-      const optionId = product.options.find((option) => option.default).id;
-      const availability = (
-        await apiClient.getAvailability({
-          productId: product.id,
-          optionId,
-          localDateStart: DateHelper.getDate(new Date().toISOString()),
-          localDateEnd: DateHelper.getDate(
-            addDays(new Date(), 30).toISOString()
-          ),
-        })
-      ).response.data.body.find(
-        (availability) => availability.status === AvailabilityStatus.SOLD_OUT
-      );
-      if (availability) {
-        STavailabilitySoldOut = {
-          product: product.id,
-          optionId,
-          availabilityId: availability.id,
-        };
-        break;
-      }
-    }
+    console.log("post1");
 
-    const startTimesProducts: ProductValidatorData = {
-      products: startTimesProductsOnly,
-      availabilityAvailable: STavailabilityAvailable,
-      availabilitySoldOut: STavailabilitySoldOut,
-    };
-
-    const openingHoursProductsOnly = products.data.body.filter(
-      (product) => product.availabilityType === AvailabilityType.OPENING_HOURS
+    const openingHoursProducts = await this.getProducts(
+      apiClient,
+      products.data.body,
+      AvailabilityType.START_TIME
     );
-    let OHavailabilityAvailable = null;
-    for await (const product of openingHoursProductsOnly) {
-      const optionId = product.options.find((option) => option.default).id;
-      const availability = (
-        await apiClient.getAvailability({
-          productId: product.id,
-          optionId,
-          localDateStart: DateHelper.getDate(new Date().toISOString()),
-          localDateEnd: DateHelper.getDate(
-            addDays(new Date(), 30).toISOString()
-          ),
-        })
-      ).response.data.body.find(
-        (availability) => availability.status === AvailabilityStatus.AVAILABLE
-      );
-      if (availability) {
-        OHavailabilityAvailable = {
-          product: product.id,
-          optionId,
-          availabilityId: availability.id,
-        };
-        break;
-      }
-    }
-    let OHavailabilitySoldOut = null;
-    for await (const product of openingHoursProductsOnly) {
-      const optionId = product.options.find((option) => option.default).id;
-      const availability = (
-        await apiClient.getAvailability({
-          productId: product.id,
-          optionId,
-          localDateStart: DateHelper.getDate(new Date().toISOString()),
-          localDateEnd: DateHelper.getDate(
-            addDays(new Date(), 30).toISOString()
-          ),
-        })
-      ).response.data.body.find(
-        (availability) => availability.status === AvailabilityStatus.SOLD_OUT
-      );
-      if (availability) {
-        OHavailabilitySoldOut = {
-          product: product.id,
-          optionId,
-          availabilityId: availability.id,
-        };
-        break;
-      }
-    }
-
-    const openingHoursProducts: ProductValidatorData = {
-      products: openingHoursProductsOnly,
-      availabilityAvailable: OHavailabilityAvailable,
-      availabilitySoldOut: OHavailabilitySoldOut,
-    };
+    console.log("post2");
 
     return new Config({
       url: data.url,
