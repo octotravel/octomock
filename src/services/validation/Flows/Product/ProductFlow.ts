@@ -5,7 +5,6 @@ import { GetProductScenario } from "../../Scenarios/Product/GetProduct";
 import { GetProductInvalidScenario } from "../../Scenarios/Product/GetProductInvalid";
 import { GetProductsScenario } from "../../Scenarios/Product/GetProducts";
 import { FlowResult } from "../Flow";
-import { AvailabilityType } from "@octocloud/types";
 
 export class ProductFlow {
   private config: Config;
@@ -31,7 +30,7 @@ export class ProductFlow {
 
   public validate = async (): Promise<FlowResult> => {
     const scenarios = [
-      ...(await this.validateGetProduct()),
+      await this.validateGetProduct(),
       await this.validateGetProducts(),
       await this.validateGetProductInvalid(),
     ];
@@ -47,27 +46,26 @@ export class ProductFlow {
     return this.setFlow(results);
   };
 
-  private validateGetProduct = async (): Promise<GetProductScenario[]> => {
-    return [
-      this.config.startTimesProducts.availabilityAvailable
-        ? new GetProductScenario({
-            apiClient: this.apiClient,
-            productId:
-              this.config.startTimesProducts.availabilityAvailable.productId,
-            availabilityType: AvailabilityType.START_TIME,
-            capabilities: this.config.capabilities,
-          })
-        : null,
-      this.config.openingHoursProducts.availabilityAvailable
-        ? new GetProductScenario({
-            apiClient: this.apiClient,
-            productId:
-              this.config.openingHoursProducts.availabilityAvailable.productId,
-            availabilityType: AvailabilityType.OPENING_HOURS,
-            capabilities: this.config.capabilities,
-          })
-        : null,
-    ].filter(Boolean);
+  private validateGetProduct = async (): Promise<GetProductScenario> => {
+    let productId = null;
+    if (this.config.availabilityRequiredFalseProducts.availabilityAvailable) {
+      productId =
+        this.config.availabilityRequiredFalseProducts.availabilityAvailable
+          .productId;
+    }
+    if (this.config.openingHoursProducts.availabilityAvailable) {
+      productId =
+        this.config.openingHoursProducts.availabilityAvailable.productId;
+    }
+    if (this.config.startTimesProducts.availabilityAvailable) {
+      productId =
+        this.config.startTimesProducts.availabilityAvailable.productId;
+    }
+    return new GetProductScenario({
+      apiClient: this.apiClient,
+      productId,
+      capabilities: this.config.capabilities,
+    });
   };
   private validateGetProducts = async (): Promise<GetProductsScenario> => {
     return new GetProductsScenario({

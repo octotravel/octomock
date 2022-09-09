@@ -10,8 +10,8 @@ import { ScenarioResult } from "../Scenarios/Scenario";
 interface ScenarioData {
   name: string;
   success: boolean;
-  request: any;
-  response: any;
+  request?: any;
+  response?: any;
   errors: ValidatorError[];
 }
 
@@ -56,6 +56,16 @@ export class ScenarioHelper {
             }
           : null,
       },
+      errors: data.errors.map((error) => error.mapError()),
+    };
+  };
+
+  public handlePreError = (data: ScenarioData): ScenarioResult<any> => {
+    return {
+      name: data.name,
+      success: data.success,
+      request: null,
+      response: null,
       errors: data.errors.map((error) => error.mapError()),
     };
   };

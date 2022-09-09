@@ -11,7 +11,7 @@ export interface ScenarioRequest {
 
 export interface ScenarioResponse<T> {
   body: Nullable<T>;
-  status: number;
+  status: Nullable<number>;
   error: Nullable<{
     body: any;
   }>;

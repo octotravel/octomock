@@ -1,4 +1,5 @@
 import { CapabilityId, Product } from "@octocloud/types";
+import { ValidatorError } from "../../../../validators/backendValidator/ValidatorHelpers";
 import { ApiClient } from "../../ApiClient";
 import { ProductScenarioHelper } from "../../helpers/ProductScenarioHelper";
 import { Scenario } from "../Scenario";
@@ -6,31 +7,38 @@ import { Scenario } from "../Scenario";
 export class GetProductScenario implements Scenario<Product> {
   private apiClient: ApiClient;
   private productId: string;
-  private availabilityType: string;
   private capabilities: CapabilityId[];
   constructor({
     apiClient,
     productId,
-    availabilityType,
     capabilities,
   }: {
     apiClient: ApiClient;
     productId: string;
-    availabilityType: string;
     capabilities: CapabilityId[];
   }) {
     this.apiClient = apiClient;
     this.productId = productId;
-    this.availabilityType = availabilityType;
     this.capabilities = capabilities;
   }
   private productScenarioHelper = new ProductScenarioHelper();
 
   public validate = async () => {
+    const name = `Get Product`;
+    if (this.productId === null) {
+      return this.productScenarioHelper.handlePreError({
+        name,
+        success: false,
+        errors: [
+          new ValidatorError({
+            message: "Atleast one product must be available",
+          }),
+        ],
+      });
+    }
     const result = await this.apiClient.getProduct({
       id: this.productId,
     });
-    const name = `Get Product (${this.availabilityType})`;
 
     return this.productScenarioHelper.validateProduct(
       {

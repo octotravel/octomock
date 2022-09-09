@@ -12,6 +12,13 @@ import { Config } from "./Config";
 import { PreConfig } from "./PreConfig";
 import { addDays } from "date-fns";
 
+interface GetProductsData {
+  apiClient: ApiClient;
+  products: Product[];
+  availabilityRequired: boolean;
+  availabilityType?: AvailabilityType;
+}
+
 export class ConfigParser {
   public parse = async (data: ValidationConfig): Promise<PreConfig> => {
     return new PreConfig({
@@ -40,44 +47,65 @@ export class ConfigParser {
             addDays(new Date(), 30).toISOString()
           ),
         })
-      ).response.data.body.find(
+      ).response.data.body;
+
+      const selectedAvailability = availability.find(
         (availability) => availability.status === availabilityStatus
       );
-      if (availability) {
+      if (selectedAvailability) {
         return {
           productId: product.id,
           optionId: defaultOption.id,
-          availabilityId: availability.id,
+          availabilityId: selectedAvailability.id,
         };
       }
     }
   };
 
-  private getProducts = async (
-    apiClient: ApiClient,
-    products: Product[],
-    availabilityType: AvailabilityType
-  ) => {
-    const filteredProducts = products.filter(
-      (product) => product.availabilityType === availabilityType
-    );
-    const availabilityAvailable = await this.getAvailabilities(
-      apiClient,
-      filteredProducts,
-      AvailabilityStatus.AVAILABLE
-    );
+  private getProducts = async (data: GetProductsData) => {
+    if (data.availabilityRequired) {
+      const filteredProducts = data.products.filter(
+        (product) => product.availabilityType === data.availabilityType
+      );
+      const availabilityAvailable = await this.getAvailabilities(
+        data.apiClient,
+        filteredProducts,
+        AvailabilityStatus.AVAILABLE
+      );
 
-    const availabilitySoldOut = await this.getAvailabilities(
-      apiClient,
-      filteredProducts,
-      AvailabilityStatus.SOLD_OUT
-    );
+      const availabilitySoldOut = await this.getAvailabilities(
+        data.apiClient,
+        filteredProducts,
+        AvailabilityStatus.SOLD_OUT
+      );
 
-    return {
-      products: filteredProducts,
-      availabilityAvailable,
-      availabilitySoldOut,
-    };
+      return {
+        products: filteredProducts,
+        availabilityAvailable,
+        availabilitySoldOut,
+      };
+    } else {
+      const filteredProducts = data.products.filter(
+        (product) => !product.availabilityRequired
+      );
+      const availabilityAvailable = await this.getAvailabilities(
+        data.apiClient,
+        filteredProducts,
+        AvailabilityStatus.AVAILABLE
+      );
+
+      const availabilitySoldOut = await this.getAvailabilities(
+        data.apiClient,
+        filteredProducts,
+        AvailabilityStatus.SOLD_OUT
+      );
+
+      return {
+        products: filteredProducts,
+        availabilityAvailable,
+        availabilitySoldOut,
+      };
+    }
   };
 
   public fetch = async (
@@ -103,17 +131,25 @@ export class ConfigParser {
       throw new BadRequestError("Invalid products");
     }
 
-    const startTimesProducts = await this.getProducts(
+    const startTimesProducts = await this.getProducts({
       apiClient,
-      products.data.body,
-      AvailabilityType.START_TIME
-    );
+      products: products.data.body,
+      availabilityType: AvailabilityType.START_TIME,
+      availabilityRequired: true,
+    });
 
-    const openingHoursProducts = await this.getProducts(
+    const openingHoursProducts = await this.getProducts({
       apiClient,
-      products.data.body,
-      AvailabilityType.START_TIME
-    );
+      products: products.data.body,
+      availabilityType: AvailabilityType.START_TIME,
+      availabilityRequired: true,
+    });
+
+    const availabilityRequiredFalseProducts = await this.getProducts({
+      apiClient,
+      products: products.data.body,
+      availabilityRequired: false,
+    });
 
     return new Config({
       url: data.url,
@@ -121,6 +157,7 @@ export class ConfigParser {
       capabilities,
       startTimesProducts,
       openingHoursProducts,
+      availabilityRequiredFalseProducts,
       ignoreKill: true,
     });
   };

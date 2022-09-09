@@ -13,7 +13,7 @@ export interface ProductScenarioData {
   response: any;
 }
 
-export class ProductScenarioHelper {
+export class ProductScenarioHelper extends ScenarioHelper {
   private scenarioHelper = new ScenarioHelper();
 
   private getErrors = (
