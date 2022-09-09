@@ -5,13 +5,23 @@ interface StringValidatorParams {
   equalsTo?: string;
 }
 
-enum ErrorType {
+export enum ErrorType {
   WARNING = "WARNING",
   CRITICAL = "CRITICAL",
 }
 
 export class ValidatorError extends Error {
-  type: ErrorType;
+  public type: ErrorType;
+  constructor({ message, type }: { message: string; type?: ErrorType }) {
+    super(message);
+    this.type = type ?? ErrorType.WARNING;
+  }
+  public mapError = () => {
+    return {
+      type: this.type,
+      message: this.message,
+    };
+  };
 }
 
 export interface ModelValidator {
@@ -34,14 +44,18 @@ export class StringValidator {
       schema.validateSync(value, { strict: true });
       if (params?.equalsTo) {
         if (params.equalsTo !== value) {
-          return new ValidatorError(
-            `${label} has to be equal to "${params.equalsTo}", but the provided value was: "${value}"`
-          );
+          return new ValidatorError({
+            type: ErrorType.WARNING,
+            message: `${label} has to be equal to "${params.equalsTo}", but the provided value was: "${value}"`,
+          });
         }
       }
       return null;
     } catch (err) {
-      return new ValidatorError(err.errors);
+      return new ValidatorError({
+        type: ErrorType.WARNING,
+        message: err.errors,
+      });
     }
   };
 }
@@ -52,9 +66,10 @@ export class NullValidator {
     value: unknown
   ): Nullable<ValidatorError> => {
     if (value !== null) {
-      return new ValidatorError(
-        `${label} must be a \`null\` type, but the final value was: \`${value}\``
-      );
+      return new ValidatorError({
+        type: ErrorType.WARNING,
+        message: `${label} must be a \`null\` type, but the final value was: \`${value}\``,
+      });
     }
     return null;
   };
@@ -86,13 +101,17 @@ export class NumberValidator {
       schema.validateSync(value, { strict: true });
       if (params?.equalsTo) {
         if (params.equalsTo !== value) {
-          return new ValidatorError(
-            `${label} has to be equal to ${params.equalsTo}, but the provided value was: ${value}`
-          );
+          return new ValidatorError({
+            type: ErrorType.WARNING,
+            message: `${label} has to be equal to ${params.equalsTo}, but the provided value was: ${value}`,
+          });
         }
       }
     } catch (err) {
-      return new ValidatorError(err.errors);
+      return new ValidatorError({
+        type: ErrorType.WARNING,
+        message: err.errors,
+      });
     }
   };
 }
@@ -107,7 +126,10 @@ export class BooleanValidator {
       schema.validateSync(value, { strict: true });
       return null;
     } catch (err) {
-      return new ValidatorError(err.errors);
+      return new ValidatorError({
+        type: ErrorType.WARNING,
+        message: err.errors,
+      });
     }
   };
 }
@@ -133,7 +155,10 @@ export class EnumValidator {
       schema.validateSync(value, { strict: true });
       return null;
     } catch (err) {
-      return new ValidatorError(err.errors);
+      return new ValidatorError({
+        type: ErrorType.WARNING,
+        message: err.errors,
+      });
     }
   };
 }
@@ -161,7 +186,10 @@ export class EnumArrayValidator {
       schema.validateSync(value, { strict: true });
       return null;
     } catch (err) {
-      return new ValidatorError(err.errors);
+      return new ValidatorError({
+        type: ErrorType.WARNING,
+        message: err.errors,
+      });
     }
   };
 }
@@ -190,7 +218,10 @@ export class RegExpValidator {
       schema.validateSync(value, { strict: true });
       return null;
     } catch (err) {
-      return new ValidatorError(err.errors);
+      return new ValidatorError({
+        type: ErrorType.WARNING,
+        message: err.errors,
+      });
     }
   };
 }
@@ -219,10 +250,17 @@ export class RegExpArrayValidator {
       if (err instanceof yup.ValidationError) {
         if (err.path.length > 1) {
           const errorMessage = `${label}${err.errors.join()}`;
-          return new ValidatorError(errorMessage);
+          return new ValidatorError({
+            type: ErrorType.WARNING,
+            message: errorMessage,
+          });
         }
       }
-      return new ValidatorError(err.errors);
+      const errorMessage = `${err.errors.join()}`;
+      return new ValidatorError({
+        type: ErrorType.WARNING,
+        message: errorMessage,
+      });
     }
   };
 }
@@ -249,9 +287,10 @@ export class ArrayValidator {
       schema.validateSync(value, { strict: true });
       if (params.empty) {
         if (Array.isArray(value) && value.length !== 0) {
-          return new ValidatorError(
-            `${label} must be an empty array, but it contains: \`${value.length}\` elements.`
-          );
+          return new ValidatorError({
+            type: ErrorType.WARNING,
+            message: `${label} must be an empty array, but it contains: \`${value.length}\` elements.`,
+          });
         }
       }
       return null;
@@ -259,7 +298,10 @@ export class ArrayValidator {
       if (err instanceof ValidatorError) {
         return err;
       }
-      return new ValidatorError(err.errors);
+      return new ValidatorError({
+        type: ErrorType.WARNING,
+        message: err.errors,
+      });
     }
   };
 }
@@ -280,7 +322,10 @@ export class StringArrayValidator {
       schema.validateSync(value, { strict: true });
       return null;
     } catch (err) {
-      return new ValidatorError(err.errors);
+      return new ValidatorError({
+        type: ErrorType.WARNING,
+        message: err.errors,
+      });
     }
   };
 }
@@ -309,7 +354,10 @@ export class NumberArrayValidator {
       schema.validateSync(value, { strict: true });
       return null;
     } catch (err) {
-      return new ValidatorError(err.errors);
+      return new ValidatorError({
+        type: ErrorType.WARNING,
+        message: err.errors,
+      });
     }
   };
 }

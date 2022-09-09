@@ -1,4 +1,9 @@
 import { CapabilityId, DeliveryMethod } from "@octocloud/types";
+import { STATUS_NOT_FOUND } from "../../../models/Error";
+import {
+  ErrorType,
+  ValidatorError,
+} from "../../../validators/backendValidator/ValidatorHelpers";
 import { ResultRequest, ResultResponse } from "../ApiClient";
 import { ScenarioResult } from "../Scenarios/Scenario";
 
@@ -7,7 +12,7 @@ interface ScenarioData {
   success: boolean;
   request: any;
   response: any;
-  errors: any[];
+  errors: ValidatorError[];
 }
 
 export interface ScenarioHelperData<T> {
@@ -25,6 +30,17 @@ export interface ScenarioConfigData {
 
 export class ScenarioHelper {
   public handleResult = (data: ScenarioData): ScenarioResult<any> => {
+    if (data.response.error) {
+      if (data.response.error.status === STATUS_NOT_FOUND) {
+        data.errors = {
+          ...data.errors,
+          ...new ValidatorError({
+            type: ErrorType.CRITICAL,
+            message: "Endpoint not implemented",
+          }),
+        };
+      }
+    }
     return {
       name: data.name,
       success: data.success,
@@ -40,7 +56,7 @@ export class ScenarioHelper {
             }
           : null,
       },
-      errors: data.errors.map((error) => error.message),
+      errors: data.errors.map((error) => error.mapError()),
     };
   };
 }

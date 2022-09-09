@@ -26,20 +26,22 @@ export class BookingCancellationScenarioHelper {
   private cancellationCheck = (
     data: ScenarioHelperData<Booking>,
     createdBooking: Booking
-  ): string[] => {
+  ): ValidatorError[] => {
     const booking = data.response.data.body;
     const reqBody = data.request.body as any;
     let errors = [
       booking.cancellation.reason === reqBody.reason
         ? null
-        : "Reason was not provided",
+        : new ValidatorError({ message: "Reason was not provided" }),
     ];
     if (createdBooking.status === BookingStatus.ON_HOLD) {
       errors = [
         ...errors,
         booking.status === BookingStatus.EXPIRED
           ? null
-          : `Booking status should be EXPIRED. Returned value was ${booking.status}`,
+          : new ValidatorError({
+              message: `Booking status should be EXPIRED. Returned value was ${booking.status}`,
+            }),
       ];
     }
     if (createdBooking.status === BookingStatus.CONFIRMED) {
@@ -47,7 +49,9 @@ export class BookingCancellationScenarioHelper {
         ...errors,
         booking.status === BookingStatus.CANCELLED
           ? null
-          : `Booking status should be CANCELLED. Returned value was ${booking.status}`,
+          : new ValidatorError({
+              message: `Booking status should be CANCELLED. Returned value was ${booking.status}`,
+            }),
       ];
     }
     return errors.filter(Boolean);
@@ -79,11 +83,7 @@ export class BookingCancellationScenarioHelper {
       return this.scenarioHelper.handleResult({
         ...data,
         success: false,
-        errors: checkErrors.map((error) => {
-          return {
-            message: error,
-          };
-        }),
+        errors: checkErrors,
       });
     }
 
@@ -107,7 +107,11 @@ export class BookingCancellationScenarioHelper {
       return this.scenarioHelper.handleResult({
         ...data,
         success: false,
-        errors: [error],
+        errors: [
+          new ValidatorError({
+            message: error,
+          }),
+        ],
       });
     }
 
@@ -115,7 +119,7 @@ export class BookingCancellationScenarioHelper {
     return this.scenarioHelper.handleResult({
       ...data,
       success: R.isEmpty(errors),
-      errors: errors.map((error) => error.message),
+      errors,
     });
   };
 }

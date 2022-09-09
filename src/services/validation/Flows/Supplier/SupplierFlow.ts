@@ -1,8 +1,7 @@
 import { ApiClient } from "../../ApiClient";
 import { Config } from "../../config/Config";
 import { ScenarioResult } from "../../Scenarios/Scenario";
-import { GetSuppliersScenario } from "../../Scenarios/Supplier/GetSuppliers";
-import { GetSupplierInvalidScenario } from "../../Scenarios/Supplier/GetSupplierInvalid";
+import { GetSupplierScenario } from "../../Scenarios/Supplier/GetSuppliers";
 import { FlowResult } from "../Flow";
 
 export class SupplierFlow {
@@ -28,10 +27,7 @@ export class SupplierFlow {
   };
 
   public validate = async (): Promise<FlowResult> => {
-    const scenarios = [
-      await this.validateGetSuppliers(),
-      await this.validateGetSupplierInvalid(),
-    ];
+    const scenarios = [await this.validateGetSuppliers()];
 
     const results = [];
     for await (const scenario of scenarios) {
@@ -44,17 +40,10 @@ export class SupplierFlow {
     return this.setFlow(results);
   };
 
-  private validateGetSuppliers = async (): Promise<GetSuppliersScenario> => {
-    return new GetSuppliersScenario({
+  private validateGetSuppliers = async (): Promise<GetSupplierScenario> => {
+    return new GetSupplierScenario({
       apiClient: this.apiClient,
       capabilities: this.config.capabilities,
     });
   };
-  private validateGetSupplierInvalid =
-    async (): Promise<GetSupplierInvalidScenario> => {
-      return new GetSupplierInvalidScenario({
-        apiClient: this.apiClient,
-        supplierId: "Invalid_supplierId",
-      });
-    };
 }

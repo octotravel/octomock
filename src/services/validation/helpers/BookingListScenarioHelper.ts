@@ -1,7 +1,10 @@
 import { Booking, CapabilityId } from "@octocloud/types";
 import * as R from "ramda";
 import { BookingValidator } from "../../../validators/backendValidator/Booking/BookingValidator";
-import { ModelValidator } from "../../../validators/backendValidator/ValidatorHelpers";
+import {
+  ModelValidator,
+  ValidatorError,
+} from "../../../validators/backendValidator/ValidatorHelpers";
 import {
   ScenarioConfigData,
   ScenarioHelper,
@@ -25,11 +28,15 @@ export class BookingListScenarioHelper {
   private listCheck = (
     bookings: Booking[],
     configData: ScenarioConfigData
-  ): string[] => {
+  ): ValidatorError[] => {
     let errors = [];
 
     if (R.isEmpty(bookings)) {
-      return ["No booking found"];
+      return [
+        new ValidatorError({
+          message: "No booking found",
+        }),
+      ];
     }
 
     if (configData.supplierReference) {
@@ -42,7 +49,9 @@ export class BookingListScenarioHelper {
         ...errors,
         supplierReferenceCheck
           ? null
-          : "Some supplierReferences do not match request",
+          : new ValidatorError({
+              message: "Some supplierReferences do not match request",
+            }),
       ];
     }
 
@@ -56,7 +65,9 @@ export class BookingListScenarioHelper {
         ...errors,
         resellerReferenceCheck
           ? null
-          : "Some resellerReferences do not match request",
+          : new ValidatorError({
+              message: "Some resellerReferences do not match request",
+            }),
       ];
     }
 
@@ -81,11 +92,7 @@ export class BookingListScenarioHelper {
       return this.scenarioHelper.handleResult({
         ...data,
         success: false,
-        errors: checkErrors.map((error) => {
-          return {
-            message: error,
-          };
-        }),
+        errors: checkErrors,
       });
     }
     const errors = this.getErrors(
@@ -108,7 +115,11 @@ export class BookingListScenarioHelper {
       return this.scenarioHelper.handleResult({
         ...data,
         success: false,
-        errors: [error],
+        errors: [
+          new ValidatorError({
+            message: error,
+          }),
+        ],
       });
     }
 
@@ -116,7 +127,7 @@ export class BookingListScenarioHelper {
     return this.scenarioHelper.handleResult({
       ...data,
       success: R.isEmpty(errors),
-      errors: errors.map((error) => error.message),
+      errors,
     });
   };
 }

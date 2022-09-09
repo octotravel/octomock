@@ -16,7 +16,6 @@ import {
   GetBookingPathParamsSchema,
   GetBookingsQueryParamsSchema,
   GetProductPathParamsSchema,
-  GetSupplierPathParamsSchema,
   Product,
   Supplier,
   UpdateBookingBodySchema,
@@ -78,22 +77,8 @@ export class ApiClient {
     return await this.setResponse({ url, body: null }, response);
   };
 
-  public getSuppliers = async (_?: ApiParams): Promise<Result<Supplier[]>> => {
-    const url = `${this.url}/suppliers`;
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
-        ...this.mapHeaders(),
-      },
-    });
-    return await this.setResponse({ url, body: null }, response);
-  };
-
-  public getSupplier = async (
-    data: GetSupplierPathParamsSchema,
-    _?: ApiParams
-  ): Promise<Result<Supplier>> => {
-    const url = `${this.url}/suppliers/${data.id}`;
+  public getSupplier = async (_?: ApiParams): Promise<Result<Supplier>> => {
+    const url = `${this.url}/supplier`;
     const response = await fetch(url, {
       method: "GET",
       headers: {
@@ -277,7 +262,6 @@ export class ApiClient {
     request: { url: string; body: Nullable<any> },
     response: Response
   ): Promise<Result<T>> => {
-    const data = await response.json();
     const status = response.status;
 
     if (status === 200) {
@@ -289,25 +273,41 @@ export class ApiClient {
         response: {
           data: {
             status,
-            body: data as T,
+            body: (await response.json()) as T,
           },
           error: null,
         },
       };
     }
-    return {
-      request: {
-        url: request.url,
-        body: JSON.parse(request.body),
-      },
-      response: {
-        data: null,
-        error: {
-          status: response.status,
-          body: data,
+    try {
+      return {
+        request: {
+          url: request.url,
+          body: JSON.parse(request.body) ?? "",
         },
-      },
-    };
+        response: {
+          data: null,
+          error: {
+            status: response.status,
+            body: await response.json(),
+          },
+        },
+      };
+    } catch (e) {
+      return {
+        request: {
+          url: request.url,
+          body: JSON.parse(request.body) ?? "",
+        },
+        response: {
+          data: null,
+          error: {
+            status: response.status,
+            body: response.statusText as any,
+          },
+        },
+      };
+    }
   };
 
   private mapHeaders = (): Record<string, string> => {

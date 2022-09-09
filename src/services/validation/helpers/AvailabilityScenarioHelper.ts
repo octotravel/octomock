@@ -6,7 +6,10 @@ import {
 import * as R from "ramda";
 import { AvailabilityValidator } from "../../../validators/backendValidator/Availability/AvailabilityValidator";
 import { ScenarioHelper } from "./ScenarioHelper";
-import { ModelValidator } from "./../../../validators/backendValidator/ValidatorHelpers";
+import {
+  ModelValidator,
+  ValidatorError,
+} from "./../../../validators/backendValidator/ValidatorHelpers";
 
 export interface AvailabilityScenarioData {
   name: string;
@@ -69,9 +72,9 @@ export class AvailabilityScenarioHelper {
         ...data,
         success: false,
         errors: [
-          {
+          new ValidatorError({
             message: "Availability has to be available",
-          },
+          }),
         ],
       });
     }
@@ -80,10 +83,10 @@ export class AvailabilityScenarioHelper {
         ...data,
         success: false,
         errors: [
-          {
+          new ValidatorError({
             message:
               "Availability can not be SOLD_OUT or CLOSED or not available",
-          },
+          }),
         ],
       });
     }
@@ -105,7 +108,11 @@ export class AvailabilityScenarioHelper {
       return this.scenarioHelper.handleResult({
         ...data,
         success: false,
-        errors: [error],
+        errors: [
+          new ValidatorError({
+            message: error,
+          }),
+        ],
       });
     }
 
@@ -113,7 +120,7 @@ export class AvailabilityScenarioHelper {
     return this.scenarioHelper.handleResult({
       ...data,
       success: R.isEmpty(errors),
-      errors: errors.map((error) => error.message),
+      errors,
     });
   };
 
@@ -134,10 +141,10 @@ export class AvailabilityScenarioHelper {
           ...data,
           success: false,
           errors: [
-            {
+            new ValidatorError({
               message:
                 "Availability should be empty or SOLD_OUT/CLOSED and not available",
-            },
+            }),
           ],
         });
       }

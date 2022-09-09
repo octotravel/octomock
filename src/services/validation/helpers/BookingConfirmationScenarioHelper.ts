@@ -32,7 +32,7 @@ export class BookingConfirmationScenarioHelper {
     data: ScenarioHelperData<Booking>,
     oldBooking: Booking,
     deliveryMethods: DeliveryMethod[]
-  ): string[] => {
+  ): ValidatorError[] => {
     const booking = data.response.data.body;
     const reqBody = data.request.body;
     const checkContact =
@@ -43,13 +43,17 @@ export class BookingConfirmationScenarioHelper {
       booking.contact.notes === reqBody.contact.notes;
 
     let errors = [
-      checkContact ? null : "Contact was not updated",
+      checkContact
+        ? null
+        : new ValidatorError({ message: "Contact was not updated" }),
       booking.status === BookingStatus.CONFIRMED
         ? null
-        : `Booking status should be CONFIRMED. Returned value was ${booking.status}`,
+        : new ValidatorError({
+            message: `Booking status should be CONFIRMED. Returned value was ${booking.status}`,
+          }),
       booking.resellerReference === reqBody.resellerReference
         ? null
-        : "Reseller reference was not updated",
+        : new ValidatorError({ message: "Reseller reference was not updated" }),
     ];
 
     if (!data.request.body.unitItems) {
@@ -57,7 +61,7 @@ export class BookingConfirmationScenarioHelper {
         ...errors,
         booking.unitItems.length === oldBooking.unitItems.length
           ? null
-          : "UnitItems count is not matching",
+          : new ValidatorError({ message: "UnitItems count is not matching" }),
       ];
     }
 
@@ -66,14 +70,19 @@ export class BookingConfirmationScenarioHelper {
         ...errors,
         !R.isEmpty(booking.voucher.deliveryOptions)
           ? null
-          : "Voucher is missing",
+          : new ValidatorError({ message: "Voucher is missing" }),
       ];
     }
     if (deliveryMethods.includes(DeliveryMethod.TICKET)) {
       const tickets = booking.unitItems.reduce((acc, unit) => {
         return [...acc, ...unit.ticket.deliveryOptions];
       }, []);
-      errors = [...errors, !R.isEmpty(tickets) ? null : "Tickets are missing"];
+      errors = [
+        ...errors,
+        !R.isEmpty(tickets)
+          ? null
+          : new ValidatorError({ message: "Tickets are missing" }),
+      ];
     }
     return errors.filter(Boolean);
   };
@@ -108,11 +117,7 @@ export class BookingConfirmationScenarioHelper {
       return this.scenarioHelper.handleResult({
         ...data,
         success: false,
-        errors: checkErrors.map((error) => {
-          return {
-            message: error,
-          };
-        }),
+        errors: checkErrors,
       });
     }
 
@@ -136,7 +141,11 @@ export class BookingConfirmationScenarioHelper {
       return this.scenarioHelper.handleResult({
         ...data,
         success: false,
-        errors: [error],
+        errors: [
+          new ValidatorError({
+            message: error,
+          }),
+        ],
       });
     }
 
@@ -144,7 +153,7 @@ export class BookingConfirmationScenarioHelper {
     return this.scenarioHelper.handleResult({
       ...data,
       success: R.isEmpty(errors),
-      errors: errors.map((error) => error.message),
+      errors,
     });
   };
 }

@@ -22,7 +22,7 @@ export interface ScenarioResult<T> {
   success: boolean;
   request: ScenarioRequest;
   response: ScenarioResponse<T>;
-  errors: string[]; // validation errors
+  errors: any[]; // validation errors
 }
 
 export interface BookingValidateData {

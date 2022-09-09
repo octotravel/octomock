@@ -1,6 +1,9 @@
 import * as R from "ramda";
 import { ScenarioHelper } from "./ScenarioHelper";
-import { ModelValidator } from "./../../../validators/backendValidator/ValidatorHelpers";
+import {
+  ModelValidator,
+  ValidatorError,
+} from "./../../../validators/backendValidator/ValidatorHelpers";
 import { CapabilityId } from "@octocloud/types";
 import { ProductValidator } from "../../../validators/backendValidator/Product/ProductValidator";
 
@@ -13,7 +16,10 @@ export interface ProductScenarioData {
 export class ProductScenarioHelper {
   private scenarioHelper = new ScenarioHelper();
 
-  private getErrors = (products: any, capabilities: CapabilityId[]) => {
+  private getErrors = (
+    products: any,
+    capabilities: CapabilityId[]
+  ): ValidatorError[] => {
     if (Array.isArray(products)) {
       return products.reduce((acc, result) => {
         return [
@@ -56,7 +62,11 @@ export class ProductScenarioHelper {
       return this.scenarioHelper.handleResult({
         ...data,
         success: false,
-        errors: [error],
+        errors: [
+          new ValidatorError({
+            message: error,
+          }),
+        ],
       });
     }
 
@@ -64,7 +74,7 @@ export class ProductScenarioHelper {
     return this.scenarioHelper.handleResult({
       ...data,
       success: R.isEmpty(errors),
-      errors: errors.map((error) => error.message),
+      errors: errors,
     });
   };
 }

@@ -1,4 +1,5 @@
 import { Booking, DeliveryMethod } from "@octocloud/types";
+import { ValidatorError } from "../../../validators/backendValidator/ValidatorHelpers";
 import { ScenarioConfigData } from "./ScenarioHelper";
 
 interface BookingCheckData {
@@ -9,7 +10,7 @@ interface BookingCheckData {
 }
 
 export class BookingScenarioHelper {
-  public bookingCheck = (data: BookingCheckData): string[] => {
+  public bookingCheck = (data: BookingCheckData): ValidatorError[] => {
     const deliveryMethodsMatch =
       data.configData.deliveryMethods.length ===
       data.newBooking.deliveryMethods.length
@@ -23,11 +24,13 @@ export class BookingScenarioHelper {
     let errors = [
       deliveryMethodsMatch
         ? null
-        : "DeliveryMethods are not matching provided ones",
+        : new ValidatorError({
+            message: "DeliveryMethods are not matching provided ones",
+          }),
       data.newBooking.voucher &&
       data.configData.deliveryMethods.includes(DeliveryMethod.VOUCHER)
         ? null
-        : "Voucher is missing",
+        : new ValidatorError({ message: "Voucher is missing" }),
     ];
 
     if (!data.rebooked) {
@@ -35,10 +38,12 @@ export class BookingScenarioHelper {
         ...errors,
         data.newBooking.productId === data.oldBooking.productId
           ? null
-          : "ProductId is not matching request",
+          : new ValidatorError({
+              message: "ProductId is not matching request",
+            }),
         data.newBooking.optionId === data.oldBooking.optionId
           ? null
-          : "OptionId is not matching request",
+          : new ValidatorError({ message: "OptionId is not matching request" }),
       ];
     }
 
@@ -46,7 +51,12 @@ export class BookingScenarioHelper {
       const ticketCheck =
         data.newBooking.unitItems.map((unitItem) => unitItem.ticket).length ===
         data.newBooking.unitItems.length;
-      errors = [...errors, ticketCheck ? null : "Some/all tickets are missing"];
+      errors = [
+        ...errors,
+        ticketCheck
+          ? null
+          : new ValidatorError({ message: "Some/all tickets are missing" }),
+      ];
     }
 
     return errors.filter(Boolean);

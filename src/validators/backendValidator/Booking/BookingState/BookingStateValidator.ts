@@ -1,5 +1,9 @@
 import { Booking, BookingStatus } from "@octocloud/types";
-import { ModelValidator, ValidatorError } from "../../ValidatorHelpers";
+import {
+  ErrorType,
+  ModelValidator,
+  ValidatorError,
+} from "../../ValidatorHelpers";
 import { BookingStateCancelledValidator } from "./BookingStateCancelledValidator";
 import { BookingStateConfirmedValidator } from "./BookingStateConfirmedValidator";
 import { BookingStateExpiredValidator } from "./BookingStateExpiredValidator";
@@ -40,9 +44,10 @@ export class BookingStateValidator implements ModelValidator {
       }
       default:
         return [
-          new ValidatorError(
-            `validation for booking.status: ${booking.status} not implemented`
-          ),
+          new ValidatorError({
+            type: ErrorType.WARNING,
+            message: `validation for booking.status: ${booking.status} not implemented`,
+          }),
         ];
     }
   };

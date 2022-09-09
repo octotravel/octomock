@@ -5,7 +5,10 @@ import {
 } from "@octocloud/types";
 import * as R from "ramda";
 import { ScenarioHelper } from "./ScenarioHelper";
-import { ModelValidator } from "./../../../validators/backendValidator/ValidatorHelpers";
+import {
+  ModelValidator,
+  ValidatorError,
+} from "./../../../validators/backendValidator/ValidatorHelpers";
 import { AvailabilityCalendarValidator } from "../../../validators/backendValidator/AvailabilityCalendar/AvailabilityCalendarValidator";
 
 export interface AvailabilityScenarioData {
@@ -69,9 +72,9 @@ export class AvailabilityCalendarScenarioHelper {
         ...data,
         success: false,
         errors: [
-          {
+          new ValidatorError({
             message: "Availability has to be available",
-          },
+          }),
         ],
       });
     }
@@ -80,10 +83,10 @@ export class AvailabilityCalendarScenarioHelper {
         ...data,
         success: false,
         errors: [
-          {
+          new ValidatorError({
             message:
               "Availability can not be SOLD_OUT or CLOSED or not available",
-          },
+          }),
         ],
       });
     }
@@ -106,9 +109,9 @@ export class AvailabilityCalendarScenarioHelper {
         ...data,
         success: false,
         errors: [
-          {
+          new ValidatorError({
             message: error,
-          },
+          }),
         ],
       });
     }
@@ -117,7 +120,7 @@ export class AvailabilityCalendarScenarioHelper {
     return this.scenarioHelper.handleResult({
       ...data,
       success: R.isEmpty(errors),
-      errors: errors.map((error) => error.message),
+      errors,
     });
   };
 
@@ -138,10 +141,10 @@ export class AvailabilityCalendarScenarioHelper {
           ...data,
           success: false,
           errors: [
-            {
+            new ValidatorError({
               message:
                 "Availability should be empty or SOLD_OUT/CLOSED and not available",
-            },
+            }),
           ],
         });
       }

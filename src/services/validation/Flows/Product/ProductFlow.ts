@@ -48,7 +48,6 @@ export class ProductFlow {
   };
 
   private validateGetProduct = async (): Promise<GetProductScenario[]> => {
-    console.log(this.config.startTimesProducts);
     return [
       this.config.startTimesProducts.availabilityAvailable
         ? new GetProductScenario({
@@ -80,7 +79,7 @@ export class ProductFlow {
     async (): Promise<GetProductInvalidScenario> => {
       return new GetProductInvalidScenario({
         apiClient: this.apiClient,
-        productId: "invalid_productid",
+        productId: "invalid_productId",
       });
     };
 }

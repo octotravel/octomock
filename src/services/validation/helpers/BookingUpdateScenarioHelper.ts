@@ -27,7 +27,7 @@ export class BookingUpdateScenarioHelper {
     data: ScenarioHelperData<Booking>,
     oldBooking: Booking,
     _deliveryMethods: DeliveryMethod[]
-  ): string[] => {
+  ): ValidatorError[] => {
     const booking = data.response.data.body;
     const reqBody = data.request.body;
     let errors = [];
@@ -37,7 +37,7 @@ export class BookingUpdateScenarioHelper {
         ...errors,
         booking.unitItems.length === oldBooking.unitItems.length
           ? null
-          : "UnitItems count is not matching",
+          : new ValidatorError({ message: "UnitItems count is not matching" }),
       ];
     } else {
       const unitIdCheck =
@@ -50,7 +50,12 @@ export class BookingUpdateScenarioHelper {
               })
               .every((status) => status)
           : false;
-      errors = [...errors, unitIdCheck ? null : "UnitIds are not matching"];
+      errors = [
+        ...errors,
+        unitIdCheck
+          ? null
+          : new ValidatorError({ message: "UnitIds are not matching" }),
+      ];
     }
 
     if (reqBody.availabilityId) {
@@ -58,17 +63,19 @@ export class BookingUpdateScenarioHelper {
         ...errors,
         booking.availabilityId === reqBody.availabilityId
           ? null
-          : "AvailabilityId was not updated",
+          : new ValidatorError({ message: "AvailabilityId was not updated" }),
         booking.availability.id === reqBody.availabilityId
           ? null
-          : "Availability was not updated",
+          : new ValidatorError({ message: "Availability was not updated" }),
       ];
     } else {
       errors = [
         ...errors,
         booking.availabilityId === oldBooking.availabilityId
           ? null
-          : "AvailabilityId is not matching request",
+          : new ValidatorError({
+              message: "AvailabilityId is not matching request",
+            }),
       ];
     }
 
@@ -103,13 +110,20 @@ export class BookingUpdateScenarioHelper {
       ]
         .filter((field) => field !== null)
         .every((status) => status);
-      errors = [...errors, contactCheck ? null : "Contact was not updated"];
+      errors = [
+        ...errors,
+        contactCheck
+          ? null
+          : new ValidatorError({ message: "Contact was not updated" }),
+      ];
     }
 
     if (reqBody.notes) {
       errors = [
         ...errors,
-        reqBody.notes === booking.notes ? null : "Notes was not updated",
+        reqBody.notes === booking.notes
+          ? null
+          : new ValidatorError({ message: "Notes was not updated" }),
       ];
     }
     return errors.filter(Boolean);
@@ -142,11 +156,7 @@ export class BookingUpdateScenarioHelper {
       return this.scenarioHelper.handleResult({
         ...data,
         success: false,
-        errors: checkErrors.map((error) => {
-          return {
-            message: error,
-          };
-        }),
+        errors: checkErrors,
       });
     }
 
@@ -170,7 +180,11 @@ export class BookingUpdateScenarioHelper {
       return this.scenarioHelper.handleResult({
         ...data,
         success: false,
-        errors: [error],
+        errors: [
+          new ValidatorError({
+            message: error,
+          }),
+        ],
       });
     }
 
@@ -178,7 +192,7 @@ export class BookingUpdateScenarioHelper {
     return this.scenarioHelper.handleResult({
       ...data,
       success: R.isEmpty(errors),
-      errors: errors.map((error) => error.message),
+      errors,
     });
   };
 }

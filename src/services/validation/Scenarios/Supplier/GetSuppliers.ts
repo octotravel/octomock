@@ -3,7 +3,7 @@ import { ApiClient } from "../../ApiClient";
 import { Scenario } from "../Scenario";
 import { SupplierScenarioHelper } from "../../helpers/SupplierScenarioHelper";
 
-export class GetSuppliersScenario implements Scenario<Supplier[]> {
+export class GetSupplierScenario implements Scenario<Supplier> {
   private apiClient: ApiClient;
   private capabilities: CapabilityId[];
   constructor({
@@ -19,8 +19,8 @@ export class GetSuppliersScenario implements Scenario<Supplier[]> {
   private supplierScenarioHelper = new SupplierScenarioHelper();
 
   public validate = async () => {
-    const result = await this.apiClient.getSuppliers();
-    const name = "Get Suppliers";
+    const result = await this.apiClient.getSupplier();
+    const name = "Get Supplier";
 
     return this.supplierScenarioHelper.validateSupplier(
       {

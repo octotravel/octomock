@@ -108,14 +108,12 @@ export class ConfigParser {
       products.data.body,
       AvailabilityType.START_TIME
     );
-    console.log("post1");
 
     const openingHoursProducts = await this.getProducts(
       apiClient,
       products.data.body,
       AvailabilityType.START_TIME
     );
-    console.log("post2");
 
     return new Config({
       url: data.url,

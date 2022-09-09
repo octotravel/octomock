@@ -23,7 +23,9 @@ export class BookingReservationScenarioHelper {
     return new BookingValidator({ capabilities }).validate(booking);
   };
 
-  private reservationCheck = (data: ScenarioHelperData<Booking>): string[] => {
+  private reservationCheck = (
+    data: ScenarioHelperData<Booking>
+  ): ValidatorError[] => {
     const unitIdCheck =
       data.response.data.body.unitItems.length ===
       data.request.body.unitItems.length
@@ -39,11 +41,15 @@ export class BookingReservationScenarioHelper {
     return [
       booking.notes === data.request.body.notes
         ? null
-        : "Notes are not matching request",
+        : new ValidatorError({ message: "Notes are not matching request" }),
       booking.status === BookingStatus.ON_HOLD
         ? null
-        : `Booking status should be ON_HOLD. Returned value was ${booking.status}`,
-      unitIdCheck ? null : "UnitIds are not matching",
+        : new ValidatorError({
+            message: `Booking status should be ON_HOLD. Returned value was ${booking.status}`,
+          }),
+      unitIdCheck
+        ? null
+        : new ValidatorError({ message: "UnitIds are not matching" }),
     ].filter(Boolean);
   };
 
@@ -72,11 +78,7 @@ export class BookingReservationScenarioHelper {
       return this.scenarioHelper.handleResult({
         ...data,
         success: false,
-        errors: checkErrors.map((error) => {
-          return {
-            message: error,
-          };
-        }),
+        errors: checkErrors,
       });
     }
 
@@ -100,7 +102,11 @@ export class BookingReservationScenarioHelper {
       return this.scenarioHelper.handleResult({
         ...data,
         success: false,
-        errors: [error],
+        errors: [
+          new ValidatorError({
+            message: error,
+          }),
+        ],
       });
     }
 
@@ -108,7 +114,7 @@ export class BookingReservationScenarioHelper {
     return this.scenarioHelper.handleResult({
       ...data,
       success: R.isEmpty(errors),
-      errors: errors.map((error) => error.message),
+      errors,
     });
   };
 }

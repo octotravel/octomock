@@ -26,14 +26,16 @@ export class BookingExtendScenarioHelper {
   private extendCheck = (
     createdBooking: Booking,
     extendedBooking: Booking
-  ): string[] => {
+  ): ValidatorError[] => {
     return [
       extendedBooking.status === BookingStatus.ON_HOLD
         ? null
-        : "Booking status is not ON_HOLD",
+        : new ValidatorError({ message: "Booking status is not ON_HOLD" }),
       createdBooking.utcExpiresAt < extendedBooking.utcExpiresAt
         ? null
-        : "Booking expire time was not extended",
+        : new ValidatorError({
+            message: "Booking expire time was not extended",
+          }),
     ].filter(Boolean);
   };
 
@@ -63,11 +65,7 @@ export class BookingExtendScenarioHelper {
       return this.scenarioHelper.handleResult({
         ...data,
         success: false,
-        errors: checkErrors.map((error) => {
-          return {
-            message: error,
-          };
-        }),
+        errors: checkErrors,
       });
     }
 
@@ -91,7 +89,11 @@ export class BookingExtendScenarioHelper {
       return this.scenarioHelper.handleResult({
         ...data,
         success: false,
-        errors: [error],
+        errors: [
+          new ValidatorError({
+            message: error,
+          }),
+        ],
       });
     }
 
@@ -99,7 +101,7 @@ export class BookingExtendScenarioHelper {
     return this.scenarioHelper.handleResult({
       ...data,
       success: R.isEmpty(errors),
-      errors: errors.map((error) => error.message),
+      errors,
     });
   };
 }
