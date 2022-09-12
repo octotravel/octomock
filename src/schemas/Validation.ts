@@ -1,6 +1,6 @@
 import * as yup from "yup";
 
-export interface ValidationConfig {
+export interface ValidationEndpoint {
   backend: {
     endpoint: string;
     type: string;
@@ -8,7 +8,7 @@ export interface ValidationConfig {
   };
 }
 
-export const validationConfigSchema: yup.SchemaOf<ValidationConfig> = yup
+export const validationConfigSchema: yup.SchemaOf<ValidationEndpoint> = yup
   .object()
   .shape({
     backend: yup.object().shape({

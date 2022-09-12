@@ -1,17 +1,17 @@
 export class PreConfig {
-  public url: string;
+  public endpoint: string;
   public apiKey: string;
   public backendType: string;
   constructor({
-    url,
+    endpoint,
     apiKey,
     backendType,
   }: {
-    url: string;
+    endpoint: string;
     apiKey: string;
     backendType: string;
   }) {
-    this.url = url;
+    this.endpoint = endpoint;
     this.apiKey = apiKey;
     this.backendType = backendType;
   }

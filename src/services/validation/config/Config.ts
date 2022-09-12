@@ -1,51 +1,52 @@
-import { CapabilityId } from "@octocloud/types";
+import { Capability, CapabilityId, Product } from "@octocloud/types";
+import { ValidatorError } from "../../../validators/backendValidator/ValidatorHelpers";
 import { ProductValidatorData } from "./ProductValidatorData";
 
-export class Config {
-  public url: string;
-  public apiKey: string;
-  public capabilities: CapabilityId[];
+interface IConfig {
+  setCapabilities?(capabilities: Capability[]): ValidatorError[];
+  getCapabilityIDs?(): CapabilityId[];
+  setProducts?(products: Product[]): ValidatorError[];
+  getStartTimeProducts?(): unknown;
+  getOpeningHoursProducts?(): unknown;
+  getAvailabilityRequiredFalseProducts?(): unknown;
+}
+export class Config implements IConfig {
+  readonly endpoint: string;
+  readonly apiKey: string;
+  readonly backendType: string;
 
-  public startTimesProducts: ProductValidatorData;
-  public openingHoursProducts: ProductValidatorData;
-  public availabilityRequiredFalseProducts: ProductValidatorData;
-  public validProducts: boolean;
+  readonly capabilities: CapabilityId[];
 
-  public ignoreKill: boolean;
+  readonly startTimesProducts: ProductValidatorData;
+  readonly openingHoursProducts: ProductValidatorData;
+  readonly availabilityRequiredFalseProducts: ProductValidatorData;
+  readonly validProducts: boolean;
+
+  readonly ignoreKill: boolean;
 
   constructor({
-    url,
+    endpoint,
     apiKey,
-    capabilities,
-
-    startTimesProducts,
-    openingHoursProducts,
-    availabilityRequiredFalseProducts,
-    validProducts,
-
-    ignoreKill,
+    backendType,
   }: {
-    url: string;
+    endpoint: string;
     apiKey: string;
-    capabilities: CapabilityId[];
-
-    startTimesProducts?: ProductValidatorData;
-    openingHoursProducts?: ProductValidatorData;
-    availabilityRequiredFalseProducts?: ProductValidatorData;
-    validProducts: boolean;
-
-    ignoreKill: boolean;
+    backendType: string;
   }) {
-    this.url = url;
+    this.endpoint = endpoint;
     this.apiKey = apiKey;
-    this.capabilities = capabilities;
+    this.backendType = backendType;
 
-    this.startTimesProducts = startTimesProducts ?? null;
-    this.openingHoursProducts = openingHoursProducts ?? null;
-    this.availabilityRequiredFalseProducts =
-      availabilityRequiredFalseProducts ?? null;
-    this.validProducts = validProducts;
+    this.capabilities = [];
 
-    this.ignoreKill = ignoreKill;
+    this.startTimesProducts = null;
+    this.openingHoursProducts = null;
+    this.availabilityRequiredFalseProducts = null;
+    this.validProducts = false;
+
+    this.ignoreKill = true;
   }
+  public setCapabilities = (_capabilities: Capability[]): ValidatorError[] => {
+    return [];
+  };
 }

@@ -23,7 +23,7 @@ export class CapabilitiesFlow {
   };
 
   public validate = async (): Promise<FlowResult> => {
-    const scenarios = [await this.validateGetCapabilitiess()];
+    const scenarios = [await this.validateGetCapabilities()];
 
     const results = [];
     for await (const scenario of scenarios) {
@@ -36,7 +36,7 @@ export class CapabilitiesFlow {
     return this.setFlow(results);
   };
 
-  private validateGetCapabilitiess =
+  private validateGetCapabilities =
     async (): Promise<GetCapabilitiesScenario> => {
       return new GetCapabilitiesScenario({
         apiClient: this.apiClient,

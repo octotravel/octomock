@@ -5,8 +5,8 @@ import {
   InternalServerError,
 } from "./models/Error";
 import { ValidationController } from "./services/validation/Controller";
-import { ConfigParser } from "./services/validation/config/ConfigParser";
 import { validationConfigSchema } from "./schemas/Validation";
+import { Config } from "./services/validation/config/Config";
 
 export default {
   async fetch(
@@ -21,9 +21,13 @@ export default {
       const reqBody = await request.json();
       await validationConfigSchema.validate(reqBody);
       const schema = validationConfigSchema.cast(reqBody);
-      const preConfig = await new ConfigParser().parse(schema);
-      console.log(preConfig);
-      const body = await new ValidationController({ preConfig }).validate();
+      const config = await new Config({
+        endpoint: schema.backend.endpoint,
+        apiKey: schema.backend.apiKey,
+        backendType: schema.backend.type,
+      });
+      console.log(config);
+      const body = await new ValidationController({ config }).validate();
 
       return new Response(JSON.stringify(body), {
         status: 200,

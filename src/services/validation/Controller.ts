@@ -1,20 +1,22 @@
-import { ConfigParser } from "./config/ConfigParser";
-import { PreConfig } from "./config/PreConfig";
+import { Config } from "./config/Config";
 import { CapabilitiesFlow } from "./Flows/Capabilites/CapabilitiesFlow";
 import { FlowResult } from "./Flows/Flow";
 import { PrimiteFlows } from "./Flows/PrimitiveFlows";
 
 export class ValidationController {
-  private preConfig: PreConfig;
-  constructor({ preConfig }: { preConfig: PreConfig }) {
-    this.preConfig = preConfig;
+  private config: Config;
+  constructor({ config }: { config: Config }) {
+    this.config = config;
   }
 
   public validate = async (): Promise<FlowResult[]> => {
-    const preConfig = this.preConfig;
-    const capabilitiesFlow = await new CapabilitiesFlow(preConfig).validate();
+    const config = this.config;
 
-    const config = await new ConfigParser().fetch(preConfig, capabilitiesFlow);
+    const capabilitiesFlow = await new CapabilitiesFlow({
+      apiKey: config.apiKey,
+      url: config.endpoint,
+    }).validate();
+
     const primitiveFlows = await new PrimiteFlows({ config }).validate();
 
     // new ComplextFlows().validate()

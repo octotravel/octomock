@@ -3,10 +3,10 @@ import { availabilityRouter } from "./modules/Availability";
 import { productRouter } from "./modules/Prodduct";
 import { CapabilityController } from "./../controllers/CapabilityController";
 import Router from "@koa/router";
-import { ConfigParser } from "../services/validation/config/ConfigParser";
 import { ValidationController } from "../services/validation/Controller";
 import { validationConfigSchema } from "../schemas/Validation";
 import { supplierRouter } from "./modules/Supplier";
+import { Config } from "../services/validation/config/Config";
 
 export const router = new Router();
 
@@ -26,9 +26,14 @@ router.post("/validate", async (ctx, _) => {
   // create some init class
   await validationConfigSchema.validate(ctx.request.body);
   const schema = validationConfigSchema.cast(ctx.request.body);
-  const preConfig = await new ConfigParser().parse(schema);
 
-  const body = await new ValidationController({ preConfig }).validate();
+  const config = new Config({
+    endpoint: schema.backend.endpoint,
+    apiKey: schema.backend.apiKey,
+    backendType: schema.backend.type,
+  });
+
+  const body = await new ValidationController({ config }).validate();
 
   ctx.status = 200;
   ctx.body = body;

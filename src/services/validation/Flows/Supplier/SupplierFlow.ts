@@ -10,7 +10,7 @@ export class SupplierFlow {
   constructor({ config }: { config: Config }) {
     this.config = config;
     this.apiClient = new ApiClient({
-      url: config.url,
+      url: config.endpoint,
       capabilities: config.capabilities,
       apiKey: this.config.apiKey,
     });

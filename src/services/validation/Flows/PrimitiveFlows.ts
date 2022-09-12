@@ -19,6 +19,7 @@ export class PrimiteFlows {
   }
   public validate = async (): Promise<FlowResult[]> => {
     const config = this.config;
+    console.log(config);
 
     const flows: Flow[] = [
       new SupplierFlow({ config }),
@@ -41,6 +42,8 @@ export class PrimiteFlows {
         break;
       }
     }
+    console.log(config);
+
     return results;
   };
 }
