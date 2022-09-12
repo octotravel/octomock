@@ -32,13 +32,13 @@ export class ScenarioHelper {
   public handleResult = (data: ScenarioData): ScenarioResult<any> => {
     if (data.response.error) {
       if (data.response.error.status === STATUS_NOT_FOUND) {
-        data.errors = {
+        data.errors = [
           ...data.errors,
-          ...new ValidatorError({
+          new ValidatorError({
             type: ErrorType.CRITICAL,
             message: "Endpoint not implemented",
           }),
-        };
+        ];
       }
     }
     return {
@@ -56,16 +56,6 @@ export class ScenarioHelper {
             }
           : null,
       },
-      errors: data.errors.map((error) => error.mapError()),
-    };
-  };
-
-  public handlePreError = (data: ScenarioData): ScenarioResult<any> => {
-    return {
-      name: data.name,
-      success: data.success,
-      request: null,
-      response: null,
       errors: data.errors.map((error) => error.mapError()),
     };
   };

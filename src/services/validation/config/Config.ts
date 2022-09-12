@@ -9,6 +9,7 @@ export class Config {
   public startTimesProducts: ProductValidatorData;
   public openingHoursProducts: ProductValidatorData;
   public availabilityRequiredFalseProducts: ProductValidatorData;
+  public validProducts: boolean;
 
   public ignoreKill: boolean;
 
@@ -20,6 +21,7 @@ export class Config {
     startTimesProducts,
     openingHoursProducts,
     availabilityRequiredFalseProducts,
+    validProducts,
 
     ignoreKill,
   }: {
@@ -30,6 +32,7 @@ export class Config {
     startTimesProducts?: ProductValidatorData;
     openingHoursProducts?: ProductValidatorData;
     availabilityRequiredFalseProducts?: ProductValidatorData;
+    validProducts: boolean;
 
     ignoreKill: boolean;
   }) {
@@ -41,6 +44,7 @@ export class Config {
     this.openingHoursProducts = openingHoursProducts ?? null;
     this.availabilityRequiredFalseProducts =
       availabilityRequiredFalseProducts ?? null;
+    this.validProducts = validProducts;
 
     this.ignoreKill = ignoreKill;
   }

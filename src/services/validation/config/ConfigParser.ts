@@ -1,6 +1,7 @@
 import {
   AvailabilityStatus,
   AvailabilityType,
+  Capability,
   Product,
 } from "@octocloud/types";
 import { DateHelper } from "../../../helpers/DateHelper";
@@ -113,7 +114,7 @@ export class ConfigParser {
     capabilitiesFlow: FlowResult
   ): Promise<Config> => {
     const capabilities = capabilitiesFlow.scenarios[0].response.body.map(
-      (capability) => {
+      (capability: Capability) => {
         if (capability.id) {
           return capability.id;
         }
@@ -158,6 +159,10 @@ export class ConfigParser {
       startTimesProducts,
       openingHoursProducts,
       availabilityRequiredFalseProducts,
+      validProducts:
+        startTimesProducts.availabilityAvailable !== undefined ||
+        openingHoursProducts.availabilityAvailable !== undefined ||
+        availabilityRequiredFalseProducts.availabilityAvailable !== undefined,
       ignoreKill: true,
     });
   };

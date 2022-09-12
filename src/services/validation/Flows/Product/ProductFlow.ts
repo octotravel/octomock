@@ -5,6 +5,10 @@ import { GetProductScenario } from "../../Scenarios/Product/GetProduct";
 import { GetProductInvalidScenario } from "../../Scenarios/Product/GetProductInvalid";
 import { GetProductsScenario } from "../../Scenarios/Product/GetProducts";
 import { FlowResult } from "../Flow";
+import {
+  ErrorType,
+  ValidatorError,
+} from "../../../../validators/backendValidator/ValidatorHelpers";
 
 export class ProductFlow {
   private config: Config;
@@ -29,6 +33,22 @@ export class ProductFlow {
   };
 
   public validate = async (): Promise<FlowResult> => {
+    if (!this.config.validProducts) {
+      return this.setFlow([
+        {
+          name: "Products check",
+          success: false,
+          request: null,
+          response: null,
+          errors: [
+            new ValidatorError({
+              message: "No valid product provided",
+              type: ErrorType.CRITICAL,
+            }).mapError(),
+          ],
+        },
+      ]);
+    }
     const scenarios = [
       await this.validateGetProduct(),
       await this.validateGetProducts(),
@@ -47,23 +67,21 @@ export class ProductFlow {
   };
 
   private validateGetProduct = async (): Promise<GetProductScenario> => {
-    let productId = null;
-    if (this.config.availabilityRequiredFalseProducts.availabilityAvailable) {
-      productId =
-        this.config.availabilityRequiredFalseProducts.availabilityAvailable
-          .productId;
-    }
-    if (this.config.openingHoursProducts.availabilityAvailable) {
-      productId =
-        this.config.openingHoursProducts.availabilityAvailable.productId;
-    }
-    if (this.config.startTimesProducts.availabilityAvailable) {
-      productId =
-        this.config.startTimesProducts.availabilityAvailable.productId;
-    }
+    const productIds = [
+      this.config.startTimesProducts.availabilityAvailable
+        ? this.config.startTimesProducts.availabilityAvailable.productId
+        : null,
+      this.config.openingHoursProducts.availabilityAvailable
+        ? this.config.openingHoursProducts.availabilityAvailable.productId
+        : null,
+      this.config.availabilityRequiredFalseProducts.availabilityAvailable
+        ? this.config.availabilityRequiredFalseProducts.availabilityAvailable
+            .productId
+        : null,
+    ].filter(Boolean);
     return new GetProductScenario({
       apiClient: this.apiClient,
-      productId,
+      productId: productIds[0],
       capabilities: this.config.capabilities,
     });
   };
