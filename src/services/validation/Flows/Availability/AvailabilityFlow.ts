@@ -1,16 +1,16 @@
 // import { AvailabilityType } from "@octocloud/types";
-// import { eachDayOfInterval } from "date-fns";
-// import { ApiClient } from "../../ApiClient";
+// // import { eachDayOfInterval } from "date-fns";
+// import { ApiClient } from "../../api/ApiClient";
 // import { Config } from "../../config/Config";
 // import { ScenarioResult } from "../../Scenarios/Scenario";
-// import { AvailabilityCheckIntervalScenario } from "../../Scenarios/Availability/AvailabilityCheckInterval";
-// import { AvailabilityCheckDateScenario } from "../../Scenarios/Availability/AvailabilityCheckDate";
+// // import { AvailabilityCheckIntervalScenario } from "../../Scenarios/Availability/AvailabilityCheckInterval";
+// // import { AvailabilityCheckDateScenario } from "../../Scenarios/Availability/AvailabilityCheckDate";
 // import { FlowResult } from "../Flow";
-// import { DateHelper } from "../../../../helpers/DateHelper";
-// import { AvailabilityCheckUnavailableDatesScenario } from "../../Scenarios/Availability/AvailabilityCheckUnavailableDates";
-// import { AvailabilityCheckInvalidProductScenario } from "../../Scenarios/Availability/AvailabilityCheckInvalidProduct";
-// import { AvailabilityCheckInvalidOptionScenario } from "../../Scenarios/Availability/AvailabilityCheckInvalidOption";
-// import { AvailabilityCheckBadRequestScenario } from "../../Scenarios/Availability/AvailabilityCheckBadRequest";
+// // import { DateHelper } from "../../../../helpers/DateHelper";
+// // import { AvailabilityCheckUnavailableDatesScenario } from "../../Scenarios/Availability/AvailabilityCheckUnavailableDates";
+// // import { AvailabilityCheckInvalidProductScenario } from "../../Scenarios/Availability/AvailabilityCheckInvalidProduct";
+// // import { AvailabilityCheckInvalidOptionScenario } from "../../Scenarios/Availability/AvailabilityCheckInvalidOption";
+// // import { AvailabilityCheckBadRequestScenario } from "../../Scenarios/Availability/AvailabilityCheckBadRequest";
 // // import { AvailabilityCheckAvailabilityIdScenario } from "../../Scenarios/Availability/AvailabilityCheckAvailabilityId";
 // // import { BadRequestError } from "../../../../models/Error";
 // // import * as R from "ramda";
@@ -63,13 +63,13 @@
 //   public validate = async (): Promise<FlowResult> => {
 //     await this.fetchData();
 //     const scenarios = [
-//       ...this.validateAvailabilityCheckInterval(),
-//       ...this.validateAvailabilityCheckDate(),
-//       // ...(await this.validateAvailabilityCheckAvailabilityId()),
-//       ...this.validateAvailabilityCheckUnavailableDates(),
-//       ...this.validateAvailabilityCheckInvalidProduct(),
-//       ...this.validateAvailabilityCheckInvalidOption(),
-//       ...this.validateAvailabilityCheckBadRequest(),
+//     //   ...this.validateAvailabilityCheckInterval(),
+//     //   ...this.validateAvailabilityCheckDate(),
+//     //   ...(await this.validateAvailabilityCheckAvailabilityId()),
+//     //   ...this.validateAvailabilityCheckUnavailableDates(),
+//     //   ...this.validateAvailabilityCheckInvalidProduct(),
+//     //   ...this.validateAvailabilityCheckInvalidOption(),
+//     //   ...this.validateAvailabilityCheckBadRequest(),
 //     ];
 
 //     const results = [];
@@ -84,48 +84,48 @@
 //     return this.setFlow(results);
 //   };
 
-//   private validateAvailabilityCheckInterval =
-//     (): AvailabilityCheckIntervalScenario[] => {
-//       return this.config.getProductConfigs().map((availabilityConfig) => {
-//         return new AvailabilityCheckIntervalScenario({
-//           apiClient: this.apiClient,
-//           productId: availabilityConfig.productId,
-//           optionId:
-//             availabilityConfig.availabilityType ===
-//             AvailabilityType.OPENING_HOURS
-//               ? this.optionIdOpeningHours
-//               : this.optionIdStartTimes,
-//           localDateStart: availabilityConfig.available.from,
-//           localDateEnd: availabilityConfig.available.to,
-//           availabilityType: availabilityConfig.availabilityType,
-//           capabilities: this.config.capabilities,
-//         });
-//       });
-//     };
+// //   private validateAvailabilityCheckInterval =
+// //     (): AvailabilityCheckIntervalScenario[] => {
+// //       return this.config.getProductConfigs().map((availabilityConfig) => {
+// //         return new AvailabilityCheckIntervalScenario({
+// //           apiClient: this.apiClient,
+// //           productId: availabilityConfig.productId,
+// //           optionId:
+// //             availabilityConfig.availabilityType ===
+// //             AvailabilityType.OPENING_HOURS
+// //               ? this.optionIdOpeningHours
+// //               : this.optionIdStartTimes,
+// //           localDateStart: availabilityConfig.available.from,
+// //           localDateEnd: availabilityConfig.available.to,
+// //           availabilityType: availabilityConfig.availabilityType,
+// //           capabilities: this.config.capabilities,
+// //         });
+// //       });
+// //     };
 
-//   private validateAvailabilityCheckDate =
-//     (): AvailabilityCheckDateScenario[] => {
-//       return this.config.getProductConfigs().map((availabilityConfig) => {
-//         const dates = eachDayOfInterval({
-//           start: new Date(availabilityConfig.available.from),
-//           end: new Date(availabilityConfig.available.to),
-//         }).map((date) => {
-//           return DateHelper.availabilityDateFormat(date);
-//         });
-//         return new AvailabilityCheckDateScenario({
-//           apiClient: this.apiClient,
-//           productId: availabilityConfig.productId,
-//           optionId:
-//             availabilityConfig.availabilityType ===
-//             AvailabilityType.OPENING_HOURS
-//               ? this.optionIdOpeningHours
-//               : this.optionIdStartTimes,
-//           localDate: dates[Math.floor(Math.random() * dates.length)],
-//           availabilityType: availabilityConfig.availabilityType,
-//           capabilities: this.config.capabilities,
-//         });
-//       });
-//     };
+// //   private validateAvailabilityCheckDate =
+// //     (): AvailabilityCheckDateScenario[] => {
+// //       return this.config.getProductConfigs().map((availabilityConfig) => {
+// //         const dates = eachDayOfInterval({
+// //           start: new Date(availabilityConfig.available.from),
+// //           end: new Date(availabilityConfig.available.to),
+// //         }).map((date) => {
+// //           return DateHelper.availabilityDateFormat(date);
+// //         });
+// //         return new AvailabilityCheckDateScenario({
+// //           apiClient: this.apiClient,
+// //           productId: availabilityConfig.productId,
+// //           optionId:
+// //             availabilityConfig.availabilityType ===
+// //             AvailabilityType.OPENING_HOURS
+// //               ? this.optionIdOpeningHours
+// //               : this.optionIdStartTimes,
+// //           localDate: dates[Math.floor(Math.random() * dates.length)],
+// //           availabilityType: availabilityConfig.availabilityType,
+// //           capabilities: this.config.capabilities,
+// //         });
+// //       });
+// //     };
 
 //   // private validateAvailabilityCheckAvailabilityId = async (): Promise<
 //   //   AvailabilityCheckAvailabilityIdScenario[]
@@ -168,115 +168,115 @@
 //   //   );
 //   // };
 
-//   private validateAvailabilityCheckUnavailableDates =
-//     (): AvailabilityCheckUnavailableDatesScenario[] => {
-//       return this.config.getProductConfigs().map((availabilityConfig) => {
-//         return new AvailabilityCheckUnavailableDatesScenario({
-//           apiClient: this.apiClient,
-//           productId: availabilityConfig.productId,
-//           optionId:
-//             availabilityConfig.availabilityType ===
-//             AvailabilityType.OPENING_HOURS
-//               ? this.optionIdOpeningHours
-//               : this.optionIdStartTimes,
-//           localDateStart: availabilityConfig.unavailable.from,
-//           localDateEnd: availabilityConfig.unavailable.to,
-//           availabilityType: availabilityConfig.availabilityType,
-//           capabilities: this.config.capabilities,
-//         });
-//       });
-//     };
+// //   private validateAvailabilityCheckUnavailableDates =
+// //     (): AvailabilityCheckUnavailableDatesScenario[] => {
+// //       return this.config.getProductConfigs().map((availabilityConfig) => {
+// //         return new AvailabilityCheckUnavailableDatesScenario({
+// //           apiClient: this.apiClient,
+// //           productId: availabilityConfig.productId,
+// //           optionId:
+// //             availabilityConfig.availabilityType ===
+// //             AvailabilityType.OPENING_HOURS
+// //               ? this.optionIdOpeningHours
+// //               : this.optionIdStartTimes,
+// //           localDateStart: availabilityConfig.unavailable.from,
+// //           localDateEnd: availabilityConfig.unavailable.to,
+// //           availabilityType: availabilityConfig.availabilityType,
+// //           capabilities: this.config.capabilities,
+// //         });
+// //       });
+// //     };
 
-//   private validateAvailabilityCheckInvalidProduct =
-//     (): AvailabilityCheckInvalidProductScenario[] => {
-//       return this.config.getProductConfigs().map((availabilityConfig) => {
-//         return new AvailabilityCheckInvalidProductScenario({
-//           apiClient: this.apiClient,
-//           productId: "invalid_productid",
-//           optionId:
-//             availabilityConfig.availabilityType ===
-//             AvailabilityType.OPENING_HOURS
-//               ? this.optionIdOpeningHours
-//               : this.optionIdStartTimes,
-//           localDate: availabilityConfig.available.from,
-//         });
-//       });
-//     };
+// //   private validateAvailabilityCheckInvalidProduct =
+// //     (): AvailabilityCheckInvalidProductScenario[] => {
+// //       return this.config.getProductConfigs().map((availabilityConfig) => {
+// //         return new AvailabilityCheckInvalidProductScenario({
+// //           apiClient: this.apiClient,
+// //           productId: "invalid_productid",
+// //           optionId:
+// //             availabilityConfig.availabilityType ===
+// //             AvailabilityType.OPENING_HOURS
+// //               ? this.optionIdOpeningHours
+// //               : this.optionIdStartTimes,
+// //           localDate: availabilityConfig.available.from,
+// //         });
+// //       });
+// //     };
 
-//   private validateAvailabilityCheckInvalidOption =
-//     (): AvailabilityCheckInvalidOptionScenario[] => {
-//       return this.config.getProductConfigs().map((availabilityConfig) => {
-//         return new AvailabilityCheckInvalidOptionScenario({
-//           apiClient: this.apiClient,
-//           productId: availabilityConfig.productId,
-//           optionId: "invalid_optionid",
-//           localDate: availabilityConfig.available.from,
-//         });
-//       });
-//     };
+// //   private validateAvailabilityCheckInvalidOption =
+// //     (): AvailabilityCheckInvalidOptionScenario[] => {
+// //       return this.config.getProductConfigs().map((availabilityConfig) => {
+// //         return new AvailabilityCheckInvalidOptionScenario({
+// //           apiClient: this.apiClient,
+// //           productId: availabilityConfig.productId,
+// //           optionId: "invalid_optionid",
+// //           localDate: availabilityConfig.available.from,
+// //         });
+// //       });
+// //     };
 
-//   private validateAvailabilityCheckBadRequest =
-//     (): AvailabilityCheckBadRequestScenario[] => {
-//       const response = this.config
-//         .getProductConfigs()
-//         .map((availabilityConfig) => {
-//           const emptyBody = new AvailabilityCheckBadRequestScenario({
-//             apiClient: this.apiClient,
-//             productId: availabilityConfig.productId,
-//             optionId:
-//               availabilityConfig.availabilityType ===
-//               AvailabilityType.OPENING_HOURS
-//                 ? this.optionIdOpeningHours
-//                 : this.optionIdStartTimes,
-//           });
+// //   private validateAvailabilityCheckBadRequest =
+// //     (): AvailabilityCheckBadRequestScenario[] => {
+// //       const response = this.config
+// //         .getProductConfigs()
+// //         .map((availabilityConfig) => {
+// //           const emptyBody = new AvailabilityCheckBadRequestScenario({
+// //             apiClient: this.apiClient,
+// //             productId: availabilityConfig.productId,
+// //             optionId:
+// //               availabilityConfig.availabilityType ===
+// //               AvailabilityType.OPENING_HOURS
+// //                 ? this.optionIdOpeningHours
+// //                 : this.optionIdStartTimes,
+// //           });
 
-//           const allDatesBody = new AvailabilityCheckBadRequestScenario({
-//             apiClient: this.apiClient,
-//             productId: availabilityConfig.productId,
-//             optionId:
-//               availabilityConfig.availabilityType ===
-//               AvailabilityType.OPENING_HOURS
-//                 ? this.optionIdOpeningHours
-//                 : this.optionIdStartTimes,
-//             localDate: availabilityConfig.available.from,
-//             localDateStart: availabilityConfig.available.to,
-//             localDateEnd: availabilityConfig.available.from,
-//           });
+// //           const allDatesBody = new AvailabilityCheckBadRequestScenario({
+// //             apiClient: this.apiClient,
+// //             productId: availabilityConfig.productId,
+// //             optionId:
+// //               availabilityConfig.availabilityType ===
+// //               AvailabilityType.OPENING_HOURS
+// //                 ? this.optionIdOpeningHours
+// //                 : this.optionIdStartTimes,
+// //             localDate: availabilityConfig.available.from,
+// //             localDateStart: availabilityConfig.available.to,
+// //             localDateEnd: availabilityConfig.available.from,
+// //           });
 
-//           const localDateAvailabilityIdsBody =
-//             new AvailabilityCheckBadRequestScenario({
-//               apiClient: this.apiClient,
-//               productId: availabilityConfig.productId,
-//               optionId:
-//                 availabilityConfig.availabilityType ===
-//                 AvailabilityType.OPENING_HOURS
-//                   ? this.optionIdOpeningHours
-//                   : this.optionIdStartTimes,
-//               localDate: availabilityConfig.available.from,
-//               availabilityIds: ["random_availability_id"],
-//             });
+// //           const localDateAvailabilityIdsBody =
+// //             new AvailabilityCheckBadRequestScenario({
+// //               apiClient: this.apiClient,
+// //               productId: availabilityConfig.productId,
+// //               optionId:
+// //                 availabilityConfig.availabilityType ===
+// //                 AvailabilityType.OPENING_HOURS
+// //                   ? this.optionIdOpeningHours
+// //                   : this.optionIdStartTimes,
+// //               localDate: availabilityConfig.available.from,
+// //               availabilityIds: ["random_availability_id"],
+// //             });
 
-//           const datesAvailabilityIdsBody =
-//             new AvailabilityCheckBadRequestScenario({
-//               apiClient: this.apiClient,
-//               productId: availabilityConfig.productId,
-//               optionId:
-//                 availabilityConfig.availabilityType ===
-//                 AvailabilityType.OPENING_HOURS
-//                   ? this.optionIdOpeningHours
-//                   : this.optionIdStartTimes,
-//               localDateStart: availabilityConfig.available.from,
-//               localDateEnd: availabilityConfig.available.to,
-//               availabilityIds: ["random_availability_id"],
-//             });
+// //           const datesAvailabilityIdsBody =
+// //             new AvailabilityCheckBadRequestScenario({
+// //               apiClient: this.apiClient,
+// //               productId: availabilityConfig.productId,
+// //               optionId:
+// //                 availabilityConfig.availabilityType ===
+// //                 AvailabilityType.OPENING_HOURS
+// //                   ? this.optionIdOpeningHours
+// //                   : this.optionIdStartTimes,
+// //               localDateStart: availabilityConfig.available.from,
+// //               localDateEnd: availabilityConfig.available.to,
+// //               availabilityIds: ["random_availability_id"],
+// //             });
 
-//           return [
-//             emptyBody,
-//             allDatesBody,
-//             localDateAvailabilityIdsBody,
-//             datesAvailabilityIdsBody,
-//           ];
-//         });
-//       return response.flat(1);
-//     };
+// //           return [
+// //             emptyBody,
+// //             allDatesBody,
+// //             localDateAvailabilityIdsBody,
+// //             datesAvailabilityIdsBody,
+// //           ];
+// //         });
+// //       return response.flat(1);
+// //     };
 // }

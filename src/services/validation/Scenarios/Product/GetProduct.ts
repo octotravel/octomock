@@ -9,8 +9,9 @@ export class GetProductScenario implements Scenario<Product> {
   private productScenarioHelper = new ProductScenarioHelper();
 
   public validate = async () => {
+    const product = this.config.getProduct();
     const result = await this.apiClient.getProduct({
-      id: this.config.productIds[0],
+      id: product.id,
     });
     const name = `Get Product`;
 

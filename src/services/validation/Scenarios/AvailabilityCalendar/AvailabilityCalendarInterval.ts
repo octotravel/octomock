@@ -1,70 +1,32 @@
-import {
-  AvailabilityCalendar,
-  AvailabilityUnit,
-  CapabilityId,
-} from "@octocloud/types";
-import { ApiClient } from "../../api/ApiClient";
+import { AvailabilityCalendar } from "@octocloud/types";
 import { Scenario } from "../Scenario";
 import { AvailabilityCalendarScenarioHelper } from "../../helpers/AvailabilityCalendarScenarioHelper";
+import { Config } from "../../config/Config";
+import { DateHelper } from "../../../../helpers/DateHelper";
+import { addDays } from "date-fns";
 
 export class AvailabilityCalendarIntervalScenario
   implements Scenario<AvailabilityCalendar[]>
 {
-  private apiClient: ApiClient;
-  private productId: string;
-  private optionId: string;
-  private localDateStart: string;
-  private localDateEnd: string;
-  private units: AvailabilityUnit[];
-  private availabilityType: string;
-  private capabilities: CapabilityId[];
-  constructor({
-    apiClient,
-    productId,
-    optionId,
-    localDateStart,
-    localDateEnd,
-    units,
-    availabilityType,
-    capabilities,
-  }: {
-    apiClient: ApiClient;
-    productId: string;
-    optionId: string;
-    localDateStart: string;
-    localDateEnd: string;
-    units?: AvailabilityUnit[];
-    availabilityType: string;
-    capabilities: CapabilityId[];
-  }) {
-    this.apiClient = apiClient;
-    this.productId = productId;
-    this.optionId = optionId;
-    this.localDateStart = localDateStart;
-    this.localDateEnd = localDateEnd;
-    this.units = units;
-    this.availabilityType = availabilityType;
-    this.capabilities = capabilities;
-  }
+  private config = Config.getInstance();
+  private apiClient = this.config.getApiClient();
+
   private availabilityCalendarScenarioHelper =
     new AvailabilityCalendarScenarioHelper();
 
   public validate = async () => {
+    const product = this.config.getProduct();
     const result = await this.apiClient.getAvailabilityCalendar({
-      productId: this.productId,
-      optionId: this.optionId,
-      localDateStart: this.localDateStart,
-      localDateEnd: this.localDateEnd,
-      units: this.units,
+      productId: product.id,
+      optionId: product.options[0].id,
+      localDateStart: DateHelper.getDate(new Date().toISOString()),
+      localDateEnd: DateHelper.getDate(addDays(new Date(), 30).toISOString()),
     });
-    const name = `Availability Calendar Interval (${this.availabilityType})`;
+    const name = `Availability Calendar Interval (${product.availabilityType})`;
 
-    return this.availabilityCalendarScenarioHelper.validateAvailability(
-      {
-        result,
-        name,
-      },
-      this.capabilities
-    );
+    return this.availabilityCalendarScenarioHelper.validateAvailability({
+      result,
+      name,
+    });
   };
 }

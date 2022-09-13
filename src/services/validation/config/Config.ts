@@ -16,10 +16,10 @@ import { ProductValidatorData } from "./ProductValidatorData";
 interface IConfig {
   setCapabilities(capabilities: Capability[]): ValidatorError[];
   getCapabilityIDs(): CapabilityId[];
-  setProducts?(products: Product[]): ValidatorError[];
-  getStartTimeProducts?(): ProductValidatorData;
-  getOpeningHoursProducts?(): ProductValidatorData;
-  getAvailabilityRequiredFalseProducts?(): ProductValidatorData;
+  setProducts(products: Product[]): ValidatorError[];
+  getProduct(): Product;
+  getStartTimeProducts(): ProductValidatorData;
+  getOpeningHoursProducts(): ProductValidatorData;
 }
 export class Config implements IConfig {
   private static instance: Config;
@@ -30,13 +30,12 @@ export class Config implements IConfig {
 
   private capabilities: CapabilityId[];
 
-  public startTimesProducts: Nullable<ProductValidatorData>;
-  public openingHoursProducts: Nullable<ProductValidatorData>;
-  public productIds: string[];
+  private startTimesProducts: Nullable<ProductValidatorData>;
+  private openingHoursProducts: Nullable<ProductValidatorData>;
 
   public invalidProductId: string;
-
-  readonly ignoreKill: boolean;
+  public invalidOptionId: string;
+  public ignoreKill: boolean;
 
   constructor() {
     this.endpoint = null;
@@ -55,8 +54,8 @@ export class Config implements IConfig {
       availabilitySoldOut: null,
       availabilityAvailable: null,
     });
-    this.productIds = [];
     this.invalidProductId = "invalidProductId";
+    this.invalidOptionId = "invalidOptionId";
 
     this.ignoreKill = false;
   }
@@ -112,14 +111,28 @@ export class Config implements IConfig {
     this.openingHoursProducts.products = products.filter(
       (product) => product.availabilityType === AvailabilityType.OPENING_HOURS
     );
-    this.productIds = products.map((product) => product.id);
     return [
-      R.isEmpty(this.productIds)
+      R.isEmpty(this.startTimesProducts.products) &&
+      R.isEmpty(this.openingHoursProducts.products)
         ? new ValidatorError({
             message: "At least one product must be provided!",
             type: ErrorType.CRITICAL,
           })
         : null,
     ].filter(Boolean);
+  };
+
+  public getProduct = (): Product => {
+    return !R.isEmpty(this.startTimesProducts.products)
+      ? this.startTimesProducts.products[0]
+      : this.openingHoursProducts.products[0];
+  };
+
+  public getStartTimeProducts = (): ProductValidatorData => {
+    return this.startTimesProducts;
+  };
+
+  public getOpeningHoursProducts = (): ProductValidatorData => {
+    return this.openingHoursProducts;
   };
 }
