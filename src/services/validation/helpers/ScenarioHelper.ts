@@ -4,7 +4,7 @@ import {
   ErrorType,
   ValidatorError,
 } from "../../../validators/backendValidator/ValidatorHelpers";
-import { ResultRequest, ResultResponse } from "../ApiClient";
+import { ResultRequest, ResultResponse } from "../api/types";
 import { ScenarioResult } from "../Scenarios/Scenario";
 
 interface ScenarioData {
@@ -17,7 +17,7 @@ interface ScenarioData {
 
 export interface ScenarioHelperData<T> {
   name: string;
-  request: ResultRequest<T>;
+  request: ResultRequest;
   response: ResultResponse<T>;
 }
 

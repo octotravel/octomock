@@ -69,7 +69,8 @@ export class BookingReservationScenarioHelper {
       ...this.reservationCheck(data),
       ...this.bookingScenarioHelper.bookingCheck({
         newBooking: data.response.data.body,
-        oldBooking: data.request.body,
+        // TODO: this is clearly wrong
+        oldBooking: data.request.body as Booking,
         configData,
       }),
     ];
