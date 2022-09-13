@@ -65,7 +65,7 @@ export class AvailabilityCalendarScenarioHelper extends ScenarioHelper {
       });
     }
 
-    if (R.isEmpty(result.response.data.body)) {
+    if (R.isEmpty(result.data)) {
       return this.handleResult({
         ...data,
         success: false,
@@ -76,7 +76,7 @@ export class AvailabilityCalendarScenarioHelper extends ScenarioHelper {
         ],
       });
     }
-    if (this.checkAvailabilityStatus(result.response.data.body)) {
+    if (this.checkAvailabilityStatus(result.data)) {
       return this.handleResult({
         ...data,
         success: false,
@@ -109,8 +109,8 @@ export class AvailabilityCalendarScenarioHelper extends ScenarioHelper {
         errors: [],
       });
     }
-    if (!R.isEmpty(result.response.data.body)) {
-      if (this.checkUnavailabilityStatus(result.response.data.body)) {
+    if (!R.isEmpty(result.data)) {
+      if (this.checkUnavailabilityStatus(result.data)) {
         return this.handleResult({
           ...data,
           success: false,

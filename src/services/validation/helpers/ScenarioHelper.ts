@@ -47,7 +47,7 @@ export class ScenarioHelper {
       success: data.success,
       request: result.request,
       response: {
-        body: result.response.data ? result.response.data.body : null,
+        body: result.response.data ? result.data : null,
         status: result.response.data
           ? result.response.data.status
           : result.response.error.status,

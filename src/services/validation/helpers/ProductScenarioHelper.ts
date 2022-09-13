@@ -1,8 +1,7 @@
+import { ProductValidator } from "./../../../validators/backendValidator/Product/ProductValidator";
 import * as R from "ramda";
+import { CapabilityId, Product } from "@octocloud/types";
 import { ScenarioHelper } from "./ScenarioHelper";
-import { ValidatorError } from "./../../../validators/backendValidator/ValidatorHelpers";
-import { CapabilityId } from "@octocloud/types";
-import { ProductValidator } from "../../../validators/backendValidator/Product/ProductValidator";
 import { Result } from "../api/types";
 
 export interface ProductScenarioData<T> {
@@ -11,28 +10,11 @@ export interface ProductScenarioData<T> {
 }
 
 export class ProductScenarioHelper extends ScenarioHelper {
-  private getErrors = (
-    products: any,
-    capabilities: CapabilityId[]
-  ): ValidatorError[] => {
-    if (Array.isArray(products)) {
-      ``;
-      return products.reduce((acc, result) => {
-        return [
-          ...acc,
-          ...new ProductValidator({
-            capabilities,
-          }).validate(result),
-        ];
-      }, []);
-    }
-    return new ProductValidator({ capabilities }).validate(products);
-  };
-
-  public validateProduct = <T>(
-    data: ProductScenarioData<T>,
+  public validateProducts = (
+    data: ProductScenarioData<Product[]>,
     capabilities: CapabilityId[]
   ) => {
+    const validator = new ProductValidator({ capabilities });
     const { result } = data;
     if (result.response.error) {
       return this.handleResult({
@@ -42,7 +24,29 @@ export class ProductScenarioHelper extends ScenarioHelper {
       });
     }
 
-    const errors = this.getErrors(result.response.data.body, capabilities);
+    const errors = result.data.map(validator.validate).flat();
+    return this.handleResult({
+      ...data,
+      success: R.isEmpty(errors),
+      errors,
+    });
+  };
+
+  public validateProduct = (
+    data: ProductScenarioData<Product>,
+    capabilities: CapabilityId[]
+  ) => {
+    const validator = new ProductValidator({ capabilities });
+    const { result } = data;
+    if (result.response.error) {
+      return this.handleResult({
+        ...data,
+        success: false,
+        errors: [],
+      });
+    }
+
+    const errors = validator.validate(result.data);
     return this.handleResult({
       ...data,
       success: R.isEmpty(errors),

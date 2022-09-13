@@ -11,10 +11,6 @@ export interface SupplierScenarioData {
 }
 
 export class SupplierScenarioHelper extends ScenarioHelper {
-  private getErrors = (supplier: Supplier, capabilities: CapabilityId[]) => {
-    return new SupplierValidator({ capabilities }).validate(supplier);
-  };
-
   public validateSupplier = (
     data: SupplierScenarioData,
     capabilities: CapabilityId[]
@@ -28,7 +24,9 @@ export class SupplierScenarioHelper extends ScenarioHelper {
       });
     }
 
-    const errors = this.getErrors(result.response.data.body, capabilities);
+    const errors = new SupplierValidator({ capabilities }).validate(
+      result.data
+    );
     return this.handleResult({
       ...data,
       success: R.isEmpty(errors),
