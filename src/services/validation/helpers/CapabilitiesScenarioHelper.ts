@@ -16,7 +16,7 @@ export interface CapabilitiesScenarioData {
 export class CapabilitiesScenarioHelper {
   private scenarioHelper = new ScenarioHelper();
 
-  private getErrors = (capabilities: Capability[]) => {
+  private getErrors = (capabilities: Capability[]): ValidatorError[] => {
     return capabilities.reduce((acc, result) => {
       return [...acc, ...new CapabilityValidator({}).validate(result)];
     }, []);

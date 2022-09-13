@@ -13,17 +13,12 @@ import { ProductFlow } from "./Product/ProductFlow";
 // import { BookingListFlow } from "./Booking/BookingListFlow";
 
 export class PrimiteFlows {
-  private config: Config;
-  constructor({ config }: { config: Config }) {
-    this.config = config;
-  }
-  public validate = async (): Promise<FlowResult[]> => {
-    const config = this.config;
-    console.log(config);
+  private config = Config.getInstance();
 
+  public validate = async (): Promise<FlowResult[]> => {
     const flows: Flow[] = [
-      new SupplierFlow({ config }),
-      new ProductFlow({ config }),
+      new SupplierFlow(),
+      new ProductFlow(),
       // new AvailabilityFlow({ config }),
       // new AvailabilityCalendarFlow({ config }),
       // new BookingReservationFlow({ config }),
@@ -34,6 +29,7 @@ export class PrimiteFlows {
       // new BookingGetFlow({ config }),
       // new BookingListFlow({ config }),
     ];
+
     const results = [];
     for await (const flow of flows) {
       const result = await flow.validate();
@@ -42,7 +38,6 @@ export class PrimiteFlows {
         break;
       }
     }
-    console.log(config);
 
     return results;
   };

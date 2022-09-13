@@ -5,14 +5,13 @@ import { GetSupplierScenario } from "../../Scenarios/Supplier/GetSuppliers";
 import { FlowResult } from "../Flow";
 
 export class SupplierFlow {
-  private config: Config;
+  private config = Config.getInstance();
   private apiClient: ApiClient;
-  constructor({ config }: { config: Config }) {
-    this.config = config;
+  constructor() {
     this.apiClient = new ApiClient({
-      url: config.endpoint,
-      capabilities: config.getCapabilityIDs(),
-      apiKey: this.config.apiKey,
+      url: this.config.getEndpointData().endpoint,
+      apiKey: this.config.getEndpointData().apiKey,
+      capabilities: this.config.getCapabilityIDs(),
     });
   }
 
@@ -27,6 +26,7 @@ export class SupplierFlow {
   };
 
   public validate = async (): Promise<FlowResult> => {
+    console.log("hr");
     const scenarios = [await this.validateGetSuppliers()];
 
     const results = [];

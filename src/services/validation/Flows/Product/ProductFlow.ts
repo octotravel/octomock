@@ -11,14 +11,13 @@ import {
 } from "../../../../validators/backendValidator/ValidatorHelpers";
 
 export class ProductFlow {
-  private config: Config;
+  private config = Config.getInstance();
   private apiClient: ApiClient;
-  constructor({ config }: { config: Config }) {
-    this.config = config;
+  constructor() {
     this.apiClient = new ApiClient({
-      url: config.endpoint,
-      capabilities: config.getCapabilityIDs(),
-      apiKey: this.config.apiKey,
+      url: this.config.getEndpointData().endpoint,
+      apiKey: this.config.getEndpointData().apiKey,
+      capabilities: this.config.getCapabilityIDs(),
     });
   }
 

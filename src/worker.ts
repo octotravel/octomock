@@ -21,13 +21,10 @@ export default {
       const reqBody = await request.json();
       await validationConfigSchema.validate(reqBody);
       const schema = validationConfigSchema.cast(reqBody);
-      const config = await new Config({
-        endpoint: schema.backend.endpoint,
-        apiKey: schema.backend.apiKey,
-        backendType: schema.backend.type,
-      });
+      const config = Config.getInstance();
+      config.init(schema);
       console.log(config);
-      const body = await new ValidationController({ config }).validate();
+      const body = await new ValidationController().validate();
 
       return new Response(JSON.stringify(body), {
         status: 200,

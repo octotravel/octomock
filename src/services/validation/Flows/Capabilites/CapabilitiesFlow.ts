@@ -5,13 +5,12 @@ import { GetCapabilitiesScenario } from "../../Scenarios/Capabilities/GetCapabil
 import { Config } from "../../config/Config";
 
 export class CapabilitiesFlow {
+  private config = Config.getInstance();
   private apiClient: ApiClient;
-  private config: Config;
-  constructor({ config }: { config: Config }) {
-    this.config = config;
+  constructor() {
     this.apiClient = new ApiClient({
-      url: config.endpoint,
-      apiKey: config.apiKey,
+      url: this.config.getEndpointData().endpoint,
+      apiKey: this.config.getEndpointData().apiKey,
     });
   }
 
@@ -26,12 +25,9 @@ export class CapabilitiesFlow {
   };
 
   public validate = async (): Promise<FlowResult> => {
+    console.log(this.config);
     const scenario = await this.validateGetCapabilities();
     const result = await scenario.validate();
-
-    if (result.success) {
-      this.config.setCapabilities(result.response.body);
-    }
 
     return this.setFlow([result]);
   };

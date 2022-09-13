@@ -27,13 +27,10 @@ router.post("/validate", async (ctx, _) => {
   await validationConfigSchema.validate(ctx.request.body);
   const schema = validationConfigSchema.cast(ctx.request.body);
 
-  const config = new Config({
-    endpoint: schema.backend.endpoint,
-    apiKey: schema.backend.apiKey,
-    backendType: schema.backend.type,
-  });
+  const config = Config.getInstance();
+  config.init(schema);
 
-  const body = await new ValidationController({ config }).validate();
+  const body = await new ValidationController().validate();
 
   ctx.status = 200;
   ctx.body = body;
