@@ -1,5 +1,5 @@
 import { CapabilityId, Supplier } from "@octocloud/types";
-import { ApiClient } from "../../ApiClient";
+import { ApiClient } from "../../api/ApiClient";
 import { Scenario } from "../Scenario";
 import { SupplierScenarioHelper } from "../../helpers/SupplierScenarioHelper";
 
@@ -24,7 +24,7 @@ export class GetSupplierScenario implements Scenario<Supplier> {
 
     return this.supplierScenarioHelper.validateSupplier(
       {
-        ...result,
+        result,
         name,
       },
       this.capabilities

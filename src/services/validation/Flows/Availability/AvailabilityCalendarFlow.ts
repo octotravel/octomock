@@ -1,5 +1,5 @@
 import { AvailabilityType } from "@octocloud/types";
-import { ApiClient } from "../../ApiClient";
+import { ApiClient } from "../../api/ApiClient";
 import { Config } from "../../config/Config";
 import { ScenarioResult } from "../../Scenarios/Scenario";
 import { FlowResult } from "../Flow";

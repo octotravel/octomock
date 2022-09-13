@@ -78,16 +78,15 @@ export class BookingListScenarioHelper {
     data: ScenarioHelperData<Booking[]>,
     configData: ScenarioConfigData
   ) => {
-    if (data.response.error) {
+    const { result } = data;
+    if (result.response.error) {
       return this.scenarioHelper.handleResult({
         ...data,
         success: false,
         errors: [],
       });
     }
-    const checkErrors = [
-      ...this.listCheck(data.response.data.body, configData),
-    ];
+    const checkErrors = [...this.listCheck(result.data, configData)];
     if (!R.isEmpty(checkErrors)) {
       return this.scenarioHelper.handleResult({
         ...data,
@@ -95,10 +94,7 @@ export class BookingListScenarioHelper {
         errors: checkErrors,
       });
     }
-    const errors = this.getErrors(
-      data.response.data.body,
-      configData.capabilities
-    );
+    const errors = this.getErrors(result.data, configData.capabilities);
     return this.scenarioHelper.handleResult({
       ...data,
       success: R.isEmpty(errors),
@@ -111,7 +107,8 @@ export class BookingListScenarioHelper {
     error: string,
     validator: ModelValidator
   ) => {
-    if (data.response.data) {
+    const { result } = data;
+    if (result.data) {
       return this.scenarioHelper.handleResult({
         ...data,
         success: false,
@@ -123,7 +120,7 @@ export class BookingListScenarioHelper {
       });
     }
 
-    const errors = validator.validate(data.response.error);
+    const errors = validator.validate(result.response.error);
     return this.scenarioHelper.handleResult({
       ...data,
       success: R.isEmpty(errors),

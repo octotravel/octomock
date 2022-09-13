@@ -6,11 +6,11 @@ import {
 } from "./../../../validators/backendValidator/ValidatorHelpers";
 import { CapabilityId } from "@octocloud/types";
 import { ProductValidator } from "../../../validators/backendValidator/Product/ProductValidator";
+import { Result } from "../api/types";
 
-export interface ProductScenarioData {
+export interface ProductScenarioData<T> {
   name: string;
-  request: any;
-  response: any;
+  result: Result<T>;
 }
 
 export class ProductScenarioHelper extends ScenarioHelper {
@@ -33,11 +33,12 @@ export class ProductScenarioHelper extends ScenarioHelper {
     return new ProductValidator({ capabilities }).validate(products);
   };
 
-  public validateProduct = (
-    data: ProductScenarioData,
+  public validateProduct = <T>(
+    data: ProductScenarioData<T>,
     capabilities: CapabilityId[]
   ) => {
-    if (data.response.error) {
+    const { result } = data;
+    if (result.response.error) {
       return this.scenarioHelper.handleResult({
         ...data,
         success: false,
@@ -45,7 +46,7 @@ export class ProductScenarioHelper extends ScenarioHelper {
       });
     }
 
-    const errors = this.getErrors(data.response.data.body, capabilities);
+    const errors = this.getErrors(result.response.data.body, capabilities);
     return this.scenarioHelper.handleResult({
       ...data,
       success: R.isEmpty(errors),
@@ -53,12 +54,13 @@ export class ProductScenarioHelper extends ScenarioHelper {
     });
   };
 
-  public validateProductError = (
-    data: ProductScenarioData,
+  public validateProductError = <T>(
+    data: ProductScenarioData<T>,
     error: string,
     validator: ModelValidator
   ) => {
-    if (data.response.data) {
+    const { result } = data;
+    if (result.response.data) {
       return this.scenarioHelper.handleResult({
         ...data,
         success: false,
@@ -70,7 +72,7 @@ export class ProductScenarioHelper extends ScenarioHelper {
       });
     }
 
-    const errors = validator.validate(data.response.error);
+    const errors = validator.validate(result.response.error);
     return this.scenarioHelper.handleResult({
       ...data,
       success: R.isEmpty(errors),

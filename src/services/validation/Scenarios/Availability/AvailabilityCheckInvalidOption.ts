@@ -1,9 +1,12 @@
+import { Availability } from "@octocloud/types";
 import { InvalidOptionIdErrorValidator } from "../../../../validators/backendValidator/Error/InvalidOptionIdErrorValidator";
-import { ApiClient } from "../../ApiClient";
+import { ApiClient } from "../../api/ApiClient";
 import { AvailabilityScenarioHelper } from "../../helpers/AvailabilityScenarioHelper";
 import { Scenario, ScenarioResult } from "../Scenario";
 
-export class AvailabilityCheckInvalidOptionScenario implements Scenario<null> {
+export class AvailabilityCheckInvalidOptionScenario
+  implements Scenario<Availability[]>
+{
   private apiClient: ApiClient;
   private productId: string;
   private optionId: string;
@@ -26,7 +29,7 @@ export class AvailabilityCheckInvalidOptionScenario implements Scenario<null> {
   }
   private availabilityScenarioHelper = new AvailabilityScenarioHelper();
 
-  public validate = async (): Promise<ScenarioResult<null>> => {
+  public validate = async (): Promise<ScenarioResult<Availability[]>> => {
     const result = await this.apiClient.getAvailability({
       productId: this.productId,
       optionId: this.optionId,
@@ -38,7 +41,7 @@ export class AvailabilityCheckInvalidOptionScenario implements Scenario<null> {
     return this.availabilityScenarioHelper.validateAvailabilityError(
       {
         name,
-        ...result,
+        result,
       },
       error,
       new InvalidOptionIdErrorValidator()

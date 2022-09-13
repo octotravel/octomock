@@ -1,5 +1,5 @@
 import { CapabilityId, Product } from "@octocloud/types";
-import { ApiClient } from "../../ApiClient";
+import { ApiClient } from "../../api/ApiClient";
 import { ProductScenarioHelper } from "../../helpers/ProductScenarioHelper";
 import { Scenario } from "../Scenario";
 
@@ -30,7 +30,7 @@ export class GetProductScenario implements Scenario<Product> {
 
     return this.productScenarioHelper.validateProduct(
       {
-        ...result,
+        result,
         name,
       },
       this.capabilities

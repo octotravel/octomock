@@ -1,10 +1,10 @@
 import { BookingContactSchema, CapabilityId } from "@octocloud/types";
-import { ApiClient } from "../../../ApiClient";
+import { ApiClient } from "../../../api/ApiClient";
 import { Scenario } from "../../Scenario";
 import { InvalidBookingUUIDErrorValidator } from "../../../../../validators/backendValidator/Error/InvalidBookingUUIDErrorValidator";
 import { BookingConfirmationScenarioHelper } from "../../../helpers/BookingConfirmationScenarioHelper";
 
-export class BookingConfirmationInvalidUUIDScenario implements Scenario<null> {
+export class BookingConfirmationInvalidUUIDScenario implements Scenario<any> {
   private apiClient: ApiClient;
   private uuid: string;
   private contact: BookingContactSchema;
@@ -37,7 +37,7 @@ export class BookingConfirmationInvalidUUIDScenario implements Scenario<null> {
 
     return this.bookingConfirmationScenarioHelper.validateBookingConfirmationError(
       {
-        ...result,
+        result,
         name,
       },
       error,

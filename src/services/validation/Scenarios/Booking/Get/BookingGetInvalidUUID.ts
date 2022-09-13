@@ -1,10 +1,10 @@
 import { CapabilityId } from "@octocloud/types";
-import { ApiClient } from "../../../ApiClient";
+import { ApiClient } from "../../../api/ApiClient";
 import { Scenario } from "../../Scenario";
 import { InvalidBookingUUIDErrorValidator } from "../../../../../validators/backendValidator/Error/InvalidBookingUUIDErrorValidator";
 import { BookingGetScenarioHelper } from "../../../helpers/BookingGetScenarioHelper";
 
-export class BookingGetInvalidUUIDScenario implements Scenario<null> {
+export class BookingGetInvalidUUIDScenario implements Scenario<any> {
   private apiClient: ApiClient;
   private uuid: string;
   constructor({
@@ -30,7 +30,7 @@ export class BookingGetInvalidUUIDScenario implements Scenario<null> {
 
     return this.bookingGetScenarioHelper.validateBookingGetError(
       {
-        ...result,
+        result,
         name,
       },
       error,

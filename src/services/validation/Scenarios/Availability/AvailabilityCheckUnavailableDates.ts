@@ -1,10 +1,10 @@
-import { CapabilityId } from "@octocloud/types";
-import { ApiClient } from "../../ApiClient";
+import { Availability, CapabilityId } from "@octocloud/types";
+import { ApiClient } from "../../api/ApiClient";
 import { AvailabilityScenarioHelper } from "../../helpers/AvailabilityScenarioHelper";
 import { Scenario, ScenarioResult } from "../Scenario";
 
 export class AvailabilityCheckUnavailableDatesScenario
-  implements Scenario<null>
+  implements Scenario<Availability[]>
 {
   private apiClient: ApiClient;
   private productId: string;
@@ -40,7 +40,7 @@ export class AvailabilityCheckUnavailableDatesScenario
   }
   private availabilityScenarioHelper = new AvailabilityScenarioHelper();
 
-  public validate = async (): Promise<ScenarioResult<null>> => {
+  public validate = async (): Promise<ScenarioResult<Availability[]>> => {
     const result = await this.apiClient.getAvailability({
       productId: this.productId,
       optionId: this.optionId,
@@ -52,7 +52,7 @@ export class AvailabilityCheckUnavailableDatesScenario
     return this.availabilityScenarioHelper.validateUnavailability(
       {
         name,
-        ...result,
+        result,
       },
       this.capabilities
     );

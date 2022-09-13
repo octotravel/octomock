@@ -33,8 +33,9 @@ export class BookingConfirmationScenarioHelper {
     oldBooking: Booking,
     deliveryMethods: DeliveryMethod[]
   ): ValidatorError[] => {
-    const booking = data.response.data.body;
-    const reqBody = data.request.body;
+    const { result } = data;
+    const booking = result.data;
+    const reqBody = result.request.body;
     const checkContact =
       booking.contact.firstName === reqBody.contact.firstName &&
       booking.contact.fullName === reqBody.contact.fullName &&
@@ -56,7 +57,7 @@ export class BookingConfirmationScenarioHelper {
         : new ValidatorError({ message: "Reseller reference was not updated" }),
     ];
 
-    if (!data.request.body.unitItems) {
+    if (!result.data.unitItems) {
       errors = [
         ...errors,
         booking.unitItems.length === oldBooking.unitItems.length
@@ -92,7 +93,8 @@ export class BookingConfirmationScenarioHelper {
     configData: ScenarioConfigData,
     createdBooking: Booking
   ) => {
-    if (data.response.error) {
+    const { result } = data;
+    if (result.response.error) {
       return this.scenarioHelper.handleResult({
         ...data,
         success: false,
@@ -107,7 +109,7 @@ export class BookingConfirmationScenarioHelper {
         configData.deliveryMethods
       ),
       ...this.bookingScenarioHelper.bookingCheck({
-        newBooking: data.response.data.body,
+        newBooking: result.data,
         oldBooking: createdBooking,
         configData,
       }),
@@ -121,10 +123,7 @@ export class BookingConfirmationScenarioHelper {
       });
     }
 
-    const errors = this.getErrors(
-      data.response.data.body,
-      configData.capabilities
-    );
+    const errors = this.getErrors(result.data, configData.capabilities);
     return this.scenarioHelper.handleResult({
       ...data,
       success: R.isEmpty(errors),
@@ -137,7 +136,8 @@ export class BookingConfirmationScenarioHelper {
     error: string,
     validator: ModelValidator
   ) => {
-    if (data.response.data) {
+    const { result } = data;
+    if (result.data) {
       return this.scenarioHelper.handleResult({
         ...data,
         success: false,
@@ -149,7 +149,7 @@ export class BookingConfirmationScenarioHelper {
       });
     }
 
-    const errors = validator.validate(data.response.error);
+    const errors = validator.validate(result.response.error);
     return this.scenarioHelper.handleResult({
       ...data,
       success: R.isEmpty(errors),

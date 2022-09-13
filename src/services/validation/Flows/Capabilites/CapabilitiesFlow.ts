@@ -1,4 +1,4 @@
-import { ApiClient } from "../../ApiClient";
+import { ApiClient } from "../../api/ApiClient";
 import { ScenarioResult } from "../../Scenarios/Scenario";
 import { FlowResult } from "../Flow";
 import { GetCapabilitiesScenario } from "../../Scenarios/Capabilities/GetCapabilities";

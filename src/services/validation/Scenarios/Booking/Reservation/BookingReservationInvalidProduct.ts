@@ -1,12 +1,10 @@
 import { BookingUnitItemSchema, CapabilityId } from "@octocloud/types";
-import { ApiClient } from "../../../ApiClient";
+import { ApiClient } from "../../../api/ApiClient";
 import { Scenario } from "../../Scenario";
 import { InvalidProductIdErrorValidator } from "../../../../../validators/backendValidator/Error/InvalidProductIdErrorValidator";
 import { BookingReservationScenarioHelper } from "../../../helpers/BookingReservationScenarioHelper";
 
-export class BookingReservationInvalidProductScenario
-  implements Scenario<null>
-{
+export class BookingReservationInvalidProductScenario implements Scenario<any> {
   private apiClient: ApiClient;
   private productId: string;
   private optionId: string;
@@ -48,7 +46,7 @@ export class BookingReservationInvalidProductScenario
 
     return this.bookingReservationScenarioHelper.validateBookingReservationError(
       {
-        ...result,
+        result,
         name,
       },
       error,

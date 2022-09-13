@@ -1,5 +1,5 @@
 import { Booking, CapabilityId, DeliveryMethod } from "@octocloud/types";
-import { ApiClient } from "../../../ApiClient";
+import { ApiClient } from "../../../api/ApiClient";
 import { Scenario } from "../../Scenario";
 import { BookingCancellationScenarioHelper } from "../../../helpers/BookingCancellationScenarioHelper";
 
@@ -42,7 +42,7 @@ export class BookingCancellationReservationScenario
 
     return this.bookingCancellationScenarioHelper.validateBookingCancellation(
       {
-        ...result,
+        result,
         name,
       },
       {

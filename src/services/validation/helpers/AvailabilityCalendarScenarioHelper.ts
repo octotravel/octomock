@@ -1,5 +1,5 @@
 import {
-  Availability,
+  AvailabilityCalendar,
   AvailabilityStatus,
   CapabilityId,
 } from "@octocloud/types";
@@ -10,17 +10,17 @@ import {
   ValidatorError,
 } from "./../../../validators/backendValidator/ValidatorHelpers";
 import { AvailabilityCalendarValidator } from "../../../validators/backendValidator/AvailabilityCalendar/AvailabilityCalendarValidator";
+import { Result } from "../api/types";
 
 export interface AvailabilityScenarioData {
   name: string;
-  request: any;
-  response: any;
+  result: Result<AvailabilityCalendar[]>;
 }
 
 export class AvailabilityCalendarScenarioHelper {
   private scenarioHelper = new ScenarioHelper();
 
-  private checkAvailabilityStatus = (availability: Availability[]) => {
+  private checkAvailabilityStatus = (availability: AvailabilityCalendar[]) => {
     return availability
       .map((availability) => {
         return (
@@ -32,7 +32,9 @@ export class AvailabilityCalendarScenarioHelper {
       .some((status) => status);
   };
 
-  private checkUnavailabilityStatus = (availability: Availability[]) => {
+  private checkUnavailabilityStatus = (
+    availability: AvailabilityCalendar[]
+  ) => {
     return availability
       .map((availability) => {
         return (
@@ -59,7 +61,8 @@ export class AvailabilityCalendarScenarioHelper {
     data: AvailabilityScenarioData,
     capabilities: CapabilityId[]
   ) => {
-    if (data.response.error) {
+    const { result } = data;
+    if (result.response.error) {
       return this.scenarioHelper.handleResult({
         ...data,
         success: false,
@@ -67,7 +70,7 @@ export class AvailabilityCalendarScenarioHelper {
       });
     }
 
-    if (R.isEmpty(data.response.data.body)) {
+    if (R.isEmpty(result.response.data.body)) {
       return this.scenarioHelper.handleResult({
         ...data,
         success: false,
@@ -78,7 +81,7 @@ export class AvailabilityCalendarScenarioHelper {
         ],
       });
     }
-    if (this.checkAvailabilityStatus(data.response.data.body)) {
+    if (this.checkAvailabilityStatus(result.response.data.body)) {
       return this.scenarioHelper.handleResult({
         ...data,
         success: false,
@@ -91,7 +94,7 @@ export class AvailabilityCalendarScenarioHelper {
       });
     }
 
-    const errors = this.getErrors(data.response, capabilities);
+    const errors = this.getErrors(result.response, capabilities);
     return this.scenarioHelper.handleResult({
       ...data,
       success: R.isEmpty(errors),
@@ -104,7 +107,8 @@ export class AvailabilityCalendarScenarioHelper {
     error: string,
     validator: ModelValidator
   ) => {
-    if (data.response.data) {
+    const { result } = data;
+    if (result.response.data) {
       return this.scenarioHelper.handleResult({
         ...data,
         success: false,
@@ -116,7 +120,7 @@ export class AvailabilityCalendarScenarioHelper {
       });
     }
 
-    const errors = validator.validate(data.response.error);
+    const errors = validator.validate(result.response.error);
     return this.scenarioHelper.handleResult({
       ...data,
       success: R.isEmpty(errors),
@@ -128,15 +132,16 @@ export class AvailabilityCalendarScenarioHelper {
     data: AvailabilityScenarioData,
     capabilities: CapabilityId[]
   ) => {
-    if (data.response.error) {
+    const { result } = data;
+    if (result.response.error) {
       return this.scenarioHelper.handleResult({
         ...data,
         success: false,
         errors: [],
       });
     }
-    if (!R.isEmpty(data.response.data.body)) {
-      if (this.checkUnavailabilityStatus(data.response.data.body)) {
+    if (!R.isEmpty(result.response.data.body)) {
+      if (this.checkUnavailabilityStatus(result.response.data.body)) {
         return this.scenarioHelper.handleResult({
           ...data,
           success: false,
@@ -150,7 +155,7 @@ export class AvailabilityCalendarScenarioHelper {
       }
     }
 
-    const errors = this.getErrors(data.response, capabilities);
+    const errors = this.getErrors(result.response, capabilities);
     return this.scenarioHelper.handleResult({
       ...data,
       success: R.isEmpty(errors),

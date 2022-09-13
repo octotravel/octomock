@@ -3,7 +3,7 @@ import {
   AvailabilityUnit,
   CapabilityId,
 } from "@octocloud/types";
-import { ApiClient } from "../../ApiClient";
+import { ApiClient } from "../../api/ApiClient";
 import { Scenario } from "../Scenario";
 import { AvailabilityCalendarScenarioHelper } from "../../helpers/AvailabilityCalendarScenarioHelper";
 
@@ -61,7 +61,7 @@ export class AvailabilityCalendarIntervalScenario
 
     return this.availabilityCalendarScenarioHelper.validateAvailability(
       {
-        ...result,
+        result,
         name,
       },
       this.capabilities
