@@ -11,7 +11,7 @@ export class SupplierFlow {
     this.config = config;
     this.apiClient = new ApiClient({
       url: config.endpoint,
-      capabilities: config.capabilities,
+      capabilities: config.getCapabilityIDs(),
       apiKey: this.config.apiKey,
     });
   }
@@ -43,7 +43,7 @@ export class SupplierFlow {
   private validateGetSuppliers = async (): Promise<GetSupplierScenario> => {
     return new GetSupplierScenario({
       apiClient: this.apiClient,
-      capabilities: this.config.capabilities,
+      capabilities: this.config.getCapabilityIDs(),
     });
   };
 }

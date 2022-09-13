@@ -18,7 +18,7 @@ export class AvailabilityCalendarFlow {
     this.config = config;
     this.apiClient = new ApiClient({
       url: config.endpoint,
-      capabilities: config.capabilities,
+      capabilities: config.getCapabilityIDs(),
       apiKey: this.config.apiKey,
     });
   }
@@ -63,7 +63,7 @@ export class AvailabilityCalendarFlow {
         localDateStart: DateHelper.getDate(new Date().toISOString()),
         localDateEnd: DateHelper.getDate(addDays(new Date(), 30).toISOString()),
         availabilityType: AvailabilityType.START_TIME,
-        capabilities: this.config.capabilities,
+        capabilities: this.config.getCapabilityIDs(),
       });
     };
 

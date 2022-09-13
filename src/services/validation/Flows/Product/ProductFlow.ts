@@ -17,7 +17,7 @@ export class ProductFlow {
     this.config = config;
     this.apiClient = new ApiClient({
       url: config.endpoint,
-      capabilities: config.capabilities,
+      capabilities: config.getCapabilityIDs(),
       apiKey: this.config.apiKey,
     });
   }
@@ -82,13 +82,13 @@ export class ProductFlow {
     return new GetProductScenario({
       apiClient: this.apiClient,
       productId: productIds[0],
-      capabilities: this.config.capabilities,
+      capabilities: this.config.getCapabilityIDs(),
     });
   };
   private validateGetProducts = async (): Promise<GetProductsScenario> => {
     return new GetProductsScenario({
       apiClient: this.apiClient,
-      capabilities: this.config.capabilities,
+      capabilities: this.config.getCapabilityIDs(),
     });
   };
   private validateGetProductInvalid =

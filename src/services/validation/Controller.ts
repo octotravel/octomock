@@ -12,10 +12,7 @@ export class ValidationController {
   public validate = async (): Promise<FlowResult[]> => {
     const config = this.config;
 
-    const capabilitiesFlow = await new CapabilitiesFlow({
-      apiKey: config.apiKey,
-      url: config.endpoint,
-    }).validate();
+    const capabilitiesFlow = await new CapabilitiesFlow({ config }).validate();
 
     const primitiveFlows = await new PrimiteFlows({ config }).validate();
 

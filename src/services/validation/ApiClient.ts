@@ -74,7 +74,7 @@ export class ApiClient {
         "content-type": "application/json",
       },
     });
-    return await this.setResponse({ url, body: null }, response);
+    return this.setResponse({ url, body: null }, response);
   };
 
   public getSupplier = async (_?: ApiParams): Promise<Result<Supplier>> => {
@@ -85,7 +85,7 @@ export class ApiClient {
         ...this.mapHeaders(),
       },
     });
-    return await this.setResponse({ url, body: null }, response);
+    return this.setResponse({ url, body: null }, response);
   };
 
   public getProducts = async (_?: ApiParams): Promise<Result<Product[]>> => {
@@ -96,7 +96,7 @@ export class ApiClient {
         ...this.mapHeaders(),
       },
     });
-    return await this.setResponse({ url, body: null }, response);
+    return this.setResponse({ url, body: null }, response);
   };
 
   public getProduct = async (
@@ -110,7 +110,7 @@ export class ApiClient {
         ...this.mapHeaders(),
       },
     });
-    return await this.setResponse({ url, body: null }, response);
+    return this.setResponse({ url, body: null }, response);
   };
 
   public getAvailability = async (
@@ -126,7 +126,7 @@ export class ApiClient {
         ...this.mapHeaders(),
       },
     });
-    return await this.setResponse({ url, body }, response);
+    return this.setResponse({ url, body }, response);
   };
 
   public getAvailabilityCalendar = async (
@@ -142,7 +142,7 @@ export class ApiClient {
         ...this.mapHeaders(),
       },
     });
-    return await this.setResponse({ url, body }, response);
+    return this.setResponse({ url, body }, response);
   };
 
   public bookingReservation = async (
@@ -158,7 +158,7 @@ export class ApiClient {
         ...this.mapHeaders(),
       },
     });
-    return await this.setResponse({ url, body }, response);
+    return this.setResponse({ url, body }, response);
   };
 
   public bookingConfirmation = async (
@@ -175,7 +175,7 @@ export class ApiClient {
         ...this.mapHeaders(),
       },
     });
-    return await this.setResponse({ url, body }, response);
+    return this.setResponse({ url, body }, response);
   };
 
   public getBookings = async (
@@ -190,7 +190,7 @@ export class ApiClient {
         ...this.mapHeaders(),
       },
     });
-    return await this.setResponse({ url, body: null }, response);
+    return this.setResponse({ url, body: null }, response);
   };
 
   public getBooking = async (
@@ -204,7 +204,7 @@ export class ApiClient {
         ...this.mapHeaders(),
       },
     });
-    return await this.setResponse({ url, body: null }, response);
+    return this.setResponse({ url, body: null }, response);
   };
 
   public cancelBooking = async (
@@ -221,7 +221,7 @@ export class ApiClient {
         ...this.mapHeaders(),
       },
     });
-    return await this.setResponse({ url, body }, response);
+    return this.setResponse({ url, body }, response);
   };
 
   public bookingExtend = async (
@@ -238,7 +238,7 @@ export class ApiClient {
         ...this.mapHeaders(),
       },
     });
-    return await this.setResponse({ url, body }, response);
+    return this.setResponse({ url, body }, response);
   };
 
   public bookingUpdate = async (
@@ -255,7 +255,7 @@ export class ApiClient {
         ...this.mapHeaders(),
       },
     });
-    return await this.setResponse({ url, body }, response);
+    return this.setResponse({ url, body }, response);
   };
 
   private setResponse = async <T>(

@@ -2,13 +2,16 @@ import { ApiClient } from "../../ApiClient";
 import { ScenarioResult } from "../../Scenarios/Scenario";
 import { FlowResult } from "../Flow";
 import { GetCapabilitiesScenario } from "../../Scenarios/Capabilities/GetCapabilities";
+import { Config } from "../../config/Config";
 
 export class CapabilitiesFlow {
   private apiClient: ApiClient;
-  constructor({ url, apiKey }: { url: string; apiKey: string }) {
+  private config: Config;
+  constructor({ config }: { config: Config }) {
+    this.config = config;
     this.apiClient = new ApiClient({
-      url: url,
-      apiKey: apiKey,
+      url: config.endpoint,
+      apiKey: config.apiKey,
     });
   }
 
@@ -23,17 +26,14 @@ export class CapabilitiesFlow {
   };
 
   public validate = async (): Promise<FlowResult> => {
-    const scenarios = [await this.validateGetCapabilities()];
+    const scenario = await this.validateGetCapabilities();
+    const result = await scenario.validate();
 
-    const results = [];
-    for await (const scenario of scenarios) {
-      const result = await scenario.validate();
-      results.push(result);
-      if (!result.success) {
-        break;
-      }
+    if (result.success) {
+      this.config.setCapabilities(result.response.body);
     }
-    return this.setFlow(results);
+
+    return this.setFlow([result]);
   };
 
   private validateGetCapabilities =

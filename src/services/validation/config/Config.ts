@@ -15,11 +15,11 @@ export class Config implements IConfig {
   readonly apiKey: string;
   readonly backendType: string;
 
-  readonly capabilities: CapabilityId[];
+  private capabilities: CapabilityId[];
 
-  readonly startTimesProducts: ProductValidatorData;
-  readonly openingHoursProducts: ProductValidatorData;
-  readonly availabilityRequiredFalseProducts: ProductValidatorData;
+  public startTimesProducts: ProductValidatorData;
+  public openingHoursProducts: ProductValidatorData;
+  public availabilityRequiredFalseProducts: ProductValidatorData;
   readonly validProducts: boolean;
 
   readonly ignoreKill: boolean;
@@ -46,7 +46,14 @@ export class Config implements IConfig {
 
     this.ignoreKill = true;
   }
-  public setCapabilities = (_capabilities: Capability[]): ValidatorError[] => {
+  public setCapabilities = (capabilities: Capability[]): ValidatorError[] => {
+    this.capabilities = capabilities.map((capability) => {
+      return capability.id;
+    });
     return [];
+  };
+
+  public getCapabilityIDs = (): CapabilityId[] => {
+    return this.capabilities;
   };
 }
