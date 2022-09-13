@@ -103,7 +103,11 @@ export class ProductValidator implements ModelValidator {
           path: `${this.path}.options[${i}]`,
           capabilities: this.capabilities,
         });
-        return optionValidator.validate(option, product.pricingPer);
+        return optionValidator.validate(
+          option,
+          product.availabilityType,
+          product.pricingPer
+        );
       })
       .flat(1)
       .filter(Boolean);

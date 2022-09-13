@@ -74,7 +74,10 @@ export class BookingValidator implements ModelValidator {
       StringValidator.validate(`${this.path}.productId`, booking.productId),
       ...this.productValidator.validate(booking.product),
       StringValidator.validate(`${this.path}.optionId`, booking.optionId),
-      ...this.optionValidator.validate(booking.option),
+      ...this.optionValidator.validate(
+        booking.option,
+        booking.product.availabilityType
+      ),
       BooleanValidator.validate(
         `${this.path}.cancellable`,
         booking.cancellable

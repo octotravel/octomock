@@ -5,6 +5,7 @@ import {
   Option,
   UnitRestrictions,
   PricingPer,
+  AvailabilityType,
 } from "@octocloud/types";
 import { OptionPickupValidator } from "./OptionPickupValidator";
 import { UnitValidator } from "../Unit/UnitValidator";
@@ -16,6 +17,7 @@ import {
   NumberValidator,
   ValidatorError,
   ModelValidator,
+  ArrayValidator,
 } from "../ValidatorHelpers";
 import { OptionPricingValidator } from "./OptionPricingValidator";
 
@@ -34,6 +36,7 @@ export class OptionValidator implements ModelValidator {
   }
   public validate = (
     option: Option,
+    availabilityType: AvailabilityType,
     pricingPer?: PricingPer
   ): ValidatorError[] => {
     return [
@@ -46,11 +49,9 @@ export class OptionValidator implements ModelValidator {
       StringValidator.validate(`${this.path}.reference`, option.reference, {
         nullable: true,
       }),
-      RegExpArrayValidator.validate(
-        `${this.path}.availabilityLocalStartTimes`,
+      this.validateAvailabilityLocalStartTimes(
         option.availabilityLocalStartTimes,
-        new RegExp(/^\d{2}:\d{2}$/g),
-        { min: 1 }
+        availabilityType
       ),
       StringValidator.validate(
         `${this.path}.cancellationCutoff`,
@@ -76,6 +77,25 @@ export class OptionValidator implements ModelValidator {
       ...this.validatePricingCapability(option, pricingPer),
       ...this.validatePickupCapability(option),
     ].filter(Boolean);
+  };
+
+  private validateAvailabilityLocalStartTimes = (
+    availabilityLocalStartTimes: string[],
+    availabilityType: AvailabilityType
+  ) => {
+    const path = `${this.path}.availabilityLocalStartTimes`;
+    if (availabilityType === AvailabilityType.OPENING_HOURS) {
+      return ArrayValidator.validate(path, availabilityLocalStartTimes, {
+        empty: true,
+      });
+    }
+
+    return RegExpArrayValidator.validate(
+      path,
+      availabilityLocalStartTimes,
+      new RegExp(/^\d{2}:\d{2}$/g),
+      { min: 1 }
+    );
   };
 
   private validateUnitRestrictions = (
