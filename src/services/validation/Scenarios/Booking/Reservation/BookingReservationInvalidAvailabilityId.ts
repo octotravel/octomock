@@ -5,7 +5,7 @@ import { InvalidAvailabilityIdErrorValidator } from "../../../../../validators/b
 import { BookingReservationScenarioHelper } from "../../../helpers/BookingReservationScenarioHelper";
 
 export class BookingReservationInvalidAvailabilityIdScenario
-  implements Scenario<null>
+  implements Scenario<any>
 {
   private apiClient: ApiClient;
   private productId: string;
@@ -49,7 +49,7 @@ export class BookingReservationInvalidAvailabilityIdScenario
 
     return this.bookingReservationScenarioHelper.validateBookingReservationError(
       {
-        ...result,
+        result,
         name,
       },
       error,

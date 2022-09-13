@@ -42,7 +42,7 @@ export class BookingCancellationReservationScenario
 
     return this.bookingCancellationScenarioHelper.validateBookingCancellation(
       {
-        ...result,
+        result,
         name,
       },
       {

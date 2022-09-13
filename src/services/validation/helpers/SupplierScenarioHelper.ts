@@ -1,17 +1,13 @@
 import * as R from "ramda";
 import { ScenarioHelper } from "./ScenarioHelper";
-import {
-  ModelValidator,
-  ValidatorError,
-} from "./../../../validators/backendValidator/ValidatorHelpers";
 import { SupplierValidator } from "../../../validators/backendValidator/Supplier/SupplierValidator";
 import { CapabilityId, Supplier } from "@octocloud/types";
 import { ScenarioResult } from "../Scenarios/Scenario";
+import { Result } from "../api/types";
 
 export interface SupplierScenarioData {
   name: string;
-  request: any;
-  response: any;
+  result: Result<Supplier>;
 }
 
 export class SupplierScenarioHelper {
@@ -25,7 +21,9 @@ export class SupplierScenarioHelper {
     data: SupplierScenarioData,
     capabilities: CapabilityId[]
   ): ScenarioResult<Supplier> => {
-    if (data.response.error) {
+    const { result } = data;
+    console.log(result);
+    if (result.response.error) {
       return this.scenarioHelper.handleResult({
         ...data,
         success: false,
@@ -33,32 +31,7 @@ export class SupplierScenarioHelper {
       });
     }
 
-    const errors = this.getErrors(data.response.data.body, capabilities);
-    return this.scenarioHelper.handleResult({
-      ...data,
-      success: R.isEmpty(errors),
-      errors,
-    });
-  };
-
-  public validateSupplierError = (
-    data: SupplierScenarioData,
-    error: string,
-    validator: ModelValidator
-  ) => {
-    if (data.response.data) {
-      return this.scenarioHelper.handleResult({
-        ...data,
-        success: false,
-        errors: [
-          new ValidatorError({
-            message: error,
-          }),
-        ],
-      });
-    }
-
-    const errors = validator.validate(data.response.error);
+    const errors = this.getErrors(result.response.data.body, capabilities);
     return this.scenarioHelper.handleResult({
       ...data,
       success: R.isEmpty(errors),

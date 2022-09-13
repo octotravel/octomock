@@ -27,7 +27,7 @@ export class GetProductInvalidScenario implements Scenario<any> {
 
     return this.productScenarioHelper.validateProductError(
       {
-        ...result,
+        result,
         name,
       },
       error,

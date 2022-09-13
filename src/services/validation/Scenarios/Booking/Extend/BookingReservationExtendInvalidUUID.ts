@@ -4,7 +4,7 @@ import { BookingExtendScenarioHelper } from "../../../helpers/BookingExtendScena
 import { InvalidBookingUUIDErrorValidator } from "../../../../../validators/backendValidator/Error/InvalidBookingUUIDErrorValidator";
 
 export class BookingReservationExtendInvalidUUIDScenario
-  implements Scenario<null>
+  implements Scenario<any>
 {
   private apiClient: ApiClient;
   private uuid: string;
@@ -25,7 +25,7 @@ export class BookingReservationExtendInvalidUUIDScenario
 
     return this.bookingExtendScenarioHelper.validateBookingReservationError(
       {
-        ...result,
+        result,
         name,
       },
       error,

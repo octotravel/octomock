@@ -26,20 +26,20 @@ export class BookingReservationScenarioHelper {
   private reservationCheck = (
     data: ScenarioHelperData<Booking>
   ): ValidatorError[] => {
+    const { result } = data;
     const unitIdCheck =
-      data.response.data.body.unitItems.length ===
-      data.request.body.unitItems.length
-        ? data.response.data.body.unitItems
+      result.data.unitItems.length === result.data.unitItems.length
+        ? result.data.unitItems
             .map((unitItem) => {
-              return data.request.body.unitItems
+              return result.data.unitItems
                 .map((item) => item.unitId)
                 .includes(unitItem.unitId);
             })
             .every((status) => status)
         : false;
-    const booking = data.response.data.body;
+    const booking = result.data;
     return [
-      booking.notes === data.request.body.notes
+      booking.notes === result.data.notes
         ? null
         : new ValidatorError({ message: "Notes are not matching request" }),
       booking.status === BookingStatus.ON_HOLD
@@ -57,7 +57,8 @@ export class BookingReservationScenarioHelper {
     data: ScenarioHelperData<Booking>,
     configData: ScenarioConfigData
   ) => {
-    if (data.response.error) {
+    const { result } = data;
+    if (result.response.error) {
       return this.scenarioHelper.handleResult({
         ...data,
         success: false,
@@ -68,9 +69,9 @@ export class BookingReservationScenarioHelper {
     const checkErrors = [
       ...this.reservationCheck(data),
       ...this.bookingScenarioHelper.bookingCheck({
-        newBooking: data.response.data.body,
+        newBooking: result.data,
         // TODO: this is clearly wrong
-        oldBooking: data.request.body as Booking,
+        oldBooking: result.request.body as Booking,
         configData,
       }),
     ];
@@ -83,10 +84,7 @@ export class BookingReservationScenarioHelper {
       });
     }
 
-    const errors = this.getErrors(
-      data.response.data.body,
-      configData.capabilities
-    );
+    const errors = this.getErrors(result.data, configData.capabilities);
     return this.scenarioHelper.handleResult({
       ...data,
       success: R.isEmpty(errors),
@@ -99,7 +97,8 @@ export class BookingReservationScenarioHelper {
     error: string,
     validator: ModelValidator
   ) => {
-    if (data.response.data) {
+    const { result } = data;
+    if (result.data) {
       return this.scenarioHelper.handleResult({
         ...data,
         success: false,
@@ -111,7 +110,7 @@ export class BookingReservationScenarioHelper {
       });
     }
 
-    const errors = validator.validate(data.response.error);
+    const errors = validator.validate(result.response.error);
     return this.scenarioHelper.handleResult({
       ...data,
       success: R.isEmpty(errors),

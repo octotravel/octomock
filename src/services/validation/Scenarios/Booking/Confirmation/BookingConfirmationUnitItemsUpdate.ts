@@ -64,7 +64,7 @@ export class BookingConfirmationUnitItemUpdateScenario
 
     return this.bookingConfirmationScenarioHelper.validateBookingConfirmation(
       {
-        ...result,
+        result,
         name,
       },
       {

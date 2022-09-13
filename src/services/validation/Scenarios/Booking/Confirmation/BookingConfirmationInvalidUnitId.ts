@@ -8,9 +8,7 @@ import { Scenario } from "../../Scenario";
 import { InvalidUnitIdErrorValidator } from "../../../../../validators/backendValidator/Error/InvalidUnitIdErrorValidator";
 import { BookingConfirmationScenarioHelper } from "../../../helpers/BookingConfirmationScenarioHelper";
 
-export class BookingConfirmationInvalidUnitIdScenario
-  implements Scenario<null>
-{
+export class BookingConfirmationInvalidUnitIdScenario implements Scenario<any> {
   private apiClient: ApiClient;
   private uuid: string;
   private unitItems: BookingUnitItemSchema[];
@@ -47,7 +45,7 @@ export class BookingConfirmationInvalidUnitIdScenario
 
     return this.bookingConfirmationScenarioHelper.validateBookingConfirmationError(
       {
-        ...result,
+        result,
         name,
       },
       error,

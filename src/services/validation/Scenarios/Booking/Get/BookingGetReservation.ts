@@ -30,7 +30,7 @@ export class BookingGetReservationScenario implements Scenario<Booking> {
 
     return this.bookingGetScenarionHelper.validateBookingGet(
       {
-        ...result,
+        result,
         name,
       },
       {

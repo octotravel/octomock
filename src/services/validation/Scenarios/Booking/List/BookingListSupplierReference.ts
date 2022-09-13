@@ -3,7 +3,9 @@ import { ApiClient } from "../../../api/ApiClient";
 import { Scenario } from "../../Scenario";
 import { BookingListScenarioHelper } from "../../../helpers/BookingListScenarioHelper";
 
-export class BookingListSupplierReferenceScenario implements Scenario<Booking> {
+export class BookingListSupplierReferenceScenario
+  implements Scenario<Booking[]>
+{
   private apiClient: ApiClient;
   private supplierReference: string;
   private capabilities: CapabilityId[];
@@ -30,7 +32,7 @@ export class BookingListSupplierReferenceScenario implements Scenario<Booking> {
 
     return this.bookingListScenarionHelper.validateBookingList(
       {
-        ...result,
+        result,
         name,
       },
       {

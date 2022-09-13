@@ -1,9 +1,9 @@
-import { CapabilityId } from "@octocloud/types";
+import { Capability } from "@octocloud/types";
 import { ApiClient } from "../../api/ApiClient";
 import { Scenario } from "../Scenario";
 import { CapabilitiesScenarioHelper } from "../../helpers/CapabilitiesScenarioHelper";
 
-export class GetCapabilitiesScenario implements Scenario<CapabilityId[]> {
+export class GetCapabilitiesScenario implements Scenario<Capability[]> {
   private apiClient: ApiClient;
   constructor({ apiClient }: { apiClient: ApiClient }) {
     this.apiClient = apiClient;
@@ -15,7 +15,7 @@ export class GetCapabilitiesScenario implements Scenario<CapabilityId[]> {
     const name = "Get Capabilities";
 
     return this.capabilitiesScenarioHelper.validateCapabilities({
-      ...result,
+      result,
       name,
     });
   };

@@ -27,8 +27,9 @@ export class BookingCancellationScenarioHelper {
     data: ScenarioHelperData<Booking>,
     createdBooking: Booking
   ): ValidatorError[] => {
-    const booking = data.response.data.body;
-    const reqBody = data.request.body as any;
+    const { result } = data;
+    const booking = result.data;
+    const reqBody = result.request.body;
     let errors = [
       booking.cancellation.reason === reqBody.reason
         ? null
@@ -62,7 +63,8 @@ export class BookingCancellationScenarioHelper {
     configData: ScenarioConfigData,
     createdBooking: Booking
   ) => {
-    if (data.response.error) {
+    const { result } = data;
+    if (result.response.error) {
       return this.scenarioHelper.handleResult({
         ...data,
         success: false,
@@ -73,7 +75,7 @@ export class BookingCancellationScenarioHelper {
     const checkErrors = [
       ...this.cancellationCheck(data, createdBooking),
       ...this.bookingScenarioHelper.bookingCheck({
-        newBooking: data.response.data.body,
+        newBooking: result.data,
         oldBooking: createdBooking,
         configData,
       }),
@@ -87,10 +89,7 @@ export class BookingCancellationScenarioHelper {
       });
     }
 
-    const errors = this.getErrors(
-      data.response.data.body,
-      configData.capabilities
-    );
+    const errors = this.getErrors(result.data, configData.capabilities);
     return this.scenarioHelper.handleResult({
       ...data,
       success: R.isEmpty(errors),
@@ -103,7 +102,8 @@ export class BookingCancellationScenarioHelper {
     error: string,
     validator: ModelValidator
   ) => {
-    if (data.response.data) {
+    const { result } = data;
+    if (result.data) {
       return this.scenarioHelper.handleResult({
         ...data,
         success: false,
@@ -115,7 +115,7 @@ export class BookingCancellationScenarioHelper {
       });
     }
 
-    const errors = validator.validate(data.response.error);
+    const errors = validator.validate(result.response.error);
     return this.scenarioHelper.handleResult({
       ...data,
       success: R.isEmpty(errors),

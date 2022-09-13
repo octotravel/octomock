@@ -51,7 +51,7 @@ export class AvailabilityCheckIntervalScenario
 
     return this.availabilityScenarioHelper.validateAvailability(
       {
-        ...result,
+        result,
         name,
       },
       this.capabilities

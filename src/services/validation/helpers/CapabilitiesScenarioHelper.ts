@@ -6,11 +6,11 @@ import {
 } from "../../../validators/backendValidator/ValidatorHelpers";
 import { Capability } from "@octocloud/types";
 import { CapabilityValidator } from "../../../validators/backendValidator/Capability/CapabilityValidator";
+import { Result } from "../api/types";
 
 export interface CapabilitiesScenarioData {
   name: string;
-  request: any;
-  response: any;
+  result: Result<Capability[]>;
 }
 
 export class CapabilitiesScenarioHelper {
@@ -23,7 +23,8 @@ export class CapabilitiesScenarioHelper {
   };
 
   public validateCapabilities = (data: CapabilitiesScenarioData) => {
-    if (data.response.error) {
+    const { result } = data;
+    if (result.response.error) {
       return this.scenarioHelper.handleResult({
         ...data,
         success: false,
@@ -31,7 +32,7 @@ export class CapabilitiesScenarioHelper {
       });
     }
 
-    const errors = this.getErrors(data.response.data.body);
+    const errors = this.getErrors(result.response.data.body);
     return this.scenarioHelper.handleResult({
       ...data,
       success: R.isEmpty(errors),
@@ -44,7 +45,8 @@ export class CapabilitiesScenarioHelper {
     error: string,
     validator: ModelValidator
   ) => {
-    if (data.response.data) {
+    const { result } = data;
+    if (result.response.data) {
       return this.scenarioHelper.handleResult({
         ...data,
         success: false,
@@ -56,7 +58,7 @@ export class CapabilitiesScenarioHelper {
       });
     }
 
-    const errors = validator.validate(data.response.error);
+    const errors = validator.validate(result.response.error);
     return this.scenarioHelper.handleResult({
       ...data,
       success: R.isEmpty(errors),

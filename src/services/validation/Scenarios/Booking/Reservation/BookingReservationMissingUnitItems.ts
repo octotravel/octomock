@@ -5,7 +5,7 @@ import { UnprocessableEntityErrorValidator } from "../../../../../validators/bac
 import { BookingReservationScenarioHelper } from "../../../helpers/BookingReservationScenarioHelper";
 
 export class BookingReservationMissingUnitItemsScenario
-  implements Scenario<null>
+  implements Scenario<any>
 {
   private apiClient: ApiClient;
   private productId: string;
@@ -49,7 +49,7 @@ export class BookingReservationMissingUnitItemsScenario
 
     return this.bookingReservationScenarioHelper.validateBookingReservationError(
       {
-        ...result,
+        result,
         name,
       },
       error,

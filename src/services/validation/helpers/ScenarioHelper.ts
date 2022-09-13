@@ -4,21 +4,19 @@ import {
   ErrorType,
   ValidatorError,
 } from "../../../validators/backendValidator/ValidatorHelpers";
-import { ResultRequest, ResultResponse } from "../api/types";
+import { Result } from "../api/types";
 import { ScenarioResult } from "../Scenarios/Scenario";
 
-interface ScenarioData {
+interface ScenarioData<T> {
   name: string;
   success: boolean;
-  request?: any;
-  response?: any;
+  result: Result<T>;
   errors: ValidatorError[];
 }
 
 export interface ScenarioHelperData<T> {
   name: string;
-  request: ResultRequest;
-  response: ResultResponse<T>;
+  result: Result<T>;
 }
 
 export interface ScenarioConfigData {
@@ -29,9 +27,10 @@ export interface ScenarioConfigData {
 }
 
 export class ScenarioHelper {
-  public handleResult = (data: ScenarioData): ScenarioResult<any> => {
-    if (data.response.error) {
-      if (data.response.error.status === STATUS_NOT_FOUND) {
+  public handleResult = <T>(data: ScenarioData<T>): ScenarioResult<T> => {
+    const { result } = data;
+    if (result.response.error) {
+      if (result.response.error.status === STATUS_NOT_FOUND) {
         data.errors = [
           ...data.errors,
           new ValidatorError({
@@ -44,15 +43,15 @@ export class ScenarioHelper {
     return {
       name: data.name,
       success: data.success,
-      request: data.request,
+      request: result.request,
       response: {
-        body: data.response.data ? data.response.data.body : null,
-        status: data.response.data
-          ? data.response.data.status
-          : data.response.error.status,
-        error: data.response.error
+        body: result.response.data ? result.response.data.body : null,
+        status: result.response.data
+          ? result.response.data.status
+          : result.response.error.status,
+        error: result.response.error
           ? {
-              body: data.response.error.body,
+              body: result.response.error.body,
             }
           : null,
       },

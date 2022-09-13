@@ -28,8 +28,9 @@ export class BookingUpdateScenarioHelper {
     oldBooking: Booking,
     _deliveryMethods: DeliveryMethod[]
   ): ValidatorError[] => {
-    const booking = data.response.data.body;
-    const reqBody = data.request.body;
+    const { result } = data;
+    const booking = result.data;
+    const reqBody = result.request.body;
     let errors = [];
 
     if (!reqBody.unitItems) {
@@ -134,7 +135,8 @@ export class BookingUpdateScenarioHelper {
     configData: ScenarioConfigData,
     createdBooking: Booking
   ) => {
-    if (data.response.error) {
+    const { result } = data;
+    if (result.response.error) {
       return this.scenarioHelper.handleResult({
         ...data,
         success: false,
@@ -145,10 +147,10 @@ export class BookingUpdateScenarioHelper {
     const checkErrors = [
       ...this.updateCheck(data, createdBooking, configData.deliveryMethods),
       ...this.bookingScenarioHelper.bookingCheck({
-        newBooking: data.response.data.body,
+        newBooking: result.data,
         oldBooking: createdBooking,
         configData,
-        rebooked: data.request.body.productId !== undefined,
+        rebooked: result.request.body.productId !== undefined,
       }),
     ];
 
@@ -160,10 +162,7 @@ export class BookingUpdateScenarioHelper {
       });
     }
 
-    const errors = this.getErrors(
-      data.response.data.body,
-      configData.capabilities
-    );
+    const errors = this.getErrors(result.data, configData.capabilities);
     return this.scenarioHelper.handleResult({
       ...data,
       success: R.isEmpty(errors),
@@ -176,7 +175,8 @@ export class BookingUpdateScenarioHelper {
     error: string,
     validator: ModelValidator
   ) => {
-    if (data.response.data) {
+    const { result } = data;
+    if (result.data) {
       return this.scenarioHelper.handleResult({
         ...data,
         success: false,
@@ -188,7 +188,7 @@ export class BookingUpdateScenarioHelper {
       });
     }
 
-    const errors = validator.validate(data.response.error);
+    const errors = validator.validate(result.response.error);
     return this.scenarioHelper.handleResult({
       ...data,
       success: R.isEmpty(errors),

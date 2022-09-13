@@ -48,7 +48,7 @@ export class AvailabilityCheckAvailabilityIdScenario
     return this.availabilityScenarioHelper.validateAvailability(
       {
         name,
-        ...result,
+        result,
       },
       this.capabilities
     );

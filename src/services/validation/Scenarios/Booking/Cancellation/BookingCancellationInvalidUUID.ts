@@ -4,7 +4,7 @@ import { Scenario } from "../../Scenario";
 import { InvalidBookingUUIDErrorValidator } from "../../../../../validators/backendValidator/Error/InvalidBookingUUIDErrorValidator";
 import { BookingCancellationScenarioHelper } from "../../../helpers/BookingCancellationScenarioHelper";
 
-export class BookingCancellationInvalidUUIDScenario implements Scenario<null> {
+export class BookingCancellationInvalidUUIDScenario implements Scenario<any> {
   private apiClient: ApiClient;
   private uuid: string;
   constructor({
@@ -32,7 +32,7 @@ export class BookingCancellationInvalidUUIDScenario implements Scenario<null> {
 
     return this.bookingCancellationScenarioHelper.validateBookingCancellationError(
       {
-        ...result,
+        result,
         name,
       },
       error,

@@ -44,7 +44,8 @@ export class BookingExtendScenarioHelper {
     configData: ScenarioConfigData,
     createdBooking: Booking
   ) => {
-    if (data.response.error) {
+    const { result } = data;
+    if (result.response.error) {
       return this.scenarioHelper.handleResult({
         ...data,
         success: false,
@@ -53,10 +54,10 @@ export class BookingExtendScenarioHelper {
     }
 
     const checkErrors = [
-      ...this.extendCheck(createdBooking, data.response.data.body),
+      ...this.extendCheck(createdBooking, result.data),
       ...this.bookingScenarioHelper.bookingCheck({
         newBooking: createdBooking,
-        oldBooking: data.response.data.body,
+        oldBooking: result.data,
         configData,
       }),
     ];
@@ -69,10 +70,7 @@ export class BookingExtendScenarioHelper {
       });
     }
 
-    const errors = this.getErrors(
-      data.response.data.body,
-      configData.capabilities
-    );
+    const errors = this.getErrors(result.data, configData.capabilities);
     return this.scenarioHelper.handleResult({
       ...data,
       success: R.isEmpty(errors),
@@ -85,7 +83,8 @@ export class BookingExtendScenarioHelper {
     error: string,
     validator: ModelValidator
   ) => {
-    if (data.response.data) {
+    const { result } = data;
+    if (result.data) {
       return this.scenarioHelper.handleResult({
         ...data,
         success: false,
@@ -97,7 +96,7 @@ export class BookingExtendScenarioHelper {
       });
     }
 
-    const errors = validator.validate(data.response.error);
+    const errors = validator.validate(result.response.error);
     return this.scenarioHelper.handleResult({
       ...data,
       success: R.isEmpty(errors),

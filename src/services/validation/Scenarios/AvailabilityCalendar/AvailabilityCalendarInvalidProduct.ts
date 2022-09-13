@@ -1,11 +1,11 @@
-import { AvailabilityUnit } from "@octocloud/types";
+import { AvailabilityCalendar, AvailabilityUnit } from "@octocloud/types";
 import { InvalidProductIdErrorValidator } from "../../../../validators/backendValidator/Error/InvalidProductIdErrorValidator";
 import { ApiClient } from "../../api/ApiClient";
 import { AvailabilityCalendarScenarioHelper } from "../../helpers/AvailabilityCalendarScenarioHelper";
 import { Scenario, ScenarioResult } from "../Scenario";
 
 export class AvailabilityCalendarInvalidProductScenario
-  implements Scenario<null>
+  implements Scenario<AvailabilityCalendar[]>
 {
   private apiClient: ApiClient;
   private productId: string;
@@ -38,7 +38,9 @@ export class AvailabilityCalendarInvalidProductScenario
   private availabilityCalendarScenarioHelper =
     new AvailabilityCalendarScenarioHelper();
 
-  public validate = async (): Promise<ScenarioResult<null>> => {
+  public validate = async (): Promise<
+    ScenarioResult<AvailabilityCalendar[]>
+  > => {
     const result = await this.apiClient.getAvailabilityCalendar({
       productId: this.productId,
       optionId: this.optionId,
@@ -52,7 +54,7 @@ export class AvailabilityCalendarInvalidProductScenario
 
     return this.availabilityCalendarScenarioHelper.validateAvailabilityError(
       {
-        ...result,
+        result,
         name,
       },
       error,

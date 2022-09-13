@@ -24,7 +24,7 @@ export class GetProductsScenario implements Scenario<Product[]> {
 
     return this.productScenarioHelper.validateProduct(
       {
-        ...result,
+        result,
         name,
       },
       this.capabilities

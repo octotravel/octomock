@@ -61,7 +61,7 @@ export class AvailabilityCalendarUnavailableDatesScenario
 
     return this.availabilityCalendarScenarioHelper.validateUnavailability(
       {
-        ...result,
+        result,
         name,
       },
       this.capabilities

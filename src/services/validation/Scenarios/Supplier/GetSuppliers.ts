@@ -24,7 +24,7 @@ export class GetSupplierScenario implements Scenario<Supplier> {
 
     return this.supplierScenarioHelper.validateSupplier(
       {
-        ...result,
+        result,
         name,
       },
       this.capabilities

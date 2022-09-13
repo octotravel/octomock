@@ -40,7 +40,7 @@ export class BookingCancellationBookingScenario implements Scenario<Booking> {
 
     return this.bookingCancellationScenarioHelper.validateBookingCancellation(
       {
-        ...result,
+        result,
         name,
       },
       {

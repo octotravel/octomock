@@ -63,7 +63,7 @@ export class BookingUpdateProductScenario implements Scenario<Booking> {
 
     return this.bookingUpdateScenarioHelper.validateBookingUpdate(
       {
-        ...result,
+        result,
         name,
       },
       {

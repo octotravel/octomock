@@ -10,11 +10,11 @@ import {
   ModelValidator,
   ValidatorError,
 } from "./../../../validators/backendValidator/ValidatorHelpers";
+import { Result } from "../api/types";
 
 export interface AvailabilityScenarioData {
   name: string;
-  request: any;
-  response: any;
+  result: Result<Availability[]>;
 }
 
 export class AvailabilityScenarioHelper {
@@ -59,7 +59,8 @@ export class AvailabilityScenarioHelper {
     data: AvailabilityScenarioData,
     capabilities: CapabilityId[]
   ) => {
-    if (data.response.error) {
+    const { result } = data;
+    if (result.response.error) {
       return this.scenarioHelper.handleResult({
         ...data,
         success: false,
@@ -67,7 +68,7 @@ export class AvailabilityScenarioHelper {
       });
     }
 
-    if (R.isEmpty(data.response.data.body)) {
+    if (R.isEmpty(result.data)) {
       return this.scenarioHelper.handleResult({
         ...data,
         success: false,
@@ -78,7 +79,7 @@ export class AvailabilityScenarioHelper {
         ],
       });
     }
-    if (this.checkAvailabilityStatus(data.response.data.body)) {
+    if (this.checkAvailabilityStatus(result.data)) {
       return this.scenarioHelper.handleResult({
         ...data,
         success: false,
@@ -91,7 +92,7 @@ export class AvailabilityScenarioHelper {
       });
     }
 
-    const errors = this.getErrors(data.response, capabilities);
+    const errors = this.getErrors(result.response, capabilities);
     return this.scenarioHelper.handleResult({
       ...data,
       success: R.isEmpty(errors),
@@ -104,7 +105,8 @@ export class AvailabilityScenarioHelper {
     error: string,
     validator: ModelValidator
   ) => {
-    if (data.response.data) {
+    const { result } = data;
+    if (result.data) {
       return this.scenarioHelper.handleResult({
         ...data,
         success: false,
@@ -116,7 +118,7 @@ export class AvailabilityScenarioHelper {
       });
     }
 
-    const errors = validator.validate(data.response.error);
+    const errors = validator.validate(result.response.error);
     return this.scenarioHelper.handleResult({
       ...data,
       success: R.isEmpty(errors),
@@ -128,15 +130,16 @@ export class AvailabilityScenarioHelper {
     data: AvailabilityScenarioData,
     capabilities: CapabilityId[]
   ) => {
-    if (data.response.error) {
+    const { result } = data;
+    if (result.response.error) {
       return this.scenarioHelper.handleResult({
         ...data,
         success: false,
         errors: [],
       });
     }
-    if (!R.isEmpty(data.response.data.body)) {
-      if (this.checkUnavailabilityStatus(data.response.data.body)) {
+    if (!R.isEmpty(result.data)) {
+      if (this.checkUnavailabilityStatus(result.data)) {
         return this.scenarioHelper.handleResult({
           ...data,
           success: false,
@@ -150,7 +153,7 @@ export class AvailabilityScenarioHelper {
       }
     }
 
-    const errors = this.getErrors(data.response, capabilities);
+    const errors = this.getErrors(result.response, capabilities);
     return this.scenarioHelper.handleResult({
       ...data,
       success: R.isEmpty(errors),

@@ -39,7 +39,7 @@ export class BookingReservationExtendScenario implements Scenario<Booking> {
 
     return this.bookingExtendScenarioHelper.validateBookingExtend(
       {
-        ...result,
+        result,
         name,
       },
       {

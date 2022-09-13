@@ -25,7 +25,8 @@ export class BookingGetScenarioHelper {
     data: ScenarioHelperData<Booking>,
     configData: ScenarioConfigData
   ) => {
-    if (data.response.error) {
+    const { result } = data;
+    if (result.response.error) {
       return this.scenarioHelper.handleResult({
         ...data,
         success: false,
@@ -33,10 +34,7 @@ export class BookingGetScenarioHelper {
       });
     }
 
-    const errors = this.getErrors(
-      data.response.data.body,
-      configData.capabilities
-    );
+    const errors = this.getErrors(result.data, configData.capabilities);
     return this.scenarioHelper.handleResult({
       ...data,
       success: R.isEmpty(errors),
@@ -49,7 +47,8 @@ export class BookingGetScenarioHelper {
     error: string,
     validator: ModelValidator
   ) => {
-    if (data.response.data) {
+    const { result } = data;
+    if (result.data) {
       return this.scenarioHelper.handleResult({
         ...data,
         success: false,
@@ -61,7 +60,7 @@ export class BookingGetScenarioHelper {
       });
     }
 
-    const errors = validator.validate(data.response.error);
+    const errors = validator.validate(result.response.error);
     return this.scenarioHelper.handleResult({
       ...data,
       success: R.isEmpty(errors),
