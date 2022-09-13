@@ -1,9 +1,10 @@
 import * as R from "ramda";
 import { ScenarioHelper } from "./ScenarioHelper";
 import { SupplierValidator } from "../../../validators/backendValidator/Supplier/SupplierValidator";
-import { CapabilityId, Supplier } from "@octocloud/types";
+import { Supplier } from "@octocloud/types";
 import { ScenarioResult } from "../Scenarios/Scenario";
 import { Result } from "../api/types";
+import { Config } from "../config/Config";
 
 export interface SupplierScenarioData {
   name: string;
@@ -11,9 +12,9 @@ export interface SupplierScenarioData {
 }
 
 export class SupplierScenarioHelper extends ScenarioHelper {
+  private config = Config.getInstance();
   public validateSupplier = (
-    data: SupplierScenarioData,
-    capabilities: CapabilityId[]
+    data: SupplierScenarioData
   ): ScenarioResult<Supplier> => {
     const { result } = data;
     if (result.response.error) {
@@ -24,9 +25,9 @@ export class SupplierScenarioHelper extends ScenarioHelper {
       });
     }
 
-    const errors = new SupplierValidator({ capabilities }).validate(
-      result.data
-    );
+    const errors = new SupplierValidator({
+      capabilities: this.config.getCapabilityIDs(),
+    }).validate(result.data);
     return this.handleResult({
       ...data,
       success: R.isEmpty(errors),
