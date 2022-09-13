@@ -1,13 +1,10 @@
-import {
-  Availability,
-  AvailabilityStatus,
-  CapabilityId,
-} from "@octocloud/types";
+import { Availability, AvailabilityStatus } from "@octocloud/types";
 import * as R from "ramda";
 import { AvailabilityValidator } from "../../../validators/backendValidator/Availability/AvailabilityValidator";
 import { ScenarioHelper } from "./ScenarioHelper";
 import { ValidatorError } from "./../../../validators/backendValidator/ValidatorHelpers";
 import { Result } from "../api/types";
+import { Config } from "../config/Config";
 
 export interface AvailabilityScenarioData {
   name: string;
@@ -15,6 +12,7 @@ export interface AvailabilityScenarioData {
 }
 
 export class AvailabilityScenarioHelper extends ScenarioHelper {
+  private config = Config.getInstance();
   private checkAvailabilityStatus = (availability: Availability[]) => {
     return availability
       .map((availability) => {
@@ -39,21 +37,18 @@ export class AvailabilityScenarioHelper extends ScenarioHelper {
       .some((status) => !status);
   };
 
-  private getErrors = (response: any, capabilities: CapabilityId[]) => {
+  private getErrors = (response: any) => {
     return response.data.body.reduce((acc, result) => {
       return [
         ...acc,
         ...new AvailabilityValidator({
-          capabilities,
+          capabilities: this.config.getCapabilityIDs(),
         }).validate(result),
       ];
     }, []);
   };
 
-  public validateAvailability = (
-    data: AvailabilityScenarioData,
-    capabilities: CapabilityId[]
-  ) => {
+  public validateAvailability = (data: AvailabilityScenarioData) => {
     const { result } = data;
     if (result.response.error) {
       return this.handleResult({
@@ -87,7 +82,7 @@ export class AvailabilityScenarioHelper extends ScenarioHelper {
       });
     }
 
-    const errors = this.getErrors(result.response, capabilities);
+    const errors = this.getErrors(result.response);
     return this.handleResult({
       ...data,
       success: R.isEmpty(errors),
@@ -95,10 +90,7 @@ export class AvailabilityScenarioHelper extends ScenarioHelper {
     });
   };
 
-  public validateUnavailability = (
-    data: AvailabilityScenarioData,
-    capabilities: CapabilityId[]
-  ) => {
+  public validateUnavailability = (data: AvailabilityScenarioData) => {
     const { result } = data;
     if (result.response.error) {
       return this.handleResult({
@@ -122,7 +114,7 @@ export class AvailabilityScenarioHelper extends ScenarioHelper {
       }
     }
 
-    const errors = this.getErrors(result.response, capabilities);
+    const errors = this.getErrors(result.response);
     return this.handleResult({
       ...data,
       success: R.isEmpty(errors),

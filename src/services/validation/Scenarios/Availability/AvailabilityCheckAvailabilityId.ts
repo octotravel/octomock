@@ -1,4 +1,4 @@
-import { Availability, CapabilityId } from "@octocloud/types";
+import { Availability } from "@octocloud/types";
 import { ApiClient } from "../../api/ApiClient";
 import { Scenario } from "../Scenario";
 import { AvailabilityScenarioHelper } from "../../helpers/AvailabilityScenarioHelper";
@@ -11,28 +11,24 @@ export class AvailabilityCheckAvailabilityIdScenario
   private optionId: string;
   private availabilityIds: string[];
   private availabilityType: string;
-  private capabilities: CapabilityId[];
   constructor({
     apiClient,
     productId,
     optionId,
     availabilityIds,
     availabilityType,
-    capabilities,
   }: {
     apiClient: ApiClient;
     productId: string;
     optionId: string;
     availabilityIds: string[];
     availabilityType: string;
-    capabilities: CapabilityId[];
   }) {
     this.apiClient = apiClient;
     this.productId = productId;
     this.optionId = optionId;
     this.availabilityIds = availabilityIds;
     this.availabilityType = availabilityType;
-    this.capabilities = capabilities;
   }
   private availabilityScenarioHelper = new AvailabilityScenarioHelper();
 
@@ -45,12 +41,9 @@ export class AvailabilityCheckAvailabilityIdScenario
 
     const name = `Availability Check AvailabilityId (${this.availabilityType})`;
 
-    return this.availabilityScenarioHelper.validateUnavailability(
-      {
-        name,
-        result,
-      },
-      this.capabilities
-    );
+    return this.availabilityScenarioHelper.validateUnavailability({
+      name,
+      result,
+    });
   };
 }

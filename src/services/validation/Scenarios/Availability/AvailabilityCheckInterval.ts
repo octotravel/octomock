@@ -1,60 +1,30 @@
-import { Availability, CapabilityId } from "@octocloud/types";
-import { ApiClient } from "../../api/ApiClient";
+import { Availability } from "@octocloud/types";
 import { Scenario } from "../Scenario";
 import { AvailabilityScenarioHelper } from "../../helpers/AvailabilityScenarioHelper";
+import { Config } from "../../config/Config";
+import { DateHelper } from "../../../../helpers/DateHelper";
+import { addDays } from "date-fns";
 
 export class AvailabilityCheckIntervalScenario
   implements Scenario<Availability[]>
 {
-  private apiClient: ApiClient;
-  private productId: string;
-  private optionId: string;
-  private localDateStart: string;
-  private localDateEnd: string;
-  private availabilityType: string;
-  private capabilities: CapabilityId[];
+  private config = Config.getInstance();
+  private apiClient = this.config.getApiClient();
   private availabilityScenarioHelper = new AvailabilityScenarioHelper();
-  constructor({
-    apiClient,
-    productId,
-    optionId,
-    localDateStart,
-    localDateEnd,
-    availabilityType,
-    capabilities,
-  }: {
-    apiClient: ApiClient;
-    productId: string;
-    optionId: string;
-    localDateStart: string;
-    localDateEnd: string;
-    availabilityType: string;
-    capabilities: CapabilityId[];
-  }) {
-    this.apiClient = apiClient;
-    this.productId = productId;
-    this.optionId = optionId;
-    this.localDateStart = localDateStart;
-    this.localDateEnd = localDateEnd;
-    this.availabilityType = availabilityType;
-    this.capabilities = capabilities;
-  }
 
   public validate = async () => {
+    const product = this.config.getProduct();
     const result = await this.apiClient.getAvailability({
-      productId: this.productId,
-      optionId: this.optionId,
-      localDateStart: this.localDateStart,
-      localDateEnd: this.localDateEnd,
+      productId: product.id,
+      optionId: product.options[0].id,
+      localDateStart: DateHelper.getDate(new Date().toISOString()),
+      localDateEnd: DateHelper.getDate(addDays(new Date(), 30).toISOString()),
     });
-    const name = `Availability Check Interval (${this.availabilityType})`;
+    const name = `Availability Check Interval (${product.availabilityType})`;
 
-    return this.availabilityScenarioHelper.validateUnavailability(
-      {
-        result,
-        name,
-      },
-      this.capabilities
-    );
+    return this.availabilityScenarioHelper.validateAvailability({
+      result,
+      name,
+    });
   };
 }

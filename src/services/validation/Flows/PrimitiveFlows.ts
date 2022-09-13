@@ -2,7 +2,7 @@ import { Config } from "../config/Config";
 import { Flow, FlowResult } from "./Flow";
 import { SupplierFlow } from "./Supplier/SupplierFlow";
 import { ProductFlow } from "./Product/ProductFlow";
-// import { AvailabilityFlow } from "./Availability/AvailabilityFlow";
+import { AvailabilityFlow } from "./Availability/AvailabilityFlow";
 import { AvailabilityCalendarFlow } from "./Availability/AvailabilityCalendarFlow";
 // import { BookingReservationFlow } from "./Booking/BookingReservationFlow";
 // import { BookingExtendFlow } from "./Booking/BookingExtendFlow";
@@ -19,7 +19,7 @@ export class PrimiteFlows {
     const flows: Flow[] = [
       new SupplierFlow(),
       new ProductFlow(),
-      // new AvailabilityFlow({ config }),
+      new AvailabilityFlow(),
       new AvailabilityCalendarFlow(),
       // new BookingReservationFlow({ config }),
       // new BookingExtendFlow({ config }),

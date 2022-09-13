@@ -1,4 +1,4 @@
-import { Availability, CapabilityId } from "@octocloud/types";
+import { Availability } from "@octocloud/types";
 import { ApiClient } from "../../api/ApiClient";
 import { AvailabilityScenarioHelper } from "../../helpers/AvailabilityScenarioHelper";
 import { Scenario, ScenarioResult } from "../Scenario";
@@ -12,7 +12,6 @@ export class AvailabilityCheckUnavailableDatesScenario
   private localDateStart: string;
   private localDateEnd: string;
   private availabilityType: string;
-  private capabilities: CapabilityId[];
   constructor({
     apiClient,
     productId,
@@ -20,7 +19,6 @@ export class AvailabilityCheckUnavailableDatesScenario
     localDateStart,
     localDateEnd,
     availabilityType,
-    capabilities,
   }: {
     apiClient: ApiClient;
     productId: string;
@@ -28,7 +26,6 @@ export class AvailabilityCheckUnavailableDatesScenario
     localDateStart: string;
     localDateEnd: string;
     availabilityType: string;
-    capabilities: CapabilityId[];
   }) {
     this.apiClient = apiClient;
     this.productId = productId;
@@ -36,7 +33,6 @@ export class AvailabilityCheckUnavailableDatesScenario
     this.localDateStart = localDateStart;
     this.localDateEnd = localDateEnd;
     this.availabilityType = availabilityType;
-    this.capabilities = capabilities;
   }
   private availabilityScenarioHelper = new AvailabilityScenarioHelper();
 
@@ -49,12 +45,9 @@ export class AvailabilityCheckUnavailableDatesScenario
     });
     const name = `Availability Check Unavailable Dates (${this.availabilityType})`;
 
-    return this.availabilityScenarioHelper.validateUnavailability(
-      {
-        name,
-        result,
-      },
-      this.capabilities
-    );
+    return this.availabilityScenarioHelper.validateUnavailability({
+      name,
+      result,
+    });
   };
 }
