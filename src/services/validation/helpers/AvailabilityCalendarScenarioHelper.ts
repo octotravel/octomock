@@ -5,10 +5,7 @@ import {
 } from "@octocloud/types";
 import * as R from "ramda";
 import { ScenarioHelper } from "./ScenarioHelper";
-import {
-  ModelValidator,
-  ValidatorError,
-} from "./../../../validators/backendValidator/ValidatorHelpers";
+import { ValidatorError } from "./../../../validators/backendValidator/ValidatorHelpers";
 import { AvailabilityCalendarValidator } from "../../../validators/backendValidator/AvailabilityCalendar/AvailabilityCalendarValidator";
 import { Result } from "../api/types";
 
@@ -17,9 +14,7 @@ export interface AvailabilityScenarioData {
   result: Result<AvailabilityCalendar[]>;
 }
 
-export class AvailabilityCalendarScenarioHelper {
-  private scenarioHelper = new ScenarioHelper();
-
+export class AvailabilityCalendarScenarioHelper extends ScenarioHelper {
   private checkAvailabilityStatus = (availability: AvailabilityCalendar[]) => {
     return availability
       .map((availability) => {
@@ -63,7 +58,7 @@ export class AvailabilityCalendarScenarioHelper {
   ) => {
     const { result } = data;
     if (result.response.error) {
-      return this.scenarioHelper.handleResult({
+      return this.handleResult({
         ...data,
         success: false,
         errors: [],
@@ -71,7 +66,7 @@ export class AvailabilityCalendarScenarioHelper {
     }
 
     if (R.isEmpty(result.response.data.body)) {
-      return this.scenarioHelper.handleResult({
+      return this.handleResult({
         ...data,
         success: false,
         errors: [
@@ -82,7 +77,7 @@ export class AvailabilityCalendarScenarioHelper {
       });
     }
     if (this.checkAvailabilityStatus(result.response.data.body)) {
-      return this.scenarioHelper.handleResult({
+      return this.handleResult({
         ...data,
         success: false,
         errors: [
@@ -95,33 +90,7 @@ export class AvailabilityCalendarScenarioHelper {
     }
 
     const errors = this.getErrors(result.response, capabilities);
-    return this.scenarioHelper.handleResult({
-      ...data,
-      success: R.isEmpty(errors),
-      errors,
-    });
-  };
-
-  public validateAvailabilityError = (
-    data: AvailabilityScenarioData,
-    error: string,
-    validator: ModelValidator
-  ) => {
-    const { result } = data;
-    if (result.response.data) {
-      return this.scenarioHelper.handleResult({
-        ...data,
-        success: false,
-        errors: [
-          new ValidatorError({
-            message: error,
-          }),
-        ],
-      });
-    }
-
-    const errors = validator.validate(result.response.error);
-    return this.scenarioHelper.handleResult({
+    return this.handleResult({
       ...data,
       success: R.isEmpty(errors),
       errors,
@@ -134,7 +103,7 @@ export class AvailabilityCalendarScenarioHelper {
   ) => {
     const { result } = data;
     if (result.response.error) {
-      return this.scenarioHelper.handleResult({
+      return this.handleResult({
         ...data,
         success: false,
         errors: [],
@@ -142,7 +111,7 @@ export class AvailabilityCalendarScenarioHelper {
     }
     if (!R.isEmpty(result.response.data.body)) {
       if (this.checkUnavailabilityStatus(result.response.data.body)) {
-        return this.scenarioHelper.handleResult({
+        return this.handleResult({
           ...data,
           success: false,
           errors: [
@@ -156,7 +125,7 @@ export class AvailabilityCalendarScenarioHelper {
     }
 
     const errors = this.getErrors(result.response, capabilities);
-    return this.scenarioHelper.handleResult({
+    return this.handleResult({
       ...data,
       success: R.isEmpty(errors),
       errors,

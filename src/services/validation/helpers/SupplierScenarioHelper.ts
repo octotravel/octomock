@@ -10,9 +10,7 @@ export interface SupplierScenarioData {
   result: Result<Supplier>;
 }
 
-export class SupplierScenarioHelper {
-  private scenarioHelper = new ScenarioHelper();
-
+export class SupplierScenarioHelper extends ScenarioHelper {
   private getErrors = (supplier: Supplier, capabilities: CapabilityId[]) => {
     return new SupplierValidator({ capabilities }).validate(supplier);
   };
@@ -22,9 +20,8 @@ export class SupplierScenarioHelper {
     capabilities: CapabilityId[]
   ): ScenarioResult<Supplier> => {
     const { result } = data;
-    console.log(result);
     if (result.response.error) {
-      return this.scenarioHelper.handleResult({
+      return this.handleResult({
         ...data,
         success: false,
         errors: [],
@@ -32,7 +29,7 @@ export class SupplierScenarioHelper {
     }
 
     const errors = this.getErrors(result.response.data.body, capabilities);
-    return this.scenarioHelper.handleResult({
+    return this.handleResult({
       ...data,
       success: R.isEmpty(errors),
       errors,

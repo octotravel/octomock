@@ -26,7 +26,6 @@ export class SupplierFlow {
   };
 
   public validate = async (): Promise<FlowResult> => {
-    console.log("hr");
     const scenarios = [await this.validateGetSuppliers()];
 
     const results = [];

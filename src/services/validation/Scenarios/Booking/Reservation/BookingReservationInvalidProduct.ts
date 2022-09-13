@@ -44,7 +44,7 @@ export class BookingReservationInvalidProductScenario implements Scenario<any> {
     const name = "Booking Reservation Invalid Product (400 INVALID_PRODUCT_ID)";
     const error = "Response should be INVALID_PRODUCT_ID";
 
-    return this.bookingReservationScenarioHelper.validateBookingReservationError(
+    return this.bookingReservationScenarioHelper.validateError(
       {
         result,
         name,

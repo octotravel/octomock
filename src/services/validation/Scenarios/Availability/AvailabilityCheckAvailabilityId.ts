@@ -45,7 +45,7 @@ export class AvailabilityCheckAvailabilityIdScenario
 
     const name = `Availability Check AvailabilityId (${this.availabilityType})`;
 
-    return this.availabilityScenarioHelper.validateAvailability(
+    return this.availabilityScenarioHelper.validateUnavailability(
       {
         name,
         result,

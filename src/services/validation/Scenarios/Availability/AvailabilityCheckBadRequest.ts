@@ -54,7 +54,7 @@ export class AvailabilityCheckBadRequestScenario
 
     const name = `Availability Check BAD_REQUEST (400 BAD_REQUEST)`;
     const error = "Response should be BAD_REQUEST";
-    return this.availabilityScenarioHelper.validateAvailabilityError(
+    return this.availabilityScenarioHelper.validateError(
       {
         name,
         result,

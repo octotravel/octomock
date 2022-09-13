@@ -52,7 +52,7 @@ export class AvailabilityCalendarBadRequestScenario
     const name = `Availability Calendar BAD_REQUEST (400 BAD_REQUEST)`;
     const error = "Response should be BAD_REQUEST";
 
-    return this.availabilityCalendarScenarioHelper.validateAvailabilityError(
+    return this.availabilityCalendarScenarioHelper.validateError(
       {
         result,
         name,

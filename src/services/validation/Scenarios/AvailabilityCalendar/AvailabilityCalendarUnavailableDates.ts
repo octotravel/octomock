@@ -59,7 +59,7 @@ export class AvailabilityCalendarUnavailableDatesScenario
     });
     const name = `Availability Calendar Unavailable Dates (${this.availabilityType})`;
 
-    return this.availabilityCalendarScenarioHelper.validateUnavailability(
+    return this.availabilityCalendarScenarioHelper.validateAvailability(
       {
         result,
         name,

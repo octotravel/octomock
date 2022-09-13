@@ -44,7 +44,7 @@ export class BookingReservationInvalidUnitIdScenario implements Scenario<any> {
     const name = "Booking Reservation Invalid Unit ID (400 INVALID_UNIT_ID)";
     const error = "Response should be INVALID_UNIT_ID";
 
-    return this.bookingReservationScenarioHelper.validateBookingReservationError(
+    return this.bookingReservationScenarioHelper.validateError(
       {
         result,
         name,

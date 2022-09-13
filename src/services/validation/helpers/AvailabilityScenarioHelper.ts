@@ -6,10 +6,7 @@ import {
 import * as R from "ramda";
 import { AvailabilityValidator } from "../../../validators/backendValidator/Availability/AvailabilityValidator";
 import { ScenarioHelper } from "./ScenarioHelper";
-import {
-  ModelValidator,
-  ValidatorError,
-} from "./../../../validators/backendValidator/ValidatorHelpers";
+import { ValidatorError } from "./../../../validators/backendValidator/ValidatorHelpers";
 import { Result } from "../api/types";
 
 export interface AvailabilityScenarioData {
@@ -17,9 +14,7 @@ export interface AvailabilityScenarioData {
   result: Result<Availability[]>;
 }
 
-export class AvailabilityScenarioHelper {
-  private scenarioHelper = new ScenarioHelper();
-
+export class AvailabilityScenarioHelper extends ScenarioHelper {
   private checkAvailabilityStatus = (availability: Availability[]) => {
     return availability
       .map((availability) => {
@@ -61,7 +56,7 @@ export class AvailabilityScenarioHelper {
   ) => {
     const { result } = data;
     if (result.response.error) {
-      return this.scenarioHelper.handleResult({
+      return this.handleResult({
         ...data,
         success: false,
         errors: [],
@@ -69,7 +64,7 @@ export class AvailabilityScenarioHelper {
     }
 
     if (R.isEmpty(result.data)) {
-      return this.scenarioHelper.handleResult({
+      return this.handleResult({
         ...data,
         success: false,
         errors: [
@@ -80,7 +75,7 @@ export class AvailabilityScenarioHelper {
       });
     }
     if (this.checkAvailabilityStatus(result.data)) {
-      return this.scenarioHelper.handleResult({
+      return this.handleResult({
         ...data,
         success: false,
         errors: [
@@ -93,33 +88,7 @@ export class AvailabilityScenarioHelper {
     }
 
     const errors = this.getErrors(result.response, capabilities);
-    return this.scenarioHelper.handleResult({
-      ...data,
-      success: R.isEmpty(errors),
-      errors,
-    });
-  };
-
-  public validateAvailabilityError = (
-    data: AvailabilityScenarioData,
-    error: string,
-    validator: ModelValidator
-  ) => {
-    const { result } = data;
-    if (result.data) {
-      return this.scenarioHelper.handleResult({
-        ...data,
-        success: false,
-        errors: [
-          new ValidatorError({
-            message: error,
-          }),
-        ],
-      });
-    }
-
-    const errors = validator.validate(result.response.error);
-    return this.scenarioHelper.handleResult({
+    return this.handleResult({
       ...data,
       success: R.isEmpty(errors),
       errors,
@@ -132,7 +101,7 @@ export class AvailabilityScenarioHelper {
   ) => {
     const { result } = data;
     if (result.response.error) {
-      return this.scenarioHelper.handleResult({
+      return this.handleResult({
         ...data,
         success: false,
         errors: [],
@@ -140,7 +109,7 @@ export class AvailabilityScenarioHelper {
     }
     if (!R.isEmpty(result.data)) {
       if (this.checkUnavailabilityStatus(result.data)) {
-        return this.scenarioHelper.handleResult({
+        return this.handleResult({
           ...data,
           success: false,
           errors: [
@@ -154,7 +123,7 @@ export class AvailabilityScenarioHelper {
     }
 
     const errors = this.getErrors(result.response, capabilities);
-    return this.scenarioHelper.handleResult({
+    return this.handleResult({
       ...data,
       success: R.isEmpty(errors),
       errors,

@@ -43,7 +43,7 @@ export class BookingConfirmationInvalidUnitIdScenario implements Scenario<any> {
     const name = "Booking Confirmation Invalid Unit ID (400 INVALID_UNIT_ID)";
     const error = "Response should be INVALID_UNIT_ID";
 
-    return this.bookingConfirmationScenarioHelper.validateBookingConfirmationError(
+    return this.bookingConfirmationScenarioHelper.validateError(
       {
         result,
         name,

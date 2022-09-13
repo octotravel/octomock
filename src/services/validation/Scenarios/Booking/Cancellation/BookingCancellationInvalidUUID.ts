@@ -30,7 +30,7 @@ export class BookingCancellationInvalidUUIDScenario implements Scenario<any> {
       "Booking Cancellation Invalid Booking UUID (400 INVALID_BOOKING_UUID)";
     const error = "Response should be INVALID_BOOKING_UUID";
 
-    return this.bookingCancellationScenarioHelper.validateBookingCancellationError(
+    return this.bookingCancellationScenarioHelper.validateError(
       {
         result,
         name,

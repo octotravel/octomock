@@ -1,19 +1,14 @@
 import { Booking, CapabilityId } from "@octocloud/types";
 import * as R from "ramda";
 import { BookingValidator } from "../../../validators/backendValidator/Booking/BookingValidator";
-import {
-  ModelValidator,
-  ValidatorError,
-} from "../../../validators/backendValidator/ValidatorHelpers";
+import { ValidatorError } from "../../../validators/backendValidator/ValidatorHelpers";
 import {
   ScenarioConfigData,
   ScenarioHelper,
   ScenarioHelperData,
 } from "./ScenarioHelper";
 
-export class BookingGetScenarioHelper {
-  private scenarioHelper = new ScenarioHelper();
-
+export class BookingGetScenarioHelper extends ScenarioHelper {
   private getErrors = (
     booking: any,
     capabilities: CapabilityId[]
@@ -27,7 +22,7 @@ export class BookingGetScenarioHelper {
   ) => {
     const { result } = data;
     if (result.response.error) {
-      return this.scenarioHelper.handleResult({
+      return this.handleResult({
         ...data,
         success: false,
         errors: [],
@@ -35,33 +30,7 @@ export class BookingGetScenarioHelper {
     }
 
     const errors = this.getErrors(result.data, configData.capabilities);
-    return this.scenarioHelper.handleResult({
-      ...data,
-      success: R.isEmpty(errors),
-      errors,
-    });
-  };
-
-  public validateBookingGetError = (
-    data: ScenarioHelperData<Booking>,
-    error: string,
-    validator: ModelValidator
-  ) => {
-    const { result } = data;
-    if (result.data) {
-      return this.scenarioHelper.handleResult({
-        ...data,
-        success: false,
-        errors: [
-          new ValidatorError({
-            message: error,
-          }),
-        ],
-      });
-    }
-
-    const errors = validator.validate(result.response.error);
-    return this.scenarioHelper.handleResult({
+    return this.handleResult({
       ...data,
       success: R.isEmpty(errors),
       errors,

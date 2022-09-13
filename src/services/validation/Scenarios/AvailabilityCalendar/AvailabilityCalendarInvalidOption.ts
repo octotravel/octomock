@@ -51,7 +51,7 @@ export class AvailabilityCalendarInvalidOptionScenario
     const name = `Availability Calendar Invalid Option (400 INVALID_OPTION_ID)`;
     const error = "Response should be INVALID_OPTION_ID";
 
-    return this.availabilityCalendarScenarioHelper.validateAvailabilityError(
+    return this.availabilityCalendarScenarioHelper.validateError(
       {
         result,
         name,

@@ -1,7 +1,9 @@
+import * as R from "ramda";
 import { CapabilityId, DeliveryMethod } from "@octocloud/types";
 import { STATUS_NOT_FOUND } from "../../../models/Error";
 import {
   ErrorType,
+  ModelValidator,
   ValidatorError,
 } from "../../../validators/backendValidator/ValidatorHelpers";
 import { Result } from "../api/types";
@@ -27,7 +29,7 @@ export interface ScenarioConfigData {
 }
 
 export class ScenarioHelper {
-  public handleResult = <T>(data: ScenarioData<T>): ScenarioResult<T> => {
+  protected handleResult = <T>(data: ScenarioData<T>): ScenarioResult<T> => {
     const { result } = data;
     if (result.response.error) {
       if (result.response.error.status === STATUS_NOT_FOUND) {
@@ -57,5 +59,31 @@ export class ScenarioHelper {
       },
       errors: data.errors.map((error) => error.mapError()),
     };
+  };
+
+  public validateError = <T>(
+    data: ScenarioHelperData<T>,
+    error: string,
+    validator: ModelValidator
+  ) => {
+    const { result } = data;
+    if (result.response.data) {
+      return this.handleResult({
+        ...data,
+        success: false,
+        errors: [
+          new ValidatorError({
+            message: error,
+          }),
+        ],
+      });
+    }
+
+    const errors = validator.validate(result.response.error);
+    return this.handleResult({
+      ...data,
+      success: R.isEmpty(errors),
+      errors: errors,
+    });
   };
 }

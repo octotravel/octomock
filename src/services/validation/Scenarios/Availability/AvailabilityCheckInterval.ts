@@ -49,7 +49,7 @@ export class AvailabilityCheckIntervalScenario
     });
     const name = `Availability Check Interval (${this.availabilityType})`;
 
-    return this.availabilityScenarioHelper.validateAvailability(
+    return this.availabilityScenarioHelper.validateUnavailability(
       {
         result,
         name,

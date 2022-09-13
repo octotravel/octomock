@@ -44,7 +44,7 @@ export class BookingReservationInvalidOptionScenario implements Scenario<any> {
     const name = "Booking Reservation Invalid Option (400 INVALID_OPTION_ID)";
     const error = "Response should be INVALID_OPTION_ID";
 
-    return this.bookingReservationScenarioHelper.validateBookingReservationError(
+    return this.bookingReservationScenarioHelper.validateError(
       {
         result,
         name,

@@ -45,7 +45,7 @@ export class BookingReservationEmptyUnitItemsScenario implements Scenario<any> {
       "Booking Reservation Missing UnitItems (400 UNPROCESSABLE_ENTITY)";
     const error = "Response should be UNPROCESSABLE_ENTITY";
 
-    return this.bookingReservationScenarioHelper.validateBookingReservationError(
+    return this.bookingReservationScenarioHelper.validateError(
       {
         result,
         name,

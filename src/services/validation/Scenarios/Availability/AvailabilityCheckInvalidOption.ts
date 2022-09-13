@@ -1,12 +1,9 @@
-import { Availability } from "@octocloud/types";
 import { InvalidOptionIdErrorValidator } from "../../../../validators/backendValidator/Error/InvalidOptionIdErrorValidator";
 import { ApiClient } from "../../api/ApiClient";
 import { AvailabilityScenarioHelper } from "../../helpers/AvailabilityScenarioHelper";
 import { Scenario, ScenarioResult } from "../Scenario";
 
-export class AvailabilityCheckInvalidOptionScenario
-  implements Scenario<Availability[]>
-{
+export class AvailabilityCheckInvalidOptionScenario implements Scenario<any> {
   private apiClient: ApiClient;
   private productId: string;
   private optionId: string;
@@ -29,7 +26,7 @@ export class AvailabilityCheckInvalidOptionScenario
   }
   private availabilityScenarioHelper = new AvailabilityScenarioHelper();
 
-  public validate = async (): Promise<ScenarioResult<Availability[]>> => {
+  public validate = async (): Promise<ScenarioResult<any>> => {
     const result = await this.apiClient.getAvailability({
       productId: this.productId,
       optionId: this.optionId,
@@ -38,7 +35,7 @@ export class AvailabilityCheckInvalidOptionScenario
     const name = `Availability Check Invalid Option (400 INVALID_OPTION_ID)`;
     const error = "Response should be INVALID_OPTION_ID";
 
-    return this.availabilityScenarioHelper.validateAvailabilityError(
+    return this.availabilityScenarioHelper.validateError(
       {
         name,
         result,

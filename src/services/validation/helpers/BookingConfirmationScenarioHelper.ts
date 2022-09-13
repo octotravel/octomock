@@ -6,10 +6,7 @@ import {
 } from "@octocloud/types";
 import * as R from "ramda";
 import { BookingValidator } from "../../../validators/backendValidator/Booking/BookingValidator";
-import {
-  ModelValidator,
-  ValidatorError,
-} from "../../../validators/backendValidator/ValidatorHelpers";
+import { ValidatorError } from "../../../validators/backendValidator/ValidatorHelpers";
 import { BookingScenarioHelper } from "./BookingScenarioHelper";
 import {
   ScenarioConfigData,
@@ -17,8 +14,7 @@ import {
   ScenarioHelperData,
 } from "./ScenarioHelper";
 
-export class BookingConfirmationScenarioHelper {
-  private scenarioHelper = new ScenarioHelper();
+export class BookingConfirmationScenarioHelper extends ScenarioHelper {
   private bookingScenarioHelper = new BookingScenarioHelper();
 
   private getErrors = (
@@ -95,7 +91,7 @@ export class BookingConfirmationScenarioHelper {
   ) => {
     const { result } = data;
     if (result.response.error) {
-      return this.scenarioHelper.handleResult({
+      return this.handleResult({
         ...data,
         success: false,
         errors: [],
@@ -116,7 +112,7 @@ export class BookingConfirmationScenarioHelper {
     ];
 
     if (!R.isEmpty(checkErrors)) {
-      return this.scenarioHelper.handleResult({
+      return this.handleResult({
         ...data,
         success: false,
         errors: checkErrors,
@@ -124,33 +120,7 @@ export class BookingConfirmationScenarioHelper {
     }
 
     const errors = this.getErrors(result.data, configData.capabilities);
-    return this.scenarioHelper.handleResult({
-      ...data,
-      success: R.isEmpty(errors),
-      errors,
-    });
-  };
-
-  public validateBookingConfirmationError = (
-    data: ScenarioHelperData<Booking>,
-    error: string,
-    validator: ModelValidator
-  ) => {
-    const { result } = data;
-    if (result.data) {
-      return this.scenarioHelper.handleResult({
-        ...data,
-        success: false,
-        errors: [
-          new ValidatorError({
-            message: error,
-          }),
-        ],
-      });
-    }
-
-    const errors = validator.validate(result.response.error);
-    return this.scenarioHelper.handleResult({
+    return this.handleResult({
       ...data,
       success: R.isEmpty(errors),
       errors,

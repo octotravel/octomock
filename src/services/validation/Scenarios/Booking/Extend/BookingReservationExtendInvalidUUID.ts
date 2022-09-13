@@ -23,7 +23,7 @@ export class BookingReservationExtendInvalidUUIDScenario
     const name = "Extend Reservation Invalid UUID (INVALID_BOOKING_UUID)";
     const error = "Response should be INVALID_BOOKING_UUID";
 
-    return this.bookingExtendScenarioHelper.validateBookingReservationError(
+    return this.bookingExtendScenarioHelper.validateError(
       {
         result,
         name,

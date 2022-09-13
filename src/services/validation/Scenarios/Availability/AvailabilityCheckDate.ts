@@ -42,7 +42,7 @@ export class AvailabilityCheckDateScenario implements Scenario<Availability[]> {
     });
     const name = `Availability Check Date (${this.availabilityType})`;
 
-    return this.availabilityScenarioHelper.validateAvailability(
+    return this.availabilityScenarioHelper.validateUnavailability(
       {
         name,
         result,

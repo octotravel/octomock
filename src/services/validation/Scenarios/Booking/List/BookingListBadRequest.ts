@@ -16,7 +16,7 @@ export class BookingListBadRequestScenario implements Scenario<any> {
     const name = "List Bookings BAD_REQUEST (400 BAD_REQUEST)";
     const error = "Response should be BAD_REQUEST";
 
-    return this.bookingListScenarioHelper.validateBookingListError(
+    return this.bookingListScenarioHelper.validateError(
       {
         result,
         name,

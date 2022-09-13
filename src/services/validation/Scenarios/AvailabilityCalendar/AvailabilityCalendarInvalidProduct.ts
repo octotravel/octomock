@@ -52,7 +52,7 @@ export class AvailabilityCalendarInvalidProductScenario
     const name = `Availability Calendar Invalid Product (400 INVALID_PRODUCT_ID)`;
     const error = "Response should be INVALID_PRODUCT_ID";
 
-    return this.availabilityCalendarScenarioHelper.validateAvailabilityError(
+    return this.availabilityCalendarScenarioHelper.validateError(
       {
         result,
         name,

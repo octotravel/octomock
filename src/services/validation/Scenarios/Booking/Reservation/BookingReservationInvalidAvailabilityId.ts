@@ -47,7 +47,7 @@ export class BookingReservationInvalidAvailabilityIdScenario
       "Booking Reservation Invalid Availability ID (400 INVALID_AVAILABILITY_ID)";
     const error = "Response should be INVALID_AVAILABILITY_ID";
 
-    return this.bookingReservationScenarioHelper.validateBookingReservationError(
+    return this.bookingReservationScenarioHelper.validateError(
       {
         result,
         name,

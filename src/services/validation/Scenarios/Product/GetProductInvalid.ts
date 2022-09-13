@@ -25,7 +25,7 @@ export class GetProductInvalidScenario implements Scenario<any> {
     const name = `Get Product Invalid (400 INVALID_PRODUCT_ID)`;
     const error = "Response should be INVALID_PRODUCT_ID";
 
-    return this.productScenarioHelper.validateProductError(
+    return this.productScenarioHelper.validateError(
       {
         result,
         name,
