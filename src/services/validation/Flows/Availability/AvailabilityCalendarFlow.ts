@@ -1,8 +1,8 @@
 import { AvailabilityType } from "@octocloud/types";
 import { ApiClient } from "../../api/ApiClient";
 import { Config } from "../../config/Config";
-import { ScenarioResult } from "../../Scenarios/Scenario";
-import { FlowResult } from "../Flow";
+import { Scenario, ScenarioResult } from "../../Scenarios/Scenario";
+import { Flow, FlowResult } from "../Flow";
 import { AvailabilityCalendarIntervalScenario } from "../../Scenarios/AvailabilityCalendar/AvailabilityCalendarInterval";
 // import { AvailabilityCalendarUnavailableDatesScenario } from "../../Scenarios/AvailabilityCalendar/AvailabilityCalendarUnavailableDates";
 // import { AvailabilityCalendarInvalidProductScenario } from "../../Scenarios/AvailabilityCalendar/AvailabilityCalendarInvalidProduct";
@@ -10,11 +10,13 @@ import { AvailabilityCalendarIntervalScenario } from "../../Scenarios/Availabili
 // import { AvailabilityCalendarBadRequestScenario } from "../../Scenarios/AvailabilityCalendar/AvailabilityCalendarBadRequest";
 import { DateHelper } from "../../../../helpers/DateHelper";
 import { addDays } from "date-fns";
+import { BaseFlow } from "../BaseFlow";
 
-export class AvailabilityCalendarFlow {
+export class AvailabilityCalendarFlow extends BaseFlow implements Flow {
   private config = Config.getInstance();
   private apiClient: ApiClient;
   constructor() {
+    super("Availability Calendar");
     this.apiClient = new ApiClient({
       url: this.config.getEndpointData().endpoint,
       apiKey: this.config.getEndpointData().apiKey,
@@ -22,18 +24,8 @@ export class AvailabilityCalendarFlow {
     });
   }
 
-  private setFlow = (scenarios: ScenarioResult<any>[]): FlowResult => {
-    return {
-      name: "Availability Calendar",
-      success: scenarios.every((scenario) => scenario.success),
-      totalScenarios: scenarios.length,
-      succesScenarios: scenarios.filter((scenario) => scenario.success).length,
-      scenarios: scenarios,
-    };
-  };
-
   public validate = async (): Promise<FlowResult> => {
-    const scenarios = [
+    const scenarios: Scenario<unknown>[] = [
       await this.validateAvailabilityCalendarInterval(),
       //   ...(await this.validateAvailabilityCalendarUnavailableDates()),
       //   ...(await this.validateAvailabilityCalendarInvalidProduct()),
@@ -41,7 +33,7 @@ export class AvailabilityCalendarFlow {
       //   ...(await this.validateAvailabilityCheckBadRequest()),
     ];
 
-    const results = [];
+    const results: ScenarioResult<unknown>[] = [];
     for await (const scenario of scenarios) {
       const result = await scenario.validate();
       results.push(result);
@@ -49,7 +41,7 @@ export class AvailabilityCalendarFlow {
         break;
       }
     }
-    return this.setFlow(results);
+    return this.getFlowResult(results);
   };
 
   private validateAvailabilityCalendarInterval =
