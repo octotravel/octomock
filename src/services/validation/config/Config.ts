@@ -1,6 +1,16 @@
-import { Capability, CapabilityId, Product } from "@octocloud/types";
+import {
+  AvailabilityType,
+  Capability,
+  CapabilityId,
+  Product,
+} from "@octocloud/types";
+import * as R from "ramda";
 import { ValidationEndpoint } from "../../../schemas/Validation";
-import { ValidatorError } from "../../../validators/backendValidator/ValidatorHelpers";
+import {
+  ErrorType,
+  ValidatorError,
+} from "../../../validators/backendValidator/ValidatorHelpers";
+import { ApiClient } from "../api/ApiClient";
 import { ProductValidatorData } from "./ProductValidatorData";
 
 interface IConfig {
@@ -22,8 +32,9 @@ export class Config implements IConfig {
 
   public startTimesProducts: Nullable<ProductValidatorData>;
   public openingHoursProducts: Nullable<ProductValidatorData>;
-  public availabilityRequiredFalseProducts: Nullable<ProductValidatorData>;
-  readonly validProducts: boolean;
+  public productIds: string[];
+
+  public invalidProductId: string;
 
   readonly ignoreKill: boolean;
 
@@ -34,12 +45,20 @@ export class Config implements IConfig {
 
     this.capabilities = [];
 
-    this.startTimesProducts = null;
-    this.openingHoursProducts = null;
-    this.availabilityRequiredFalseProducts = null;
-    this.validProducts = false;
+    this.startTimesProducts = new ProductValidatorData({
+      products: [],
+      availabilitySoldOut: null,
+      availabilityAvailable: null,
+    });
+    this.openingHoursProducts = new ProductValidatorData({
+      products: [],
+      availabilitySoldOut: null,
+      availabilityAvailable: null,
+    });
+    this.productIds = [];
+    this.invalidProductId = "invalidProductId";
 
-    this.ignoreKill = true;
+    this.ignoreKill = false;
   }
 
   public static getInstance = (): Config => {
@@ -67,19 +86,40 @@ export class Config implements IConfig {
     };
   };
 
+  public getApiClient = (): ApiClient => {
+    return new ApiClient({
+      url: this.endpoint,
+      apiKey: this.apiKey,
+      capabilities: this.getCapabilityIDs(),
+    });
+  };
+
   public setCapabilities = (capabilities: Capability[]): ValidatorError[] => {
     this.capabilities = capabilities.map((capability) => {
       return capability.id;
     });
-    return [new ValidatorError({ message: "tst" })];
+    return [];
   };
 
   public getCapabilityIDs = (): CapabilityId[] => {
     return this.capabilities;
   };
 
-  // public setProducts = (products: Product[]): ValidatorError[] => {
-
-  //   return [];
-  // }
+  public setProducts = (products: Product[]): ValidatorError[] => {
+    this.startTimesProducts.products = products.filter(
+      (product) => product.availabilityType === AvailabilityType.START_TIME
+    );
+    this.openingHoursProducts.products = products.filter(
+      (product) => product.availabilityType === AvailabilityType.OPENING_HOURS
+    );
+    this.productIds = products.map((product) => product.id);
+    return [
+      R.isEmpty(this.productIds)
+        ? new ValidatorError({
+            message: "At least one product must be provided!",
+            type: ErrorType.CRITICAL,
+          })
+        : null,
+    ].filter(Boolean);
+  };
 }

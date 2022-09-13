@@ -1,8 +1,9 @@
 import { ProductValidator } from "./../../../validators/backendValidator/Product/ProductValidator";
 import * as R from "ramda";
-import { CapabilityId, Product } from "@octocloud/types";
+import { Product } from "@octocloud/types";
 import { ScenarioHelper } from "./ScenarioHelper";
 import { Result } from "../api/types";
+import { Config } from "../config/Config";
 
 export interface ProductScenarioData<T> {
   name: string;
@@ -10,11 +11,12 @@ export interface ProductScenarioData<T> {
 }
 
 export class ProductScenarioHelper extends ScenarioHelper {
-  public validateProducts = (
-    data: ProductScenarioData<Product[]>,
-    capabilities: CapabilityId[]
-  ) => {
-    const validator = new ProductValidator({ capabilities });
+  private config = Config.getInstance();
+
+  public validateProducts = (data: ProductScenarioData<Product[]>) => {
+    const validator = new ProductValidator({
+      capabilities: this.config.getCapabilityIDs(),
+    });
     const { result } = data;
     if (result.response.error) {
       return this.handleResult({
@@ -24,7 +26,12 @@ export class ProductScenarioHelper extends ScenarioHelper {
       });
     }
 
-    const errors = result.data.map(validator.validate).flat();
+    let errors = result.data.map(validator.validate).flat();
+
+    if (R.isEmpty(errors)) {
+      errors = [...this.config.setProducts(result.data)];
+    }
+
     return this.handleResult({
       ...data,
       success: R.isEmpty(errors),
@@ -32,11 +39,10 @@ export class ProductScenarioHelper extends ScenarioHelper {
     });
   };
 
-  public validateProduct = (
-    data: ProductScenarioData<Product>,
-    capabilities: CapabilityId[]
-  ) => {
-    const validator = new ProductValidator({ capabilities });
+  public validateProduct = (data: ProductScenarioData<Product>) => {
+    const validator = new ProductValidator({
+      capabilities: this.config.getCapabilityIDs(),
+    });
     const { result } = data;
     if (result.response.error) {
       return this.handleResult({

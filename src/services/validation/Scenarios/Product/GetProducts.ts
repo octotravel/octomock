@@ -1,33 +1,21 @@
-import { CapabilityId, Product } from "@octocloud/types";
-import { ApiClient } from "../../api/ApiClient";
+import { Product } from "@octocloud/types";
 import { Scenario } from "../Scenario";
 import { ProductScenarioHelper } from "../../helpers/ProductScenarioHelper";
+import { Config } from "../../config/Config";
 
 export class GetProductsScenario implements Scenario<Product[]> {
-  private apiClient: ApiClient;
-  private capabilities: CapabilityId[];
-  constructor({
-    apiClient,
-    capabilities,
-  }: {
-    apiClient: ApiClient;
-    capabilities: CapabilityId[];
-  }) {
-    this.apiClient = apiClient;
-    this.capabilities = capabilities;
-  }
+  private config = Config.getInstance();
+  private apiClient = this.config.getApiClient();
+
   private productScenarioHelper = new ProductScenarioHelper();
 
   public validate = async () => {
     const result = await this.apiClient.getProducts();
     const name = "Get Products";
 
-    return this.productScenarioHelper.validateProducts(
-      {
-        result,
-        name,
-      },
-      this.capabilities
-    );
+    return this.productScenarioHelper.validateProducts({
+      result,
+      name,
+    });
   };
 }
