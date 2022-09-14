@@ -1,39 +1,29 @@
-import { AvailabilityType, Booking, CapabilityId } from "@octocloud/types";
-import { ApiClient } from "../../../api/ApiClient";
+import { Booking, CapabilityId } from "@octocloud/types";
 import { Scenario } from "../../Scenario";
 import { BookingConfirmationScenarioHelper } from "../../../helpers/BookingConfirmationScenarioHelper";
+import { Config } from "../../../config/Config";
 
 export class BookingConfirmationScenario implements Scenario<Booking> {
-  private apiClient: ApiClient;
-  private uuid: string;
-  private availabilityType: AvailabilityType;
-  private capabilities: CapabilityId[];
+  private config = Config.getInstance();
+  private apiClient = this.config.getApiClient();
   private booking: Booking;
+  private capabilities: CapabilityId[];
   constructor({
-    apiClient,
-    uuid,
-    availabilityType,
-    capabilities,
     booking,
+    capabilities,
   }: {
-    apiClient: ApiClient;
-    uuid: string;
-    availabilityType: AvailabilityType;
-    capabilities: CapabilityId[];
     booking: Booking;
+    capabilities: CapabilityId[];
   }) {
-    this.apiClient = apiClient;
-    this.uuid = uuid;
-    this.availabilityType = availabilityType;
-    this.capabilities = capabilities;
     this.booking = booking;
+    this.capabilities = capabilities;
   }
   private bookingConfirmationScenarioHelper =
     new BookingConfirmationScenarioHelper();
 
   public validate = async () => {
     const result = await this.apiClient.bookingConfirmation({
-      uuid: this.uuid,
+      uuid: this.booking.uuid,
       contact: {
         firstName: "John",
         lastName: "Doe",
@@ -43,7 +33,7 @@ export class BookingConfirmationScenario implements Scenario<Booking> {
       },
       resellerReference: "RESELLERREF#1",
     });
-    const name = `Booking Confirmation (${this.availabilityType})`;
+    const name = `Booking Confirmation`;
 
     return this.bookingConfirmationScenarioHelper.validateBookingConfirmation(
       {

@@ -1,25 +1,13 @@
-import { BookingContactSchema, CapabilityId } from "@octocloud/types";
-import { ApiClient } from "../../../api/ApiClient";
 import { Scenario } from "../../Scenario";
 import { InvalidBookingUUIDErrorValidator } from "../../../../../validators/backendValidator/Error/InvalidBookingUUIDErrorValidator";
 import { BookingConfirmationScenarioHelper } from "../../../helpers/BookingConfirmationScenarioHelper";
+import { Config } from "../../../config/Config";
 
 export class BookingConfirmationInvalidUUIDScenario implements Scenario<any> {
-  private apiClient: ApiClient;
+  private config = Config.getInstance();
+  private apiClient = this.config.getApiClient();
   private uuid: string;
-  private contact: BookingContactSchema;
-  constructor({
-    apiClient,
-    uuid,
-    contact,
-  }: {
-    apiClient: ApiClient;
-    uuid: string;
-    contact: BookingContactSchema;
-    capabilities: CapabilityId[];
-  }) {
-    this.apiClient = apiClient;
-    this.contact = contact;
+  constructor({ uuid }: { uuid: string }) {
     this.uuid = uuid;
   }
   private bookingConfirmationScenarioHelper =
@@ -28,7 +16,7 @@ export class BookingConfirmationInvalidUUIDScenario implements Scenario<any> {
   public validate = async () => {
     const result = await this.apiClient.bookingConfirmation({
       uuid: this.uuid,
-      contact: this.contact,
+      contact: {},
     });
 
     const name =

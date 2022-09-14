@@ -1,40 +1,25 @@
-import {
-  AvailabilityType,
-  Booking,
-  BookingUnitItemSchema,
-  CapabilityId,
-} from "@octocloud/types";
-import { ApiClient } from "../../../api/ApiClient";
+import { Booking, BookingUnitItemSchema, CapabilityId } from "@octocloud/types";
 import { Scenario } from "../../Scenario";
 import { BookingConfirmationScenarioHelper } from "../../../helpers/BookingConfirmationScenarioHelper";
+import { Config } from "../../../config/Config";
 
 export class BookingConfirmationUnitItemUpdateScenario
   implements Scenario<Booking>
 {
-  private apiClient: ApiClient;
-  private uuid: string;
-  private availabilityType: AvailabilityType;
+  private config = Config.getInstance();
+  private apiClient = this.config.getApiClient();
   private capabilities: CapabilityId[];
   private unitItems: BookingUnitItemSchema[];
   private booking: Booking;
   constructor({
-    apiClient,
-    uuid,
-    availabilityType,
     capabilities,
     unitItems,
     booking,
   }: {
-    apiClient: ApiClient;
-    uuid: string;
-    availabilityType: AvailabilityType;
     capabilities: CapabilityId[];
     unitItems: BookingUnitItemSchema[];
     booking: Booking;
   }) {
-    this.apiClient = apiClient;
-    this.uuid = uuid;
-    this.availabilityType = availabilityType;
     this.capabilities = capabilities;
     this.unitItems = unitItems;
     this.booking = booking;
@@ -44,7 +29,7 @@ export class BookingConfirmationUnitItemUpdateScenario
 
   public validate = async () => {
     const result = await this.apiClient.bookingConfirmation({
-      uuid: this.uuid,
+      uuid: this.booking.uuid,
       contact: {
         firstName: "John",
         lastName: "Doe",
@@ -55,7 +40,7 @@ export class BookingConfirmationUnitItemUpdateScenario
       resellerReference: "RESELLERREF#1",
       unitItems: this.unitItems,
     });
-    const name = `Booking Confirmation unitItems update (${this.availabilityType})`;
+    const name = `Booking Confirmation unitItems update`;
 
     return this.bookingConfirmationScenarioHelper.validateBookingConfirmation(
       {
