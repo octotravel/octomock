@@ -1,4 +1,4 @@
-import { Booking, CapabilityId, DeliveryMethod } from "@octocloud/types";
+import { Booking, CapabilityId } from "@octocloud/types";
 import { ApiClient } from "../../../api/ApiClient";
 import { Scenario } from "../../Scenario";
 import { BookingCancellationScenarioHelper } from "../../../helpers/BookingCancellationScenarioHelper";
@@ -9,25 +9,21 @@ export class BookingCancellationReservationScenario
   private apiClient: ApiClient;
   private uuid: string;
   private capabilities: CapabilityId[];
-  private deliveryMethods: DeliveryMethod[];
   private booking: Booking;
   constructor({
     apiClient,
     uuid,
     capabilities,
-    deliveryMethods,
     booking,
   }: {
     apiClient: ApiClient;
     uuid: string;
     capabilities: CapabilityId[];
-    deliveryMethods: DeliveryMethod[];
     booking: Booking;
   }) {
     this.apiClient = apiClient;
     this.uuid = uuid;
     this.capabilities = capabilities;
-    this.deliveryMethods = deliveryMethods;
     this.booking = booking;
   }
   private bookingCancellationScenarioHelper =
@@ -47,7 +43,6 @@ export class BookingCancellationReservationScenario
       },
       {
         capabilities: this.capabilities,
-        deliveryMethods: this.deliveryMethods,
       },
       this.booking
     );

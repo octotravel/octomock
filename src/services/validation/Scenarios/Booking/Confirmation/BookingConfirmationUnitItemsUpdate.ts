@@ -3,7 +3,6 @@ import {
   Booking,
   BookingUnitItemSchema,
   CapabilityId,
-  DeliveryMethod,
 } from "@octocloud/types";
 import { ApiClient } from "../../../api/ApiClient";
 import { Scenario } from "../../Scenario";
@@ -16,7 +15,6 @@ export class BookingConfirmationUnitItemUpdateScenario
   private uuid: string;
   private availabilityType: AvailabilityType;
   private capabilities: CapabilityId[];
-  private deliveryMethods: DeliveryMethod[];
   private unitItems: BookingUnitItemSchema[];
   private booking: Booking;
   constructor({
@@ -24,7 +22,6 @@ export class BookingConfirmationUnitItemUpdateScenario
     uuid,
     availabilityType,
     capabilities,
-    deliveryMethods,
     unitItems,
     booking,
   }: {
@@ -32,7 +29,6 @@ export class BookingConfirmationUnitItemUpdateScenario
     uuid: string;
     availabilityType: AvailabilityType;
     capabilities: CapabilityId[];
-    deliveryMethods: DeliveryMethod[];
     unitItems: BookingUnitItemSchema[];
     booking: Booking;
   }) {
@@ -40,7 +36,6 @@ export class BookingConfirmationUnitItemUpdateScenario
     this.uuid = uuid;
     this.availabilityType = availabilityType;
     this.capabilities = capabilities;
-    this.deliveryMethods = deliveryMethods;
     this.unitItems = unitItems;
     this.booking = booking;
   }
@@ -69,7 +64,6 @@ export class BookingConfirmationUnitItemUpdateScenario
       },
       {
         capabilities: this.capabilities,
-        deliveryMethods: this.deliveryMethods,
       },
       this.booking
     );

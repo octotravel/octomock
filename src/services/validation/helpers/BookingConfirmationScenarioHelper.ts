@@ -1,9 +1,4 @@
-import {
-  Booking,
-  BookingStatus,
-  CapabilityId,
-  DeliveryMethod,
-} from "@octocloud/types";
+import { Booking, BookingStatus, CapabilityId } from "@octocloud/types";
 import * as R from "ramda";
 import { BookingValidator } from "../../../validators/backendValidator/Booking/BookingValidator";
 import { ValidatorError } from "../../../validators/backendValidator/ValidatorHelpers";
@@ -26,8 +21,7 @@ export class BookingConfirmationScenarioHelper extends ScenarioHelper {
 
   private confirmationCheck = (
     data: ScenarioHelperData<Booking>,
-    oldBooking: Booking,
-    deliveryMethods: DeliveryMethod[]
+    oldBooking: Booking
   ): ValidatorError[] => {
     const { result } = data;
     const booking = result.data;
@@ -61,26 +55,6 @@ export class BookingConfirmationScenarioHelper extends ScenarioHelper {
           : new ValidatorError({ message: "UnitItems count is not matching" }),
       ];
     }
-
-    if (deliveryMethods.includes(DeliveryMethod.VOUCHER)) {
-      errors = [
-        ...errors,
-        !R.isEmpty(booking.voucher.deliveryOptions)
-          ? null
-          : new ValidatorError({ message: "Voucher is missing" }),
-      ];
-    }
-    if (deliveryMethods.includes(DeliveryMethod.TICKET)) {
-      const tickets = booking.unitItems.reduce((acc, unit) => {
-        return [...acc, ...unit.ticket.deliveryOptions];
-      }, []);
-      errors = [
-        ...errors,
-        !R.isEmpty(tickets)
-          ? null
-          : new ValidatorError({ message: "Tickets are missing" }),
-      ];
-    }
     return errors.filter(Boolean);
   };
 
@@ -99,11 +73,7 @@ export class BookingConfirmationScenarioHelper extends ScenarioHelper {
     }
 
     const checkErrors = [
-      ...this.confirmationCheck(
-        data,
-        createdBooking,
-        configData.deliveryMethods
-      ),
+      ...this.confirmationCheck(data, createdBooking),
       ...this.bookingScenarioHelper.bookingCheck({
         newBooking: result.data,
         oldBooking: createdBooking,

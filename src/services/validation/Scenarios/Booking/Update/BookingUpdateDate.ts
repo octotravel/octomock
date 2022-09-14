@@ -7,14 +7,12 @@ export class BookingUpdateDateScenario implements Scenario<Booking> {
   private apiClient: ApiClient;
   private uuid: string;
   private capabilities: CapabilityId[];
-  private deliveryMethods: DeliveryMethod[];
   private booking: Booking;
   private availabilityId: string;
   constructor({
     apiClient,
     uuid,
     capabilities,
-    deliveryMethods,
     booking,
     availabilityId,
   }: {
@@ -28,7 +26,6 @@ export class BookingUpdateDateScenario implements Scenario<Booking> {
     this.apiClient = apiClient;
     this.uuid = uuid;
     this.capabilities = capabilities;
-    this.deliveryMethods = deliveryMethods;
     this.booking = booking;
     this.availabilityId = availabilityId;
   }
@@ -48,7 +45,6 @@ export class BookingUpdateDateScenario implements Scenario<Booking> {
       },
       {
         capabilities: this.capabilities,
-        deliveryMethods: this.deliveryMethods,
       },
       this.booking
     );

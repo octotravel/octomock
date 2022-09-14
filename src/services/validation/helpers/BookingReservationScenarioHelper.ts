@@ -38,12 +38,12 @@ export class BookingReservationScenarioHelper extends ScenarioHelper {
 
     const errors = new Array<ValidatorError>();
 
-    if (booking.notes === result.data.notes) {
+    if (booking.notes !== result.data.notes) {
       errors.push(
         new ValidatorError({ message: "Notes are not matching request" })
       );
     }
-    if (booking.status === BookingStatus.ON_HOLD) {
+    if (booking.status !== BookingStatus.ON_HOLD) {
       errors.push(
         new ValidatorError({
           message: `Booking status should be ON_HOLD. Returned value was ${booking.status}`,
@@ -51,7 +51,7 @@ export class BookingReservationScenarioHelper extends ScenarioHelper {
         })
       );
     }
-    if (unitIdCheck) {
+    if (!unitIdCheck) {
       errors.push(
         new ValidatorError({
           message: "UnitIds are not matching",

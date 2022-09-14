@@ -49,7 +49,6 @@ export class BookingReservationScenario implements Scenario<Booking> {
       },
       {
         capabilities: this.config.getCapabilityIDs(),
-        deliveryMethods: this.product.deliveryMethods,
       }
     );
   };
