@@ -1,6 +1,7 @@
 import {
   Availability,
   AvailabilityStatus,
+  AvailabilityType,
   CapabilityId,
 } from "@octocloud/types";
 import { CommonValidator } from "../CommonValidator";
@@ -19,17 +20,21 @@ import { AvailabilityPricingValidator } from "./AvailabilityPricingValidator";
 export class AvailabilityValidator implements ModelValidator {
   private pricingValidator: AvailabilityPricingValidator;
   private pickupValidator: AvailabilityPickupValidator;
+  private availabilityType?: AvailabilityType;
   private path: string;
   private capabilities: CapabilityId[];
   constructor({
     path,
     capabilities,
+    availabilityType,
   }: {
     path?: string;
     capabilities: CapabilityId[];
+    availabilityType?: AvailabilityType;
   }) {
     this.path = `${path}availability`;
     this.capabilities = capabilities;
+    this.availabilityType = availabilityType;
     this.pricingValidator = new AvailabilityPricingValidator({
       path: this.path,
     });
@@ -61,7 +66,7 @@ export class AvailabilityValidator implements ModelValidator {
         availability.localDateTimeEnd
       ),
 
-      BooleanValidator.validate(`${this.path}.allDay`, availability.allDay),
+      this.validateAllDay(availability),
       BooleanValidator.validate(
         `${this.path}.available`,
         availability.available
@@ -104,6 +109,16 @@ export class AvailabilityValidator implements ModelValidator {
     ]
       .flat(1)
       .filter(Boolean);
+  };
+
+  private validateAllDay = (availability: Availability) => {
+    const path = `${this.path}.allDay`;
+    if (this.availabilityType) {
+      return BooleanValidator.validate(path, availability.allDay, {
+        equalsTo: this.availabilityType === AvailabilityType.OPENING_HOURS,
+      });
+    }
+    return BooleanValidator.validate(path, availability.allDay);
   };
 
   private validatePricingCapability = (

@@ -116,14 +116,27 @@ export class NumberValidator {
   };
 }
 
+interface BooleanValidatorParams {
+  equalsTo?: boolean;
+}
+
 export class BooleanValidator {
   public static validate = (
     label: string,
-    value: unknown
+    value: unknown,
+    params?: BooleanValidatorParams
   ): Nullable<ValidatorError> => {
     try {
       const schema = yup.boolean().label(label).required();
       schema.validateSync(value, { strict: true });
+      if (params?.equalsTo) {
+        if (params.equalsTo !== value) {
+          return new ValidatorError({
+            type: ErrorType.WARNING,
+            message: `${label} has to be equal to ${params.equalsTo}, but the provided value was: ${value}`,
+          });
+        }
+      }
       return null;
     } catch (err) {
       return new ValidatorError({
