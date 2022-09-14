@@ -1,31 +1,24 @@
-import {
-  BookingContactSchema,
-  BookingUnitItemSchema,
-  CapabilityId,
-} from "@octocloud/types";
-import { ApiClient } from "../../../api/ApiClient";
+import { BookingContactSchema, BookingUnitItemSchema } from "@octocloud/types";
 import { Scenario } from "../../Scenario";
 import { InvalidUnitIdErrorValidator } from "../../../../../validators/backendValidator/Error/InvalidUnitIdErrorValidator";
 import { BookingConfirmationScenarioHelper } from "../../../helpers/BookingConfirmationScenarioHelper";
+import { Config } from "../../../config/Config";
 
 export class BookingConfirmationInvalidUnitIdScenario implements Scenario<any> {
-  private apiClient: ApiClient;
+  private config = Config.getInstance();
+  private apiClient = this.config.getApiClient();
   private uuid: string;
   private unitItems: BookingUnitItemSchema[];
   private contact: BookingContactSchema;
   constructor({
-    apiClient,
     uuid,
     unitItems,
     contact,
   }: {
-    apiClient: ApiClient;
     uuid: string;
     unitItems: BookingUnitItemSchema[];
     contact: BookingContactSchema;
-    capabilities: CapabilityId[];
   }) {
-    this.apiClient = apiClient;
     this.contact = contact;
     this.unitItems = unitItems;
     this.uuid = uuid;

@@ -1,15 +1,15 @@
-import { ApiClient } from "../../../api/ApiClient";
 import { Scenario } from "../../Scenario";
 import { BookingExtendScenarioHelper } from "../../../helpers/BookingExtendScenarioHelper";
 import { InvalidBookingUUIDErrorValidator } from "../../../../../validators/backendValidator/Error/InvalidBookingUUIDErrorValidator";
+import { Config } from "../../../config/Config";
 
 export class BookingReservationExtendInvalidUUIDScenario
   implements Scenario<any>
 {
-  private apiClient: ApiClient;
+  private config = Config.getInstance();
+  private apiClient = this.config.getApiClient();
   private uuid: string;
-  constructor({ apiClient, uuid }: { apiClient: ApiClient; uuid: string }) {
-    this.apiClient = apiClient;
+  constructor({ uuid }: { uuid: string }) {
     this.uuid = uuid;
   }
   private bookingExtendScenarioHelper = new BookingExtendScenarioHelper();

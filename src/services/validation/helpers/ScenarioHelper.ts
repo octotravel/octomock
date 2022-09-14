@@ -1,5 +1,5 @@
 import * as R from "ramda";
-import { CapabilityId, DeliveryMethod } from "@octocloud/types";
+import { CapabilityId } from "@octocloud/types";
 import { STATUS_NOT_FOUND } from "../../../models/Error";
 import {
   ErrorType,
@@ -23,7 +23,6 @@ export interface ScenarioHelperData<T> {
 
 export interface ScenarioConfigData {
   capabilities?: CapabilityId[];
-  deliveryMethods?: DeliveryMethod[];
   supplierReference?: string;
   resellerReference?: string;
 }

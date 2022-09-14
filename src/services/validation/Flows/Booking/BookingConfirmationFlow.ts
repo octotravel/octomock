@@ -1,260 +1,129 @@
-// import { AvailabilityType } from "@octocloud/types";
-// import * as R from "ramda";
-// import { BadRequestError } from "../../../../models/Error";
-// import { ApiClient } from "../../ApiClient";
-// import { Config } from "../../config/Config";
-// import { BookingValidateData, ScenarioResult } from "../../Scenarios/Scenario";
-// import { BookingConfirmationScenario } from "../../Scenarios/Booking/Confirmation/BookingConfirmation";
-// import { FlowResult } from "../Flow";
-// import { BookingConfirmationUnitItemUpdateScenario } from "../../Scenarios/Booking/Confirmation/BookingConfirmationUnitItemsUpdate";
-// import { BookingConfirmationInvalidUUIDScenario } from "../../Scenarios/Booking/Confirmation/BookingConfirmationInvalidUUID";
-// import { BookingConfirmationInvalidUnitIdScenario } from "../../Scenarios/Booking/Confirmation/BookingConfirmationInvalidUnitId";
+import { BookingConfirmationScenario } from "../../Scenarios/Booking/Confirmation/BookingConfirmation";
+import { Flow, FlowResult } from "../Flow";
+import { BookingConfirmationUnitItemUpdateScenario } from "../../Scenarios/Booking/Confirmation/BookingConfirmationUnitItemsUpdate";
+import { BookingConfirmationInvalidUUIDScenario } from "../../Scenarios/Booking/Confirmation/BookingConfirmationInvalidUUID";
+import { BookingConfirmationInvalidUnitIdScenario } from "../../Scenarios/Booking/Confirmation/BookingConfirmationInvalidUnitId";
+import { BaseFlow } from "../BaseFlow";
+import { BookingUnitItemSchema, UnitType } from "@octocloud/types";
 
-// export class BookingConfirmationFlow {
-//   private config: Config;
-//   private apiClient: ApiClient;
-//   private startTimes: Nullable<BookingValidateData>;
-//   private openingHours: Nullable<BookingValidateData>;
-//   constructor({ config }: { config: Config }) {
-//     this.config = config;
-//     this.apiClient = new ApiClient({
-//       url: config.url,
-//       capabilities: config.capabilities,
-//       apiKey: this.config.apiKey,
-//     });
-//   }
+export class BookingConfirmationFlow extends BaseFlow implements Flow {
+  private apiClient = this.config.getApiClient();
+  constructor() {
+    super("Booking Confirmation");
+  }
 
-//   private fetchData = async (): Promise<void> => {
-//     await Promise.all(
-//       this.config.getProductConfigs().map(async (productConfig) => {
-//         const optionId =
-//           productConfig.optionId ??
-//           (
-//             await this.apiClient.getProduct({ id: productConfig.productId })
-//           ).response.data.body.options.find((option) => option.default).id;
-//         const availability = await this.apiClient.getAvailability({
-//           productId: productConfig.productId,
-//           optionId: optionId,
-//           localDateStart: productConfig.available.from,
-//           localDateEnd: productConfig.available.to,
-//         });
-//         if (
-//           R.isEmpty(availability.response.data.body) &&
-//           !availability.response.error
-//         ) {
-//           throw new BadRequestError("Invalid available dates!");
-//         }
-//         const product = (
-//           await this.apiClient.getProduct({
-//             id: productConfig.productId,
-//           })
-//         ).response.data.body;
+  public validate = async (): Promise<FlowResult> => {
+    const scenarios = [
+      await this.validateBookingConfirmation(),
+      await this.validateBookingConfirmationUnitItemsUpdate(),
+      await this.validateBookingInvalidUUIDError(),
+      await this.validateBookingInvalidUnitId(),
+    ];
 
-//         if (productConfig.availabilityType === AvailabilityType.START_TIME) {
-//           this.startTimes = {
-//             productId: productConfig.productId,
-//             optionId,
-//             availability: availability.response.data.body,
-//             product,
-//           };
-//         } else {
-//           this.openingHours = {
-//             productId: productConfig.productId,
-//             optionId,
-//             availability: availability.response.data.body,
-//             product,
-//           };
-//         }
-//       })
-//     );
-//   };
+    return this.validateScenarios(scenarios);
+  };
 
-//   private setFlow = (scenarios: ScenarioResult<any>[]): FlowResult => {
-//     return {
-//       name: "Booking Confirmation",
-//       success: scenarios.every((scenario) => scenario.success),
-//       totalScenarios: scenarios.length,
-//       succesScenarios: scenarios.filter((scenario) => scenario.success).length,
-//       scenarios: scenarios,
-//     };
-//   };
+  private validateBookingConfirmation =
+    async (): Promise<BookingConfirmationScenario> => {
+      const product = this.config.getProduct();
+      // TODO: get from somewhere else
+      const option = product.options[0];
 
-//   public validate = async (): Promise<FlowResult> => {
-//     await this.fetchData();
+      const unitAdult =
+        option.units.find((u) => u.type === UnitType.ADULT) ?? null;
+      if (unitAdult === null) {
+        throw Error("no adult unit");
+      }
 
-//     const scenarios = [
-//       ...(await this.validateBookingConfirmation()),
-//       ...(await this.validateBookingConfirmationUnitItemsUpdate()),
-//       await this.validateBookingInvalidUUIDError(),
-//       ...(await this.validateBookingInvalidUnitId()),
-//     ];
+      const unitItems: BookingUnitItemSchema[] = [
+        { unitId: unitAdult.id },
+        { unitId: unitAdult.id },
+      ];
+      const result = await this.apiClient.bookingReservation({
+        productId: product.id,
+        optionId: option.id,
+        availabilityId: "2022-09-14T00:00:00-04:00",
+        unitItems,
+      });
+      const booking = result.data;
+      return new BookingConfirmationScenario({
+        capabilities: this.config.getCapabilityIDs(),
+        booking,
+      });
+    };
 
-//     const results = [];
-//     for await (const scenario of scenarios) {
-//       const result = await scenario.validate();
-//       results.push(result);
-//       if (!result.success && !this.config.ignoreKill) {
-//         break;
-//       }
-//     }
-//     return this.setFlow(results);
-//   };
+  private validateBookingConfirmationUnitItemsUpdate =
+    async (): Promise<BookingConfirmationUnitItemUpdateScenario> => {
+      const product = this.config.getProduct();
+      // TODO: get from somewhere else
+      const option = product.options[0];
 
-//   private validateBookingConfirmation = async (): Promise<
-//     BookingConfirmationScenario[]
-//   > => {
-//     return Promise.all(
-//       this.config.getProductConfigs().map(async (productConfig) => {
-//         const validateData =
-//           productConfig.availabilityType === AvailabilityType.OPENING_HOURS
-//             ? this.openingHours
-//             : this.startTimes;
-//         const booking = (
-//           await this.apiClient.bookingReservation({
-//             productId: validateData.productId,
-//             optionId: validateData.optionId,
-//             availabilityId: validateData.availability[0].id,
-//             unitItems: [
-//               {
-//                 unitId: validateData.product.options.find(
-//                   (option) => option.id === validateData.optionId
-//                 ).units[0].id,
-//               },
-//               {
-//                 unitId: validateData.product.options.find(
-//                   (option) => option.id === validateData.optionId
-//                 ).units[0].id,
-//               },
-//             ],
-//           })
-//         ).response.data.body;
-//         return new BookingConfirmationScenario({
-//           apiClient: this.apiClient,
-//           uuid: booking.uuid,
-//           capabilities: this.config.capabilities,
-//           availabilityType: productConfig.availabilityType,
-//           deliveryMethods: productConfig.deliveryMethods,
-//           booking,
-//         });
-//       })
-//     );
-//   };
+      const unitAdult =
+        option.units.find((u) => u.type === UnitType.ADULT) ?? null;
+      if (unitAdult === null) {
+        throw Error("no adult unit");
+      }
 
-//   private validateBookingConfirmationUnitItemsUpdate = async (): Promise<
-//     BookingConfirmationUnitItemUpdateScenario[]
-//   > => {
-//     return Promise.all(
-//       this.config.getProductConfigs().map(async (productConfig) => {
-//         const validateData =
-//           productConfig.availabilityType === AvailabilityType.OPENING_HOURS
-//             ? this.openingHours
-//             : this.startTimes;
-//         const booking = (
-//           await this.apiClient.bookingReservation({
-//             productId: validateData.productId,
-//             optionId: validateData.optionId,
-//             availabilityId: validateData.availability[0].id,
-//             unitItems: [
-//               {
-//                 unitId: validateData.product.options.find(
-//                   (option) => option.id === validateData.optionId
-//                 ).units[0].id,
-//               },
-//               {
-//                 unitId: validateData.product.options.find(
-//                   (option) => option.id === validateData.optionId
-//                 ).units[0].id,
-//               },
-//             ],
-//           })
-//         ).response.data.body;
-//         return new BookingConfirmationUnitItemUpdateScenario({
-//           apiClient: this.apiClient,
-//           uuid: booking.uuid,
-//           capabilities: this.config.capabilities,
-//           availabilityType: productConfig.availabilityType,
-//           deliveryMethods: productConfig.deliveryMethods,
-//           unitItems: [
-//             {
-//               unitId: validateData.product.options.find(
-//                 (option) => option.id === validateData.optionId
-//               ).units[0].id,
-//             },
-//             {
-//               unitId: validateData.product.options.find(
-//                 (option) => option.id === validateData.optionId
-//               ).units[0].id,
-//             },
-//             {
-//               unitId: validateData.product.options.find(
-//                 (option) => option.id === validateData.optionId
-//               ).units[0].id,
-//             },
-//             {
-//               unitId: validateData.product.options.find(
-//                 (option) => option.id === validateData.optionId
-//               ).units[0].id,
-//             },
-//           ],
-//           booking,
-//         });
-//       })
-//     );
-//   };
+      const unitItems: BookingUnitItemSchema[] = [
+        { unitId: unitAdult.id },
+        { unitId: unitAdult.id },
+      ];
+      const result = await this.apiClient.bookingReservation({
+        productId: product.id,
+        optionId: option.id,
+        availabilityId: "2022-09-14T00:00:00-04:00",
+        unitItems,
+      });
+      const booking = result.data;
+      // todo: update units and check max units
+      return new BookingConfirmationUnitItemUpdateScenario({
+        booking: booking,
+        capabilities: this.config.getCapabilityIDs(),
+        unitItems: [...unitItems, ...unitItems],
+      });
+    };
 
-//   private validateBookingInvalidUUIDError =
-//     async (): Promise<BookingConfirmationInvalidUUIDScenario> => {
-//       return new BookingConfirmationInvalidUUIDScenario({
-//         apiClient: this.apiClient,
-//         uuid: "invalid_UUID",
-//         contact: {},
-//         capabilities: this.config.capabilities,
-//       });
-//     };
+  private validateBookingInvalidUUIDError =
+    async (): Promise<BookingConfirmationInvalidUUIDScenario> => {
+      return new BookingConfirmationInvalidUUIDScenario({
+        uuid: "invalid_UUID",
+      });
+    };
 
-//   private validateBookingInvalidUnitId = async (): Promise<
-//     BookingConfirmationInvalidUnitIdScenario[]
-//   > => {
-//     return Promise.all(
-//       this.config.getProductConfigs().map(async (productConfig) => {
-//         const validateData =
-//           productConfig.availabilityType === AvailabilityType.OPENING_HOURS
-//             ? this.openingHours
-//             : this.startTimes;
-//         const booking = (
-//           await this.apiClient.bookingReservation({
-//             productId: validateData.productId,
-//             optionId: validateData.optionId,
-//             availabilityId: validateData.availability[0].id,
-//             unitItems: [
-//               {
-//                 unitId: validateData.product.options.find(
-//                   (option) => option.id === validateData.optionId
-//                 ).units[0].id,
-//               },
-//               {
-//                 unitId: validateData.product.options.find(
-//                   (option) => option.id === validateData.optionId
-//                 ).units[0].id,
-//               },
-//             ],
-//           })
-//         ).response.data.body;
-//         return new BookingConfirmationInvalidUnitIdScenario({
-//           apiClient: this.apiClient,
-//           uuid: booking.uuid,
-//           unitItems: [
-//             {
-//               unitId: "invalid_unitId",
-//             },
-//             {
-//               unitId: "invalid_unitId",
-//             },
-//           ],
-//           contact: {},
-//           capabilities: this.config.capabilities,
-//         });
-//       })
-//     );
-//   };
-// }
+  private validateBookingInvalidUnitId =
+    async (): Promise<BookingConfirmationInvalidUnitIdScenario> => {
+      const product = this.config.getProduct();
+      // TODO: get from somewhere else
+      const option = product.options[0];
+
+      const unitAdult =
+        option.units.find((u) => u.type === UnitType.ADULT) ?? null;
+      if (unitAdult === null) {
+        throw Error("no adult unit");
+      }
+
+      const unitItems: BookingUnitItemSchema[] = [
+        { unitId: unitAdult.id },
+        { unitId: unitAdult.id },
+      ];
+      const result = await this.apiClient.bookingReservation({
+        productId: product.id,
+        optionId: option.id,
+        availabilityId: "2022-09-14T00:00:00-04:00",
+        unitItems,
+      });
+      const booking = result.data;
+      return new BookingConfirmationInvalidUnitIdScenario({
+        uuid: booking.uuid,
+        unitItems: [
+          {
+            unitId: "invalid_unitId",
+          },
+          {
+            unitId: "invalid_unitId",
+          },
+        ],
+        contact: {},
+      });
+    };
+}

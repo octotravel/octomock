@@ -12,7 +12,6 @@ export class BookingUpdateProductScenario implements Scenario<Booking> {
   private apiClient: ApiClient;
   private uuid: string;
   private capabilities: CapabilityId[];
-  private deliveryMethods: DeliveryMethod[];
   private booking: Booking;
   private productId: string;
   private optionId: string;
@@ -22,7 +21,6 @@ export class BookingUpdateProductScenario implements Scenario<Booking> {
     apiClient,
     uuid,
     capabilities,
-    deliveryMethods,
     booking,
     productId,
     optionId,
@@ -42,7 +40,6 @@ export class BookingUpdateProductScenario implements Scenario<Booking> {
     this.apiClient = apiClient;
     this.uuid = uuid;
     this.capabilities = capabilities;
-    this.deliveryMethods = deliveryMethods;
     this.booking = booking;
     this.productId = productId;
     this.optionId = optionId;
@@ -68,7 +65,6 @@ export class BookingUpdateProductScenario implements Scenario<Booking> {
       },
       {
         capabilities: this.capabilities,
-        deliveryMethods: this.deliveryMethods,
       },
       this.booking
     );

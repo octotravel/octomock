@@ -1,4 +1,5 @@
-import { Booking, BookingStatus, CapabilityId } from "@octocloud/types";
+import { ErrorType } from "./../../../validators/backendValidator/ValidatorHelpers";
+import { Booking, BookingStatus } from "@octocloud/types";
 import * as R from "ramda";
 import { BookingValidator } from "../../../validators/backendValidator/Booking/BookingValidator";
 import { ValidatorError } from "../../../validators/backendValidator/ValidatorHelpers";
@@ -11,43 +12,6 @@ import {
 
 export class BookingReservationScenarioHelper extends ScenarioHelper {
   private bookingScenarioHelper = new BookingScenarioHelper();
-
-  private getErrors = (
-    booking: any,
-    capabilities: CapabilityId[]
-  ): ValidatorError[] => {
-    return new BookingValidator({ capabilities }).validate(booking);
-  };
-
-  private reservationCheck = (
-    data: ScenarioHelperData<Booking>
-  ): ValidatorError[] => {
-    const { result } = data;
-    const unitIdCheck =
-      result.data.unitItems.length === result.data.unitItems.length
-        ? result.data.unitItems
-            .map((unitItem) => {
-              return result.data.unitItems
-                .map((item) => item.unitId)
-                .includes(unitItem.unitId);
-            })
-            .every((status) => status)
-        : false;
-    const booking = result.data;
-    return [
-      booking.notes === result.data.notes
-        ? null
-        : new ValidatorError({ message: "Notes are not matching request" }),
-      booking.status === BookingStatus.ON_HOLD
-        ? null
-        : new ValidatorError({
-            message: `Booking status should be ON_HOLD. Returned value was ${booking.status}`,
-          }),
-      unitIdCheck
-        ? null
-        : new ValidatorError({ message: "UnitIds are not matching" }),
-    ].filter(Boolean);
-  };
 
   public validateBookingReservation = (
     data: ScenarioHelperData<Booking>,
@@ -66,25 +30,64 @@ export class BookingReservationScenarioHelper extends ScenarioHelper {
       ...this.reservationCheck(data),
       ...this.bookingScenarioHelper.bookingCheck({
         newBooking: result.data,
-        // TODO: this is clearly wrong
+        // TODO: this is clearly wrong redo it
         oldBooking: result.request.body as Booking,
         configData,
       }),
     ];
 
-    if (!R.isEmpty(checkErrors)) {
-      return this.handleResult({
-        ...data,
-        success: false,
-        errors: checkErrors,
-      });
-    }
-
-    const errors = this.getErrors(result.data, configData.capabilities);
+    const errors = new BookingValidator({
+      capabilities: configData.capabilities,
+    }).validate(result.data);
     return this.handleResult({
       ...data,
-      success: R.isEmpty(errors),
+      success: R.isEmpty([...checkErrors, ...errors]),
       errors,
     });
+  };
+
+  private reservationCheck = (
+    data: ScenarioHelperData<Booking>
+  ): ValidatorError[] => {
+    const { result } = data;
+    const booking = result.data;
+    const request = result.request;
+
+    // TODO: this should be checked in general check, not in reservation one
+    const unitIdCheck =
+      booking.unitItems.length === request.body.unitItems.length
+        ? result.data.unitItems
+            .map((unitItem) => {
+              return booking.unitItems
+                .map((item) => item.unitId)
+                .includes(unitItem.unitId);
+            })
+            .every((status) => status)
+        : false;
+
+    const errors = new Array<ValidatorError>();
+
+    if (booking.notes !== request.body.notes) {
+      errors.push(
+        new ValidatorError({ message: "Notes are not matching request" })
+      );
+    }
+    if (booking.status !== BookingStatus.ON_HOLD) {
+      errors.push(
+        new ValidatorError({
+          message: `Booking status should be ON_HOLD. Returned value was ${booking.status}`,
+          type: ErrorType.CRITICAL,
+        })
+      );
+    }
+    if (!unitIdCheck) {
+      errors.push(
+        new ValidatorError({
+          message: "UnitIds are not matching",
+          type: ErrorType.CRITICAL,
+        })
+      );
+    }
+    return errors;
   };
 }

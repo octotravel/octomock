@@ -82,17 +82,10 @@ export class BookingListScenarioHelper extends ScenarioHelper {
       });
     }
     const checkErrors = [...this.listCheck(result.data, configData)];
-    if (!R.isEmpty(checkErrors)) {
-      return this.handleResult({
-        ...data,
-        success: false,
-        errors: checkErrors,
-      });
-    }
     const errors = this.getErrors(result.data, configData.capabilities);
     return this.handleResult({
       ...data,
-      success: R.isEmpty(errors),
+      success: R.isEmpty([...checkErrors, ...errors]),
       errors,
     });
   };

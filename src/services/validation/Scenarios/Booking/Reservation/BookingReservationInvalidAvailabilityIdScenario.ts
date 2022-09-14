@@ -1,33 +1,30 @@
-import { BookingUnitItemSchema, CapabilityId } from "@octocloud/types";
-import { ApiClient } from "../../../api/ApiClient";
+import { UnprocessableEntityErrorValidator } from "./../../../../../validators/backendValidator/Error/UnprocessableEntityErrorValidator";
+import { BookingUnitItemSchema, Product } from "@octocloud/types";
 import { Scenario } from "../../Scenario";
-import { InvalidAvailabilityIdErrorValidator } from "../../../../../validators/backendValidator/Error/InvalidAvailabilityIdErrorValidator";
 import { BookingReservationScenarioHelper } from "../../../helpers/BookingReservationScenarioHelper";
+import { Config } from "../../../config/Config";
 
 export class BookingReservationInvalidAvailabilityIdScenario
   implements Scenario<any>
 {
-  private apiClient: ApiClient;
-  private productId: string;
+  private config = Config.getInstance();
+  private apiClient = this.config.getApiClient();
+  private product: Product;
   private optionId: string;
   private availabilityId: string;
   private unitItems: BookingUnitItemSchema[];
   constructor({
-    apiClient,
-    productId,
+    product,
     optionId,
     availabilityId,
     unitItems,
   }: {
-    apiClient: ApiClient;
-    productId: string;
+    product: Product;
     optionId: string;
     availabilityId: string;
     unitItems: BookingUnitItemSchema[];
-    capabilities: CapabilityId[];
   }) {
-    this.apiClient = apiClient;
-    this.productId = productId;
+    this.product = product;
     this.optionId = optionId;
     this.availabilityId = availabilityId;
     this.unitItems = unitItems;
@@ -37,15 +34,15 @@ export class BookingReservationInvalidAvailabilityIdScenario
 
   public validate = async () => {
     const result = await this.apiClient.bookingReservation({
-      productId: this.productId,
+      productId: this.product.id,
       optionId: this.optionId,
       availabilityId: this.availabilityId,
       unitItems: this.unitItems,
     });
 
     const name =
-      "Booking Reservation Invalid Availability ID (400 INVALID_AVAILABILITY_ID)";
-    const error = "Response should be INVALID_AVAILABILITY_ID";
+      "Booking Reservation Invalid Availability ID (400 UNPROCESSABLE_ENTITY)";
+    const error = "Response should be UNPROCESSABLE_ENTITY";
 
     return this.bookingReservationScenarioHelper.validateError(
       {
@@ -53,7 +50,7 @@ export class BookingReservationInvalidAvailabilityIdScenario
         name,
       },
       error,
-      new InvalidAvailabilityIdErrorValidator()
+      new UnprocessableEntityErrorValidator()
     );
   };
 }

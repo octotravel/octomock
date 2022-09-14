@@ -1,4 +1,3 @@
-import { Config } from "../../config/Config";
 import { Scenario, ScenarioResult } from "../../Scenarios/Scenario";
 import { Flow, FlowResult } from "../Flow";
 import { AvailabilityCalendarIntervalScenario } from "../../Scenarios/AvailabilityCalendar/AvailabilityCalendarInterval";
@@ -8,7 +7,6 @@ import { AvailabilityCalendarBadRequestScenario } from "../../Scenarios/Availabi
 import { BaseFlow } from "../BaseFlow";
 
 export class AvailabilityCalendarFlow extends BaseFlow implements Flow {
-  private config = Config.getInstance();
   constructor() {
     super("Availability Calendar");
   }

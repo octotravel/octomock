@@ -7,13 +7,11 @@ export class BookingCancellationBookingScenario implements Scenario<Booking> {
   private apiClient: ApiClient;
   private uuid: string;
   private capabilities: CapabilityId[];
-  private deliveryMethods: DeliveryMethod[];
   private booking: Booking;
   constructor({
     apiClient,
     uuid,
     capabilities,
-    deliveryMethods,
     booking,
   }: {
     apiClient: ApiClient;
@@ -25,7 +23,6 @@ export class BookingCancellationBookingScenario implements Scenario<Booking> {
     this.apiClient = apiClient;
     this.uuid = uuid;
     this.capabilities = capabilities;
-    this.deliveryMethods = deliveryMethods;
     this.booking = booking;
   }
   private bookingCancellationScenarioHelper =
@@ -45,7 +42,6 @@ export class BookingCancellationBookingScenario implements Scenario<Booking> {
       },
       {
         capabilities: this.capabilities,
-        deliveryMethods: this.deliveryMethods,
       },
       this.booking
     );
