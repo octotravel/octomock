@@ -21,44 +21,52 @@ export class BookingScenarioHelper {
             .every((status) => status)
         : false;
 
-    let errors = [
-      deliveryMethodsMatch
-        ? null
-        : new ValidatorError({
-            message: "DeliveryMethods are not matching provided ones",
-          }),
+    const errors = new Array<ValidatorError>();
+
+    if (!deliveryMethodsMatch) {
+      errors.push(
+        new ValidatorError({
+          message: "DeliveryMethods are not matching provided ones",
+        })
+      );
+    }
+
+    const voucherIsMissing = !(
       data.newBooking.voucher &&
       data.configData.deliveryMethods.includes(DeliveryMethod.VOUCHER)
-        ? null
-        : new ValidatorError({ message: "Voucher is missing" }),
-    ];
+    );
+    if (voucherIsMissing) {
+      errors.push(new ValidatorError({ message: "Voucher is missing" }));
+    }
 
     if (!data.rebooked) {
-      errors = [
-        ...errors,
-        data.newBooking.productId === data.oldBooking.productId
-          ? null
-          : new ValidatorError({
-              message: "ProductId is not matching request",
-            }),
-        data.newBooking.optionId === data.oldBooking.optionId
-          ? null
-          : new ValidatorError({ message: "OptionId is not matching request" }),
-      ];
+      if (data.newBooking.productId !== data.oldBooking.productId) {
+        errors.push(
+          new ValidatorError({
+            message: "ProductId is not matching request",
+          })
+        );
+      }
+
+      if (data.newBooking.optionId !== data.oldBooking.optionId) {
+        errors.push(
+          new ValidatorError({ message: "OptionId is not matching request" })
+        );
+      }
     }
 
     if (data.configData.deliveryMethods.includes(DeliveryMethod.TICKET)) {
-      const ticketCheck =
-        data.newBooking.unitItems.map((unitItem) => unitItem.ticket).length ===
+      const ticketsMissing =
+        data.newBooking.unitItems.map((unitItem) => unitItem.ticket).length !==
         data.newBooking.unitItems.length;
-      errors = [
-        ...errors,
-        ticketCheck
-          ? null
-          : new ValidatorError({ message: "Some/all tickets are missing" }),
-      ];
+
+      if (ticketsMissing) {
+        errors.push(
+          new ValidatorError({ message: "Some/all tickets are missing" })
+        );
+      }
     }
 
-    return errors.filter(Boolean);
+    return errors;
   };
 }

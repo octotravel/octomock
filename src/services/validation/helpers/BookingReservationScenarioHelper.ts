@@ -1,3 +1,4 @@
+import { ErrorType } from "./../../../validators/backendValidator/ValidatorHelpers";
 import { Booking, BookingStatus, CapabilityId } from "@octocloud/types";
 import * as R from "ramda";
 import { BookingValidator } from "../../../validators/backendValidator/Booking/BookingValidator";
@@ -12,8 +13,8 @@ import {
 export class BookingReservationScenarioHelper extends ScenarioHelper {
   private bookingScenarioHelper = new BookingScenarioHelper();
 
-  private getErrors = (
-    booking: any,
+  private validateBooking = (
+    booking: Booking,
     capabilities: CapabilityId[]
   ): ValidatorError[] => {
     return new BookingValidator({ capabilities }).validate(booking);
@@ -34,19 +35,31 @@ export class BookingReservationScenarioHelper extends ScenarioHelper {
             .every((status) => status)
         : false;
     const booking = result.data;
-    return [
-      booking.notes === result.data.notes
-        ? null
-        : new ValidatorError({ message: "Notes are not matching request" }),
-      booking.status === BookingStatus.ON_HOLD
-        ? null
-        : new ValidatorError({
-            message: `Booking status should be ON_HOLD. Returned value was ${booking.status}`,
-          }),
-      unitIdCheck
-        ? null
-        : new ValidatorError({ message: "UnitIds are not matching" }),
-    ].filter(Boolean);
+
+    const errors = new Array<ValidatorError>();
+
+    if (booking.notes === result.data.notes) {
+      errors.push(
+        new ValidatorError({ message: "Notes are not matching request" })
+      );
+    }
+    if (booking.status === BookingStatus.ON_HOLD) {
+      errors.push(
+        new ValidatorError({
+          message: `Booking status should be ON_HOLD. Returned value was ${booking.status}`,
+          type: ErrorType.CRITICAL,
+        })
+      );
+    }
+    if (unitIdCheck) {
+      errors.push(
+        new ValidatorError({
+          message: "UnitIds are not matching",
+          type: ErrorType.CRITICAL,
+        })
+      );
+    }
+    return errors;
   };
 
   public validateBookingReservation = (
@@ -80,7 +93,7 @@ export class BookingReservationScenarioHelper extends ScenarioHelper {
       });
     }
 
-    const errors = this.getErrors(result.data, configData.capabilities);
+    const errors = this.validateBooking(result.data, configData.capabilities);
     return this.handleResult({
       ...data,
       success: R.isEmpty(errors),
