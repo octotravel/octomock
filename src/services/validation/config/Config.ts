@@ -57,7 +57,7 @@ export class Config implements IConfig {
     this.invalidProductId = "invalidProductId";
     this.invalidOptionId = "invalidOptionId";
 
-    this.ignoreKill = false;
+    this.ignoreKill = true;
   }
 
   public static getInstance = (): Config => {

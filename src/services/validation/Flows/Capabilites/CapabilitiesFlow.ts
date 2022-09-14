@@ -9,8 +9,6 @@ export class CapabilitiesFlow extends BaseFlow implements Flow {
 
   public validate = async (): Promise<FlowResult> => {
     const scenario = new GetCapabilitiesScenario();
-    const result = await scenario.validate();
-
-    return this.getFlowResult([result]);
+    return this.validateScenarios([scenario]);
   };
 }
