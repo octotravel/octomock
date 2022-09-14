@@ -1,49 +1,32 @@
-import { Availability } from "@octocloud/types";
-import { ApiClient } from "../../api/ApiClient";
+import { Availability, AvailabilityType } from "@octocloud/types";
 import { Scenario } from "../Scenario";
 import { AvailabilityScenarioHelper } from "../../helpers/AvailabilityScenarioHelper";
+import { Config } from "../../config/Config";
 
 export class AvailabilityCheckAvailabilityIdScenario
   implements Scenario<Availability[]>
 {
-  private apiClient: ApiClient;
-  private productId: string;
-  private optionId: string;
-  private availabilityIds: string[];
-  private availabilityType: string;
-  constructor({
-    apiClient,
-    productId,
-    optionId,
-    availabilityIds,
-    availabilityType,
-  }: {
-    apiClient: ApiClient;
-    productId: string;
-    optionId: string;
-    availabilityIds: string[];
-    availabilityType: string;
-  }) {
-    this.apiClient = apiClient;
-    this.productId = productId;
-    this.optionId = optionId;
-    this.availabilityIds = availabilityIds;
-    this.availabilityType = availabilityType;
-  }
+  private config = Config.getInstance();
+  private apiClient = this.config.getApiClient();
   private availabilityScenarioHelper = new AvailabilityScenarioHelper();
 
   public validate = async () => {
     const result = await this.apiClient.getAvailability({
-      productId: this.productId,
-      optionId: this.optionId,
-      availabilityIds: this.availabilityIds,
+      productId:
+        this.config.getStartTimeProducts().availabilityAvailable.productId,
+      optionId:
+        this.config.getStartTimeProducts().availabilityAvailable.optionId,
+      availabilityIds: [
+        this.config.getStartTimeProducts().availabilityAvailable.availabilityId,
+      ],
     });
 
-    const name = `Availability Check AvailabilityId (${this.availabilityType})`;
+    const name = `Availability Check AvailabilityId (${AvailabilityType.START_TIME})`;
 
-    return this.availabilityScenarioHelper.validateUnavailability({
+    return this.availabilityScenarioHelper.validateAvailability({
       name,
       result,
+      availabilityType: AvailabilityType.START_TIME,
     });
   };
 }

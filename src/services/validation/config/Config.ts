@@ -1,4 +1,6 @@
 import {
+  Availability,
+  AvailabilityStatus,
   AvailabilityType,
   Capability,
   CapabilityId,
@@ -17,6 +19,7 @@ interface IConfig {
   setCapabilities(capabilities: Capability[]): ValidatorError[];
   getCapabilityIDs(): CapabilityId[];
   setProducts(products: Product[]): ValidatorError[];
+  setAvailability(availability: Availability, product: Product);
   getProduct(): Product;
   getStartTimeProducts(): ProductValidatorData;
   getOpeningHoursProducts(): ProductValidatorData;
@@ -122,7 +125,53 @@ export class Config implements IConfig {
     ].filter(Boolean);
   };
 
-  public getProduct = (): Product => {
+  public setAvailability = (availability: Availability, product: Product) => {
+    if (product.availabilityType === AvailabilityType.START_TIME) {
+      if (
+        availability.status === AvailabilityStatus.AVAILABLE ||
+        availability.status === AvailabilityStatus.FREESALE
+      ) {
+        this.startTimesProducts.availabilityAvailable = {
+          productId: product.id,
+          optionId: product.options[0].id,
+          availabilityId: availability.id,
+        };
+      }
+      if (availability.status === AvailabilityStatus.SOLD_OUT) {
+        this.startTimesProducts.availabilitySoldOut = {
+          productId: product.id,
+          optionId: product.options[0].id,
+          availabilityId: availability.id,
+        };
+      }
+    }
+    if (product.availabilityType === AvailabilityType.OPENING_HOURS) {
+      if (
+        availability.status === AvailabilityStatus.AVAILABLE ||
+        availability.status === AvailabilityStatus.FREESALE
+      ) {
+        this.openingHoursProducts.availabilityAvailable = {
+          productId: product.id,
+          optionId: product.options[0].id,
+          availabilityId: availability.id,
+        };
+      }
+      if (availability.status === AvailabilityStatus.SOLD_OUT) {
+        this.openingHoursProducts.availabilitySoldOut = {
+          productId: product.id,
+          optionId: product.options[0].id,
+          availabilityId: availability.id,
+        };
+      }
+    }
+  };
+
+  public getProduct = (availabilityType?: AvailabilityType): Product => {
+    if (availabilityType) {
+      if (availabilityType === AvailabilityType.START_TIME) {
+        return this.startTimesProducts.products[0];
+      }
+    }
     return !R.isEmpty(this.startTimesProducts.products)
       ? this.startTimesProducts.products[0]
       : this.openingHoursProducts.products[0];

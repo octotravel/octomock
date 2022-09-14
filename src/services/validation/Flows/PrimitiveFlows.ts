@@ -19,8 +19,8 @@ export class PrimiteFlows {
     const flows: Flow[] = [
       new SupplierFlow(),
       new ProductFlow(),
-      new AvailabilityFlow(),
       new AvailabilityCalendarFlow(),
+      new AvailabilityFlow(),
       // new BookingReservationFlow({ config }),
       // new BookingExtendFlow({ config }),
       // new BookingConfirmationFlow({ config }),
