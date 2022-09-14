@@ -1,4 +1,4 @@
-import { Booking, BookingStatus, CapabilityId } from "@octocloud/types";
+import { Booking, BookingStatus } from "@octocloud/types";
 import * as R from "ramda";
 import { BookingValidator } from "../../../validators/backendValidator/Booking/BookingValidator";
 import { ValidatorError } from "../../../validators/backendValidator/ValidatorHelpers";
@@ -11,13 +11,6 @@ import {
 
 export class BookingCancellationScenarioHelper extends ScenarioHelper {
   private bookingScenarioHelper = new BookingScenarioHelper();
-
-  private getErrors = (
-    booking: any,
-    capabilities: CapabilityId[]
-  ): ValidatorError[] => {
-    return new BookingValidator({ capabilities }).validate(booking);
-  };
 
   private cancellationCheck = (
     data: ScenarioHelperData<Booking>,
@@ -77,18 +70,12 @@ export class BookingCancellationScenarioHelper extends ScenarioHelper {
       }),
     ];
 
-    if (!R.isEmpty(checkErrors)) {
-      return this.handleResult({
-        ...data,
-        success: false,
-        errors: checkErrors,
-      });
-    }
-
-    const errors = this.getErrors(result.data, configData.capabilities);
+    const errors = new BookingValidator({
+      capabilities: configData.capabilities,
+    }).validate(result.data);
     return this.handleResult({
       ...data,
-      success: R.isEmpty(errors),
+      success: R.isEmpty([...checkErrors, ...errors]),
       errors,
     });
   };

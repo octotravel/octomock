@@ -5,7 +5,7 @@ import { ProductFlow } from "./Product/ProductFlow";
 import { AvailabilityFlow } from "./Availability/AvailabilityFlow";
 import { AvailabilityCalendarFlow } from "./Availability/AvailabilityCalendarFlow";
 import { BookingReservationFlow } from "./Booking/BookingReservationFlow";
-// import { BookingExtendFlow } from "./Booking/BookingExtendFlow";
+import { BookingExtendFlow } from "./Booking/BookingExtendFlow";
 // import { BookingConfirmationFlow } from "./Booking/BookingConfirmationFlow";
 // import { BookingUpdateFlow } from "./Booking/BookingUpdateFlow";
 // import { BookingCancellationFlow } from "./Booking/BookingCancellationFlow";
@@ -22,7 +22,7 @@ export class PrimiteFlows {
       new AvailabilityFlow(),
       new AvailabilityCalendarFlow(),
       new BookingReservationFlow(),
-      // new BookingExtendFlow({ config }),
+      new BookingExtendFlow(),
       // new BookingConfirmationFlow({ config }),
       // new BookingUpdateFlow({ config }),
       // new BookingCancellationFlow({ config }),

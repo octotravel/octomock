@@ -1,5 +1,5 @@
 import { ErrorType } from "./../../../validators/backendValidator/ValidatorHelpers";
-import { Booking, BookingStatus, CapabilityId } from "@octocloud/types";
+import { Booking, BookingStatus } from "@octocloud/types";
 import * as R from "ramda";
 import { BookingValidator } from "../../../validators/backendValidator/Booking/BookingValidator";
 import { ValidatorError } from "../../../validators/backendValidator/ValidatorHelpers";
@@ -13,32 +13,61 @@ import {
 export class BookingReservationScenarioHelper extends ScenarioHelper {
   private bookingScenarioHelper = new BookingScenarioHelper();
 
-  private validateBooking = (
-    booking: Booking,
-    capabilities: CapabilityId[]
-  ): ValidatorError[] => {
-    return new BookingValidator({ capabilities }).validate(booking);
+  public validateBookingReservation = (
+    data: ScenarioHelperData<Booking>,
+    configData: ScenarioConfigData
+  ) => {
+    const { result } = data;
+    if (result.response.error) {
+      return this.handleResult({
+        ...data,
+        success: false,
+        errors: [],
+      });
+    }
+
+    const checkErrors = [
+      ...this.reservationCheck(data),
+      ...this.bookingScenarioHelper.bookingCheck({
+        newBooking: result.data,
+        // TODO: this is clearly wrong redo it
+        oldBooking: result.request.body as Booking,
+        configData,
+      }),
+    ];
+
+    const errors = new BookingValidator({
+      capabilities: configData.capabilities,
+    }).validate(result.data);
+    return this.handleResult({
+      ...data,
+      success: R.isEmpty([...checkErrors, ...errors]),
+      errors,
+    });
   };
 
   private reservationCheck = (
     data: ScenarioHelperData<Booking>
   ): ValidatorError[] => {
     const { result } = data;
+    const booking = result.data;
+    const request = result.request;
+
+    // TODO: this should be checked in general check, not in reservation one
     const unitIdCheck =
-      result.data.unitItems.length === result.data.unitItems.length
+      booking.unitItems.length === request.body.unitItems.length
         ? result.data.unitItems
             .map((unitItem) => {
-              return result.data.unitItems
+              return booking.unitItems
                 .map((item) => item.unitId)
                 .includes(unitItem.unitId);
             })
             .every((status) => status)
         : false;
-    const booking = result.data;
 
     const errors = new Array<ValidatorError>();
 
-    if (booking.notes !== result.data.notes) {
+    if (booking.notes !== request.body.notes) {
       errors.push(
         new ValidatorError({ message: "Notes are not matching request" })
       );
@@ -60,44 +89,5 @@ export class BookingReservationScenarioHelper extends ScenarioHelper {
       );
     }
     return errors;
-  };
-
-  public validateBookingReservation = (
-    data: ScenarioHelperData<Booking>,
-    configData: ScenarioConfigData
-  ) => {
-    const { result } = data;
-    if (result.response.error) {
-      return this.handleResult({
-        ...data,
-        success: false,
-        errors: [],
-      });
-    }
-
-    const checkErrors = [
-      ...this.reservationCheck(data),
-      ...this.bookingScenarioHelper.bookingCheck({
-        newBooking: result.data,
-        // TODO: this is clearly wrong
-        oldBooking: result.request.body as Booking,
-        configData,
-      }),
-    ];
-
-    if (!R.isEmpty(checkErrors)) {
-      return this.handleResult({
-        ...data,
-        success: false,
-        errors: checkErrors,
-      });
-    }
-
-    const errors = this.validateBooking(result.data, configData.capabilities);
-    return this.handleResult({
-      ...data,
-      success: R.isEmpty(errors),
-      errors,
-    });
   };
 }
