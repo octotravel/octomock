@@ -7,6 +7,7 @@ export interface Scenario<T> {
 export interface ScenarioRequest {
   url: string;
   body: Nullable<any>;
+  headers: Record<string, string>;
 }
 
 export interface ScenarioResponse<T> {
@@ -15,13 +16,14 @@ export interface ScenarioResponse<T> {
   error: Nullable<{
     body: any;
   }>;
+  headers: Record<string, string>;
 }
 
 export interface ScenarioResult<T> {
   name: string;
   success: boolean;
-  request: ScenarioRequest;
-  response: ScenarioResponse<T>;
+  request: Nullable<ScenarioRequest>;
+  response: Nullable<ScenarioResponse<T>>;
   errors: any[]; // validation errors
 }
 

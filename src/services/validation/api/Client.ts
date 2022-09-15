@@ -24,15 +24,16 @@ export class Client {
   protected fetch = async <T>(data: FetchData): Promise<Result<T>> => {
     const { url, method = "GET", body } = data;
     console.log(`${new Date().toISOString()} | ${method}: ${url}`);
+    const headers = this.createHeaders();
     const init: RequestInit = {
       method: method,
-      headers: this.createHeaders(),
+      headers,
     };
     if (body) {
       init.body = body;
     }
     const res = await fetch(url, init);
-    return this.setResponse({ url, body: body ?? null }, res);
+    return this.setResponse({ url, body: body ?? null, headers }, res);
   };
 
   private createHeaders = (): Record<string, string> => {
@@ -46,20 +47,27 @@ export class Client {
   };
 
   protected setResponse = async <T>(
-    request: { url: string; body: Nullable<string> },
+    request: {
+      url: string;
+      body: Nullable<string>;
+      headers: Record<string, string>;
+    },
     response: Response
   ): Promise<Result<T>> => {
     const status = response.status;
     const requestBody = this.parseBody(request.body);
     const { data } = await this.parseResponse<T>(response);
+    const resHeaders = this.transformHeaders(response.headers);
     if (status === 200) {
       return {
         data,
         request: {
           url: request.url,
           body: requestBody,
+          headers: request.headers,
         },
         response: {
+          headers: resHeaders,
           data: {
             status,
             body: data,
@@ -74,9 +82,11 @@ export class Client {
         request: {
           url: request.url,
           body: requestBody,
+          headers: request.headers,
         },
         response: {
           data: null,
+          headers: resHeaders,
           error: {
             status: response.status,
             body: data as Record<string, unknown>,
@@ -89,8 +99,10 @@ export class Client {
         request: {
           url: request.url,
           body: requestBody,
+          headers: request.headers,
         },
         response: {
+          headers: resHeaders,
           data: null,
           error: {
             status: response.status,
@@ -124,5 +136,13 @@ export class Client {
       const text = await response.text();
       return { data: null, text, error: new Error("invalid response format") };
     }
+  };
+
+  private transformHeaders = (headers: Headers): { [key: string]: string } => {
+    const obj: { [key: string]: string } = {};
+    headers.forEach((value, key) => {
+      obj[key] = value;
+    });
+    return obj;
   };
 }

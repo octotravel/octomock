@@ -39,7 +39,7 @@ export class AvailabilityCheckStatusScenario implements Scenario<any> {
         };
       })
     );
-
+    console.log("fap");
     const openingHours = await Promise.all(
       openingHoursProducst.map(async (product) => {
         const optionId =

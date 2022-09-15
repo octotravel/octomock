@@ -12,6 +12,7 @@ export type Result<T> = {
 export type ResultRequest = {
   url: string;
   body: Nullable<Record<string, any>>;
+  headers: Record<string, string>;
 };
 export type ResultResponse<T> = {
   data: Nullable<{
@@ -19,4 +20,5 @@ export type ResultResponse<T> = {
     body: T;
   }>;
   error: Nullable<ValidatedError>;
+  headers: Record<string, string>;
 };

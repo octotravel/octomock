@@ -4,11 +4,12 @@ import { BookingReservationInvalidProductScenario } from "../../Scenarios/Bookin
 import { BookingReservationInvalidOptionScenario } from "../../Scenarios/Booking/Reservation/BookingReservationInvalidOptionScenario";
 import { BookingReservationInvalidAvailabilityIdScenario } from "../../Scenarios/Booking/Reservation/BookingReservationInvalidAvailabilityIdScenario";
 import { BaseFlow } from "../BaseFlow";
-import { BookingUnitItemSchema, Product, UnitType } from "@octocloud/types";
 import { BookingReservationSoldOutScenario } from "../../Scenarios/Booking/Reservation/BookingReservationSoldOutScenario";
 import { BookingReservationMissingUnitItemsScenario } from "../../Scenarios/Booking/Reservation/BookingReservationMissingUnitItemsScenario";
 import { BookingReservationEmptyUnitItemsScenario } from "../../Scenarios/Booking/Reservation/BookingReservationEmptyUnitItemsScenario";
 import { BookingReservationInvalidUnitIdScenario } from "../../Scenarios/Booking/Reservation/BookingReservationInvalidUnitIdScenario";
+import { Scenario } from "../../Scenarios/Scenario";
+import { ErrorScenario } from "../../Scenarios/ErrorScenario";
 
 export class BookingReservationFlow extends BaseFlow implements Flow {
   constructor() {
@@ -29,185 +30,128 @@ export class BookingReservationFlow extends BaseFlow implements Flow {
     return this.validateScenarios(scenarios);
   };
 
-  private reserveAvailableProduct =
-    async (): Promise<BookingReservationScenario> => {
-      const product = this.config.getProduct();
-      // TODO: get from somewhere else
-      const option = product.options[0];
+  private reserveAvailableProduct = async (): Promise<Scenario<unknown>> => {
+    const { data, error } = this.config.getBookingProduct();
+    const product = data;
+    if (data === null) {
+      return new ErrorScenario([error]);
+    }
 
-      const unitAdult =
-        option.units.find((u) => u.type === UnitType.ADULT) ?? null;
-      if (unitAdult === null) {
-        throw Error("no adult unit");
-      }
-
-      const unitItems: BookingUnitItemSchema[] = [
-        { unitId: unitAdult.id },
-        { unitId: unitAdult.id },
-      ];
-
-      const bookingData = {
-        product: product,
-        optionId: option.id,
-        availabilityId: "2022-10-14T00:00:00-04:00",
-        unitItems,
-        notes: "Test note",
-      };
-      return new BookingReservationScenario(bookingData);
+    const bookingData = {
+      productId: product.product.id,
+      optionId: product.getOption().id,
+      availabilityId: product.getAvailabilityIDAvailable()[0],
+      unitItems: product.getValidUnitItems(),
+      notes: "Test note",
     };
+    return new BookingReservationScenario(bookingData);
+  };
 
-  private reserveSoldOutProduct =
-    async (): Promise<BookingReservationSoldOutScenario> => {
-      const product = this.config.getProduct();
-      // TODO: get from somewhere else
-      const option = product.options[0];
+  private reserveSoldOutProduct = async (): Promise<Scenario<unknown>> => {
+    const { data, error } = this.config.getBookingProduct();
+    const product = data;
+    if (data === null) {
+      throw error;
+    }
 
-      const unitAdult =
-        option.units.find((u) => u.type === UnitType.ADULT) ?? null;
-      if (unitAdult === null) {
-        throw Error("no adult unit");
-      }
-
-      const unitItems: BookingUnitItemSchema[] = [
-        { unitId: unitAdult.id },
-        { unitId: unitAdult.id },
-      ];
-
-      const bookingData = {
-        product: product,
-        optionId: option.id,
-        availabilityId: "2022-09-15T00:00:00-04:00",
-        unitItems,
-      };
-      return new BookingReservationSoldOutScenario(bookingData);
+    const bookingData = {
+      productId: product.product.id,
+      optionId: product.getOption().id,
+      availabilityId: product.getAvailabilityIDSoldOut(),
+      unitItems: product.getValidUnitItems(),
+      notes: "Test note",
     };
+    return new BookingReservationSoldOutScenario(bookingData);
+  };
 
-  private reserveInvalidProduct =
-    async (): Promise<BookingReservationInvalidProductScenario> => {
-      const product = this.config.getProduct();
-      // TODO: get from somewhere else
-      const option = product.options[0];
+  private reserveInvalidProduct = async (): Promise<Scenario<unknown>> => {
+    const { data, error } = this.config.getBookingProduct();
+    const product = data;
+    if (data === null) {
+      throw error;
+    }
+    return new BookingReservationInvalidProductScenario({
+      productId: this.config.invalidProductId,
+      optionId: product.getOption().id,
+      availabilityId: product.getAvailabilityIDAvailable()[0],
+      unitItems: product.getValidUnitItems(),
+    });
+  };
 
-      const unitAdult =
-        option.units.find((u) => u.type === UnitType.ADULT) ?? null;
-      if (unitAdult === null) {
-        throw Error("no adult unit");
-      }
+  private reserveInvalidOption = async (): Promise<Scenario<unknown>> => {
+    const { data, error } = this.config.getBookingProduct();
+    const product = data;
+    if (data === null) {
+      throw error;
+    }
+    return new BookingReservationInvalidOptionScenario({
+      productId: product.product.id,
+      optionId: this.config.invalidOptionId,
+      availabilityId: product.getAvailabilityIDAvailable()[0],
+      unitItems: product.getValidUnitItems(),
+    });
+  };
 
-      const unitItems: BookingUnitItemSchema[] = [
-        { unitId: unitAdult.id },
-        { unitId: unitAdult.id },
-      ];
-      return new BookingReservationInvalidProductScenario({
-        product: { id: "invalid_product_id" } as Product,
-        optionId: option.id,
-        availabilityId: "2022-10-14T00:00:00-04:00",
-        unitItems,
-      });
+  private reserveInvalidAvailabilityID = async (): Promise<
+    Scenario<unknown>
+  > => {
+    const { data, error } = this.config.getBookingProduct();
+    const product = data;
+    if (data === null) {
+      throw error;
+    }
+    return new BookingReservationInvalidAvailabilityIdScenario({
+      productId: product.product.id,
+      optionId: product.getOption().id,
+      availabilityId: "invalidAvailabilityId",
+      unitItems: product.getValidUnitItems(),
+    });
+  };
+
+  private reserveWithMissingUnitItems = async (): Promise<
+    Scenario<unknown>
+  > => {
+    const { data, error } = this.config.getBookingProduct();
+    const product = data;
+    if (data === null) {
+      throw error;
+    }
+    return new BookingReservationMissingUnitItemsScenario({
+      productId: product.product.id,
+      optionId: product.getOption().id,
+      availabilityId: product.getAvailabilityIDAvailable()[0],
+    });
+  };
+
+  private reserveWithEmptyUnitItems = async (): Promise<Scenario<unknown>> => {
+    const { data, error } = this.config.getBookingProduct();
+    const product = data;
+    if (data === null) {
+      throw error;
+    }
+    const bookingData = {
+      productId: product.product.id,
+      optionId: product.getOption().id,
+      availabilityId: product.getAvailabilityIDAvailable()[0],
+      unitItems: [],
     };
+    return new BookingReservationEmptyUnitItemsScenario(bookingData);
+  };
 
-  private reserveInvalidOption =
-    async (): Promise<BookingReservationInvalidOptionScenario> => {
-      const product = this.config.getProduct();
-      // TODO: get from somewhere else
-      const option = product.options[0];
+  private validateBookingInvalidUnitId = async (): Promise<
+    Scenario<unknown>
+  > => {
+    const { data, error } = this.config.getBookingProduct();
+    const product = data;
+    if (data === null) {
+      throw error;
+    }
 
-      const unitAdult =
-        option.units.find((u) => u.type === UnitType.ADULT) ?? null;
-      if (unitAdult === null) {
-        throw Error("no adult unit");
-      }
-
-      const unitItems: BookingUnitItemSchema[] = [
-        { unitId: unitAdult.id },
-        { unitId: unitAdult.id },
-      ];
-      return new BookingReservationInvalidOptionScenario({
-        product: product,
-        optionId: "invalid_optionId",
-        availabilityId: "2022-10-14T00:00:00-04:00",
-        unitItems,
-      });
-    };
-
-  private reserveInvalidAvailabilityID =
-    async (): Promise<BookingReservationInvalidAvailabilityIdScenario> => {
-      const product = this.config.getProduct();
-      // TODO: get from somewhere else
-      const option = product.options[0];
-
-      const unitAdult =
-        option.units.find((u) => u.type === UnitType.ADULT) ?? null;
-      if (unitAdult === null) {
-        throw Error("no adult unit");
-      }
-
-      const unitItems: BookingUnitItemSchema[] = [
-        { unitId: unitAdult.id },
-        { unitId: unitAdult.id },
-      ];
-
-      const bookingData = {
-        product: product,
-        optionId: option.id,
-        availabilityId: "2022-09-15T00:00:00-04:00",
-        unitItems,
-      };
-      return new BookingReservationInvalidAvailabilityIdScenario(bookingData);
-    };
-
-  private reserveWithMissingUnitItems =
-    async (): Promise<BookingReservationMissingUnitItemsScenario> => {
-      const product = this.config.getProduct();
-      // TODO: get from somewhere else
-      const option = product.options[0];
-
-      const unitAdult =
-        option.units.find((u) => u.type === UnitType.ADULT) ?? null;
-      if (unitAdult === null) {
-        throw Error("no adult unit");
-      }
-
-      const bookingData = {
-        product: product,
-        optionId: option.id,
-        availabilityId: "2022-09-15T00:00:00-04:00",
-      };
-      return new BookingReservationMissingUnitItemsScenario(bookingData);
-    };
-
-  private reserveWithEmptyUnitItems =
-    async (): Promise<BookingReservationEmptyUnitItemsScenario> => {
-      const product = this.config.getProduct();
-      // TODO: get from somewhere else
-      const option = product.options[0];
-
-      const bookingData = {
-        product: product,
-        optionId: option.id,
-        availabilityId: "2022-09-15T00:00:00-04:00",
-        unitItems: [],
-      };
-      return new BookingReservationEmptyUnitItemsScenario(bookingData);
-    };
-
-  private validateBookingInvalidUnitId =
-    async (): Promise<BookingReservationInvalidUnitIdScenario> => {
-      const product = this.config.getProduct();
-      // TODO: get from somewhere else
-      const option = product.options[0];
-
-      const unitItems: BookingUnitItemSchema[] = [
-        { unitId: "invalid_unit_id" },
-      ];
-
-      const data = {
-        product: product,
-        optionId: option.id,
-        availabilityId: "2022-09-15T00:00:00-04:00",
-        unitItems,
-      };
-
-      return new BookingReservationInvalidUnitIdScenario(data);
-    };
+    return new BookingReservationInvalidUnitIdScenario({
+      productId: product.product.id,
+      optionId: product.getOption().id,
+      availabilityId: product.getAvailabilityIDAvailable()[0],
+      unitItems: product.getInvalidUnitItems({ quantity: 3 }),
+    });
+  };
 }

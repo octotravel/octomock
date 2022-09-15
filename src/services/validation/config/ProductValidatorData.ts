@@ -4,7 +4,12 @@ import {
   Product,
   UnitType,
 } from "@octocloud/types";
+import { ValidatorError } from "../../../validators/backendValidator/ValidatorHelpers";
 
+export interface ErrorResult<T> {
+  data: Nullable<T>;
+  error: Nullable<ValidatorError>;
+}
 interface IProductValidatorData {
   product: Product;
   getValidUnitItems(data?: Record<UnitType, number>): BookingUnitItemSchema[];
@@ -17,6 +22,10 @@ interface IProductValidatorData {
   getAvailabilityIDAvailable(): string[];
   getAvailabilityIDSoldOut(): string;
 }
+
+const randomInteger = (min: number, max: number): number => {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+};
 
 export class ProductValidatorData implements IProductValidatorData {
   public product: Product;
@@ -50,18 +59,15 @@ export class ProductValidatorData implements IProductValidatorData {
         .filter(Boolean)
         .flat(1);
     }
-    const unit = option.units.find((unit) => unit.type === UnitType.ADULT);
-    if (unit) {
-      const ran = Math.floor(
-        Math.random() *
-          ((option.restrictions.maxUnits ?? 5) -
-            (option.restrictions.minUnits ?? 1) +
-            1) +
-          (option.restrictions.minUnits ?? 1)
-      );
-      console.log(ran);
-      return Array(ran).fill({ unitId: unit.id });
-    }
+    const unitId =
+      option.units.find((unit) => unit.type === UnitType.ADULT).id ??
+      option.units[0].id;
+
+    const quantity = randomInteger(
+      option.restrictions.minUnits || 1,
+      option.restrictions.maxUnits ?? 5
+    );
+    return Array(quantity).fill({ unitId });
   };
 
   public getInvalidUnitItems = ({

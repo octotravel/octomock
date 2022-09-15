@@ -1,4 +1,4 @@
-import { CreateBookingBodySchema, Product } from "@octocloud/types";
+import { CreateBookingBodySchema } from "@octocloud/types";
 import { Scenario } from "../../Scenario";
 import { UnprocessableEntityErrorValidator } from "../../../../../validators/backendValidator/Error/UnprocessableEntityErrorValidator";
 import { BookingReservationScenarioHelper } from "../../../helpers/BookingReservationScenarioHelper";
@@ -9,19 +9,19 @@ export class BookingReservationMissingUnitItemsScenario
 {
   private config = Config.getInstance();
   private apiClient = this.config.getApiClient();
-  private product: Product;
+  private productId: string;
   private optionId: string;
   private availabilityId: string;
   constructor({
-    product,
+    productId,
     optionId,
     availabilityId,
   }: {
-    product: Product;
+    productId: string;
     optionId: string;
     availabilityId: string;
   }) {
-    this.product = product;
+    this.productId = productId;
     this.optionId = optionId;
     this.availabilityId = availabilityId;
   }
@@ -30,7 +30,7 @@ export class BookingReservationMissingUnitItemsScenario
 
   public validate = async () => {
     const result = await this.apiClient.bookingReservation({
-      productId: this.product.id,
+      productId: this.productId,
       optionId: this.optionId,
       availabilityId: this.availabilityId,
     } as CreateBookingBodySchema);

@@ -1,4 +1,4 @@
-import { Booking, BookingUnitItemSchema, Product } from "@octocloud/types";
+import { Booking, BookingUnitItemSchema } from "@octocloud/types";
 import { Scenario } from "../../Scenario";
 import { BookingReservationScenarioHelper } from "../../../helpers/BookingReservationScenarioHelper";
 import { Config } from "../../../config/Config";
@@ -6,25 +6,25 @@ import { Config } from "../../../config/Config";
 export class BookingReservationScenario implements Scenario<Booking> {
   private config = Config.getInstance();
   private apiClient = this.config.getApiClient();
-  private product: Product;
+  private productId: string;
   private optionId: string;
   private availabilityId: string;
   private unitItems: BookingUnitItemSchema[];
   private notes: string;
   constructor({
-    product,
+    productId,
     optionId,
     availabilityId,
     unitItems,
     notes,
   }: {
-    product: Product;
+    productId: string;
     optionId: string;
     availabilityId: string;
     unitItems: BookingUnitItemSchema[];
     notes?: string;
   }) {
-    this.product = product;
+    this.productId = productId;
     this.optionId = optionId;
     this.availabilityId = availabilityId;
     this.unitItems = unitItems;
@@ -34,7 +34,7 @@ export class BookingReservationScenario implements Scenario<Booking> {
     new BookingReservationScenarioHelper();
   public validate = async () => {
     const result = await this.apiClient.bookingReservation({
-      productId: this.product.id,
+      productId: this.productId,
       optionId: this.optionId,
       availabilityId: this.availabilityId,
       unitItems: this.unitItems,

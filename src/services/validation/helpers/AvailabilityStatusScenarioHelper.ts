@@ -1,9 +1,9 @@
+import * as R from "ramda";
 import { Availability, AvailabilityStatus, Product } from "@octocloud/types";
 import { ScenarioHelper } from "./ScenarioHelper";
 import { Result } from "../api/types";
 import { Config } from "../config/Config";
 import { AvailabilityValidator } from "../../../validators/backendValidator/Availability/AvailabilityValidator";
-import * as R from "ramda";
 import { ValidatorError } from "../../../validators/backendValidator/ValidatorHelpers";
 
 export interface AvailabilityScenarioData {
@@ -72,6 +72,7 @@ export class AvailabilityStatusScenarioHelper extends ScenarioHelper {
       success: R.isEmpty(errors),
       result: {
         response: {
+          headers: {},
           data: {
             status: null,
             body: null,
@@ -79,6 +80,7 @@ export class AvailabilityStatusScenarioHelper extends ScenarioHelper {
           error: null,
         },
         request: {
+          headers: {},
           url: null,
           body: null,
         },

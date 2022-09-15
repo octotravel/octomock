@@ -5,9 +5,12 @@ import {
   Product,
 } from "@octocloud/types";
 import { ValidationEndpoint } from "../../../schemas/Validation";
-import { ValidatorError } from "../../../validators/backendValidator/ValidatorHelpers";
+import {
+  ErrorType,
+  ValidatorError,
+} from "../../../validators/backendValidator/ValidatorHelpers";
 import { ApiClient } from "../api/ApiClient";
-import { ProductValidatorData } from "./ProductValidatorData";
+import { ErrorResult, ProductValidatorData } from "./ProductValidatorData";
 
 interface IConfig {
   setCapabilities(capabilities: Capability[]): ValidatorError[];
@@ -22,6 +25,7 @@ interface IConfig {
   getProducts(availabilityType?: AvailabilityType): Product[];
   getStartTimeProducts(): ProductValidatorData[];
   getOpeningHoursProducts(): ProductValidatorData[];
+  getBookingProduct(): ErrorResult<ProductValidatorData>;
 }
 export class Config implements IConfig {
   private static instance: Config;
@@ -157,5 +161,31 @@ export class Config implements IConfig {
 
   public getOpeningHoursProducts = (): ProductValidatorData[] => {
     return this.openingHoursProducts;
+  };
+
+  public getBookingProduct = (): ErrorResult<ProductValidatorData> => {
+    const products = [...this.startTimesProducts, ...this.openingHoursProducts];
+
+    const product =
+      products.find(
+        (p) =>
+          p.getAvailabilityIDAvailable().length > 1 &&
+          p.getAvailabilityIDSoldOut().length > 0 &&
+          p.getOption()
+      ) ?? null;
+
+    if (product === null) {
+      return {
+        error: new ValidatorError({
+          type: ErrorType.CRITICAL,
+          message: "there is no suitable product",
+        }),
+        data: null,
+      };
+    }
+    return {
+      error: null,
+      data: product,
+    };
   };
 }
