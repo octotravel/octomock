@@ -15,7 +15,9 @@ export interface ErrorResult<T> {
 }
 interface IProductValidatorData {
   product: Product;
-  getValidUnitItems(data?: Record<UnitType, number>): BookingUnitItemSchema[];
+  getValidUnitItems(
+    data?: Record<UnitType, number>
+  ): ErrorResult<BookingUnitItemSchema[]>;
   getInvalidUnitItems({
     quantity,
   }: {
@@ -49,28 +51,45 @@ export class ProductValidatorData implements IProductValidatorData {
   }
   public getValidUnitItems = (
     data?: Record<UnitType, number>
-  ): BookingUnitItemSchema[] => {
+  ): ErrorResult<BookingUnitItemSchema[]> => {
     const option = this.getOption();
     if (data) {
-      return Object.keys(data)
-        .map((key) => {
-          const unit = option.data.units.find((unit) => unit.type === key);
-          if (unit) {
-            return Array(data[key]).fill({ unitId: unit.id });
-          }
-        })
-        .filter(Boolean)
-        .flat(1);
+      return {
+        data: Object.keys(data)
+          .map((key) => {
+            const unit = option.data.units.find((unit) => unit.type === key);
+            if (unit) {
+              return Array(data[key]).fill({ unitId: unit.id });
+            }
+          })
+          .filter(Boolean)
+          .flat(1),
+        error: null,
+      };
     }
     const unitId =
       option.data.units.find((unit) => unit.type === UnitType.ADULT).id ??
-      option.data.units[0].id;
+      option.data.units[0].id ??
+      null;
+
+    if (unitId === null) {
+      return {
+        data: null,
+        error: new ValidatorError({
+          message: "unit does not exist",
+          type: ErrorType.CRITICAL,
+        }),
+      };
+    }
 
     const quantity = randomInteger(
       option.data.restrictions.minUnits || 1,
       option.data.restrictions.maxUnits ?? 5
     );
-    return Array(quantity).fill({ unitId });
+    return {
+      data: Array(quantity).fill({ unitId }),
+      error: null,
+    };
   };
 
   public getInvalidUnitItems = ({
@@ -107,7 +126,8 @@ export class ProductValidatorData implements IProductValidatorData {
     }
     const option =
       this.product.options.find((option) => option.default) ??
-      this.product.options[0];
+      this.product.options[0] ??
+      null;
     if (option === null) {
       return {
         data: null,
