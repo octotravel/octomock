@@ -14,14 +14,12 @@ export class AvailabilityCheckBadRequestScenario
 
   public validate = async (): Promise<ScenarioResult<Availability[]>> => {
     const result = await this.apiClient.getAvailability({
-      productId:
-        this.config.getStartTimeProducts().availabilityAvailable.productId,
-      optionId:
-        this.config.getStartTimeProducts().availabilityAvailable.optionId,
+      productId: this.config.getStartTimeProducts()[0].product.id,
+      optionId: this.config.getStartTimeProducts()[0].getOption().id,
       localDateStart: DateHelper.getDate(new Date().toISOString()),
       localDateEnd: DateHelper.getDate(new Date().toISOString()),
       availabilityIds: [
-        this.config.getStartTimeProducts().availabilityAvailable.availabilityId,
+        this.config.getStartTimeProducts()[0].getAvailabilityIDAvailable()[0],
       ],
     });
 

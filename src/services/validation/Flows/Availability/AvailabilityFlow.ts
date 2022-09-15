@@ -23,7 +23,6 @@ export class AvailabilityFlow extends BaseFlow implements Flow {
       new AvailabilityCheckInvalidOptionScenario(),
       new AvailabilityCheckBadRequestScenario(),
     ];
-
     const results = [];
     for await (const scenario of scenarios) {
       const result = await scenario.validate();

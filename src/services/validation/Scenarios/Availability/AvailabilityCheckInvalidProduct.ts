@@ -12,8 +12,7 @@ export class AvailabilityCheckInvalidProductScenario implements Scenario<any> {
   public validate = async (): Promise<ScenarioResult<any>> => {
     const result = await this.apiClient.getAvailability({
       productId: this.config.invalidProductId,
-      optionId:
-        this.config.getStartTimeProducts().availabilityAvailable.optionId,
+      optionId: this.config.getStartTimeProducts()[0].getOption().id,
       localDate: DateHelper.getDate(new Date().toISOString()),
     });
 

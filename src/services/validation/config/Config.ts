@@ -1,6 +1,4 @@
 import {
-  Availability,
-  AvailabilityStatus,
   AvailabilityType,
   Capability,
   CapabilityId,
@@ -8,10 +6,7 @@ import {
 } from "@octocloud/types";
 import * as R from "ramda";
 import { ValidationEndpoint } from "../../../schemas/Validation";
-import {
-  ErrorType,
-  ValidatorError,
-} from "../../../validators/backendValidator/ValidatorHelpers";
+import { ValidatorError } from "../../../validators/backendValidator/ValidatorHelpers";
 import { ApiClient } from "../api/ApiClient";
 import { ProductValidatorData } from "./ProductValidatorData";
 
@@ -19,10 +14,15 @@ interface IConfig {
   setCapabilities(capabilities: Capability[]): ValidatorError[];
   getCapabilityIDs(): CapabilityId[];
   setProducts(products: Product[]): ValidatorError[];
-  setAvailability(availability: Availability, product: Product);
+  setAvailability(
+    product: Product,
+    availabilityIdAvailable: string[],
+    availabilityIdSoldOut: string
+  ): void;
   getProduct(): Product;
-  getStartTimeProducts(): ProductValidatorData;
-  getOpeningHoursProducts(): ProductValidatorData;
+  getProducts(availabilityType?: AvailabilityType): Product[];
+  getStartTimeProducts(): ProductValidatorData[];
+  getOpeningHoursProducts(): ProductValidatorData[];
 }
 export class Config implements IConfig {
   private static instance: Config;
@@ -33,8 +33,9 @@ export class Config implements IConfig {
 
   private capabilities: CapabilityId[];
 
-  private startTimesProducts: Nullable<ProductValidatorData>;
-  private openingHoursProducts: Nullable<ProductValidatorData>;
+  private products: Product[];
+  private startTimesProducts: ProductValidatorData[];
+  private openingHoursProducts: ProductValidatorData[];
 
   public invalidProductId: string;
   public invalidOptionId: string;
@@ -47,16 +48,9 @@ export class Config implements IConfig {
 
     this.capabilities = [];
 
-    this.startTimesProducts = new ProductValidatorData({
-      products: [],
-      availabilitySoldOut: null,
-      availabilityAvailable: null,
-    });
-    this.openingHoursProducts = new ProductValidatorData({
-      products: [],
-      availabilitySoldOut: null,
-      availabilityAvailable: null,
-    });
+    this.products = [];
+    this.startTimesProducts = [];
+    this.openingHoursProducts = [];
     this.invalidProductId = "invalidProductId";
     this.invalidOptionId = "invalidOptionId";
 
@@ -108,80 +102,69 @@ export class Config implements IConfig {
   };
 
   public setProducts = (products: Product[]): ValidatorError[] => {
-    this.startTimesProducts.products = products.filter(
-      (product) => product.availabilityType === AvailabilityType.START_TIME
-    );
-    this.openingHoursProducts.products = products.filter(
-      (product) => product.availabilityType === AvailabilityType.OPENING_HOURS
-    );
-    return [
-      R.isEmpty(this.startTimesProducts.products) &&
-      R.isEmpty(this.openingHoursProducts.products)
-        ? new ValidatorError({
-            message: "At least one product must be provided!",
-            type: ErrorType.CRITICAL,
-          })
-        : null,
-    ].filter(Boolean);
+    products.map((product) => {
+      this.products.push(product);
+    });
+    return [];
   };
 
-  public setAvailability = (availability: Availability, product: Product) => {
+  public setAvailability = (
+    product: Product,
+    availabilityIdAvailable: string[],
+    availabilityIdSoldOut: string
+  ): void => {
     if (product.availabilityType === AvailabilityType.START_TIME) {
-      if (
-        availability.status === AvailabilityStatus.AVAILABLE ||
-        availability.status === AvailabilityStatus.FREESALE
-      ) {
-        this.startTimesProducts.availabilityAvailable = {
-          productId: product.id,
-          optionId: product.options[0].id,
-          availabilityId: availability.id,
-        };
-      }
-      if (availability.status === AvailabilityStatus.SOLD_OUT) {
-        this.startTimesProducts.availabilitySoldOut = {
-          productId: product.id,
-          optionId: product.options[0].id,
-          availabilityId: availability.id,
-        };
-      }
+      this.startTimesProducts.push(
+        new ProductValidatorData({
+          product,
+          availabilityIdAvailable,
+          availabilityIdSoldOut,
+        })
+      );
     }
+
     if (product.availabilityType === AvailabilityType.OPENING_HOURS) {
-      if (
-        availability.status === AvailabilityStatus.AVAILABLE ||
-        availability.status === AvailabilityStatus.FREESALE
-      ) {
-        this.openingHoursProducts.availabilityAvailable = {
-          productId: product.id,
-          optionId: product.options[0].id,
-          availabilityId: availability.id,
-        };
-      }
-      if (availability.status === AvailabilityStatus.SOLD_OUT) {
-        this.openingHoursProducts.availabilitySoldOut = {
-          productId: product.id,
-          optionId: product.options[0].id,
-          availabilityId: availability.id,
-        };
-      }
+      this.openingHoursProducts.push(
+        new ProductValidatorData({
+          product,
+          availabilityIdAvailable,
+          availabilityIdSoldOut,
+        })
+      );
     }
   };
 
   public getProduct = (availabilityType?: AvailabilityType): Product => {
     if (availabilityType) {
       if (availabilityType === AvailabilityType.START_TIME) {
-        return this.startTimesProducts.products[0];
+        return this.products[0];
       }
     }
-    return !R.isEmpty(this.startTimesProducts.products)
-      ? this.startTimesProducts.products[0]
-      : this.openingHoursProducts.products[0];
+    return !R.isEmpty(this.products) ? this.products[0] : this.products[0];
   };
 
-  public getStartTimeProducts = (): ProductValidatorData => {
+  public getProducts = (availabilityType?: AvailabilityType): Product[] => {
+    if (availabilityType) {
+      if (availabilityType === AvailabilityType.START_TIME) {
+        return this.products.filter(
+          (product) => product.availabilityType === AvailabilityType.START_TIME
+        );
+      }
+      if (availabilityType === AvailabilityType.OPENING_HOURS) {
+        return this.products.filter(
+          (product) =>
+            product.availabilityType === AvailabilityType.OPENING_HOURS
+        );
+      }
+    }
+    return this.products;
+  };
+
+  public getStartTimeProducts = (): ProductValidatorData[] => {
     return this.startTimesProducts;
   };
 
-  public getOpeningHoursProducts = (): ProductValidatorData => {
+  public getOpeningHoursProducts = (): ProductValidatorData[] => {
     return this.openingHoursProducts;
   };
 }

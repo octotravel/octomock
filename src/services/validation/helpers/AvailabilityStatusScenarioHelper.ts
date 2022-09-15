@@ -23,8 +23,7 @@ export class AvailabilityStatusScenarioHelper extends ScenarioHelper {
 
   public validateAvailability = (data: AvailabilityScenarioData) => {
     const errors: ValidatorError[] = [];
-    let stAvailable = false;
-    let stSoldOut = false;
+    const stIds = [];
 
     for (const startTime of data.startTimes) {
       const validator = new AvailabilityValidator({
@@ -43,31 +42,28 @@ export class AvailabilityStatusScenarioHelper extends ScenarioHelper {
         const soldout = startTime.result.data.filter(
           (availability) => availability.status === AvailabilityStatus.SOLD_OUT
         );
-        if (!R.isEmpty(available)) {
-          this.config.setAvailability(available[0], startTime.product);
-          stAvailable = true;
-        }
-        if (!R.isEmpty(soldout)) {
-          this.config.setAvailability(soldout[0], startTime.product);
-          stSoldOut = true;
+        if (available.length > 1 && !R.isEmpty(soldout)) {
+          this.config.setAvailability(
+            startTime.product,
+            [available[0].id, available[1].id],
+            soldout[0].id
+          );
+          stIds.push(startTime.product.id);
         }
       }
-      if (stAvailable && stSoldOut) {
+      if (stIds.length > 1) {
         break;
       }
     }
-    if (!stAvailable || !stSoldOut) {
+    if (stIds.length < 2) {
       errors.push(
         new ValidatorError({
-          message: `Missing ${
-            !stAvailable ? "AVAILABLE" : "SOLD_OUT"
-          } availability for START_TIME product!`,
+          message: `Missing START_TIME products with AVAILABLE and SOLD_OUT availability status`,
         })
       );
     }
 
-    let ohAvailable = false;
-    let ohSoldOut = false;
+    const ohIds = [];
 
     for (const openingHour of data.openingHours) {
       const validator = new AvailabilityValidator({
@@ -86,25 +82,23 @@ export class AvailabilityStatusScenarioHelper extends ScenarioHelper {
         const soldout = openingHour.result.data.filter(
           (availability) => availability.status === AvailabilityStatus.SOLD_OUT
         );
-        if (!R.isEmpty(available)) {
-          this.config.setAvailability(available[0], openingHour.product);
-          ohAvailable = true;
-        }
-        if (!R.isEmpty(soldout)) {
-          this.config.setAvailability(soldout[0], openingHour.product);
-          ohSoldOut = true;
+        if (available.length > 1 && !R.isEmpty(soldout)) {
+          this.config.setAvailability(
+            openingHour.product,
+            [available[0].id, available[1].id],
+            soldout[0].id
+          );
+          ohIds.push(openingHour.product.id);
         }
       }
-      if (ohAvailable && ohSoldOut) {
+      if (ohIds.length > 1) {
         break;
       }
     }
-    if (!ohAvailable || !ohSoldOut) {
+    if (ohIds.length < 2) {
       errors.push(
         new ValidatorError({
-          message: `Missing ${
-            !ohAvailable ? "AVAILABLE | FREESALE" : "SOLD_OUT"
-          } availability for OPENING_HOURS product!`,
+          message: `Missing OPENING_HOUR products with AVAILABLE and SOLD_OUT availability status`,
         })
       );
     }

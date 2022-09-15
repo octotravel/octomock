@@ -19,10 +19,8 @@ export class AvailabilityCheckDateScenario implements Scenario<Availability[]> {
       return DateHelper.availabilityDateFormat(date);
     });
     const result = await this.apiClient.getAvailability({
-      productId:
-        this.config.getStartTimeProducts().availabilityAvailable.productId,
-      optionId:
-        this.config.getStartTimeProducts().availabilityAvailable.optionId,
+      productId: this.config.getStartTimeProducts()[0].product.id,
+      optionId: this.config.getStartTimeProducts()[0].getOption().id,
       localDate: dates[Math.floor(Math.random() * dates.length)],
     });
     const name = `Availability Check Date (${AvailabilityType.START_TIME})`;
