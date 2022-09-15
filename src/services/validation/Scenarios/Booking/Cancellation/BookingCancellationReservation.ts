@@ -1,28 +1,23 @@
 import { Booking, CapabilityId } from "@octocloud/types";
-import { ApiClient } from "../../../api/ApiClient";
 import { Scenario } from "../../Scenario";
 import { BookingCancellationScenarioHelper } from "../../../helpers/BookingCancellationScenarioHelper";
+import { Config } from "../../../config/Config";
 
 export class BookingCancellationReservationScenario
   implements Scenario<Booking>
 {
-  private apiClient: ApiClient;
+  private config = Config.getInstance();
+  private apiClient = this.config.getApiClient();
   private uuid: string;
   private capabilities: CapabilityId[];
   private booking: Booking;
   constructor({
-    apiClient,
-    uuid,
     capabilities,
     booking,
   }: {
-    apiClient: ApiClient;
-    uuid: string;
     capabilities: CapabilityId[];
     booking: Booking;
   }) {
-    this.apiClient = apiClient;
-    this.uuid = uuid;
     this.capabilities = capabilities;
     this.booking = booking;
   }

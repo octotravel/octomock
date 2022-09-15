@@ -37,7 +37,7 @@ export class BookingExtendFlow extends BaseFlow implements Flow {
       const result = await this.apiClient.bookingReservation({
         productId: product.id,
         optionId: option.id,
-        availabilityId: "2022-09-14T00:00:00-04:00",
+        availabilityId: "2022-10-14T00:00:00-04:00",
         unitItems,
       });
       const booking = result.data;

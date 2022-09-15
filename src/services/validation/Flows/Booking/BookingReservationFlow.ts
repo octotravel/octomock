@@ -49,7 +49,7 @@ export class BookingReservationFlow extends BaseFlow implements Flow {
       const bookingData = {
         product: product,
         optionId: option.id,
-        availabilityId: "2022-09-14T00:00:00-04:00",
+        availabilityId: "2022-10-14T00:00:00-04:00",
         unitItems,
         notes: "Test note",
       };
@@ -101,7 +101,7 @@ export class BookingReservationFlow extends BaseFlow implements Flow {
       return new BookingReservationInvalidProductScenario({
         product: { id: "invalid_product_id" } as Product,
         optionId: option.id,
-        availabilityId: "2022-09-14T00:00:00-04:00",
+        availabilityId: "2022-10-14T00:00:00-04:00",
         unitItems,
       });
     };
@@ -125,7 +125,7 @@ export class BookingReservationFlow extends BaseFlow implements Flow {
       return new BookingReservationInvalidOptionScenario({
         product: product,
         optionId: "invalid_optionId",
-        availabilityId: "2022-09-14T00:00:00-04:00",
+        availabilityId: "2022-10-14T00:00:00-04:00",
         unitItems,
       });
     };

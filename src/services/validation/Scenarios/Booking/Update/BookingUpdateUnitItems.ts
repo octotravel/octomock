@@ -1,35 +1,23 @@
-import {
-  Booking,
-  BookingUnitItemSchema,
-  CapabilityId,
-  DeliveryMethod,
-} from "@octocloud/types";
-import { ApiClient } from "../../../api/ApiClient";
+import { Booking, BookingUnitItemSchema, CapabilityId } from "@octocloud/types";
 import { Scenario } from "../../Scenario";
 import { BookingUpdateScenarioHelper } from "../../../helpers/BookingUpdateScenarioHelper";
+import { Config } from "../../../config/Config";
 
 export class BookingUpdateUnitItemsScenario implements Scenario<Booking> {
-  private apiClient: ApiClient;
-  private uuid: string;
+  private config = Config.getInstance();
+  private apiClient = this.config.getApiClient();
   private capabilities: CapabilityId[];
   private booking: Booking;
   private unitItems: BookingUnitItemSchema[];
   constructor({
-    apiClient,
-    uuid,
     capabilities,
     booking,
     unitItems,
   }: {
-    apiClient: ApiClient;
-    uuid: string;
     capabilities: CapabilityId[];
-    deliveryMethods: DeliveryMethod[];
     booking: Booking;
     unitItems: BookingUnitItemSchema[];
   }) {
-    this.apiClient = apiClient;
-    this.uuid = uuid;
     this.capabilities = capabilities;
     this.booking = booking;
     this.unitItems = unitItems;
@@ -38,7 +26,7 @@ export class BookingUpdateUnitItemsScenario implements Scenario<Booking> {
 
   public validate = async () => {
     const result = await this.apiClient.bookingUpdate({
-      uuid: this.uuid,
+      uuid: this.booking.uuid,
       unitItems: this.unitItems,
     });
     const name = `Booking Update - Unit Items`;

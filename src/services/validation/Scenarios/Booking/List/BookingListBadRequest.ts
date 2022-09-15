@@ -1,13 +1,12 @@
-import { ApiClient } from "../../../api/ApiClient";
 import { Scenario } from "../../Scenario";
 import { BookingListScenarioHelper } from "../../../helpers/BookingListScenarioHelper";
 import { BadRequestErrorValidator } from "../../../../../validators/backendValidator/Error/BadRequestErrorValidator";
+import { Config } from "../../../config/Config";
 
 export class BookingListBadRequestScenario implements Scenario<any> {
-  private apiClient: ApiClient;
-  constructor({ apiClient }: { apiClient: ApiClient }) {
-    this.apiClient = apiClient;
-  }
+  private config = Config.getInstance();
+  private apiClient = this.config.getApiClient();
+
   private bookingListScenarioHelper = new BookingListScenarioHelper();
 
   public validate = async () => {
