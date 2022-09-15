@@ -4,7 +4,6 @@ import {
   CapabilityId,
   Product,
 } from "@octocloud/types";
-import * as R from "ramda";
 import { ValidationEndpoint } from "../../../schemas/Validation";
 import { ValidatorError } from "../../../validators/backendValidator/ValidatorHelpers";
 import { ApiClient } from "../api/ApiClient";
@@ -102,9 +101,7 @@ export class Config implements IConfig {
   };
 
   public setProducts = (products: Product[]): ValidatorError[] => {
-    products.map((product) => {
-      this.products.push(product);
-    });
+    this.products = products;
     return [];
   };
 
@@ -137,25 +134,19 @@ export class Config implements IConfig {
   public getProduct = (availabilityType?: AvailabilityType): Product => {
     if (availabilityType) {
       if (availabilityType === AvailabilityType.START_TIME) {
-        return this.products[0];
+        return this.products.filter(
+          (product) => product.availabilityType === AvailabilityType.START_TIME
+        )[0];
       }
     }
-    return !R.isEmpty(this.products) ? this.products[0] : this.products[0];
+    return this.products[0];
   };
 
   public getProducts = (availabilityType?: AvailabilityType): Product[] => {
     if (availabilityType) {
-      if (availabilityType === AvailabilityType.START_TIME) {
-        return this.products.filter(
-          (product) => product.availabilityType === AvailabilityType.START_TIME
-        );
-      }
-      if (availabilityType === AvailabilityType.OPENING_HOURS) {
-        return this.products.filter(
-          (product) =>
-            product.availabilityType === AvailabilityType.OPENING_HOURS
-        );
-      }
+      return this.products.filter(
+        (product) => product.availabilityType === availabilityType
+      );
     }
     return this.products;
   };
