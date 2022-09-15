@@ -4,6 +4,7 @@ import {
   CapabilityId,
   Product,
 } from "@octocloud/types";
+import * as R from "ramda";
 import { ValidationEndpoint } from "../../../schemas/Validation";
 import {
   ErrorType,
@@ -21,8 +22,8 @@ interface IConfig {
     availabilityIdAvailable: string[],
     availabilityIdSoldOut: string
   ): void;
-  getProduct(): Product;
-  getProducts(availabilityType?: AvailabilityType): Product[];
+  getProduct(): ErrorResult<Product>;
+  getProducts(availabilityType?: AvailabilityType): ErrorResult<Product[]>;
   getStartTimeProducts(): ProductValidatorData[];
   getOpeningHoursProducts(): ProductValidatorData[];
   getBookingProduct(): ErrorResult<ProductValidatorData>;
@@ -135,24 +136,66 @@ export class Config implements IConfig {
     }
   };
 
-  public getProduct = (availabilityType?: AvailabilityType): Product => {
+  public getProduct = (
+    availabilityType?: AvailabilityType
+  ): ErrorResult<Product> => {
     if (availabilityType) {
       if (availabilityType === AvailabilityType.START_TIME) {
-        return this.products.filter(
+        const products = this.products.filter(
           (product) => product.availabilityType === AvailabilityType.START_TIME
-        )[0];
+        );
+        if (R.isEmpty(products)) {
+          return {
+            error: new ValidatorError({
+              type: ErrorType.CRITICAL,
+              message: "there is no suitable product",
+            }),
+            data: null,
+          };
+        }
+        return {
+          data: products[0],
+          error: null,
+        };
       }
     }
-    return this.products[0];
+    if (R.isEmpty(this.products)) {
+      return {
+        error: new ValidatorError({
+          type: ErrorType.CRITICAL,
+          message: "there is no suitable product",
+        }),
+        data: null,
+      };
+    }
+    return {
+      data: this.products[0],
+      error: null,
+    };
   };
 
-  public getProducts = (availabilityType?: AvailabilityType): Product[] => {
+  public getProducts = (
+    availabilityType?: AvailabilityType
+  ): ErrorResult<Product[]> => {
     if (availabilityType) {
-      return this.products.filter(
+      const products = this.products.filter(
         (product) => product.availabilityType === availabilityType
       );
+      if (R.isEmpty(products)) {
+        return {
+          data: null,
+          error: new ValidatorError({
+            type: ErrorType.CRITICAL,
+            message: "there is no suitable products",
+          }),
+        };
+      }
+      return;
     }
-    return this.products;
+    return {
+      data: this.products,
+      error: null,
+    };
   };
 
   public getStartTimeProducts = (): ProductValidatorData[] => {

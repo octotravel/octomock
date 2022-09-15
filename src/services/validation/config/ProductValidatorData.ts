@@ -4,7 +4,10 @@ import {
   Product,
   UnitType,
 } from "@octocloud/types";
-import { ValidatorError } from "../../../validators/backendValidator/ValidatorHelpers";
+import {
+  ErrorType,
+  ValidatorError,
+} from "../../../validators/backendValidator/ValidatorHelpers";
 
 export interface ErrorResult<T> {
   data: Nullable<T>;
@@ -18,7 +21,7 @@ interface IProductValidatorData {
   }: {
     quantity: number;
   }): BookingUnitItemSchema[];
-  getOption(optionID?: string): Option;
+  getOption(optionID?: string): ErrorResult<Option>;
   getAvailabilityIDAvailable(): string[];
   getAvailabilityIDSoldOut(): string;
 }
@@ -51,7 +54,7 @@ export class ProductValidatorData implements IProductValidatorData {
     if (data) {
       return Object.keys(data)
         .map((key) => {
-          const unit = option.units.find((unit) => unit.type === key);
+          const unit = option.data.units.find((unit) => unit.type === key);
           if (unit) {
             return Array(data[key]).fill({ unitId: unit.id });
           }
@@ -60,12 +63,12 @@ export class ProductValidatorData implements IProductValidatorData {
         .flat(1);
     }
     const unitId =
-      option.units.find((unit) => unit.type === UnitType.ADULT).id ??
-      option.units[0].id;
+      option.data.units.find((unit) => unit.type === UnitType.ADULT).id ??
+      option.data.units[0].id;
 
     const quantity = randomInteger(
-      option.restrictions.minUnits || 1,
-      option.restrictions.maxUnits ?? 5
+      option.data.restrictions.minUnits || 1,
+      option.data.restrictions.maxUnits ?? 5
     );
     return Array(quantity).fill({ unitId });
   };
@@ -83,14 +86,41 @@ export class ProductValidatorData implements IProductValidatorData {
     return unitItems;
   };
 
-  public getOption = (optionID?: string): Option => {
+  public getOption = (optionID?: string): ErrorResult<Option> => {
     if (optionID) {
-      return this.product.options.find((option) => option.id === optionID);
+      const option = this.product.options.find(
+        (option) => option.id === optionID
+      );
+      if (option === null) {
+        return {
+          data: null,
+          error: new ValidatorError({
+            message: "Option does not exist",
+            type: ErrorType.CRITICAL,
+          }),
+        };
+      }
+      return {
+        data: option,
+        error: null,
+      };
     }
-    return (
+    const option =
       this.product.options.find((option) => option.default) ??
-      this.product.options[0]
-    );
+      this.product.options[0];
+    if (option === null) {
+      return {
+        data: null,
+        error: new ValidatorError({
+          message: "Option does not exist",
+          type: ErrorType.CRITICAL,
+        }),
+      };
+    }
+    return {
+      data: option,
+      error: null,
+    };
   };
 
   public getAvailabilityIDAvailable = (): string[] => {
