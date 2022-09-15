@@ -8,7 +8,11 @@ import {
 interface IProductValidatorData {
   product: Product;
   getValidUnitItems(data?: Record<UnitType, number>): BookingUnitItemSchema[];
-  getInvalidUnitItems(quantity: number): BookingUnitItemSchema[];
+  getInvalidUnitItems({
+    quantity,
+  }: {
+    quantity: number;
+  }): BookingUnitItemSchema[];
   getOption(optionID?: string): Option;
   getAvailabilityIDAvailable(): string[];
   getAvailabilityIDSoldOut(): string;
@@ -38,30 +42,33 @@ export class ProductValidatorData implements IProductValidatorData {
     if (data) {
       return Object.keys(data)
         .map((key) => {
-          const unitId = option.units.find((unit) => unit.type === key).id;
-          return Array.from({ length: data[key] }, () => {
-            return {
-              unitId: unitId,
-            };
-          });
+          const unit = option.units.find((unit) => unit.type === key);
+          if (unit) {
+            return Array(data[key]).fill({ unitId: unit.id });
+          }
         })
+        .filter(Boolean)
         .flat(1);
     }
-    const unitId =
-      option.units.find((unit) => unit.type === UnitType.ADULT).id ??
-      option.units[0].id;
-    const unitItems = Array.from(
-      { length: option.restrictions.maxUnits - option.restrictions.minUnits },
-      () => {
-        return {
-          unitId: unitId,
-        };
-      }
-    );
-    return unitItems;
+    const unit = option.units.find((unit) => unit.type === UnitType.ADULT);
+    if (unit) {
+      const ran = Math.floor(
+        Math.random() *
+          ((option.restrictions.maxUnits ?? 5) -
+            (option.restrictions.minUnits ?? 1) +
+            1) +
+          (option.restrictions.minUnits ?? 1)
+      );
+      console.log(ran);
+      return Array(ran).fill({ unitId: unit.id });
+    }
   };
 
-  public getInvalidUnitItems = (quantity: number): BookingUnitItemSchema[] => {
+  public getInvalidUnitItems = ({
+    quantity,
+  }: {
+    quantity: number;
+  }): BookingUnitItemSchema[] => {
     const unitItems = Array.from({ length: quantity }, () => {
       return {
         unitId: "invalidUnitId",
