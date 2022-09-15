@@ -59,7 +59,6 @@ export class AvailabilityCheckStatusScenario implements Scenario<any> {
         };
       })
     );
-
     return this.availabilityStatusScenarioHelper.validateAvailability({
       name,
       startTimes,

@@ -1,21 +1,14 @@
 import { CapabilityId } from "@octocloud/types";
-import { ApiClient } from "../../../api/ApiClient";
 import { Scenario } from "../../Scenario";
 import { InvalidBookingUUIDErrorValidator } from "../../../../../validators/backendValidator/Error/InvalidBookingUUIDErrorValidator";
 import { BookingGetScenarioHelper } from "../../../helpers/BookingGetScenarioHelper";
+import { Config } from "../../../config/Config";
 
 export class BookingGetInvalidUUIDScenario implements Scenario<any> {
-  private apiClient: ApiClient;
+  private config = Config.getInstance();
+  private apiClient = this.config.getApiClient();
   private uuid: string;
-  constructor({
-    apiClient,
-    uuid,
-  }: {
-    apiClient: ApiClient;
-    uuid: string;
-    capabilities: CapabilityId[];
-  }) {
-    this.apiClient = apiClient;
+  constructor({ uuid }: { uuid: string; capabilities: CapabilityId[] }) {
     this.uuid = uuid;
   }
   private bookingGetScenarioHelper = new BookingGetScenarioHelper();

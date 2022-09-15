@@ -1,16 +1,11 @@
-import {
-  Booking,
-  BookingUnitItemSchema,
-  CapabilityId,
-  DeliveryMethod,
-} from "@octocloud/types";
-import { ApiClient } from "../../../api/ApiClient";
+import { Booking, BookingUnitItemSchema, CapabilityId } from "@octocloud/types";
 import { Scenario } from "../../Scenario";
 import { BookingUpdateScenarioHelper } from "../../../helpers/BookingUpdateScenarioHelper";
+import { Config } from "../../../config/Config";
 
 export class BookingUpdateProductScenario implements Scenario<Booking> {
-  private apiClient: ApiClient;
-  private uuid: string;
+  private config = Config.getInstance();
+  private apiClient = this.config.getApiClient();
   private capabilities: CapabilityId[];
   private booking: Booking;
   private productId: string;
@@ -18,8 +13,6 @@ export class BookingUpdateProductScenario implements Scenario<Booking> {
   private availabilityId: string;
   private unitItems: BookingUnitItemSchema[];
   constructor({
-    apiClient,
-    uuid,
     capabilities,
     booking,
     productId,
@@ -27,18 +20,13 @@ export class BookingUpdateProductScenario implements Scenario<Booking> {
     availabilityId,
     unitItems,
   }: {
-    apiClient: ApiClient;
-    uuid: string;
     capabilities: CapabilityId[];
-    deliveryMethods: DeliveryMethod[];
     booking: Booking;
     productId: string;
     optionId: string;
     availabilityId: string;
     unitItems: BookingUnitItemSchema[];
   }) {
-    this.apiClient = apiClient;
-    this.uuid = uuid;
     this.capabilities = capabilities;
     this.booking = booking;
     this.productId = productId;
@@ -50,7 +38,7 @@ export class BookingUpdateProductScenario implements Scenario<Booking> {
 
   public validate = async () => {
     const result = await this.apiClient.bookingUpdate({
-      uuid: this.uuid,
+      uuid: this.booking.uuid,
       productId: this.productId,
       optionId: this.optionId,
       availabilityId: this.availabilityId,

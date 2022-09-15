@@ -4,13 +4,13 @@ import { SupplierFlow } from "./Supplier/SupplierFlow";
 import { ProductFlow } from "./Product/ProductFlow";
 import { AvailabilityFlow } from "./Availability/AvailabilityFlow";
 import { AvailabilityCalendarFlow } from "./Availability/AvailabilityCalendarFlow";
-// import { BookingReservationFlow } from "./Booking/BookingReservationFlow";
-// import { BookingExtendFlow } from "./Booking/BookingExtendFlow";
-// import { BookingConfirmationFlow } from "./Booking/BookingConfirmationFlow";
-// import { BookingUpdateFlow } from "./Booking/BookingUpdateFlow";
-// import { BookingCancellationFlow } from "./Booking/BookingCancellationFlow";
-// import { BookingGetFlow } from "./Booking/BookingGetFlow";
-// import { BookingListFlow } from "./Booking/BookingListFlow";
+import { BookingReservationFlow } from "./Booking/BookingReservationFlow";
+import { BookingListFlow } from "./Booking/BookingListFlow";
+import { BookingGetFlow } from "./Booking/BookingGetFlow";
+import { BookingCancellationFlow } from "./Booking/BookingCancellationFlow";
+import { BookingUpdateFlow } from "./Booking/BookingUpdateFlow";
+import { BookingConfirmationFlow } from "./Booking/BookingConfirmationFlow";
+import { BookingExtendFlow } from "./Booking/BookingExtendFlow";
 
 export class PrimiteFlows {
   private config = Config.getInstance();
@@ -21,13 +21,13 @@ export class PrimiteFlows {
       new ProductFlow(),
       new AvailabilityCalendarFlow(),
       new AvailabilityFlow(),
-      // new BookingReservationFlow(),
-      // new BookingExtendFlow(),
-      // new BookingConfirmationFlow(),
-      // new BookingUpdateFlow({ config }),
-      // new BookingCancellationFlow({ config }),
-      // new BookingGetFlow({ config }),
-      // new BookingListFlow({ config }),
+      new BookingReservationFlow(),
+      new BookingExtendFlow(),
+      new BookingConfirmationFlow(),
+      new BookingUpdateFlow(),
+      new BookingCancellationFlow(),
+      new BookingGetFlow(),
+      new BookingListFlow(),
     ];
 
     const results = [];

@@ -1,32 +1,26 @@
 import { Booking, BookingContactSchema, CapabilityId } from "@octocloud/types";
-import { ApiClient } from "../../../api/ApiClient";
 import { Scenario } from "../../Scenario";
 import { BookingUpdateScenarioHelper } from "../../../helpers/BookingUpdateScenarioHelper";
+import { Config } from "../../../config/Config";
 
 export class BookingUpdateContactScenario implements Scenario<Booking> {
-  private apiClient: ApiClient;
-  private uuid: string;
+  private config = Config.getInstance();
+  private apiClient = this.config.getApiClient();
   private capabilities: CapabilityId[];
   private booking: Booking;
   private contact: BookingContactSchema;
   private notes: string;
   constructor({
-    apiClient,
-    uuid,
     capabilities,
     booking,
     contact,
     notes,
   }: {
-    apiClient: ApiClient;
-    uuid: string;
     capabilities: CapabilityId[];
     booking: Booking;
     contact: BookingContactSchema;
     notes: string;
   }) {
-    this.apiClient = apiClient;
-    this.uuid = uuid;
     this.capabilities = capabilities;
     this.booking = booking;
     this.contact = contact;
@@ -36,7 +30,7 @@ export class BookingUpdateContactScenario implements Scenario<Booking> {
 
   public validate = async () => {
     const result = await this.apiClient.bookingUpdate({
-      uuid: this.uuid,
+      uuid: this.booking.uuid,
       contact: this.contact,
       notes: this.notes,
     });
