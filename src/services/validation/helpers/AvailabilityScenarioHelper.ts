@@ -1,5 +1,4 @@
 import { Availability, AvailabilityType } from "@octocloud/types";
-import * as R from "ramda";
 import { AvailabilityValidator } from "../../../validators/backendValidator/Availability/AvailabilityValidator";
 import { ScenarioHelper } from "./ScenarioHelper";
 import { Result } from "../api/types";
@@ -34,7 +33,6 @@ export class AvailabilityScenarioHelper extends ScenarioHelper {
 
     return this.handleResult({
       ...data,
-      success: R.isEmpty(errors),
       errors,
     });
   };

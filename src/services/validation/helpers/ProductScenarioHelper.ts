@@ -1,9 +1,9 @@
 import { ProductValidator } from "./../../../validators/backendValidator/Product/ProductValidator";
-import * as R from "ramda";
 import { Product } from "@octocloud/types";
 import { ScenarioHelper } from "./ScenarioHelper";
 import { Result } from "../api/types";
 import { Config } from "../config/Config";
+import { ValidatorError } from "../../../validators/backendValidator/ValidatorHelpers";
 
 export interface ProductScenarioData<T> {
   name: string;
@@ -12,11 +12,11 @@ export interface ProductScenarioData<T> {
 
 export class ProductScenarioHelper extends ScenarioHelper {
   private config = Config.getInstance();
+  private validator = new ProductValidator({
+    capabilities: this.config.getCapabilityIDs(),
+  });
 
   public validateProducts = (data: ProductScenarioData<Product[]>) => {
-    const validator = new ProductValidator({
-      capabilities: this.config.getCapabilityIDs(),
-    });
     const { result } = data;
     if (result.response.error) {
       return this.handleResult({
@@ -25,24 +25,21 @@ export class ProductScenarioHelper extends ScenarioHelper {
         errors: [],
       });
     }
-
-    let errors = result.data.map(validator.validate).flat();
-
-    if (R.isEmpty(errors)) {
-      errors = [...this.config.setProducts(result.data)];
-    }
+    // const products = [result.data[0]]
+    const products = result.data;
+    const errors = new Array<ValidatorError>();
+    const configErrors = this.config.setProducts(products);
+    errors.push(...configErrors);
+    const validatorErrors = products.map(this.validator.validate).flat(1);
+    errors.push(...validatorErrors);
 
     return this.handleResult({
       ...data,
-      success: R.isEmpty(errors),
       errors,
     });
   };
 
   public validateProduct = (data: ProductScenarioData<Product>) => {
-    const validator = new ProductValidator({
-      capabilities: this.config.getCapabilityIDs(),
-    });
     const { result } = data;
     if (result.response.error) {
       return this.handleResult({
@@ -52,10 +49,9 @@ export class ProductScenarioHelper extends ScenarioHelper {
       });
     }
 
-    const errors = validator.validate(result.data);
+    const errors = this.validator.validate(result.data);
     return this.handleResult({
       ...data,
-      success: R.isEmpty(errors),
       errors,
     });
   };

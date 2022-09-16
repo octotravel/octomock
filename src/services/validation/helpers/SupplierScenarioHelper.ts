@@ -1,4 +1,3 @@
-import * as R from "ramda";
 import { ScenarioHelper } from "./ScenarioHelper";
 import { SupplierValidator } from "../../../validators/backendValidator/Supplier/SupplierValidator";
 import { Supplier } from "@octocloud/types";
@@ -30,7 +29,6 @@ export class SupplierScenarioHelper extends ScenarioHelper {
     }).validate(result.data);
     return this.handleResult({
       ...data,
-      success: R.isEmpty(errors),
       errors,
     });
   };

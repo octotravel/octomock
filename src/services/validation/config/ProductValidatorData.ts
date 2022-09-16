@@ -4,10 +4,7 @@ import {
   Product,
   UnitType,
 } from "@octocloud/types";
-import {
-  ErrorType,
-  ValidatorError,
-} from "../../../validators/backendValidator/ValidatorHelpers";
+import { ValidatorError } from "../../../validators/backendValidator/ValidatorHelpers";
 
 export interface ErrorResult<T> {
   data: Nullable<T>;
@@ -15,16 +12,14 @@ export interface ErrorResult<T> {
 }
 interface IProductValidatorData {
   product: Product;
-  getValidUnitItems(
-    data?: Record<UnitType, number>
-  ): ErrorResult<BookingUnitItemSchema[]>;
+  getValidUnitItems(data?: Record<UnitType, number>): BookingUnitItemSchema[];
   getInvalidUnitItems({
     quantity,
   }: {
     quantity: number;
   }): BookingUnitItemSchema[];
-  getOption(optionID?: string): ErrorResult<Option>;
-  getAvailabilityIDAvailable(): string[];
+  getOption(optionID?: string): Option;
+  getAvailabilityIDAvailable(): [string, string];
   getAvailabilityIDSoldOut(): string;
 }
 
@@ -34,7 +29,7 @@ const randomInteger = (min: number, max: number): number => {
 
 export class ProductValidatorData implements IProductValidatorData {
   public product: Product;
-  private availabilityIdAvailable: string[];
+  private availabilityIdAvailable: [string, string];
   private availabilityIdSoldOut: Nullable<string>;
   constructor({
     product,
@@ -42,7 +37,7 @@ export class ProductValidatorData implements IProductValidatorData {
     availabilityIdSoldOut,
   }: {
     product: Product;
-    availabilityIdAvailable: string[];
+    availabilityIdAvailable: [string, string];
     availabilityIdSoldOut: Nullable<string>;
   }) {
     this.product = product;
@@ -51,45 +46,39 @@ export class ProductValidatorData implements IProductValidatorData {
   }
   public getValidUnitItems = (
     data?: Record<UnitType, number>
-  ): ErrorResult<BookingUnitItemSchema[]> => {
+  ): BookingUnitItemSchema[] => {
     const option = this.getOption();
     if (data) {
-      return {
-        data: Object.keys(data)
-          .map((key) => {
-            const unit = option.data.units.find((unit) => unit.type === key);
-            if (unit) {
-              return Array(data[key]).fill({ unitId: unit.id });
-            }
-          })
-          .filter(Boolean)
-          .flat(1),
-        error: null,
-      };
+      return Object.keys(data)
+        .map((key) => {
+          const unit = option.units.find((unit) => unit.type === key);
+          if (unit) {
+            return Array(data[key]).fill({ unitId: unit.id });
+          }
+        })
+        .filter(Boolean)
+        .flat(1);
     }
-    const unitId =
-      option.data.units.find((unit) => unit.type === UnitType.ADULT).id ??
-      option.data.units[0].id ??
-      null;
+    const unit =
+      option.units.find((unit) => unit.type === UnitType.ADULT) ??
+      option.units[0];
+    const unitId = unit.id;
 
-    if (unitId === null) {
-      return {
-        data: null,
-        error: new ValidatorError({
-          message: "unit does not exist",
-          type: ErrorType.CRITICAL,
-        }),
-      };
-    }
+    // if (unitId === null) {
+    //   return {
+    //     data: null,
+    //     error: new ValidatorError({
+    //       message: "unit does not exist",
+    //       type: ErrorType.CRITICAL,
+    //     }),
+    //   };
+    // }
 
     const quantity = randomInteger(
-      option.data.restrictions.minUnits || 1,
-      option.data.restrictions.maxUnits ?? 5
+      option.restrictions.minUnits || 1,
+      option.restrictions.maxUnits ?? 5
     );
-    return {
-      data: Array(quantity).fill({ unitId }),
-      error: null,
-    };
+    return Array(quantity).fill({ unitId });
   };
 
   public getInvalidUnitItems = ({
@@ -105,45 +94,48 @@ export class ProductValidatorData implements IProductValidatorData {
     return unitItems;
   };
 
-  public getOption = (optionID?: string): ErrorResult<Option> => {
+  public getOption = (optionID?: string): Option => {
     if (optionID) {
       const option = this.product.options.find(
         (option) => option.id === optionID
       );
-      if (option === null) {
-        return {
-          data: null,
-          error: new ValidatorError({
-            message: "Option does not exist",
-            type: ErrorType.CRITICAL,
-          }),
-        };
-      }
-      return {
-        data: option,
-        error: null,
-      };
+      return option;
+      // if (option === null) {
+      //   return {
+      //     data: null,
+      //     error: new ValidatorError({
+      //       message: "Option does not exist",
+      //       type: ErrorType.CRITICAL,
+      //     }),
+      //   };
+      // }
+      // return {
+      //   data: option,
+      //   error: null,
+      // };
     }
     const option =
       this.product.options.find((option) => option.default) ??
-      this.product.options[0] ??
-      null;
-    if (option === null) {
-      return {
-        data: null,
-        error: new ValidatorError({
-          message: "Option does not exist",
-          type: ErrorType.CRITICAL,
-        }),
-      };
-    }
-    return {
-      data: option,
-      error: null,
-    };
+      this.product.options[0];
+    // null;
+
+    return option;
+    // if (option === null) {
+    //   return {
+    //     data: null,
+    //     error: new ValidatorError({
+    //       message: "Option does not exist",
+    //       type: ErrorType.CRITICAL,
+    //     }),
+    //   };
+    // }
+    // return {
+    //   data: option,
+    //   error: null,
+    // };
   };
 
-  public getAvailabilityIDAvailable = (): string[] => {
+  public getAvailabilityIDAvailable = (): [string, string] => {
     return this.availabilityIdAvailable;
   };
 

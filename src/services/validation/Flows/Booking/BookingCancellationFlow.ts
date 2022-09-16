@@ -1,11 +1,13 @@
-import { BookingUnitItemSchema, Contact, UnitType } from "@octocloud/types";
+import { Contact } from "@octocloud/types";
 import { Flow, FlowResult } from "../Flow";
 import { BookingCancellationReservationScenario } from "../../Scenarios/Booking/Cancellation/BookingCancellationReservation";
 import { BookingCancellationBookingScenario } from "../../Scenarios/Booking/Cancellation/BookingCancellationBooking";
 import { BookingCancellationInvalidUUIDScenario } from "../../Scenarios/Booking/Cancellation/BookingCancellationInvalidUUID";
 import { BaseFlow } from "../BaseFlow";
+import { Booker } from "../../Booker";
 
 export class BookingCancellationFlow extends BaseFlow implements Flow {
+  private booker = new Booker();
   private apiClient = this.config.getApiClient();
   constructor() {
     super("Booking Cancellation");
@@ -23,26 +25,9 @@ export class BookingCancellationFlow extends BaseFlow implements Flow {
 
   private validateBookingCancellationReservation =
     async (): Promise<BookingCancellationReservationScenario> => {
-      const product = this.config.getProduct();
-      // TODO: get from somewhere else
-      const option = product.options[0];
+      const [bookableProduct] = this.config.productConfig.availableProducts;
 
-      const unitAdult =
-        option.units.find((u) => u.type === UnitType.ADULT) ?? null;
-      if (unitAdult === null) {
-        throw Error("no adult unit");
-      }
-
-      const unitItems: BookingUnitItemSchema[] = [
-        { unitId: unitAdult.id },
-        { unitId: unitAdult.id },
-      ];
-      const result = await this.apiClient.bookingReservation({
-        productId: product.id,
-        optionId: option.id,
-        availabilityId: "2022-10-14T00:00:00-04:00",
-        unitItems,
-      });
+      const result = await this.booker.createReservation(bookableProduct);
       const booking = result.data;
       return new BookingCancellationReservationScenario({
         capabilities: this.config.getCapabilityIDs(),
@@ -52,28 +37,14 @@ export class BookingCancellationFlow extends BaseFlow implements Flow {
 
   private validateBookingCancellationBooking =
     async (): Promise<BookingCancellationBookingScenario> => {
-      const product = this.config.getProduct();
-      // TODO: get from somewhere else
-      const option = product.options[0];
+      const [bookableProduct] = this.config.productConfig.availableProducts;
 
-      const unitAdult =
-        option.units.find((u) => u.type === UnitType.ADULT) ?? null;
-      if (unitAdult === null) {
-        throw Error("no adult unit");
-      }
-
-      const unitItems: BookingUnitItemSchema[] = [
-        { unitId: unitAdult.id },
-        { unitId: unitAdult.id },
-      ];
-      const reservationResult = await this.apiClient.bookingReservation({
-        productId: product.id,
-        optionId: option.id,
-        availabilityId: "2022-10-14T00:00:00-04:00",
-        unitItems,
-      });
+      const reservationResult = await this.booker.createReservation(
+        bookableProduct
+      );
       const reservation = reservationResult.data;
 
+      // TODO: add confirmReservation to Booker
       const result = await this.apiClient.bookingConfirmation({
         uuid: reservation.id,
         // TODO: create legit contact

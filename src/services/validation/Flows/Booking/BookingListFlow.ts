@@ -1,13 +1,14 @@
-import { BookingUnitItemSchema, UnitType } from "@octocloud/types";
 import { Flow, FlowResult } from "../Flow";
 import { BookingListSupplierReferenceScenario } from "../../Scenarios/Booking/List/BookingListSupplierReference";
 import { BookingListResellerReferenceScenario } from "../../Scenarios/Booking/List/BookingListResellerReference";
 import { BookingListBadRequestScenario } from "../../Scenarios/Booking/List/BookingListBadRequest";
 import { DateHelper } from "../../../../helpers/DateHelper";
 import { BaseFlow } from "../BaseFlow";
+import { Booker } from "../../Booker";
 
 export class BookingListFlow extends BaseFlow implements Flow {
   private apiClient = this.config.getApiClient();
+  private booker = new Booker();
   constructor() {
     super("List Bookings");
   }
@@ -23,26 +24,11 @@ export class BookingListFlow extends BaseFlow implements Flow {
 
   private validateListBookingsSupplierReference =
     async (): Promise<BookingListSupplierReferenceScenario> => {
-      const product = this.config.getProduct();
-      // TODO: get from somewhere else
-      const option = product.options[0];
+      const [bookableProduct] = this.config.productConfig.availableProducts;
 
-      const unitAdult =
-        option.units.find((u) => u.type === UnitType.ADULT) ?? null;
-      if (unitAdult === null) {
-        throw Error("no adult unit");
-      }
-
-      const unitItems: BookingUnitItemSchema[] = [
-        { unitId: unitAdult.id },
-        { unitId: unitAdult.id },
-      ];
-      const reservationResult = await this.apiClient.bookingReservation({
-        productId: product.id,
-        optionId: option.id,
-        availabilityId: "2022-10-14T00:00:00-04:00",
-        unitItems,
-      });
+      const reservationResult = await this.booker.createReservation(
+        bookableProduct
+      );
       const reservation = reservationResult.data;
 
       const result = await this.apiClient.bookingConfirmation({
@@ -60,26 +46,11 @@ export class BookingListFlow extends BaseFlow implements Flow {
 
   private validateListBookingsResellerReference =
     async (): Promise<BookingListResellerReferenceScenario> => {
-      const product = this.config.getProduct();
-      // TODO: get from somewhere else
-      const option = product.options[0];
+      const [bookableProduct] = this.config.productConfig.availableProducts;
 
-      const unitAdult =
-        option.units.find((u) => u.type === UnitType.ADULT) ?? null;
-      if (unitAdult === null) {
-        throw Error("no adult unit");
-      }
-
-      const unitItems: BookingUnitItemSchema[] = [
-        { unitId: unitAdult.id },
-        { unitId: unitAdult.id },
-      ];
-      const reservationResult = await this.apiClient.bookingReservation({
-        productId: product.id,
-        optionId: option.id,
-        availabilityId: "2022-10-14T00:00:00-04:00",
-        unitItems,
-      });
+      const reservationResult = await this.booker.createReservation(
+        bookableProduct
+      );
       const reservation = reservationResult.data;
 
       const resellerReference = `TEST_REFERENCE-${DateHelper.getDate(

@@ -1,3 +1,4 @@
+import { Product } from "@octocloud/types";
 import { Scenario } from "../../Scenarios/Scenario";
 import { Flow, FlowResult } from "../Flow";
 import { AvailabilityCalendarIntervalScenario } from "../../Scenarios/AvailabilityCalendar/AvailabilityCalendarInterval";
@@ -13,11 +14,26 @@ export class AvailabilityCalendarFlow extends BaseFlow implements Flow {
 
   public validate = async (): Promise<FlowResult> => {
     const scenarios: Scenario<unknown>[] = [
-      new AvailabilityCalendarIntervalScenario(),
+      ...this.checkCalendarAvaialbility(),
       new AvailabilityCalendarInvalidProductScenario(),
       new AvailabilityCalendarInvalidOptionScenario(),
       new AvailabilityCalendarBadRequestScenario(),
     ];
     return this.validateScenarios(scenarios);
   };
+
+  private checkCalendarAvaialbility =
+    (): AvailabilityCalendarIntervalScenario[] => {
+      const products = Array<Product>();
+      if (this.config.productConfig.hasOpeningHourProducts) {
+        products.push(this.config.productConfig.openingHourProducts[0]);
+      }
+      if (this.config.productConfig.hasStartTimeProducts) {
+        products.push(this.config.productConfig.startTimeProducts[0]);
+      }
+
+      return products.map(
+        (product) => new AvailabilityCalendarIntervalScenario(product)
+      );
+    };
 }

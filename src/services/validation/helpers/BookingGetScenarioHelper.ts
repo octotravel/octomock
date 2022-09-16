@@ -1,4 +1,3 @@
-import * as R from "ramda";
 import { Booking } from "@octocloud/types";
 import { BookingValidator } from "../../../validators/backendValidator/Booking/BookingValidator";
 import {
@@ -26,7 +25,6 @@ export class BookingGetScenarioHelper extends ScenarioHelper {
     }).validate(result.data);
     return this.handleResult({
       ...data,
-      success: R.isEmpty(errors),
       errors,
     });
   };

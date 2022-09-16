@@ -1,4 +1,3 @@
-import * as R from "ramda";
 import { CapabilityId } from "@octocloud/types";
 import { STATUS_NOT_FOUND } from "../../../models/Error";
 import {
@@ -11,7 +10,7 @@ import { ScenarioResult } from "../Scenarios/Scenario";
 
 interface ScenarioData<T> {
   name: string;
-  success: boolean;
+  success?: boolean;
   result: Result<T>;
   errors: ValidatorError[];
 }
@@ -43,7 +42,7 @@ export class ScenarioHelper {
     }
     return {
       name: data.name,
-      success: data.success,
+      success: data.success ?? this.isSuccess(data.errors),
       request: result.request,
       response: {
         headers: result.response.headers,
@@ -82,8 +81,12 @@ export class ScenarioHelper {
     const errors = validator.validate(result.response.error);
     return this.handleResult({
       ...data,
-      success: R.isEmpty(errors),
+      success: this.isSuccess(errors),
       errors: errors,
     });
+  };
+
+  protected isSuccess = (errors: ValidatorError[]): boolean => {
+    return !errors.some((e) => e.type === ErrorType.CRITICAL);
   };
 }

@@ -4,10 +4,10 @@ import { BookingConfirmationUnitItemUpdateScenario } from "../../Scenarios/Booki
 import { BookingConfirmationInvalidUUIDScenario } from "../../Scenarios/Booking/Confirmation/BookingConfirmationInvalidUUID";
 import { BookingConfirmationInvalidUnitIdScenario } from "../../Scenarios/Booking/Confirmation/BookingConfirmationInvalidUnitId";
 import { BaseFlow } from "../BaseFlow";
-import { BookingUnitItemSchema, UnitType } from "@octocloud/types";
+import { Booker } from "../../Booker";
 
 export class BookingConfirmationFlow extends BaseFlow implements Flow {
-  private apiClient = this.config.getApiClient();
+  private booker = new Booker();
   constructor() {
     super("Booking Confirmation");
   }
@@ -25,61 +25,28 @@ export class BookingConfirmationFlow extends BaseFlow implements Flow {
 
   private validateBookingConfirmation =
     async (): Promise<BookingConfirmationScenario> => {
-      const product = this.config.getProduct();
-      // TODO: get from somewhere else
-      const option = product.options[0];
+      const [bookableProduct] = this.config.productConfig.availableProducts;
 
-      const unitAdult =
-        option.units.find((u) => u.type === UnitType.ADULT) ?? null;
-      if (unitAdult === null) {
-        throw Error("no adult unit");
-      }
-
-      const unitItems: BookingUnitItemSchema[] = [
-        { unitId: unitAdult.id },
-        { unitId: unitAdult.id },
-      ];
-      const result = await this.apiClient.bookingReservation({
-        productId: product.id,
-        optionId: option.id,
-        availabilityId: "2022-10-14T00:00:00-04:00",
-        unitItems,
-      });
-      const booking = result.data;
+      const result = await this.booker.createReservation(bookableProduct);
       return new BookingConfirmationScenario({
         capabilities: this.config.getCapabilityIDs(),
-        booking,
+        booking: result.data,
       });
     };
 
   private validateBookingConfirmationUnitItemsUpdate =
     async (): Promise<BookingConfirmationUnitItemUpdateScenario> => {
-      const product = this.config.getProduct();
-      // TODO: get from somewhere else
-      const option = product.options[0];
+      const [bookableProduct] = this.config.productConfig.availableProducts;
 
-      const unitAdult =
-        option.units.find((u) => u.type === UnitType.ADULT) ?? null;
-      if (unitAdult === null) {
-        throw Error("no adult unit");
-      }
-
-      const unitItems: BookingUnitItemSchema[] = [
-        { unitId: unitAdult.id },
-        { unitId: unitAdult.id },
-      ];
-      const result = await this.apiClient.bookingReservation({
-        productId: product.id,
-        optionId: option.id,
-        availabilityId: "2022-10-14T00:00:00-04:00",
-        unitItems,
+      const result = await this.booker.createReservation(bookableProduct, {
+        unitItemsQuantity: 2,
       });
-      const booking = result.data;
-      // todo: update units and check max units
+      const unitItems = bookableProduct.getValidUnitItems({ quantity: 3 });
+
       return new BookingConfirmationUnitItemUpdateScenario({
-        booking: booking,
+        booking: result.data,
         capabilities: this.config.getCapabilityIDs(),
-        unitItems: [...unitItems, ...unitItems],
+        unitItems,
       });
     };
 
@@ -92,37 +59,16 @@ export class BookingConfirmationFlow extends BaseFlow implements Flow {
 
   private validateBookingInvalidUnitId =
     async (): Promise<BookingConfirmationInvalidUnitIdScenario> => {
-      const product = this.config.getProduct();
-      // TODO: get from somewhere else
-      const option = product.options[0];
+      const [bookableProduct] = this.config.productConfig.availableProducts;
 
-      const unitAdult =
-        option.units.find((u) => u.type === UnitType.ADULT) ?? null;
-      if (unitAdult === null) {
-        throw Error("no adult unit");
-      }
-
-      const unitItems: BookingUnitItemSchema[] = [
-        { unitId: unitAdult.id },
-        { unitId: unitAdult.id },
-      ];
-      const result = await this.apiClient.bookingReservation({
-        productId: product.id,
-        optionId: option.id,
-        availabilityId: "2022-10-14T00:00:00-04:00",
-        unitItems,
+      const result = await this.booker.createReservation(bookableProduct, {
+        unitItemsQuantity: 2,
       });
-      const booking = result.data;
+      const unitItems = bookableProduct.getInvalidUnitItems({ quantity: 1 });
+
       return new BookingConfirmationInvalidUnitIdScenario({
-        uuid: booking.uuid,
-        unitItems: [
-          {
-            unitId: "invalid_unitId",
-          },
-          {
-            unitId: "invalid_unitId",
-          },
-        ],
+        uuid: result.data.uuid,
+        unitItems,
         contact: {},
       });
     };

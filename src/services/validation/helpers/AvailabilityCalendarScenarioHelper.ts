@@ -56,7 +56,7 @@ export class AvailabilityCalendarScenarioHelper extends ScenarioHelper {
 
     return this.handleResult({
       ...data,
-      success: R.isEmpty(errors),
+      success: this.isSuccess(errors),
       errors,
     });
   };

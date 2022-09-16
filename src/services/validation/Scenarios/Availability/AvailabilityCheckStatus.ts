@@ -1,9 +1,7 @@
 import { Scenario } from "../Scenario";
 import { Config } from "../../config/Config";
 import { AvailabilityStatusScenarioHelper } from "../../helpers/AvailabilityStatusScenarioHelper";
-import { DateHelper } from "../../../../helpers/DateHelper";
-import { addDays } from "date-fns";
-import { AvailabilityType } from "@octocloud/types";
+import { Product } from "@octocloud/types";
 
 export class AvailabilityCheckStatusScenario implements Scenario<any> {
   private config = Config.getInstance();
@@ -13,56 +11,40 @@ export class AvailabilityCheckStatusScenario implements Scenario<any> {
 
   public validate = async () => {
     const name = `Availability Check Status`;
-    const startTimesProducts = this.config.getProducts(
-      AvailabilityType.START_TIME
+    const productsStartTime = this.config.productConfig.startTimeProducts;
+    const productsOpeningHour = this.config.productConfig.openingHourProducts;
+
+    const startTimes = await this.fetchAvailabilityForProducts(
+      productsStartTime
     );
-    const openingHoursProducst = this.config.getProducts(
-      AvailabilityType.OPENING_HOURS
+    const openingHours = await this.fetchAvailabilityForProducts(
+      productsOpeningHour
     );
 
-    const startTimes = await Promise.all(
-      startTimesProducts.map(async (product) => {
-        const optionId =
-          product.options.find((option) => option.default).id ??
-          product.options[0].id;
-        const result = await this.apiClient.getAvailability({
-          productId: product.id,
-          optionId,
-          localDateStart: DateHelper.getDate(new Date().toISOString()),
-          localDateEnd: DateHelper.getDate(
-            addDays(new Date(), 30).toISOString()
-          ),
-        });
-        return {
-          result,
-          product,
-        };
-      })
-    );
-    console.log("fap");
-    const openingHours = await Promise.all(
-      openingHoursProducst.map(async (product) => {
-        const optionId =
-          product.options.find((option) => option.default).id ??
-          product.options[0].id;
-        const result = await this.apiClient.getAvailability({
-          productId: product.id,
-          optionId,
-          localDateStart: DateHelper.getDate(new Date().toISOString()),
-          localDateEnd: DateHelper.getDate(
-            addDays(new Date(), 30).toISOString()
-          ),
-        });
-        return {
-          result,
-          product,
-        };
-      })
-    );
     return this.availabilityStatusScenarioHelper.validateAvailability({
       name,
       startTimes,
       openingHours,
     });
+  };
+
+  private fetchAvailabilityForProducts = async (products: Product[]) => {
+    return Promise.all(
+      products.map(async (product) => {
+        const option =
+          product.options.find((option) => option.default) ??
+          product.options[0];
+        const result = await this.apiClient.getAvailability({
+          productId: product.id,
+          optionId: option.id,
+          localDateStart: this.config.localDateStart,
+          localDateEnd: this.config.localDateEnd,
+        });
+        return {
+          result,
+          product,
+        };
+      })
+    );
   };
 }

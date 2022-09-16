@@ -1,3 +1,4 @@
+import { ProductConfig } from "./ProductConfig";
 import {
   AvailabilityType,
   Capability,
@@ -12,6 +13,8 @@ import {
 } from "../../../validators/backendValidator/ValidatorHelpers";
 import { ApiClient } from "../api/ApiClient";
 import { ErrorResult, ProductValidatorData } from "./ProductValidatorData";
+import { DateHelper } from "../../../helpers/DateHelper";
+import { addDays } from "date-fns";
 
 interface IConfig {
   setCapabilities(capabilities: Capability[]): ValidatorError[];
@@ -22,7 +25,7 @@ interface IConfig {
     availabilityIdAvailable: string[],
     availabilityIdSoldOut: string
   ): void;
-  getProduct(): ErrorResult<Product>;
+  getProduct(): Product;
   getProducts(availabilityType?: AvailabilityType): ErrorResult<Product[]>;
   getStartTimeProducts(): ProductValidatorData[];
   getOpeningHoursProducts(): ProductValidatorData[];
@@ -33,30 +36,34 @@ export class Config implements IConfig {
 
   private endpoint: Nullable<string>;
   private apiKey: Nullable<string>;
-  private backendType: Nullable<string>;
 
   private capabilities: CapabilityId[];
 
-  private products: Product[];
   private startTimesProducts: ProductValidatorData[];
   private openingHoursProducts: ProductValidatorData[];
 
-  public invalidProductId: string;
-  public invalidOptionId: string;
+  public invalidProductId = "invalidProductId";
+  public invalidOptionId = "invalidOptionId";
+  public invalidAvailabilityId = "invalidAvailabilityId";
+  public invalidUUID = "invalidUUID";
+  public note = "Test Note";
   public ignoreKill: boolean;
+
+  public localDateStart = DateHelper.getDate(new Date().toISOString());
+  public localDateEnd = DateHelper.getDate(
+    addDays(new Date(), 30).toISOString()
+  );
+
+  public readonly productConfig = new ProductConfig();
 
   constructor() {
     this.endpoint = null;
     this.apiKey = null;
-    this.backendType = null;
 
     this.capabilities = [];
 
-    this.products = [];
     this.startTimesProducts = [];
     this.openingHoursProducts = [];
-    this.invalidProductId = "invalidProductId";
-    this.invalidOptionId = "invalidOptionId";
 
     this.ignoreKill = true;
   }
@@ -71,19 +78,6 @@ export class Config implements IConfig {
   public init = (data: ValidationEndpoint): void => {
     this.endpoint = data.backend.endpoint;
     this.apiKey = data.backend.apiKey;
-    this.backendType = data.backend.type;
-  };
-
-  public getEndpointData = (): {
-    endpoint: string;
-    apiKey: string;
-    backendType: string;
-  } => {
-    return {
-      endpoint: this.endpoint,
-      apiKey: this.apiKey,
-      backendType: this.backendType,
-    };
   };
 
   public getApiClient = (): ApiClient => {
@@ -106,13 +100,16 @@ export class Config implements IConfig {
   };
 
   public setProducts = (products: Product[]): ValidatorError[] => {
-    this.products = products;
-    return [];
+    if (R.isEmpty(products)) {
+      this.ignoreKill = false;
+    }
+
+    return this.productConfig.setProducts(products);
   };
 
   public setAvailability = (
     product: Product,
-    availabilityIdAvailable: string[],
+    availabilityIdAvailable: [string, string],
     availabilityIdSoldOut: string
   ): void => {
     if (product.availabilityType === AvailabilityType.START_TIME) {
@@ -136,64 +133,65 @@ export class Config implements IConfig {
     }
   };
 
-  public getProduct = (
-    availabilityType?: AvailabilityType
-  ): ErrorResult<Product> => {
+  public getProduct = (availabilityType?: AvailabilityType): Product => {
     if (availabilityType) {
       if (availabilityType === AvailabilityType.START_TIME) {
-        const products = this.products.filter(
+        const products = this.productConfig.products.filter(
           (product) => product.availabilityType === AvailabilityType.START_TIME
         );
-        if (R.isEmpty(products)) {
-          return {
-            error: new ValidatorError({
-              type: ErrorType.CRITICAL,
-              message: "there is no suitable product",
-            }),
-            data: null,
-          };
-        }
-        return {
-          data: products[0],
-          error: null,
-        };
+        return products[0];
+        // if (R.isEmpty(products)) {
+        //   return {
+        //     error: new ValidatorError({
+        //       type: ErrorType.CRITICAL,
+        //       message: "there is no suitable product",
+        //     }),
+        //     data: null,
+        //   };
+        // }
+        // return {
+        // data: products[0],
+        // error: null,
+        // };
       }
+      // }
+      // if (R.isEmpty(this.products)) {
+      //   return {
+      //     error: new ValidatorError({
+      //       type: ErrorType.CRITICAL,
+      //       message: "there is no suitable product",
+      //     }),
+      //     data: null,
+      //   };
+      // }
+      // return {
+      //   data: this.products[0],
+      //   error: null,
+      // };
     }
-    if (R.isEmpty(this.products)) {
-      return {
-        error: new ValidatorError({
-          type: ErrorType.CRITICAL,
-          message: "there is no suitable product",
-        }),
-        data: null,
-      };
-    }
-    return {
-      data: this.products[0],
-      error: null,
-    };
+    return this.productConfig.products[0];
   };
 
   public getProducts = (
     availabilityType?: AvailabilityType
   ): ErrorResult<Product[]> => {
     if (availabilityType) {
-      const products = this.products.filter(
+      const products = this.productConfig.products.filter(
         (product) => product.availabilityType === availabilityType
       );
       if (R.isEmpty(products)) {
         return {
           data: null,
           error: new ValidatorError({
-            type: ErrorType.CRITICAL,
-            message: "there is no suitable products",
+            type: ErrorType.WARNING,
+            message: `There is no product with availabilityType=${availabilityType}`,
           }),
         };
       }
       return;
     }
     return {
-      data: this.products,
+      data: this.productConfig.products,
       error: null,
     };
   };

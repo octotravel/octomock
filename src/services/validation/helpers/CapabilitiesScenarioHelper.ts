@@ -1,4 +1,3 @@
-import * as R from "ramda";
 import { ScenarioHelper } from "./ScenarioHelper";
 import { Capability } from "@octocloud/types";
 import { CapabilityValidator } from "../../../validators/backendValidator/Capability/CapabilityValidator";
@@ -24,7 +23,6 @@ export class CapabilitiesScenarioHelper extends ScenarioHelper {
     const errors = result.data.map(validator.validate).flat(1);
     return this.handleResult({
       ...data,
-      success: R.isEmpty(errors),
       errors,
     });
   };

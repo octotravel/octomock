@@ -1,12 +1,14 @@
-import { BookingUnitItemSchema, Contact, UnitType } from "@octocloud/types";
+import { Contact } from "@octocloud/types";
 import { Flow, FlowResult } from "../Flow";
 import { BookingGetReservationScenario } from "../../Scenarios/Booking/Get/BookingGetReservation";
 import { BookingGetBookingScenario } from "../../Scenarios/Booking/Get/BookingGetBooking";
 import { BookingGetInvalidUUIDScenario } from "../../Scenarios/Booking/Get/BookingGetInvalidUUID";
 import { BaseFlow } from "../BaseFlow";
+import { Booker } from "../../Booker";
 
 export class BookingGetFlow extends BaseFlow implements Flow {
   private apiClient = this.config.getApiClient();
+  private booker = new Booker();
   constructor() {
     super("Get Booking");
   }
@@ -21,26 +23,9 @@ export class BookingGetFlow extends BaseFlow implements Flow {
 
   private validateGetBookingReservation =
     async (): Promise<BookingGetReservationScenario> => {
-      const product = this.config.getProduct();
-      // TODO: get from somewhere else
-      const option = product.options[0];
+      const [bookableProduct] = this.config.productConfig.availableProducts;
 
-      const unitAdult =
-        option.units.find((u) => u.type === UnitType.ADULT) ?? null;
-      if (unitAdult === null) {
-        throw Error("no adult unit");
-      }
-
-      const unitItems: BookingUnitItemSchema[] = [
-        { unitId: unitAdult.id },
-        { unitId: unitAdult.id },
-      ];
-      const result = await this.apiClient.bookingReservation({
-        productId: product.id,
-        optionId: option.id,
-        availabilityId: "2022-10-14T00:00:00-04:00",
-        unitItems,
-      });
+      const result = await this.booker.createReservation(bookableProduct);
       const booking = result.data;
       return new BookingGetReservationScenario({
         uuid: booking.uuid,
@@ -50,26 +35,11 @@ export class BookingGetFlow extends BaseFlow implements Flow {
 
   private validateGetBookingBooking =
     async (): Promise<BookingGetBookingScenario> => {
-      const product = this.config.getProduct();
-      // TODO: get from somewhere else
-      const option = product.options[0];
+      const [bookableProduct] = this.config.productConfig.availableProducts;
 
-      const unitAdult =
-        option.units.find((u) => u.type === UnitType.ADULT) ?? null;
-      if (unitAdult === null) {
-        throw Error("no adult unit");
-      }
-
-      const unitItems: BookingUnitItemSchema[] = [
-        { unitId: unitAdult.id },
-        { unitId: unitAdult.id },
-      ];
-      const reservationResult = await this.apiClient.bookingReservation({
-        productId: product.id,
-        optionId: option.id,
-        availabilityId: "2022-10-14T00:00:00-04:00",
-        unitItems,
-      });
+      const reservationResult = await this.booker.createReservation(
+        bookableProduct
+      );
       const reservation = reservationResult.data;
 
       const result = await this.apiClient.bookingConfirmation({
@@ -87,7 +57,7 @@ export class BookingGetFlow extends BaseFlow implements Flow {
   private validateGetBookingInvalidUUIDError =
     async (): Promise<BookingGetInvalidUUIDScenario> => {
       return new BookingGetInvalidUUIDScenario({
-        uuid: "invalid_UUID",
+        uuid: this.config.invalidUUID,
         capabilities: this.config.getCapabilityIDs(),
       });
     };
