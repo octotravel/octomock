@@ -6,6 +6,7 @@ export interface Scenario<T> {
 
 export interface ScenarioRequest {
   url: string;
+  method: string;
   body: Nullable<any>;
   headers: Record<string, string>;
 }
@@ -19,12 +20,20 @@ export interface ScenarioResponse<T> {
   headers: Record<string, string>;
 }
 
+export enum ValidationResult {
+  SUCCESS = "SUCCESS",
+  WARNING = "WARNING",
+  FAILED = "FAILED",
+}
+
 export interface ScenarioResult<T> {
   name: string;
   success: boolean;
+  validationResult: ValidationResult;
   request: Nullable<ScenarioRequest>;
   response: Nullable<ScenarioResponse<T>>;
   errors: any[]; // validation errors
+  description: string;
 }
 
 export interface BookingValidateData {

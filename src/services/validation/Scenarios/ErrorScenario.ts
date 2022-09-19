@@ -1,5 +1,5 @@
 import { ValidatorError } from "../../../validators/backendValidator/ValidatorHelpers";
-import { Scenario, ScenarioResult } from "./Scenario";
+import { Scenario, ScenarioResult, ValidationResult } from "./Scenario";
 
 export class ErrorScenario implements Scenario<unknown> {
   private errors: ValidatorError[] = [];
@@ -10,9 +10,11 @@ export class ErrorScenario implements Scenario<unknown> {
     return {
       name: "",
       success: false,
+      validationResult: ValidationResult.FAILED,
       request: null,
       response: null,
       errors: this.errors,
+      description: "",
     };
   };
 }

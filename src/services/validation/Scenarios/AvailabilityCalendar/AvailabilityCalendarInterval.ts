@@ -2,6 +2,7 @@ import { AvailabilityCalendar, Product } from "@octocloud/types";
 import { Scenario } from "../Scenario";
 import { AvailabilityCalendarScenarioHelper } from "../../helpers/AvailabilityCalendarScenarioHelper";
 import { Config } from "../../config/Config";
+import descriptions from "../../consts/descriptions";
 
 export class AvailabilityCalendarIntervalScenario
   implements Scenario<AvailabilityCalendar[]>
@@ -27,10 +28,15 @@ export class AvailabilityCalendarIntervalScenario
       localDateEnd: this.config.localDateEnd,
     });
     const name = `Availability Calendar Interval (${this.product.availabilityType})`;
-    return this.availabilityCalendarScenarioHelper.validateAvailability({
-      result,
-      name,
-      product: this.product,
-    });
+    const description = descriptions.availabilityCalendarInterval;
+
+    return this.availabilityCalendarScenarioHelper.validateAvailability(
+      {
+        result,
+        name,
+        description,
+      },
+      this.product
+    );
   };
 }

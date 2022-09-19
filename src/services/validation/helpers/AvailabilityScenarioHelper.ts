@@ -1,24 +1,18 @@
 import { Availability, Product } from "@octocloud/types";
 import { AvailabilityValidator } from "../../../validators/backendValidator/Availability/AvailabilityValidator";
-import { ScenarioHelper } from "./ScenarioHelper";
-import { Result } from "../api/types";
+import { ScenarioHelper, ScenarioHelperData } from "./ScenarioHelper";
 import { Config } from "../config/Config";
-
-export interface AvailabilityScenarioData<T> {
-  name: string;
-  result: Result<T>;
-  product: Product;
-}
 
 export class AvailabilityScenarioHelper extends ScenarioHelper {
   private config = Config.getInstance();
 
   public validateAvailability = (
-    data: AvailabilityScenarioData<Availability[]>
+    data: ScenarioHelperData<Availability[]>,
+    product: Product
   ) => {
     const validator = new AvailabilityValidator({
       capabilities: this.config.getCapabilityIDs(),
-      availabilityType: data.product.availabilityType,
+      availabilityType: product.availabilityType,
     });
     const { result } = data;
     if (result.response.error) {

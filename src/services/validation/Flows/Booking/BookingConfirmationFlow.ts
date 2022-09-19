@@ -5,11 +5,12 @@ import { BookingConfirmationInvalidUUIDScenario } from "../../Scenarios/Booking/
 import { BookingConfirmationInvalidUnitIdScenario } from "../../Scenarios/Booking/Confirmation/BookingConfirmationInvalidUnitId";
 import { BaseFlow } from "../BaseFlow";
 import { Booker } from "../../Booker";
+import docs from "../../consts/docs";
 
 export class BookingConfirmationFlow extends BaseFlow implements Flow {
   private booker = new Booker();
   constructor() {
-    super("Booking Confirmation");
+    super("Booking Confirmation", docs.bookingConfirmation);
   }
 
   public validate = async (): Promise<FlowResult> => {

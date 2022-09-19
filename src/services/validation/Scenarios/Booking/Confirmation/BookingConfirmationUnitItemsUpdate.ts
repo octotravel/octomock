@@ -2,6 +2,7 @@ import { Booking, BookingUnitItemSchema, CapabilityId } from "@octocloud/types";
 import { Scenario } from "../../Scenario";
 import { BookingConfirmationScenarioHelper } from "../../../helpers/BookingConfirmationScenarioHelper";
 import { Config } from "../../../config/Config";
+import descriptions from "../../../consts/descriptions";
 
 export class BookingConfirmationUnitItemUpdateScenario
   implements Scenario<Booking>
@@ -41,11 +42,13 @@ export class BookingConfirmationUnitItemUpdateScenario
       unitItems: this.unitItems,
     });
     const name = `Booking Confirmation unitItems update`;
+    const description = descriptions.bookingConfirmationUnitItemsUpdate;
 
     return this.bookingConfirmationScenarioHelper.validateBookingConfirmation(
       {
         result,
         name,
+        description,
       },
       {
         capabilities: this.capabilities,

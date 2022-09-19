@@ -33,7 +33,7 @@ export class Client {
       init.body = body;
     }
     const res = await fetch(url, init);
-    return this.setResponse({ url, body: body ?? null, headers }, res);
+    return this.setResponse({ url, method, body: body ?? null, headers }, res);
   };
 
   private createHeaders = (): Record<string, string> => {
@@ -49,6 +49,7 @@ export class Client {
   protected setResponse = async <T>(
     request: {
       url: string;
+      method: string;
       body: Nullable<string>;
       headers: Record<string, string>;
     },
@@ -63,6 +64,7 @@ export class Client {
         data,
         request: {
           url: request.url,
+          method: request.method,
           body: requestBody,
           headers: request.headers,
         },
@@ -81,6 +83,7 @@ export class Client {
         data: null,
         request: {
           url: request.url,
+          method: request.method,
           body: requestBody,
           headers: request.headers,
         },
@@ -98,6 +101,7 @@ export class Client {
         data: null,
         request: {
           url: request.url,
+          method: request.method,
           body: requestBody,
           headers: request.headers,
         },

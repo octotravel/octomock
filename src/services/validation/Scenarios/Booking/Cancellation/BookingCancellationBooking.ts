@@ -2,6 +2,7 @@ import { Booking, CapabilityId } from "@octocloud/types";
 import { Scenario } from "../../Scenario";
 import { BookingCancellationScenarioHelper } from "../../../helpers/BookingCancellationScenarioHelper";
 import { Config } from "../../../config/Config";
+import descriptions from "../../../consts/descriptions";
 
 export class BookingCancellationBookingScenario implements Scenario<Booking> {
   private config = Config.getInstance();
@@ -27,11 +28,13 @@ export class BookingCancellationBookingScenario implements Scenario<Booking> {
       reason: "Reason for cancellation",
     });
     const name = `Booking Cancellation - Booking`;
+    const description = descriptions.bookingCancellationBooking;
 
     return this.bookingCancellationScenarioHelper.validateBookingCancellation(
       {
         result,
         name,
+        description,
       },
       {
         capabilities: this.capabilities,

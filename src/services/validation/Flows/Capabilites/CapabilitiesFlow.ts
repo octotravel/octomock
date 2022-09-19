@@ -4,7 +4,7 @@ import { BaseFlow } from "../BaseFlow";
 
 export class CapabilitiesFlow extends BaseFlow implements Flow {
   constructor() {
-    super("Get Capabilities");
+    super("Get Capabilities", "");
   }
 
   public validate = async (): Promise<FlowResult> => {

@@ -1,25 +1,21 @@
 import * as R from "ramda";
 import { AvailabilityCalendar, Product } from "@octocloud/types";
-import { ScenarioHelper } from "./ScenarioHelper";
+import { ScenarioHelper, ScenarioHelperData } from "./ScenarioHelper";
 import {
   ErrorType,
   ValidatorError,
 } from "./../../../validators/backendValidator/ValidatorHelpers";
 import { AvailabilityCalendarValidator } from "../../../validators/backendValidator/AvailabilityCalendar/AvailabilityCalendarValidator";
-import { Result } from "../api/types";
 import { Config } from "../config/Config";
-
-export interface AvailabilityScenarioData {
-  name: string;
-  result: Result<AvailabilityCalendar[]>;
-  product: Product;
-}
 
 export class AvailabilityCalendarScenarioHelper extends ScenarioHelper {
   private config = Config.getInstance();
 
-  public validateAvailability = (data: AvailabilityScenarioData) => {
-    const { result, product } = data;
+  public validateAvailability = (
+    data: ScenarioHelperData<AvailabilityCalendar[]>,
+    product: Product
+  ) => {
+    const { result } = data;
     const availabilities = R.is(Array, result.data) ? result.data : [];
     if (result.response.error) {
       return this.handleResult({

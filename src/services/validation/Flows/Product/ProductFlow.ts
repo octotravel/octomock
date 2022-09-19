@@ -4,10 +4,11 @@ import { GetProductInvalidScenario } from "../../Scenarios/Product/GetProductInv
 import { GetProductsScenario } from "../../Scenarios/Product/GetProducts";
 import { Flow, FlowResult } from "../Flow";
 import { BaseFlow } from "../BaseFlow";
+import docs from "../../consts/docs";
 
 export class ProductFlow extends BaseFlow implements Flow {
   constructor() {
-    super("Get Products");
+    super("Get Products", docs.products);
   }
 
   public validate = async (): Promise<FlowResult> => {

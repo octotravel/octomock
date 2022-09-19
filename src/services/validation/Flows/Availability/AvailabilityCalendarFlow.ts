@@ -5,10 +5,11 @@ import { AvailabilityCalendarInvalidProductScenario } from "../../Scenarios/Avai
 import { AvailabilityCalendarInvalidOptionScenario } from "../../Scenarios/AvailabilityCalendar/AvailabilityCalendarInvalidOption";
 import { AvailabilityCalendarBadRequestScenario } from "../../Scenarios/AvailabilityCalendar/AvailabilityCalendarBadRequest";
 import { BaseFlow } from "../BaseFlow";
+import docs from "../../consts/docs";
 
 export class AvailabilityCalendarFlow extends BaseFlow implements Flow {
   constructor() {
-    super("Availability Calendar");
+    super("Availability Calendar", docs.availabilityCalendar);
   }
 
   public validate = async (): Promise<FlowResult> => {

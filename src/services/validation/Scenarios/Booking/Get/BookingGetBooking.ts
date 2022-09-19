@@ -2,6 +2,7 @@ import { Booking, CapabilityId } from "@octocloud/types";
 import { Scenario } from "../../Scenario";
 import { BookingGetScenarioHelper } from "../../../helpers/BookingGetScenarioHelper";
 import { Config } from "../../../config/Config";
+import descriptions from "../../../consts/descriptions";
 
 export class BookingGetBookingScenario implements Scenario<Booking> {
   private config = Config.getInstance();
@@ -25,11 +26,13 @@ export class BookingGetBookingScenario implements Scenario<Booking> {
       uuid: this.uuid,
     });
     const name = "Get Booking - Booking";
+    const description = descriptions.bookingGetBooking;
 
     return this.bookingGetScenarionHelper.validateBookingGet(
       {
         result,
         name,
+        description,
       },
       {
         capabilities: this.capabilities,

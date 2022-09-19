@@ -3,6 +3,7 @@ import { addDays } from "date-fns";
 import { DateHelper } from "../../../../helpers/DateHelper";
 import { InvalidOptionIdErrorValidator } from "../../../../validators/backendValidator/Error/InvalidOptionIdErrorValidator";
 import { Config } from "../../config/Config";
+import descriptions from "../../consts/descriptions";
 import { AvailabilityCalendarScenarioHelper } from "../../helpers/AvailabilityCalendarScenarioHelper";
 import { Scenario, ScenarioResult } from "../Scenario";
 
@@ -26,11 +27,13 @@ export class AvailabilityCalendarInvalidOptionScenario
     });
     const name = `Availability Calendar Invalid Option (400 INVALID_OPTION_ID)`;
     const error = "Response should be INVALID_OPTION_ID";
+    const description = descriptions.invalidOption;
 
     return this.availabilityCalendarScenarioHelper.validateError(
       {
         result,
         name,
+        description,
       },
       error,
       new InvalidOptionIdErrorValidator()

@@ -5,12 +5,13 @@ import { BookingListBadRequestScenario } from "../../Scenarios/Booking/List/Book
 import { DateHelper } from "../../../../helpers/DateHelper";
 import { BaseFlow } from "../BaseFlow";
 import { Booker } from "../../Booker";
+import docs from "../../consts/docs";
 
 export class BookingListFlow extends BaseFlow implements Flow {
   private apiClient = this.config.getApiClient();
   private booker = new Booker();
   constructor() {
-    super("List Bookings");
+    super("List Bookings", docs.bookingList);
   }
 
   public validate = async (): Promise<FlowResult> => {

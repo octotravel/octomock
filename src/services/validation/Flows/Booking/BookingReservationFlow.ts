@@ -10,11 +10,12 @@ import { BookingReservationEmptyUnitItemsScenario } from "../../Scenarios/Bookin
 import { BookingReservationInvalidUnitIdScenario } from "../../Scenarios/Booking/Reservation/BookingReservationInvalidUnitIdScenario";
 import { Scenario } from "../../Scenarios/Scenario";
 import { Booker } from "../../Booker";
+import docs from "../../consts/docs";
 
 export class BookingReservationFlow extends BaseFlow implements Flow {
   private booker = new Booker();
   constructor() {
-    super("Booking Reservation");
+    super("Booking Reservation", docs.bookingReservation);
   }
 
   public validate = async (): Promise<FlowResult> => {

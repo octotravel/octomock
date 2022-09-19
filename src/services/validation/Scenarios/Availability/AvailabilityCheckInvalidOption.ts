@@ -1,5 +1,6 @@
 import { InvalidOptionIdErrorValidator } from "../../../../validators/backendValidator/Error/InvalidOptionIdErrorValidator";
 import { Config } from "../../config/Config";
+import descriptions from "../../consts/descriptions";
 import { AvailabilityScenarioHelper } from "../../helpers/AvailabilityScenarioHelper";
 import { Scenario, ScenarioResult } from "../Scenario";
 
@@ -18,11 +19,13 @@ export class AvailabilityCheckInvalidOptionScenario implements Scenario<any> {
     });
     const name = `Availability Check Invalid Option (400 INVALID_OPTION_ID)`;
     const error = "Response should be INVALID_OPTION_ID";
+    const description = descriptions.invalidOption;
 
     return this.availabilityScenarioHelper.validateError(
       {
         name,
         result,
+        description,
       },
       error,
       new InvalidOptionIdErrorValidator()

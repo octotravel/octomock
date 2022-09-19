@@ -1,15 +1,9 @@
-import { ScenarioHelper } from "./ScenarioHelper";
+import { ScenarioHelper, ScenarioHelperData } from "./ScenarioHelper";
 import { Capability } from "@octocloud/types";
 import { CapabilityValidator } from "../../../validators/backendValidator/Capability/CapabilityValidator";
-import { Result } from "../api/types";
-
-export interface CapabilitiesScenarioData {
-  name: string;
-  result: Result<Capability[]>;
-}
 
 export class CapabilitiesScenarioHelper extends ScenarioHelper {
-  public validateCapabilities = (data: CapabilitiesScenarioData) => {
+  public validateCapabilities = (data: ScenarioHelperData<Capability[]>) => {
     const validator = new CapabilityValidator({});
     const { result } = data;
     if (result.response.error) {

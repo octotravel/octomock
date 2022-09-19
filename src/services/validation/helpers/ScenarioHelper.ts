@@ -1,4 +1,5 @@
 import { CapabilityId } from "@octocloud/types";
+import * as R from "ramda";
 import { STATUS_NOT_FOUND } from "../../../models/Error";
 import {
   ErrorType,
@@ -6,18 +7,20 @@ import {
   ValidatorError,
 } from "../../../validators/backendValidator/ValidatorHelpers";
 import { Result } from "../api/types";
-import { ScenarioResult } from "../Scenarios/Scenario";
+import { ScenarioResult, ValidationResult } from "../Scenarios/Scenario";
 
 interface ScenarioData<T> {
   name: string;
   success?: boolean;
   result: Result<T>;
   errors: ValidatorError[];
+  description: string;
 }
 
 export interface ScenarioHelperData<T> {
   name: string;
   result: Result<T>;
+  description: string;
 }
 
 export interface ScenarioConfigData {
@@ -27,6 +30,25 @@ export interface ScenarioConfigData {
 }
 
 export class ScenarioHelper {
+  private getValidationResult = <T>(
+    data: ScenarioData<T>
+  ): ValidationResult => {
+    if (!R.isEmpty(data.errors)) {
+      const warnings = data.errors.filter(
+        (error) => error.type === ErrorType.WARNING
+      );
+      const criticals = data.errors.filter(
+        (error) => error.type === ErrorType.CRITICAL
+      );
+      if (criticals.length > 0) {
+        return ValidationResult.FAILED;
+      }
+      if (warnings.length > 0) {
+        return ValidationResult.WARNING;
+      }
+    }
+    return ValidationResult.SUCCESS;
+  };
   protected handleResult = <T>(data: ScenarioData<T>): ScenarioResult<T> => {
     const { result } = data;
     if (result.response.error) {
@@ -43,6 +65,7 @@ export class ScenarioHelper {
     return {
       name: data.name,
       success: data.success ?? this.isSuccess(data.errors),
+      validationResult: this.getValidationResult(data),
       request: result.request,
       response: {
         headers: result.response.headers,
@@ -57,6 +80,7 @@ export class ScenarioHelper {
           : null,
       },
       errors: data.errors.map((error) => error?.mapError()),
+      description: data.description,
     };
   };
 

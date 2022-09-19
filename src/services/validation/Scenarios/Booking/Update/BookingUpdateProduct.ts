@@ -2,6 +2,7 @@ import { Booking, BookingUnitItemSchema, CapabilityId } from "@octocloud/types";
 import { Scenario } from "../../Scenario";
 import { BookingUpdateScenarioHelper } from "../../../helpers/BookingUpdateScenarioHelper";
 import { Config } from "../../../config/Config";
+import descriptions from "../../../consts/descriptions";
 
 export class BookingUpdateProductScenario implements Scenario<Booking> {
   private config = Config.getInstance();
@@ -45,11 +46,13 @@ export class BookingUpdateProductScenario implements Scenario<Booking> {
       unitItems: this.unitItems,
     });
     const name = `Booking Update - Change Product`;
+    const description = descriptions.bookingUpdateProduct;
 
     return this.bookingUpdateScenarioHelper.validateBookingUpdate(
       {
         result,
         name,
+        description,
       },
       {
         capabilities: this.capabilities,

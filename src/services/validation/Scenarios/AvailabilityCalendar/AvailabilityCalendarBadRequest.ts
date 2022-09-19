@@ -3,6 +3,7 @@ import { addDays } from "date-fns";
 import { DateHelper } from "../../../../helpers/DateHelper";
 import { BadRequestErrorValidator } from "../../../../validators/backendValidator/Error/BadRequestErrorValidator";
 import { Config } from "../../config/Config";
+import descriptions from "../../consts/descriptions";
 import { AvailabilityCalendarScenarioHelper } from "../../helpers/AvailabilityCalendarScenarioHelper";
 import { Scenario, ScenarioResult } from "../Scenario";
 
@@ -27,11 +28,13 @@ export class AvailabilityCalendarBadRequestScenario
 
     const name = `Availability Calendar BAD_REQUEST (400 BAD_REQUEST)`;
     const error = "Response should be BAD_REQUEST";
+    const description = descriptions.availabilityCalendarBadRequest;
 
     return this.availabilityCalendarScenarioHelper.validateError(
       {
         result,
         name,
+        description,
       },
       error,
       new BadRequestErrorValidator()

@@ -2,6 +2,7 @@ import { Booking, CapabilityId } from "@octocloud/types";
 import { Scenario } from "../../Scenario";
 import { BookingListScenarioHelper } from "../../../helpers/BookingListScenarioHelper";
 import { Config } from "../../../config/Config";
+import descriptions from "../../../consts/descriptions";
 
 export class BookingListResellerReferenceScenario
   implements Scenario<Booking[]>
@@ -27,11 +28,13 @@ export class BookingListResellerReferenceScenario
       resellerReference: this.resellerReference,
     });
     const name = "List Bookings - Reseller Reference";
+    const description = descriptions.bookingListResellerReference;
 
     return this.bookingListScenarionHelper.validateBookingList(
       {
         result,
         name,
+        description,
       },
       {
         capabilities: this.capabilities,

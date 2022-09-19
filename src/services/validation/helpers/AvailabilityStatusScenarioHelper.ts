@@ -10,6 +10,7 @@ import {
 } from "../../../validators/backendValidator/ValidatorHelpers";
 import { ErrorResult } from "../config/ProductValidatorData";
 import { ProductBookable } from "../config/ProductBookable";
+import descriptions from "../consts/descriptions";
 
 export interface AvailabilityScenarioData {
   name: string;
@@ -205,11 +206,13 @@ export class AvailabilityStatusScenarioHelper extends ScenarioHelper {
         request: {
           headers: {},
           url: null,
+          method: null,
           body: null,
         },
         data: null,
       },
       errors,
+      description: descriptions.availabilityCheckStatus,
     });
   };
 }

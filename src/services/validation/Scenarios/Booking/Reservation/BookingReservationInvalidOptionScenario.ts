@@ -3,6 +3,7 @@ import { Scenario } from "../../Scenario";
 import { InvalidOptionIdErrorValidator } from "../../../../../validators/backendValidator/Error/InvalidOptionIdErrorValidator";
 import { BookingReservationScenarioHelper } from "../../../helpers/BookingReservationScenarioHelper";
 import { Result } from "../../../api/types";
+import descriptions from "../../../consts/descriptions";
 
 export class BookingReservationInvalidOptionScenario implements Scenario<any> {
   private result: Result<Booking>;
@@ -15,11 +16,13 @@ export class BookingReservationInvalidOptionScenario implements Scenario<any> {
   public validate = async () => {
     const name = "Booking Reservation Invalid Option (400 INVALID_OPTION_ID)";
     const error = "Response should be INVALID_OPTION_ID";
+    const description = descriptions.invalidOption;
 
     return this.bookingReservationScenarioHelper.validateError(
       {
         result: this.result,
         name,
+        description,
       },
       error,
       new InvalidOptionIdErrorValidator()

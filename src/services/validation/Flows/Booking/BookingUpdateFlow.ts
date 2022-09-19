@@ -6,11 +6,12 @@ import { BookingUpdateContactScenario } from "../../Scenarios/Booking/Update/Boo
 import { BookingUpdateProductScenario } from "../../Scenarios/Booking/Update/BookingUpdateProduct";
 import { BaseFlow } from "../BaseFlow";
 import { Booker } from "../../Booker";
+import docs from "../../consts/docs";
 
 export class BookingUpdateFlow extends BaseFlow implements Flow {
   private booker = new Booker();
   constructor() {
-    super("Booking Update");
+    super("Booking Update", docs.bookingUpdate);
   }
   public validate = async (): Promise<FlowResult> => {
     const scenarios: Scenario<unknown>[] = [

@@ -2,6 +2,7 @@ import { Availability, Product } from "@octocloud/types";
 import { Scenario } from "../Scenario";
 import { AvailabilityScenarioHelper } from "../../helpers/AvailabilityScenarioHelper";
 import { Config } from "../../config/Config";
+import descriptions from "../../consts/descriptions";
 
 export class AvailabilityCheckAvailabilityIdScenario
   implements Scenario<Availability[]>
@@ -26,11 +27,15 @@ export class AvailabilityCheckAvailabilityIdScenario
     });
 
     const name = `Availability Check AvailabilityId (${this.product.availabilityType})`;
+    const description = descriptions.availabilityCheckAvailabilityId;
 
-    return this.availabilityScenarioHelper.validateAvailability({
-      name,
-      result,
-      product: this.product,
-    });
+    return this.availabilityScenarioHelper.validateAvailability(
+      {
+        name,
+        result,
+        description,
+      },
+      this.product
+    );
   };
 }

@@ -2,6 +2,7 @@ import { Booking, CapabilityId } from "@octocloud/types";
 import { Scenario } from "../../Scenario";
 import { BookingConfirmationScenarioHelper } from "../../../helpers/BookingConfirmationScenarioHelper";
 import { Config } from "../../../config/Config";
+import descriptions from "../../../consts/descriptions";
 
 export class BookingConfirmationScenario implements Scenario<Booking> {
   private config = Config.getInstance();
@@ -34,11 +35,13 @@ export class BookingConfirmationScenario implements Scenario<Booking> {
       resellerReference: "RESELLERREF#1",
     });
     const name = `Booking Confirmation`;
+    const description = descriptions.bookingConfirmation;
 
     return this.bookingConfirmationScenarioHelper.validateBookingConfirmation(
       {
         result,
         name,
+        description,
       },
       {
         capabilities: this.capabilities,

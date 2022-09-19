@@ -2,6 +2,7 @@ import { Availability, Product } from "@octocloud/types";
 import { Scenario } from "../Scenario";
 import { AvailabilityScenarioHelper } from "../../helpers/AvailabilityScenarioHelper";
 import { Config } from "../../config/Config";
+import descriptions from "../../consts/descriptions";
 
 export class AvailabilityChecIntervalScenario
   implements Scenario<Availability[]>
@@ -34,10 +35,15 @@ export class AvailabilityChecIntervalScenario
     console.log("fap", randomAvailability);
 
     const name = `Availability Check Interval (${this.product.availabilityType})`;
-    return this.availabilityScenarioHelper.validateAvailability({
-      name,
-      result,
-      product: this.product,
-    });
+    const description = descriptions.availabilityCheckInterval;
+
+    return this.availabilityScenarioHelper.validateAvailability(
+      {
+        name,
+        result,
+        description,
+      },
+      this.product
+    );
   };
 }

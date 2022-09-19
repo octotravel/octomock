@@ -1,5 +1,6 @@
 import { Product } from "@octocloud/types";
 import { Config } from "../../config/Config";
+import descriptions from "../../consts/descriptions";
 import { ProductScenarioHelper } from "../../helpers/ProductScenarioHelper";
 import { Scenario } from "../Scenario";
 
@@ -14,10 +15,12 @@ export class GetProductScenario implements Scenario<Product> {
       id: product.id,
     });
     const name = `Get Product`;
+    const description = descriptions.getProduct;
 
     return this.productScenarioHelper.validateProduct({
       result,
       name,
+      description,
     });
   };
 }

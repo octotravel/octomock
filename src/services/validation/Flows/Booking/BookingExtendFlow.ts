@@ -3,11 +3,12 @@ import { BookingReservationExtendScenario } from "../../Scenarios/Booking/Extend
 import { BookingReservationExtendInvalidUUIDScenario } from "../../Scenarios/Booking/Extend/BookingReservationExtendInvalidUUID";
 import { BaseFlow } from "../BaseFlow";
 import { Booker } from "../../Booker";
+import docs from "../../consts/docs";
 
 export class BookingExtendFlow extends BaseFlow implements Flow {
   private booker = new Booker();
   constructor() {
-    super("Extend Reservation");
+    super("Extend Reservation", docs.bookingReservationExtend);
   }
 
   public validate = async (): Promise<FlowResult> => {

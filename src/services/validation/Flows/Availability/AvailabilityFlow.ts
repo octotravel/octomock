@@ -1,4 +1,5 @@
 import { Config } from "../../config/Config";
+import docs from "../../consts/docs";
 import { AvailabilityCheckAvailabilityIdScenario } from "../../Scenarios/Availability/AvailabilityCheckAvailabilityId";
 import { AvailabilityCheckBadRequestScenario } from "../../Scenarios/Availability/AvailabilityCheckBadRequest";
 import { AvailabilityCheckDateScenario } from "../../Scenarios/Availability/AvailabilityCheckDate";
@@ -12,7 +13,7 @@ import { Flow, FlowResult } from "../Flow";
 export class AvailabilityFlow extends BaseFlow implements Flow {
   public config = Config.getInstance();
   constructor() {
-    super("Availability Check");
+    super("Availability Check", docs.availabilityCheck);
   }
 
   public validate = async (): Promise<FlowResult> => {

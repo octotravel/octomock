@@ -1,5 +1,6 @@
 import { InvalidProductIdErrorValidator } from "../../../../validators/backendValidator/Error/InvalidProductIdErrorValidator";
 import { Config } from "../../config/Config";
+import descriptions from "../../consts/descriptions";
 import { AvailabilityScenarioHelper } from "../../helpers/AvailabilityScenarioHelper";
 import { Scenario, ScenarioResult } from "../Scenario";
 
@@ -19,11 +20,13 @@ export class AvailabilityCheckInvalidProductScenario implements Scenario<any> {
 
     const name = `Availability Check Invalid Product (400 INVALID_PRODUCT_ID)`;
     const error = "Response should be INVALID_PRODUCT_ID";
+    const description = descriptions.invalidProduct;
 
     return this.availabilityScenarioHelper.validateError(
       {
         name,
         result,
+        description,
       },
       error,
       new InvalidProductIdErrorValidator()

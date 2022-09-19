@@ -3,6 +3,7 @@ import { Scenario } from "../../Scenario";
 import { UnprocessableEntityErrorValidator } from "../../../../../validators/backendValidator/Error/UnprocessableEntityErrorValidator";
 import { BookingReservationScenarioHelper } from "../../../helpers/BookingReservationScenarioHelper";
 import { Result } from "../../../api/types";
+import descriptions from "../../../consts/descriptions";
 
 export class BookingReservationMissingUnitItemsScenario
   implements Scenario<any>
@@ -18,11 +19,13 @@ export class BookingReservationMissingUnitItemsScenario
     const name =
       "Booking Reservation Missing UnitItems (400 UNPROCESSABLE_ENTITY)";
     const error = "Response should be UNPROCESSABLE_ENTITY";
+    const description = descriptions.bookingReservationMissingUnitItems;
 
     return this.bookingReservationScenarioHelper.validateError(
       {
         result: this.result,
         name,
+        description,
       },
       error,
       new UnprocessableEntityErrorValidator()

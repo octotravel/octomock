@@ -1,20 +1,14 @@
 import * as R from "ramda";
 import { ProductValidator } from "./../../../validators/backendValidator/Product/ProductValidator";
 import { Product } from "@octocloud/types";
-import { ScenarioHelper } from "./ScenarioHelper";
-import { Result } from "../api/types";
+import { ScenarioHelper, ScenarioHelperData } from "./ScenarioHelper";
 import { Config } from "../config/Config";
 import { ValidatorError } from "../../../validators/backendValidator/ValidatorHelpers";
-
-export interface ProductScenarioData<T> {
-  name: string;
-  result: Result<T>;
-}
 
 export class ProductScenarioHelper extends ScenarioHelper {
   private config = Config.getInstance();
 
-  public validateProducts = (data: ProductScenarioData<Product[]>) => {
+  public validateProducts = (data: ScenarioHelperData<Product[]>) => {
     const { result } = data;
     if (result.response.error) {
       return this.handleResult({
@@ -44,7 +38,7 @@ export class ProductScenarioHelper extends ScenarioHelper {
     });
   };
 
-  public validateProduct = (data: ProductScenarioData<Product>) => {
+  public validateProduct = (data: ScenarioHelperData<Product>) => {
     const { result } = data;
     if (result.response.error) {
       return this.handleResult({

@@ -11,6 +11,7 @@ export type Result<T> = {
 
 export type ResultRequest = {
   url: string;
+  method: string;
   body: Nullable<Record<string, any>>;
   headers: Record<string, string>;
 };
