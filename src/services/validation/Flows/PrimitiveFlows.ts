@@ -34,8 +34,8 @@ export class PrimiteFlows {
     for await (const flow of flows) {
       const result = await flow.validate();
       results.push(result);
-      if (!result.success && !this.config.ignoreKill === true) {
-        // break;
+      if (!result.success && this.config.ignoreKill === false) {
+        break;
       }
     }
 

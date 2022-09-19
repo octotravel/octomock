@@ -26,7 +26,7 @@ export abstract class BaseFlow {
     for await (const scenario of scenarios) {
       const result = await scenario.validate();
       results.push(result);
-      if (!result.success && this.config.ignoreKill === true) {
+      if (!result.success && this.config.ignoreKill === false) {
         break;
       }
     }
