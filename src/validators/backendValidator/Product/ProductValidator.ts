@@ -1,3 +1,4 @@
+import { ArrayValidator } from "./../ValidatorHelpers";
 import {
   CapabilityId,
   Product,
@@ -96,20 +97,26 @@ export class ProductValidator implements ModelValidator {
 
   private validateOptions = (product: Product): ValidatorError[] => {
     const options = product?.options ?? [];
-    return options
-      .map((option, i) => {
-        const optionValidator = new OptionValidator({
-          path: `${this.path}.options[${i}]`,
-          capabilities: this.capabilities,
-        });
-        return optionValidator.validate(
-          option,
-          product?.availabilityType,
-          product?.pricingPer
-        );
-      })
-      .flat(1)
-      .filter(Boolean);
+    const errors = [
+      ArrayValidator.validate(`${this.path}.options`, options, { min: 1 }),
+    ];
+    errors.push(
+      ...options
+        .map((option, i) => {
+          const optionValidator = new OptionValidator({
+            path: `${this.path}.options[${i}]`,
+            capabilities: this.capabilities,
+          });
+          return optionValidator.validate(
+            option,
+            product?.availabilityType,
+            product?.pricingPer
+          );
+        })
+        .flat(1)
+    );
+
+    return errors;
   };
 
   private validatePricingCapability = (product: Product): ValidatorError[] => {

@@ -2,6 +2,7 @@ import {
   AvailabilityStatus,
   CapabilityId,
   AvailabilityCalendar,
+  AvailabilityType,
 } from "@octocloud/types";
 import { CommonValidator } from "../CommonValidator";
 import {
@@ -17,15 +18,19 @@ import { AvailabilityCalendarPricingValidator } from "./AvailabilityCalendarPric
 export class AvailabilityCalendarValidator implements ModelValidator {
   private pricingValidator: AvailabilityCalendarPricingValidator;
   private path: string;
+  private availabilityType: AvailabilityType;
   private capabilities: CapabilityId[];
   constructor({
     path,
     capabilities,
+    availabilityType,
   }: {
     path: string;
     capabilities: CapabilityId[];
+    availabilityType: AvailabilityType;
   }) {
     this.path = `${path}`;
+    this.availabilityType = availabilityType;
     this.capabilities = capabilities;
     this.pricingValidator = new AvailabilityCalendarPricingValidator({
       path: this.path,
@@ -69,7 +74,8 @@ export class AvailabilityCalendarValidator implements ModelValidator {
 
       ...CommonValidator.validateOpeningHours(
         this.path,
-        availability?.openingHours ?? []
+        availability?.openingHours ?? [],
+        this.availabilityType
       ),
       ...this.validatePricingCapability(availability),
     ].filter(Boolean);

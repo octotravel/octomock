@@ -1,4 +1,8 @@
-import { AvailabilityCalendar, AvailabilityUnit } from "@octocloud/types";
+import {
+  AvailabilityCalendar,
+  AvailabilityUnit,
+  Product,
+} from "@octocloud/types";
 import { ApiClient } from "../../api/ApiClient";
 import { Scenario } from "../Scenario";
 import { AvailabilityCalendarScenarioHelper } from "../../helpers/AvailabilityCalendarScenarioHelper";
@@ -7,7 +11,7 @@ export class AvailabilityCalendarUnavailableDatesScenario
   implements Scenario<AvailabilityCalendar[]>
 {
   private apiClient: ApiClient;
-  private productId: string;
+  private product: Product;
   private optionId: string;
   private localDateStart: string;
   private localDateEnd: string;
@@ -15,7 +19,7 @@ export class AvailabilityCalendarUnavailableDatesScenario
   private availabilityType: string;
   constructor({
     apiClient,
-    productId,
+    product,
     optionId,
     localDateStart,
     localDateEnd,
@@ -23,7 +27,7 @@ export class AvailabilityCalendarUnavailableDatesScenario
     availabilityType,
   }: {
     apiClient: ApiClient;
-    productId: string;
+    product: Product;
     optionId: string;
     localDateStart: string;
     localDateEnd: string;
@@ -31,7 +35,7 @@ export class AvailabilityCalendarUnavailableDatesScenario
     availabilityType: string;
   }) {
     this.apiClient = apiClient;
-    this.productId = productId;
+    this.product = product;
     this.optionId = optionId;
     this.localDateStart = localDateStart;
     this.localDateEnd = localDateEnd;
@@ -43,7 +47,7 @@ export class AvailabilityCalendarUnavailableDatesScenario
 
   public validate = async () => {
     const result = await this.apiClient.getAvailabilityCalendar({
-      productId: this.productId,
+      productId: this.product.id,
       optionId: this.optionId,
       localDateStart: this.localDateStart,
       localDateEnd: this.localDateEnd,
@@ -54,6 +58,7 @@ export class AvailabilityCalendarUnavailableDatesScenario
     return this.availabilityCalendarScenarioHelper.validateAvailability({
       result,
       name,
+      product: this.product,
     });
   };
 }

@@ -165,7 +165,8 @@ export class BookingValidator implements ModelValidator {
       ),
       ...CommonValidator.validateOpeningHours(
         `${this.path}.availability`,
-        booking?.availability?.openingHours ?? []
+        booking?.availability?.openingHours ?? [],
+        booking?.product?.availabilityType
       ),
     ].filter(Boolean);
 

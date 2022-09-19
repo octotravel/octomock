@@ -32,7 +32,7 @@ export class AvailabilityValidator implements ModelValidator {
     capabilities: CapabilityId[];
     availabilityType?: AvailabilityType;
   }) {
-    this.path = `${path}availability`;
+    this.path = path ? path : `availability`;
     this.capabilities = capabilities;
     this.availabilityType = availabilityType;
     this.pricingValidator = new AvailabilityPricingValidator({
@@ -109,7 +109,8 @@ export class AvailabilityValidator implements ModelValidator {
 
       ...CommonValidator.validateOpeningHours(
         this.path,
-        availability?.openingHours
+        availability?.openingHours ?? [],
+        this.availabilityType
       ),
 
       ...this.validatePricingCapability(availability),

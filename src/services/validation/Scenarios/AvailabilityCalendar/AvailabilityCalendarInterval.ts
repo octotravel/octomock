@@ -30,6 +30,7 @@ export class AvailabilityCalendarIntervalScenario
     return this.availabilityCalendarScenarioHelper.validateAvailability({
       result,
       name,
+      product: this.product,
     });
   };
 }

@@ -1,5 +1,9 @@
-import { OpeningHours } from "@octocloud/types";
-import { RegExpValidator, ValidatorError } from "./ValidatorHelpers";
+import { AvailabilityType, OpeningHours } from "@octocloud/types";
+import {
+  ArrayValidator,
+  RegExpValidator,
+  ValidatorError,
+} from "./ValidatorHelpers";
 
 interface CommonValidatorParams {
   nullable?: boolean;
@@ -8,24 +12,35 @@ interface CommonValidatorParams {
 export class CommonValidator {
   public static validateOpeningHours = (
     label: string,
-    openingHours: OpeningHours[]
+    openingHours: OpeningHours[],
+    availabilityType: AvailabilityType
   ): ValidatorError[] => {
     const regExp = new RegExp(/^\d{2}:\d{2}$/g);
-    return openingHours
-      .map((openingHour, i) => [
-        RegExpValidator.validate(
-          `${label}.openingHours[${i}].from`,
-          openingHour?.from,
-          regExp
-        ),
-        RegExpValidator.validate(
-          `${label}.openingHours[${i}].to`,
-          openingHour?.to,
-          regExp
-        ),
-      ])
-      .flat(1)
-      .filter(Boolean);
+    const errors: ValidatorError[] = [
+      ...openingHours
+        .map((openingHour, i) => [
+          RegExpValidator.validate(
+            `${label}.openingHours[${i}].from`,
+            openingHour?.from,
+            regExp
+          ),
+          RegExpValidator.validate(
+            `${label}.openingHours[${i}].to`,
+            openingHour?.to,
+            regExp
+          ),
+        ])
+        .flat(1),
+    ];
+    if (availabilityType === AvailabilityType.OPENING_HOURS) {
+      errors.push(
+        ArrayValidator.validate(`${label}.openingHours`, openingHours, {
+          min: 1,
+        })
+      );
+    }
+
+    return errors.filter(Boolean);
   };
 
   public static validateLocalDate = (
