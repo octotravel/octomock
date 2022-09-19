@@ -40,7 +40,7 @@ export class BookingValidator implements ModelValidator {
     this.path = `booking`;
     this.capabilities = capabilities;
     this.productValidator = new ProductValidator({
-      path: `${this.path}.`,
+      path: `${this.path}.product`,
       capabilities: this.capabilities,
     });
     this.optionValidator = new OptionValidator({

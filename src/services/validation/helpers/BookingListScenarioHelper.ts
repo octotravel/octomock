@@ -93,7 +93,6 @@ export class BookingListScenarioHelper extends ScenarioHelper {
     const errors = [...checkErrors, ...validatorErrors];
     return this.handleResult({
       ...data,
-      success: R.isEmpty(errors),
       errors,
     });
   };

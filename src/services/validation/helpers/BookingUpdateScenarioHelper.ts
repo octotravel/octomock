@@ -1,5 +1,4 @@
 import { Booking, CapabilityId } from "@octocloud/types";
-import * as R from "ramda";
 import { BookingValidator } from "../../../validators/backendValidator/Booking/BookingValidator";
 import { ValidatorError } from "../../../validators/backendValidator/ValidatorHelpers";
 import { BookingScenarioHelper } from "./BookingScenarioHelper";
@@ -156,7 +155,6 @@ export class BookingUpdateScenarioHelper extends ScenarioHelper {
     const errors = [...checkErrors, ...validatorErrors];
     return this.handleResult({
       ...data,
-      success: R.isEmpty(errors),
       errors,
     });
   };
