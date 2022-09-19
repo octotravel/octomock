@@ -19,32 +19,29 @@ export class BookingCancellationScenarioHelper extends ScenarioHelper {
     const { result } = data;
     const booking = result.data;
     const reqBody = result.request.body;
-    let errors = [
-      booking.cancellation.reason === reqBody.reason
-        ? null
-        : new ValidatorError({ message: "Reason was not provided" }),
-    ];
-    if (createdBooking.status === BookingStatus.ON_HOLD) {
-      errors = [
-        ...errors,
-        booking.status === BookingStatus.EXPIRED
-          ? null
-          : new ValidatorError({
-              message: `Booking status should be EXPIRED. Returned value was ${booking.status}`,
-            }),
-      ];
+
+    const errors = [];
+    if (booking?.cancellation?.reason !== reqBody?.reason) {
+      errors.push(new ValidatorError({ message: "Reason was not provided" }));
     }
-    if (createdBooking.status === BookingStatus.CONFIRMED) {
-      errors = [
-        ...errors,
-        booking.status === BookingStatus.CANCELLED
-          ? null
-          : new ValidatorError({
-              message: `Booking status should be CANCELLED. Returned value was ${booking.status}`,
-            }),
-      ];
+
+    if (createdBooking?.status === BookingStatus.ON_HOLD) {
+      if (booking?.status !== BookingStatus.EXPIRED) {
+        errors.push(
+          new ValidatorError({
+            message: `Booking status should be EXPIRED. Returned value was ${booking?.status}`,
+          })
+        );
+      }
     }
-    return errors.filter(Boolean);
+    if (createdBooking?.status === BookingStatus.CONFIRMED) {
+      if (booking?.status !== BookingStatus.CANCELLED) {
+        new ValidatorError({
+          message: `Booking status should be CANCELLED. Returned value was ${booking?.status}`,
+        });
+      }
+    }
+    return errors;
   };
 
   public validateBookingCancellation = (

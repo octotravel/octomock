@@ -32,7 +32,7 @@ export class BookingListFlow extends BaseFlow implements Flow {
       const reservation = reservationResult.data;
 
       const result = await this.apiClient.bookingConfirmation({
-        uuid: reservation.id,
+        uuid: reservation.uuid,
         contact: {
           fullName: "John Doe",
         },
@@ -57,7 +57,7 @@ export class BookingListFlow extends BaseFlow implements Flow {
         new Date().toISOString()
       )}`;
       await this.apiClient.bookingConfirmation({
-        uuid: reservation.id,
+        uuid: reservation.uuid,
         contact: {
           fullName: "John Doe",
         },

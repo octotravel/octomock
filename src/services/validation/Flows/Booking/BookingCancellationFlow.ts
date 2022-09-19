@@ -46,10 +46,11 @@ export class BookingCancellationFlow extends BaseFlow implements Flow {
 
       // TODO: add confirmReservation to Booker
       const result = await this.apiClient.bookingConfirmation({
-        uuid: reservation.id,
+        uuid: reservation.uuid,
         // TODO: create legit contact
         contact: {} as Contact,
       });
+
       const booking = result.data;
       return new BookingCancellationBookingScenario({
         capabilities: this.config.getCapabilityIDs(),

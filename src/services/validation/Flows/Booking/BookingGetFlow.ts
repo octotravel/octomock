@@ -43,7 +43,7 @@ export class BookingGetFlow extends BaseFlow implements Flow {
       const reservation = reservationResult.data;
 
       const result = await this.apiClient.bookingConfirmation({
-        uuid: reservation.id,
+        uuid: reservation.uuid,
         // TODO: create legit contact
         contact: {} as Contact,
       });

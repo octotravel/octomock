@@ -1,7 +1,10 @@
 import { Booking, CapabilityId } from "@octocloud/types";
 import * as R from "ramda";
 import { BookingValidator } from "../../../validators/backendValidator/Booking/BookingValidator";
-import { ValidatorError } from "../../../validators/backendValidator/ValidatorHelpers";
+import {
+  ErrorType,
+  ValidatorError,
+} from "../../../validators/backendValidator/ValidatorHelpers";
 import {
   ScenarioConfigData,
   ScenarioHelper,
@@ -29,6 +32,7 @@ export class BookingListScenarioHelper extends ScenarioHelper {
     if (R.isEmpty(bookings)) {
       return [
         new ValidatorError({
+          type: ErrorType.CRITICAL,
           message: "No booking found",
         }),
       ];
@@ -81,11 +85,11 @@ export class BookingListScenarioHelper extends ScenarioHelper {
         errors: [],
       });
     }
-    const checkErrors = [...this.listCheck(result.data, configData)];
-    const validatorErrors = this.getErrors(
-      result.data,
-      configData.capabilities
-    );
+
+    const bookings = R.is(Array, result.data) ? result.data : [];
+
+    const checkErrors = [...this.listCheck(bookings, configData)];
+    const validatorErrors = this.getErrors(bookings, configData.capabilities);
     const errors = [...checkErrors, ...validatorErrors];
     return this.handleResult({
       ...data,

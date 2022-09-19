@@ -8,9 +8,9 @@ import { BookingReservationFlow } from "./Booking/BookingReservationFlow";
 import { BookingExtendFlow } from "./Booking/BookingExtendFlow";
 import { BookingConfirmationFlow } from "./Booking/BookingConfirmationFlow";
 import { BookingUpdateFlow } from "./Booking/BookingUpdateFlow";
-// import { BookingListFlow } from "./Booking/BookingListFlow";
-// import { BookingGetFlow } from "./Booking/BookingGetFlow";
-// import { BookingCancellationFlow } from "./Booking/BookingCancellationFlow";
+import { BookingCancellationFlow } from "./Booking/BookingCancellationFlow";
+import { BookingGetFlow } from "./Booking/BookingGetFlow";
+import { BookingListFlow } from "./Booking/BookingListFlow";
 
 export class PrimiteFlows {
   private config = Config.getInstance();
@@ -25,9 +25,9 @@ export class PrimiteFlows {
       new BookingExtendFlow(),
       new BookingConfirmationFlow(),
       new BookingUpdateFlow(),
-      // new BookingCancellationFlow(),
-      // new BookingGetFlow(),
-      // new BookingListFlow(),
+      new BookingCancellationFlow(),
+      new BookingGetFlow(),
+      new BookingListFlow(),
     ];
 
     const results = [];
