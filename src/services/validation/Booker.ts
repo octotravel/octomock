@@ -17,6 +17,7 @@ interface CreateReservationParams {
 export class Booker {
   private config = Config.getInstance();
   private apiClient = this.config.getApiClient();
+
   public createReservation = async (
     productBookable: ProductBookable,
     params?: CreateReservationParams

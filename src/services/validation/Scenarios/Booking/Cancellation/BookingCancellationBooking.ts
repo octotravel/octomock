@@ -6,7 +6,6 @@ import { Config } from "../../../config/Config";
 export class BookingCancellationBookingScenario implements Scenario<Booking> {
   private config = Config.getInstance();
   private apiClient = this.config.getApiClient();
-  private uuid: string;
   private capabilities: CapabilityId[];
   private booking: Booking;
   constructor({
@@ -24,7 +23,7 @@ export class BookingCancellationBookingScenario implements Scenario<Booking> {
 
   public validate = async () => {
     const result = await this.apiClient.cancelBooking({
-      uuid: this.uuid,
+      uuid: this.booking.uuid,
       reason: "Reason for cancellation",
     });
     const name = `Booking Cancellation - Booking`;

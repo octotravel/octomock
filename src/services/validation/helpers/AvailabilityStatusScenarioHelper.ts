@@ -192,13 +192,6 @@ export class AvailabilityStatusScenarioHelper extends ScenarioHelper {
         availableData.data[1],
       ];
     }
-    console.log(errors);
-
-    // const products =
-
-    // this.setProduct(data.startTimes);
-    // this.setProduct(data.openingHours);
-    console.log("kekinedc");
     return this.handleResult({
       name: data.name,
       result: {
