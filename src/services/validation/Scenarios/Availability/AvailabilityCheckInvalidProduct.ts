@@ -1,4 +1,3 @@
-import { DateHelper } from "../../../../helpers/DateHelper";
 import { InvalidProductIdErrorValidator } from "../../../../validators/backendValidator/Error/InvalidProductIdErrorValidator";
 import { Config } from "../../config/Config";
 import { AvailabilityScenarioHelper } from "../../helpers/AvailabilityScenarioHelper";
@@ -10,10 +9,12 @@ export class AvailabilityCheckInvalidProductScenario implements Scenario<any> {
   private availabilityScenarioHelper = new AvailabilityScenarioHelper();
 
   public validate = async (): Promise<ScenarioResult<any>> => {
+    const [product] = this.config.productConfig.productsForAvailabilityCheck;
     const result = await this.apiClient.getAvailability({
       productId: this.config.invalidProductId,
-      optionId: this.config.getStartTimeProducts()[0].getOption().id,
-      localDate: DateHelper.getDate(new Date().toISOString()),
+      optionId: product.options[0].id,
+      localDateStart: this.config.localDateStart,
+      localDateEnd: this.config.localDateEnd,
     });
 
     const name = `Availability Check Invalid Product (400 INVALID_PRODUCT_ID)`;

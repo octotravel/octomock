@@ -2,9 +2,10 @@ import { Availability, Product } from "@octocloud/types";
 import { Scenario } from "../Scenario";
 import { AvailabilityScenarioHelper } from "../../helpers/AvailabilityScenarioHelper";
 import { Config } from "../../config/Config";
-import { DateHelper } from "../../../../helpers/DateHelper";
 
-export class AvailabilityCheckDateScenario implements Scenario<Availability[]> {
+export class AvailabilityChecIntervalScenario
+  implements Scenario<Availability[]>
+{
   private config = Config.getInstance();
   private apiClient = this.config.getApiClient();
 
@@ -16,14 +17,23 @@ export class AvailabilityCheckDateScenario implements Scenario<Availability[]> {
   }
 
   public validate = async () => {
-    const availabilityID =
-      this.config.productConfig.availabilityIDs[this.product.availabilityType];
     const result = await this.apiClient.getAvailability({
       productId: this.product.id,
       optionId: this.product.options[0].id,
-      localDate: DateHelper.getDate(availabilityID),
+      localDateStart: this.config.localDateStart,
+      localDateEnd: this.config.localDateEnd,
     });
-    const name = `Availability Check Date (${this.product.availabilityType})`;
+
+    const availabilities = result.data;
+    const randomAvailability =
+      availabilities[Math.floor(Math.random() * availabilities.length)];
+    this.config.productConfig.addAvailabilityID = {
+      availabilityType: this.product.availabilityType,
+      availabilityID: randomAvailability.id,
+    };
+    console.log("fap", randomAvailability);
+
+    const name = `Availability Check Interval (${this.product.availabilityType})`;
     return this.availabilityScenarioHelper.validateAvailability({
       name,
       result,

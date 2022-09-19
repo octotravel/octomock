@@ -12,6 +12,7 @@ export class ProductConfig {
   private _products: Product[] = [];
   private _soldOutProduct: ProductBookable;
   private _availableProducts: [ProductBookable, ProductBookable];
+  private _availabilityIDs: { [key: string]: string } = {};
 
   public setProducts = (products: Product[]): ValidatorError[] => {
     this._products = products;
@@ -97,4 +98,34 @@ export class ProductConfig {
   public get openingHourProducts() {
     return this._openingHourProducts;
   }
+
+  public get productsForAvailabilityCheck() {
+    const products = Array<Product>();
+    if (this.hasOpeningHourProducts) {
+      products.push(this.openingHourProducts[0]);
+    }
+    if (this.hasStartTimeProducts) {
+      products.push(this.startTimeProducts[0]);
+    }
+    return products;
+  }
+
+  public set addAvailabilityID({
+    availabilityType,
+    availabilityID,
+  }: {
+    availabilityType: AvailabilityType;
+    availabilityID: string;
+  }) {
+    console.log(availabilityType, availabilityID);
+    this._availabilityIDs[availabilityType] = availabilityID;
+  }
+
+  public get availabilityIDs() {
+    return this._availabilityIDs;
+  }
+
+  // public set availabilityIDs(data: Record<AvailabilityType, Nullable<string>>){
+  //   this._availabilityIDs = data
+  // }
 }

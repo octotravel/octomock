@@ -61,7 +61,7 @@ export class BookingCancellationFlow extends BaseFlow implements Flow {
   private validateBookingCancellationInvalidUUID =
     async (): Promise<BookingCancellationInvalidUUIDScenario> => {
       return new BookingCancellationInvalidUUIDScenario({
-        uuid: "invalid_UUID",
+        uuid: this.config.invalidUUID,
       });
     };
 }
