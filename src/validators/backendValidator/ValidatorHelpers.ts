@@ -28,7 +28,24 @@ export interface ModelValidator {
   validate(...args: any[]): ValidatorError[];
 }
 
-export class StringValidator {
+class BaseValidator {
+  protected static handleValidatedError = (error: any) => {
+    if (error instanceof yup.ValidationError) {
+      if (error.type === "required" || error.type === "typeError") {
+        return new ValidatorError({
+          type: ErrorType.CRITICAL,
+          message: error.errors as any,
+        });
+      }
+    }
+    return new ValidatorError({
+      type: ErrorType.WARNING,
+      message: error.errors,
+    });
+  };
+}
+
+export class StringValidator extends BaseValidator {
   public static validate = (
     label: string,
     value: unknown,
@@ -52,15 +69,12 @@ export class StringValidator {
       }
       return null;
     } catch (err) {
-      return new ValidatorError({
-        type: ErrorType.WARNING,
-        message: err.errors,
-      });
+      return this.handleValidatedError(err);
     }
   };
 }
 
-export class NullValidator {
+export class NullValidator extends BaseValidator {
   public static validate = (
     label: string,
     value: unknown
@@ -81,7 +95,7 @@ interface NumberValidatorParams {
   equalsTo?: number;
 }
 
-export class NumberValidator {
+export class NumberValidator extends BaseValidator {
   public static validate = (
     label: string,
     value: unknown,
@@ -108,10 +122,7 @@ export class NumberValidator {
         }
       }
     } catch (err) {
-      return new ValidatorError({
-        type: ErrorType.WARNING,
-        message: err.errors,
-      });
+      return this.handleValidatedError(err);
     }
   };
 }
@@ -120,7 +131,7 @@ interface BooleanValidatorParams {
   equalsTo?: boolean;
 }
 
-export class BooleanValidator {
+export class BooleanValidator extends BaseValidator {
   public static validate = (
     label: string,
     value: unknown,
@@ -139,10 +150,7 @@ export class BooleanValidator {
       }
       return null;
     } catch (err) {
-      return new ValidatorError({
-        type: ErrorType.WARNING,
-        message: err.errors,
-      });
+      return this.handleValidatedError(err);
     }
   };
 }
@@ -151,7 +159,7 @@ interface EnumValidatorParams {
   nullable?: boolean;
 }
 
-export class EnumValidator {
+export class EnumValidator extends BaseValidator {
   public static validate = (
     label: string,
     value: unknown,
@@ -168,10 +176,7 @@ export class EnumValidator {
       schema.validateSync(value, { strict: true });
       return null;
     } catch (err) {
-      return new ValidatorError({
-        type: ErrorType.WARNING,
-        message: err.errors,
-      });
+      return this.handleValidatedError(err);
     }
   };
 }
@@ -181,7 +186,7 @@ interface GeneralArrayValidatorParams {
   max?: number;
 }
 
-export class EnumArrayValidator {
+export class EnumArrayValidator extends BaseValidator {
   public static validate = (
     label: string,
     value: unknown,
@@ -199,10 +204,7 @@ export class EnumArrayValidator {
       schema.validateSync(value, { strict: true });
       return null;
     } catch (err) {
-      return new ValidatorError({
-        type: ErrorType.WARNING,
-        message: err.errors,
-      });
+      return this.handleValidatedError(err);
     }
   };
 }
@@ -212,7 +214,7 @@ interface RegExpValidatorParams {
   isNull?: boolean;
 }
 
-export class RegExpValidator {
+export class RegExpValidator extends BaseValidator {
   public static validate = (
     label: string,
     value: unknown,
@@ -231,15 +233,12 @@ export class RegExpValidator {
       schema.validateSync(value, { strict: true });
       return null;
     } catch (err) {
-      return new ValidatorError({
-        type: ErrorType.WARNING,
-        message: err.errors,
-      });
+      return this.handleValidatedError(err);
     }
   };
 }
 
-export class RegExpArrayValidator {
+export class RegExpArrayValidator extends BaseValidator {
   public static validate = (
     label: string,
     value: unknown,
@@ -269,11 +268,8 @@ export class RegExpArrayValidator {
           });
         }
       }
-      const errorMessage = `${err.errors.join()}`;
-      return new ValidatorError({
-        type: ErrorType.WARNING,
-        message: errorMessage,
-      });
+
+      return this.handleValidatedError(err);
     }
   };
 }
@@ -282,7 +278,7 @@ interface ArrayValidatorParams extends GeneralArrayValidatorParams {
   empty?: boolean;
 }
 
-export class ArrayValidator {
+export class ArrayValidator extends BaseValidator {
   public static validate = (
     label: string,
     value: unknown,
@@ -311,14 +307,11 @@ export class ArrayValidator {
       if (err instanceof ValidatorError) {
         return err;
       }
-      return new ValidatorError({
-        type: ErrorType.WARNING,
-        message: err.errors,
-      });
+      return this.handleValidatedError(err);
     }
   };
 }
-export class StringArrayValidator {
+export class StringArrayValidator extends BaseValidator {
   public static validate = (
     label: string,
     value: unknown,
@@ -335,10 +328,7 @@ export class StringArrayValidator {
       schema.validateSync(value, { strict: true });
       return null;
     } catch (err) {
-      return new ValidatorError({
-        type: ErrorType.WARNING,
-        message: err.errors,
-      });
+      return this.handleValidatedError(err);
     }
   };
 }
@@ -346,7 +336,7 @@ export class StringArrayValidator {
 interface NumberArrayValidatorParams extends GeneralArrayValidatorParams {
   integer?: boolean;
 }
-export class NumberArrayValidator {
+export class NumberArrayValidator extends BaseValidator {
   public static validate = (
     label: string,
     value: unknown,
@@ -367,10 +357,7 @@ export class NumberArrayValidator {
       schema.validateSync(value, { strict: true });
       return null;
     } catch (err) {
-      return new ValidatorError({
-        type: ErrorType.WARNING,
-        message: err.errors,
-      });
+      return this.handleValidatedError(err);
     }
   };
 }

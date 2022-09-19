@@ -15,12 +15,12 @@ export class CommonValidator {
       .map((openingHour, i) => [
         RegExpValidator.validate(
           `${label}.openingHours[${i}].from`,
-          openingHour.from,
+          openingHour?.from,
           regExp
         ),
         RegExpValidator.validate(
           `${label}.openingHours[${i}].to`,
-          openingHour.to,
+          openingHour?.to,
           regExp
         ),
       ])

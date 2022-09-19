@@ -16,23 +16,23 @@ export class BookingStateExpiredValidator implements ModelValidator {
     return [
       CommonValidator.validateUTCDateTime(
         `${this.path}.utcCreatedAt`,
-        booking.utcCreatedAt
+        booking?.utcCreatedAt
       ),
       CommonValidator.validateUTCDateTime(
         `${this.path}.utcUpdatedAt`,
-        booking.utcUpdatedAt
+        booking?.utcUpdatedAt
       ),
       CommonValidator.validateUTCDateTime(
         `${this.path}.utcExpiresAt`,
-        booking.utcExpiresAt
+        booking?.utcExpiresAt
       ),
       NullValidator.validate(
         `${this.path}.utcRedeemedAt`,
-        booking.utcRedeemedAt
+        booking?.utcRedeemedAt
       ),
       CommonValidator.validateUTCDateTime(
         `${this.path}.utcConfirmedAt`,
-        booking.utcConfirmedAt,
+        booking?.utcConfirmedAt,
         { nullable: true }
       ),
       ...this.validateCancellation(booking),
@@ -43,16 +43,16 @@ export class BookingStateExpiredValidator implements ModelValidator {
     [
       StringValidator.validate(
         `${this.path}.cancellation.refund`,
-        booking.cancellation.refund
+        booking?.cancellation?.refund
       ),
       StringValidator.validate(
         `${this.path}.cancellation.reason`,
-        booking.cancellation.reason,
+        booking?.cancellation?.reason,
         { nullable: true }
       ),
       CommonValidator.validateUTCDateTime(
         `${this.path}.cancellation.utcCancelledAt`,
-        booking.cancellation.utcCancelledAt
+        booking?.cancellation?.utcCancelledAt
       ),
     ].filter(Boolean);
 }

@@ -40,39 +40,39 @@ export class OptionValidator implements ModelValidator {
     pricingPer?: PricingPer
   ): ValidatorError[] => {
     return [
-      StringValidator.validate(`${this.path}.id`, option.id),
-      BooleanValidator.validate(`${this.path}.default`, option.default),
+      StringValidator.validate(`${this.path}.id`, option?.id),
+      BooleanValidator.validate(`${this.path}.default`, option?.default),
       StringValidator.validate(
         `${this.path}.internalName`,
-        option.internalName
+        option?.internalName
       ),
-      StringValidator.validate(`${this.path}.reference`, option.reference, {
+      StringValidator.validate(`${this.path}.reference`, option?.reference, {
         nullable: true,
       }),
       this.validateAvailabilityLocalStartTimes(
-        option.availabilityLocalStartTimes,
+        option?.availabilityLocalStartTimes ?? [],
         availabilityType
       ),
       StringValidator.validate(
         `${this.path}.cancellationCutoff`,
-        option.cancellationCutoff
+        option?.cancellationCutoff
       ),
       NumberValidator.validate(
         `${this.path}.cancellationCutoffAmount`,
-        option.cancellationCutoffAmount,
+        option?.cancellationCutoffAmount,
         { integer: true }
       ),
       StringValidator.validate(
         `${this.path}.cancellationCutoffUnit`,
-        option.cancellationCutoffUnit
+        option?.cancellationCutoffUnit
       ),
       EnumArrayValidator.validate(
         `${this.path}.requiredContactFields`,
-        option.requiredContactFields,
+        option?.requiredContactFields,
         Object.values(ContactField)
       ),
-      ...this.validateUnitRestrictions(option.restrictions),
-      ...this.validateUnits(option.units, pricingPer),
+      ...this.validateUnitRestrictions(option?.restrictions),
+      ...this.validateUnits(option?.units ?? [], pricingPer),
 
       ...this.validatePricingCapability(option, pricingPer),
       ...this.validatePickupCapability(option),
@@ -104,12 +104,12 @@ export class OptionValidator implements ModelValidator {
     [
       NumberValidator.validate(
         `${this.path}.restrictions.minUnits`,
-        restrictions.minUnits,
+        restrictions?.minUnits,
         { integer: true }
       ),
       NumberValidator.validate(
         `${this.path}.restrictions.maxUnits`,
-        restrictions.maxUnits,
+        restrictions?.maxUnits,
         { nullable: true, integer: true }
       ),
     ].filter(Boolean);

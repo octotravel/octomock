@@ -15,12 +15,12 @@ export class AvailabilityPricingValidator implements ModelValidator {
   }
 
   public validate = (availability: Availability): ValidatorError[] => {
-    if (availability.unitPricing) {
+    if (availability?.unitPricing) {
       return this.validateUnitPricing(
-        availability.unitPricing as PricingUnit[]
+        availability?.unitPricing as PricingUnit[]
       );
     } else {
-      return this.validatePricing(availability.pricing as Pricing);
+      return this.validatePricing(availability?.pricing as Pricing);
     }
   };
 
@@ -33,7 +33,7 @@ export class AvailabilityPricingValidator implements ModelValidator {
         this.pricingValidator.setPath(path);
         return [
           ...this.pricingValidator.validate(pricing),
-          StringValidator.validate(`${path}.unitId`, pricing.unitId),
+          StringValidator.validate(`${path}.unitId`, pricing?.unitId),
         ];
       })
       .flat(1)

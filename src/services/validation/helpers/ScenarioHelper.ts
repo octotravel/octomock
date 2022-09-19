@@ -56,7 +56,7 @@ export class ScenarioHelper {
             }
           : null,
       },
-      errors: data.errors.map((error) => error.mapError()),
+      errors: data.errors.map((error) => error?.mapError()),
     };
   };
 
@@ -90,3 +90,4 @@ export class ScenarioHelper {
     return !errors.some((e) => e.type === ErrorType.CRITICAL);
   };
 }
+``;

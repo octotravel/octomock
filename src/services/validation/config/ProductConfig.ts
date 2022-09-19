@@ -14,7 +14,9 @@ export class ProductConfig {
   private _availableProducts: [ProductBookable, ProductBookable];
 
   public setProducts = (products: Product[]): ValidatorError[] => {
-    if (R.isEmpty(products)) {
+    this._products = products;
+    if (this.invalidDataProvided) {
+      console.log("fapity");
       return [
         new ValidatorError({
           type: ErrorType.CRITICAL,
@@ -23,7 +25,6 @@ export class ProductConfig {
       ];
     }
     const errors = new Array<ValidatorError>();
-    this._products = products;
     const startTimeProducts = products.filter(
       (p) => p.availabilityType === AvailabilityType.START_TIME
     );
@@ -51,6 +52,14 @@ export class ProductConfig {
 
     return errors;
   };
+
+  public get invalidDataProvided() {
+    return (
+      R.isEmpty(this._products) ||
+      R.isNil(this._products) ||
+      !R.is(Array, this._products)
+    );
+  }
 
   public set soldOutProduct(soldOutProduct: ProductBookable) {
     this._soldOutProduct = soldOutProduct;

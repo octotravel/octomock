@@ -27,7 +27,6 @@ export class AvailabilityCalendarIntervalScenario
       localDateEnd: this.config.localDateEnd,
     });
     const name = `Availability Calendar Interval (${this.product.availabilityType})`;
-
     return this.availabilityCalendarScenarioHelper.validateAvailability({
       result,
       name,

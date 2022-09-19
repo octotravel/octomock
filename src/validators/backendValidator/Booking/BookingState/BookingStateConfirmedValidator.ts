@@ -15,22 +15,28 @@ export class BookingStateConfirmedValidator implements ModelValidator {
     return [
       CommonValidator.validateUTCDateTime(
         `${this.path}.utcCreatedAt`,
-        booking.utcCreatedAt
+        booking?.utcCreatedAt
       ),
       CommonValidator.validateUTCDateTime(
         `${this.path}.utcUpdatedAt`,
-        booking.utcUpdatedAt
+        booking?.utcUpdatedAt
       ),
-      NullValidator.validate(`${this.path}.utcExpiresAt`, booking.utcExpiresAt),
+      NullValidator.validate(
+        `${this.path}.utcExpiresAt`,
+        booking?.utcExpiresAt
+      ),
       NullValidator.validate(
         `${this.path}.utcRedeemedAt`,
-        booking.utcRedeemedAt
+        booking?.utcRedeemedAt
       ),
       CommonValidator.validateUTCDateTime(
         `${this.path}.utcConfirmedAt`,
-        booking.utcConfirmedAt
+        booking?.utcConfirmedAt
       ),
-      NullValidator.validate(`${this.path}.cancellation`, booking.cancellation),
+      NullValidator.validate(
+        `${this.path}.cancellation`,
+        booking?.cancellation
+      ),
     ].filter(Boolean);
   };
 }

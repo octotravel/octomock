@@ -20,17 +20,17 @@ export class CapabilityValidator implements ModelValidator {
     return [
       EnumValidator.validate(
         `${this.path}.id`,
-        capability.id,
+        capability?.id,
         Object.values(CapabilityId)
       ),
-      NumberValidator.validate(`${this.path}.revision`, capability.revision),
-      BooleanValidator.validate(`${this.path}.required`, capability.required),
+      NumberValidator.validate(`${this.path}.revision`, capability?.revision),
+      BooleanValidator.validate(`${this.path}.required`, capability?.required),
       EnumArrayValidator.validate(
         `${this.path}.dependencies`,
-        capability.dependencies,
+        capability?.dependencies,
         Object.values(CapabilityId)
       ),
-      StringValidator.validate(`${this.path}.docs`, capability.docs, {
+      StringValidator.validate(`${this.path}.docs`, capability?.docs, {
         nullable: true,
       }),
     ].filter(Boolean);

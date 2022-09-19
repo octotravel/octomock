@@ -1,7 +1,10 @@
-import { AvailabilityCalendar, AvailabilityStatus } from "@octocloud/types";
 import * as R from "ramda";
+import { AvailabilityCalendar } from "@octocloud/types";
 import { ScenarioHelper } from "./ScenarioHelper";
-import { ValidatorError } from "./../../../validators/backendValidator/ValidatorHelpers";
+import {
+  ErrorType,
+  ValidatorError,
+} from "./../../../validators/backendValidator/ValidatorHelpers";
 import { AvailabilityCalendarValidator } from "../../../validators/backendValidator/AvailabilityCalendar/AvailabilityCalendarValidator";
 import { Result } from "../api/types";
 import { Config } from "../config/Config";
@@ -14,23 +17,9 @@ export interface AvailabilityScenarioData {
 export class AvailabilityCalendarScenarioHelper extends ScenarioHelper {
   private config = Config.getInstance();
 
-  private checkAvailabilityStatus = (availability: AvailabilityCalendar[]) => {
-    return availability
-      .map((availability) => {
-        return (
-          !availability.available ||
-          availability.status === AvailabilityStatus.CLOSED ||
-          availability.status === AvailabilityStatus.SOLD_OUT
-        );
-      })
-      .some((status) => status);
-  };
-
   public validateAvailability = (data: AvailabilityScenarioData) => {
-    const validator = new AvailabilityCalendarValidator({
-      capabilities: this.config.getCapabilityIDs(),
-    });
     const { result } = data;
+    const availabilities = R.is(Array, result.data) ? result.data : [];
     if (result.response.error) {
       return this.handleResult({
         ...data,
@@ -38,26 +27,32 @@ export class AvailabilityCalendarScenarioHelper extends ScenarioHelper {
         errors: [],
       });
     }
+    const errors = [];
 
-    const errors = [
-      R.isEmpty(result.data)
-        ? new ValidatorError({
-            message: "Availability has to be available",
-          })
-        : null,
-      this.checkAvailabilityStatus(result.data)
-        ? new ValidatorError({
-            message:
-              "Availability can not be SOLD_OUT or CLOSED or not available",
-          })
-        : null,
-      ...result.data.map(validator.validate).flat(),
-    ].filter(Boolean);
+    if (R.isEmpty(availabilities)) {
+      errors.push(
+        new ValidatorError({
+          type: ErrorType.CRITICAL,
+          message: "No availabilities were provided",
+        })
+      );
+    }
+
+    const validationErrors = availabilities
+      .map((availability, i) =>
+        new AvailabilityCalendarValidator({
+          capabilities: this.config.getCapabilityIDs(),
+          path: `[${i}]`,
+        }).validate(availability)
+      )
+      .flat();
+
+    errors.push(...validationErrors);
 
     return this.handleResult({
       ...data,
       success: this.isSuccess(errors),
-      errors,
+      errors: errors,
     });
   };
 }

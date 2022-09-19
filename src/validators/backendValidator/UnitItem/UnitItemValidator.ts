@@ -44,36 +44,36 @@ export class UnitItemValidator implements ModelValidator {
     deliveryMethods: DeliveryMethod[]
   ): ValidatorError[] => {
     const errors = [
-      StringValidator.validate(`${this.path}.uuid`, unitItem.uuid),
+      StringValidator.validate(`${this.path}.uuid`, unitItem?.uuid),
       StringValidator.validate(
         `${this.path}.resellerReference`,
-        unitItem.uuid,
+        unitItem?.uuid,
         {
           nullable: true,
         }
       ),
       StringValidator.validate(
         `${this.path}.supplierReference`,
-        unitItem.uuid,
+        unitItem?.uuid,
         {
           nullable: true,
         }
       ),
-      StringValidator.validate(`${this.path}.unitId`, unitItem.unitId),
-      ...this.unitValidator.validate(unitItem.unit, pricingPer),
+      StringValidator.validate(`${this.path}.unitId`, unitItem?.unitId),
+      ...this.unitValidator.validate(unitItem?.unit, pricingPer),
       EnumValidator.validate(
         `${this.path}.status`,
-        unitItem.status,
+        unitItem?.status,
         Object.values(BookingStatus)
       ),
       NullValidator.validate(
         `${this.path}.utcRedeemedAt`,
-        unitItem.utcRedeemedAt
+        unitItem?.utcRedeemedAt
       ),
-      ...this.contactValidator.validate(unitItem.contact),
+      ...this.contactValidator.validate(unitItem?.contact),
 
       ...this.validatePricingCapability(unitItem, pricingPer),
-      ...this.validateTicket(unitItem.ticket, deliveryMethods),
+      ...this.validateTicket(unitItem?.ticket, deliveryMethods ?? []),
     ];
     return errors.filter(Boolean);
   };

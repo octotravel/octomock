@@ -100,7 +100,7 @@ export class Config implements IConfig {
   };
 
   public setProducts = (products: Product[]): ValidatorError[] => {
-    if (R.isEmpty(products)) {
+    if (this.productConfig.invalidDataProvided) {
       this.ignoreKill = false;
     }
 

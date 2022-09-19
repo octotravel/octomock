@@ -22,10 +22,10 @@ export class AvailabilityCalendarValidator implements ModelValidator {
     path,
     capabilities,
   }: {
-    path?: string;
+    path: string;
     capabilities: CapabilityId[];
   }) {
-    this.path = `${path}availability`;
+    this.path = `${path}`;
     this.capabilities = capabilities;
     this.pricingValidator = new AvailabilityCalendarPricingValidator({
       path: this.path,
@@ -36,36 +36,40 @@ export class AvailabilityCalendarValidator implements ModelValidator {
     return [
       StringValidator.validate(
         `${this.path}.localDate`,
-        availability.localDate
+        availability?.localDate
       ),
       CommonValidator.validateLocalDate(
         `${this.path}.localDate`,
-        availability.localDate
+        availability?.localDate
       ),
 
       BooleanValidator.validate(
         `${this.path}.available`,
-        availability.available
+        availability?.available
       ),
       EnumValidator.validate(
         `${this.path}.status`,
-        availability.status,
+        availability?.status,
         Object.values(AvailabilityStatus)
       ),
       NumberValidator.validate(
         `${this.path}.vacancies`,
-        availability.vacancies,
+        availability?.vacancies,
         {
           nullable: true,
         }
       ),
-      NumberValidator.validate(`${this.path}.capacity`, availability.capacity, {
-        nullable: true,
-      }),
+      NumberValidator.validate(
+        `${this.path}.capacity`,
+        availability?.capacity,
+        {
+          nullable: true,
+        }
+      ),
 
       ...CommonValidator.validateOpeningHours(
         this.path,
-        availability.openingHours
+        availability?.openingHours ?? []
       ),
       ...this.validatePricingCapability(availability),
     ].filter(Boolean);

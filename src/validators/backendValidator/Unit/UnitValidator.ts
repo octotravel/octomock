@@ -31,18 +31,18 @@ export class UnitValidator implements ModelValidator {
   }
   public validate = (unit: Unit, pricingPer: PricingPer): ValidatorError[] => {
     return [
-      StringValidator.validate(`${this.path}.id`, unit.id),
-      StringValidator.validate(`${this.path}.internalName`, unit.internalName),
-      StringValidator.validate(`${this.path}.reference`, unit.reference, {
+      StringValidator.validate(`${this.path}.id`, unit?.id),
+      StringValidator.validate(`${this.path}.internalName`, unit?.internalName),
+      StringValidator.validate(`${this.path}.reference`, unit?.reference, {
         nullable: true,
       }),
-      StringValidator.validate(`${this.path}.type`, unit.type, {
+      StringValidator.validate(`${this.path}.type`, unit?.type, {
         nullable: true,
       }),
-      ...this.validateRestrictions(unit.restrictions),
+      ...this.validateRestrictions(unit?.restrictions),
       EnumArrayValidator.validate(
         `${this.path}.requiredContactFields`,
-        unit.requiredContactFields,
+        unit?.requiredContactFields,
         Object.values(ContactField)
       ),
       ...this.validatePricingCapability(unit, pricingPer),
@@ -71,40 +71,40 @@ export class UnitValidator implements ModelValidator {
     return [
       NumberValidator.validate(
         `${this.path}.restrictions.minAge`,
-        restrictions.minAge,
+        restrictions?.minAge,
         {
           integer: true,
         }
       ),
       NumberValidator.validate(
         `${this.path}.restrictions.maxAge`,
-        restrictions.maxAge,
+        restrictions?.maxAge,
         {
           integer: true,
         }
       ),
       BooleanValidator.validate(
         `${this.path}.restrictions.idRequired`,
-        restrictions.idRequired
+        restrictions?.idRequired
       ),
       NumberValidator.validate(
         `${this.path}.restrictions.minQuantity`,
-        restrictions.minQuantity,
+        restrictions?.minQuantity,
         { integer: true, nullable: true }
       ),
       NumberValidator.validate(
         `${this.path}.restrictions.maxQuantity`,
-        restrictions.maxQuantity,
+        restrictions?.maxQuantity,
         { integer: true, nullable: true }
       ),
       NumberValidator.validate(
         `${this.path}.restrictions.paxCount`,
-        restrictions.paxCount,
+        restrictions?.paxCount,
         { integer: true }
       ),
       StringArrayValidator.validate(
         `${this.path}.restrictions.accompaniedBy`,
-        restrictions.accompaniedBy
+        restrictions?.accompaniedBy
       ),
     ].filter(Boolean);
   };

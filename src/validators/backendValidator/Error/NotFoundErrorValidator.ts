@@ -10,11 +10,11 @@ import {
 export class NotFoundErrorValidator implements ModelValidator {
   public validate = (data: ValidatedError): ValidatorError[] => {
     return [
-      StringValidator.validate(`error`, data.body.error, {
+      StringValidator.validate(`error`, data?.body?.error, {
         equalsTo: NOT_FOUND,
       }),
-      StringValidator.validate(`errorMessage`, data.body.errorMessage),
-      NumberValidator.validate(`status`, data.status, {
+      StringValidator.validate(`errorMessage`, data?.body?.errorMessage),
+      NumberValidator.validate(`status`, data?.status, {
         integer: true,
         equalsTo: STATUS_NOT_FOUND,
       }),

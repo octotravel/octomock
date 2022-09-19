@@ -18,45 +18,45 @@ export class PricingValidator implements ModelValidator {
 
   public validate = (pricing: Pricing): ValidatorError[] => {
     return [
-      NumberValidator.validate(`${this.path}.original`, pricing.original, {
+      NumberValidator.validate(`${this.path}.original`, pricing?.original, {
         integer: true,
       }),
-      NumberValidator.validate(`${this.path}.retail`, pricing.retail, {
+      NumberValidator.validate(`${this.path}.retail`, pricing?.retail, {
         integer: true,
       }),
-      NumberValidator.validate(`${this.path}.net`, pricing.net, {
+      NumberValidator.validate(`${this.path}.net`, pricing?.net, {
         nullable: true,
         integer: true,
       }),
-      StringValidator.validate(`${this.path}.currency`, pricing.currency),
+      StringValidator.validate(`${this.path}.currency`, pricing?.currency),
       NumberValidator.validate(
         `${this.path}.currencyPrecision`,
-        pricing.currencyPrecision,
+        pricing?.currencyPrecision,
         {
           integer: true,
         }
       ),
-      ...this.validateTaxes(pricing.includedTaxes),
+      ...this.validateTaxes(pricing?.includedTaxes),
     ].filter(Boolean);
   };
 
   private validateTaxes = (taxes: Tax[]): ValidatorError[] => {
     return taxes
       .map((tax, i) => [
-        StringValidator.validate(`${this.path}.taxes[${i}].name`, tax.name),
+        StringValidator.validate(`${this.path}.taxes[${i}].name`, tax?.name),
         NumberValidator.validate(
           `${this.path}.taxes[${i}].retail`,
-          tax.retail,
+          tax?.retail,
           {
             integer: true,
           }
         ),
         NumberValidator.validate(
           `${this.path}.taxes[${i}].original`,
-          tax.retail,
+          tax?.original,
           { integer: true }
         ),
-        NumberValidator.validate(`${this.path}.taxes[${i}].net`, tax.retail, {
+        NumberValidator.validate(`${this.path}.taxes[${i}].net`, tax?.net, {
           integer: true,
           nullable: true,
         }),

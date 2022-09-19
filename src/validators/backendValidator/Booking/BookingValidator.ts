@@ -40,7 +40,7 @@ export class BookingValidator implements ModelValidator {
     this.path = `booking`;
     this.capabilities = capabilities;
     this.productValidator = new ProductValidator({
-      path: this.path,
+      path: `${this.path}.`,
       capabilities: this.capabilities,
     });
     this.optionValidator = new OptionValidator({
@@ -58,40 +58,40 @@ export class BookingValidator implements ModelValidator {
 
   public validate = (booking: Booking): ValidatorError[] => {
     return [
-      StringValidator.validate(`${this.path}.id`, booking.id),
-      StringValidator.validate(`${this.path}.uuid`, booking.uuid),
-      BooleanValidator.validate(`${this.path}.testMode`, booking.testMode),
+      StringValidator.validate(`${this.path}.id`, booking?.id),
+      StringValidator.validate(`${this.path}.uuid`, booking?.uuid),
+      BooleanValidator.validate(`${this.path}.testMode`, booking?.testMode),
       StringValidator.validate(
         `${this.path}.resellerReference`,
-        booking.resellerReference,
+        booking?.resellerReference,
         { nullable: true }
       ),
       StringValidator.validate(
         `${this.path}.supplierReference`,
-        booking.supplierReference,
+        booking?.supplierReference,
         { nullable: true }
       ),
       EnumValidator.validate(
         `${this.path}.status`,
-        booking.status,
+        booking?.status,
         Object.values(BookingStatus)
       ),
       ...this.bookingStateValidator.validate(booking),
-      StringValidator.validate(`${this.path}.productId`, booking.productId),
-      ...this.productValidator.validate(booking.product),
-      StringValidator.validate(`${this.path}.optionId`, booking.optionId),
+      StringValidator.validate(`${this.path}.productId`, booking?.productId),
+      ...this.productValidator.validate(booking?.product),
+      StringValidator.validate(`${this.path}.optionId`, booking?.optionId),
       ...this.optionValidator.validate(
-        booking.option,
-        booking.product.availabilityType
+        booking?.option,
+        booking?.product.availabilityType
       ),
       BooleanValidator.validate(
         `${this.path}.cancellable`,
-        booking.cancellable
+        booking?.cancellable
       ),
-      BooleanValidator.validate(`${this.path}.freesale`, booking.freesale),
+      BooleanValidator.validate(`${this.path}.freesale`, booking?.freesale),
       ...this.validateBookingAvailability(booking),
-      ...this.contactValidator.validate(booking.contact),
-      StringValidator.validate(`${this.path}.notes`, booking.notes, {
+      ...this.contactValidator.validate(booking?.contact),
+      StringValidator.validate(`${this.path}.notes`, booking?.notes, {
         nullable: true,
       }),
       ...this.validateDeliveryMethods(booking),
@@ -99,17 +99,16 @@ export class BookingValidator implements ModelValidator {
       ...this.validateVoucher(booking),
       ...this.validatePricingCapability(booking),
       ...this.validatePickupCapability(booking),
-      ...this.ticketValidator.validate(booking.voucher),
-      ...this.ticketValidator.validate(booking.voucher),
+      ...this.ticketValidator.validate(booking?.voucher),
     ].filter(Boolean);
   };
 
   private validateVoucher = (booking: Booking): ValidatorError[] => {
-    if (booking.deliveryMethods.includes(DeliveryMethod.VOUCHER)) {
-      return this.ticketValidator.validate(booking.voucher);
+    if ((booking?.deliveryMethods ?? []).includes(DeliveryMethod.VOUCHER)) {
+      return this.ticketValidator.validate(booking?.voucher);
     }
 
-    return [NullValidator.validate(`${this.path}.voucher`, booking.voucher)];
+    return [NullValidator.validate(`${this.path}.voucher`, booking?.voucher)];
   };
 
   private validateDeliveryMethods = (booking: Booking): ValidatorError[] => {
@@ -117,7 +116,7 @@ export class BookingValidator implements ModelValidator {
     const errors = new Array<ValidatorError>();
     const deliveryMethodsValidated = EnumArrayValidator.validate(
       path,
-      booking.deliveryMethods,
+      booking?.deliveryMethods,
       Object.values(DeliveryMethod)
     );
     if (deliveryMethodsValidated) {
@@ -125,10 +124,11 @@ export class BookingValidator implements ModelValidator {
     }
 
     const deliveryMethodsMatch =
-      booking.deliveryMethods.every((method) =>
-        booking.product.deliveryMethods.includes(method)
+      booking?.deliveryMethods?.every((method) =>
+        booking?.product?.deliveryMethods.includes(method)
       ) &&
-      booking.deliveryMethods.length === booking.product.deliveryMethods.length;
+      booking?.deliveryMethods?.length ===
+        booking?.product?.deliveryMethods?.length;
 
     if (!deliveryMethodsMatch) {
       errors.push(
@@ -144,32 +144,32 @@ export class BookingValidator implements ModelValidator {
     [
       CommonValidator.validateLocalDateTime(
         `${this.path}.availabilityId`,
-        booking.availabilityId
+        booking?.availabilityId
       ),
       CommonValidator.validateLocalDateTime(
         `${this.path}.availability.id`,
-        booking.availability.id
+        booking?.availability?.id
       ),
       CommonValidator.validateLocalDateTime(
         `${this.path}.availability.localDateTimeStart`,
-        booking.availability.localDateTimeStart
+        booking?.availability?.localDateTimeStart
       ),
       CommonValidator.validateLocalDateTime(
         `${this.path}.availability.localDateTimeEnd`,
-        booking.availability.localDateTimeEnd
+        booking?.availability?.localDateTimeEnd
       ),
       BooleanValidator.validate(
         `${this.path}.availability.allDay`,
-        booking.availability.allDay
+        booking?.availability?.allDay
       ),
       ...CommonValidator.validateOpeningHours(
         `${this.path}.availability`,
-        booking.availability.openingHours
+        booking?.availability?.openingHours
       ),
     ].filter(Boolean);
 
   private validateUnitItems = (booking: Booking): ValidatorError[] => {
-    return booking.unitItems
+    return (booking.unitItems ?? [])
       .map((unitItem, i) => {
         const validator = new UnitItemValidator({
           path: `${this.path}.unitItems[${i}]`,
@@ -177,8 +177,8 @@ export class BookingValidator implements ModelValidator {
         });
         return validator.validate(
           unitItem,
-          booking.product.pricingPer,
-          booking.deliveryMethods
+          booking?.product?.pricingPer,
+          booking?.deliveryMethods
         );
       })
       .flat(1)
@@ -187,7 +187,7 @@ export class BookingValidator implements ModelValidator {
 
   private validatePricingCapability = (booking: Booking): ValidatorError[] => {
     if (this.capabilities.includes(CapabilityId.Pricing)) {
-      return this.pricingValidator.validate(booking.pricing);
+      return this.pricingValidator.validate(booking?.pricing);
     }
     return [];
   };

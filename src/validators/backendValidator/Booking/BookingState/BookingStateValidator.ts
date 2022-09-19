@@ -46,7 +46,7 @@ export class BookingStateValidator implements ModelValidator {
         return [
           new ValidatorError({
             type: ErrorType.WARNING,
-            message: `validation for booking.status: ${booking.status} not implemented`,
+            message: `validation for booking.status: ${booking?.status} not implemented`,
           }),
         ];
     }

@@ -17,20 +17,20 @@ export class BookingPickupValidator implements ModelValidator {
     return [
       BooleanValidator.validate(
         `${this.path}.pickupRequested`,
-        booking.pickupRequested
+        booking?.pickupRequested
       ),
       StringValidator.validate(
         `${this.path}.pickupPointId`,
-        booking.pickupPointId
+        booking?.pickupPointId
       ),
       StringValidator.validate(
         `${this.path}.pickupHotel`,
-        booking.pickupHotel,
+        booking?.pickupHotel,
         { nullable: true }
       ),
       StringValidator.validate(
         `${this.path}.pickupHotelRoom`,
-        booking.pickupHotelRoom,
+        booking?.pickupHotelRoom,
         { nullable: true }
       ),
       ...this.validatePickupPoint(booking),
@@ -38,33 +38,33 @@ export class BookingPickupValidator implements ModelValidator {
   };
 
   private validatePickupPoint = (booking: Booking): ValidatorError[] => {
-    if (booking.pickupPoint) {
+    if (booking?.pickupPoint) {
       return [
         StringValidator.validate(
           `${this.path}.booking.pickupPoint.id`,
-          booking.pickupPoint.id
+          booking?.pickupPoint?.id
         ),
         StringValidator.validate(
           `${this.path}.booking.pickupPoint.name`,
-          booking.pickupPoint.name
+          booking?.pickupPoint?.name
         ),
         StringValidator.validate(
           `${this.path}.booking.pickupPoint.directions`,
-          booking.pickupPoint.directions,
+          booking?.pickupPoint?.directions,
           { nullable: true }
         ),
         StringValidator.validate(
           `${this.path}.booking.pickupPoint.address`,
-          booking.pickupPoint.address
+          booking?.pickupPoint?.address
         ),
         NumberValidator.validate(
           `${this.path}.booking.pickupPoint.latitude`,
-          booking.pickupPoint.latitude,
+          booking?.pickupPoint?.latitude,
           { nullable: true }
         ),
         NumberValidator.validate(
           `${this.path}.booking.pickupPoint.longitude`,
-          booking.pickupPoint.longitude,
+          booking?.pickupPoint?.longitude,
           { nullable: true }
         ),
         // CommonValidator.validateLocalDateTime(
@@ -73,37 +73,37 @@ export class BookingPickupValidator implements ModelValidator {
         // ),
         StringValidator.validate(
           `${this.path}.booking.pickupPoint.googlePlaceId`,
-          booking.pickupPoint.googlePlaceId,
+          booking?.pickupPoint?.googlePlaceId,
           { nullable: true }
         ),
         StringValidator.validate(
           `${this.path}.booking.pickupPoint.street`,
-          booking.pickupPoint.street,
+          booking?.pickupPoint?.street,
           { nullable: true }
         ),
         StringValidator.validate(
           `${this.path}.booking.pickupPoint.postalCode`,
-          booking.pickupPoint.postalCode,
+          booking?.pickupPoint?.postalCode,
           { nullable: true }
         ),
         StringValidator.validate(
           `${this.path}.booking.pickupPoint.locality`,
-          booking.pickupPoint.locality,
+          booking?.pickupPoint?.locality,
           { nullable: true }
         ),
         StringValidator.validate(
           `${this.path}.booking.pickupPoint.region`,
-          booking.pickupPoint.region,
+          booking?.pickupPoint?.region,
           { nullable: true }
         ),
         StringValidator.validate(
           `${this.path}.booking.pickupPoint.state`,
-          booking.pickupPoint.state,
+          booking?.pickupPoint?.state,
           { nullable: true }
         ),
         StringValidator.validate(
           `${this.path}.booking.pickupPoint.country`,
-          booking.pickupPoint.country,
+          booking?.pickupPoint?.country,
           { nullable: true }
         ),
       ].filter(Boolean);

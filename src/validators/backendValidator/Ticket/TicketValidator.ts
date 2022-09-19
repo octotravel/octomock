@@ -16,12 +16,12 @@ export class TicketValidator implements ModelValidator {
     const errors = [
       EnumValidator.validate(
         `${this.path}.redemptionMethod`,
-        ticket.redemptionMethod,
+        ticket?.redemptionMethod,
         Object.values(RedemptionMethod)
       ),
       NullValidator.validate(
         `${this.path}.utcRedeemedAt`,
-        ticket.utcRedeemedAt
+        ticket?.utcRedeemedAt
       ),
       ...this.validateDeliveryOptions(ticket),
     ];
@@ -29,16 +29,16 @@ export class TicketValidator implements ModelValidator {
     return errors.filter(Boolean);
   };
   private validateDeliveryOptions = (ticket: Ticket): ValidatorError[] => {
-    return ticket.deliveryOptions
+    return (ticket?.deliveryOptions ?? [])
       .map((deliveryOption, i) => [
         EnumValidator.validate(
           `${this.path}.deliveryOptions[${i}].deliveryFormat`,
-          deliveryOption.deliveryFormat,
+          deliveryOption?.deliveryFormat,
           Object.values(DeliveryFormat)
         ),
         StringValidator.validate(
           `${this.path}.deliveryOptions[${i}].deliveryValue`,
-          deliveryOption.deliveryValue
+          deliveryOption?.deliveryValue
         ),
       ])
       .flat(1)

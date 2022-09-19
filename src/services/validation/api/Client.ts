@@ -134,7 +134,12 @@ export class Client {
       return { data, error: null, text: null };
     } catch (err) {
       const text = await response.text();
-      return { data: null, text, error: new Error("invalid response format") };
+      console.log("fap", text);
+      return {
+        data: text as any,
+        text,
+        error: new Error("invalid response format"),
+      };
     }
   };
 

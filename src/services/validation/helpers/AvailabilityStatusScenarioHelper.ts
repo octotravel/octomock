@@ -166,7 +166,6 @@ export class AvailabilityStatusScenarioHelper extends ScenarioHelper {
       });
     });
 
-    console.log(produts);
     return {
       error: null,
       data: produts,
