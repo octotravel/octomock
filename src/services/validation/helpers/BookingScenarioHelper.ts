@@ -12,8 +12,8 @@ interface BookingCheckData {
 export class BookingScenarioHelper {
   public bookingCheck = (data: BookingCheckData): ValidatorError[] => {
     const errors = new Array<ValidatorError>();
-    if (!data.rebooked) {
-      if (data.newBooking.productId !== data.oldBooking.productId) {
+    if (!data?.rebooked) {
+      if (data?.newBooking?.productId !== data?.oldBooking?.productId) {
         errors.push(
           new ValidatorError({
             message: "ProductId is not matching request",
@@ -21,7 +21,7 @@ export class BookingScenarioHelper {
         );
       }
 
-      if (data.newBooking.optionId !== data.oldBooking.optionId) {
+      if (data?.newBooking?.optionId !== data?.oldBooking?.optionId) {
         errors.push(
           new ValidatorError({ message: "OptionId is not matching request" })
         );

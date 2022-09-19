@@ -70,12 +70,13 @@ export class BookingCancellationScenarioHelper extends ScenarioHelper {
       }),
     ];
 
-    const errors = new BookingValidator({
+    const validatorErrors = new BookingValidator({
       capabilities: configData.capabilities,
     }).validate(result.data);
+    const errors = [...checkErrors, ...validatorErrors];
     return this.handleResult({
       ...data,
-      success: R.isEmpty([...checkErrors, ...errors]),
+      success: R.isEmpty(errors),
       errors,
     });
   };

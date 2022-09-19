@@ -149,10 +149,14 @@ export class BookingUpdateScenarioHelper extends ScenarioHelper {
       }),
     ];
 
-    const errors = this.getErrors(result.data, configData.capabilities);
+    const validatorErrors = this.getErrors(
+      result.data,
+      configData.capabilities
+    );
+    const errors = [...checkErrors, ...validatorErrors];
     return this.handleResult({
       ...data,
-      success: R.isEmpty([...checkErrors, ...errors]),
+      success: R.isEmpty(errors),
       errors,
     });
   };

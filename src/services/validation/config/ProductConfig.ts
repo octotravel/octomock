@@ -16,7 +16,6 @@ export class ProductConfig {
   public setProducts = (products: Product[]): ValidatorError[] => {
     this._products = products;
     if (this.invalidDataProvided) {
-      console.log("fapity");
       return [
         new ValidatorError({
           type: ErrorType.CRITICAL,

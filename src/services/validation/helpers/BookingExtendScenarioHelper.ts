@@ -36,12 +36,14 @@ export class BookingExtendScenarioHelper extends ScenarioHelper {
       }),
     ];
 
-    const errors = new BookingValidator({
+    const validatorErrors = new BookingValidator({
       capabilities: configData.capabilities,
     }).validate(result.data);
+
+    const errors = [...checkErrors, ...validatorErrors];
     return this.handleResult({
       ...data,
-      success: R.isEmpty([...checkErrors, ...errors]),
+      success: R.isEmpty(errors),
       errors,
     });
   };
@@ -51,14 +53,16 @@ export class BookingExtendScenarioHelper extends ScenarioHelper {
     extendedBooking: Booking
   ): ValidatorError[] => {
     const errors = new Array<ValidatorError>();
-    if (extendedBooking.status !== BookingStatus.ON_HOLD) {
+    if (extendedBooking?.status !== BookingStatus.ON_HOLD) {
       errors.push(
-        new ValidatorError({ message: "Booking status is not ON_HOLD" })
+        new ValidatorError({
+          message: `booking.status must be a \`${BookingStatus.ON_HOLD}\` type, but the final value was: \`${extendedBooking?.status}\``,
+        })
       );
     }
     if (createdBooking.utcExpiresAt >= extendedBooking.utcExpiresAt) {
       errors.push(
-        new ValidatorError({ message: "Booking expire time was not extended" })
+        new ValidatorError({ message: "booking.utcExpiresAt was not extended" })
       );
     }
 

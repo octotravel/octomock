@@ -36,7 +36,7 @@ export class PricingValidator implements ModelValidator {
           integer: true,
         }
       ),
-      ...this.validateTaxes(pricing?.includedTaxes),
+      ...this.validateTaxes(pricing?.includedTaxes ?? []),
     ].filter(Boolean);
   };
 

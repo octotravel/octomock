@@ -36,17 +36,18 @@ export class BookingReservationScenarioHelper extends ScenarioHelper {
       }),
     ];
 
-    const errors = new BookingValidator({
+    const validatorErrors = new BookingValidator({
       capabilities: configData.capabilities,
     }).validate(result.data);
+    const errors = [...checkErrors, ...validatorErrors];
     return this.handleResult({
       ...data,
-      success: R.isEmpty([...checkErrors, ...errors]),
+      success: R.isEmpty(errors),
       errors,
     });
   };
 
-  private reservationCheck = (
+  public reservationCheck = (
     data: ScenarioHelperData<Booking>
   ): ValidatorError[] => {
     const { result } = data;
@@ -55,10 +56,10 @@ export class BookingReservationScenarioHelper extends ScenarioHelper {
 
     // TODO: this should be checked in general check, not in reservation one
     const unitIdCheck =
-      booking.unitItems.length === request.body.unitItems.length
-        ? result.data.unitItems
+      booking?.unitItems?.length === request?.body?.unitItems?.length
+        ? result?.data?.unitItems
             .map((unitItem) => {
-              return booking.unitItems
+              return (booking?.unitItems ?? [])
                 .map((item) => item.unitId)
                 .includes(unitItem.unitId);
             })

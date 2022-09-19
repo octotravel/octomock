@@ -57,6 +57,7 @@ export class BookingValidator implements ModelValidator {
   }
 
   public validate = (booking: Booking): ValidatorError[] => {
+    console;
     return [
       StringValidator.validate(`${this.path}.id`, booking?.id),
       StringValidator.validate(`${this.path}.uuid`, booking?.uuid),
@@ -82,7 +83,7 @@ export class BookingValidator implements ModelValidator {
       StringValidator.validate(`${this.path}.optionId`, booking?.optionId),
       ...this.optionValidator.validate(
         booking?.option,
-        booking?.product.availabilityType
+        booking?.product?.availabilityType
       ),
       BooleanValidator.validate(
         `${this.path}.cancellable`,
@@ -164,12 +165,13 @@ export class BookingValidator implements ModelValidator {
       ),
       ...CommonValidator.validateOpeningHours(
         `${this.path}.availability`,
-        booking?.availability?.openingHours
+        booking?.availability?.openingHours ?? []
       ),
     ].filter(Boolean);
 
   private validateUnitItems = (booking: Booking): ValidatorError[] => {
-    return (booking.unitItems ?? [])
+    const unitItems = booking?.unitItems ?? [];
+    return unitItems
       .map((unitItem, i) => {
         const validator = new UnitItemValidator({
           path: `${this.path}.unitItems[${i}]`,

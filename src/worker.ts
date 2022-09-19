@@ -23,7 +23,6 @@ export default {
       const schema = validationConfigSchema.cast(reqBody);
       const config = Config.getInstance();
       config.init(schema);
-      console.log(config);
       const body = await new ValidationController().validate();
 
       return new Response(JSON.stringify(body), {

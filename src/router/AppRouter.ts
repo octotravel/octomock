@@ -17,8 +17,8 @@ router.use(productRouter.routes());
 router.use(availabilityRouter.routes());
 router.use(bookingRouter.routes());
 router.get("/capabilities", async (ctx, _) => {
-  const supplier = await capabilityController.getCapabilities();
-  ctx.body = supplier;
+  const data = await capabilityController.getCapabilities();
+  ctx.body = data;
   ctx.toJSON();
 });
 

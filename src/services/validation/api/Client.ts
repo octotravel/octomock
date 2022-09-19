@@ -134,7 +134,6 @@ export class Client {
       return { data, error: null, text: null };
     } catch (err) {
       const text = await response.text();
-      console.log("fap", text);
       return {
         data: text as any,
         text,

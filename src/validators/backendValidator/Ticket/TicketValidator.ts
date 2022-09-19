@@ -29,7 +29,8 @@ export class TicketValidator implements ModelValidator {
     return errors.filter(Boolean);
   };
   private validateDeliveryOptions = (ticket: Ticket): ValidatorError[] => {
-    return (ticket?.deliveryOptions ?? [])
+    const deliveryOptions = ticket?.deliveryOptions ?? [];
+    return deliveryOptions
       .map((deliveryOption, i) => [
         EnumValidator.validate(
           `${this.path}.deliveryOptions[${i}].deliveryFormat`,

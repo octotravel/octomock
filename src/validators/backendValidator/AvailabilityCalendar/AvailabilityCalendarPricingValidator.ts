@@ -28,7 +28,6 @@ export class AvailabilityCalendarPricingValidator implements ModelValidator {
   private validateUnitPricing = (
     unitPricing: PricingUnit[]
   ): ValidatorError[] => {
-    console.log("unitPricing", unitPricing);
     return unitPricing
       .map((pricing, i) => {
         const path = `${this.path}.unitPricing[${i}]`;

@@ -26,36 +26,38 @@ export class BookingConfirmationScenarioHelper extends ScenarioHelper {
     const { result } = data;
     const booking = result.data;
     const reqBody = result.request.body;
-    const checkContact =
-      booking.contact.firstName === reqBody.contact.firstName &&
-      booking.contact.fullName === reqBody.contact.fullName &&
-      booking.contact.lastName === reqBody.contact.lastName &&
-      booking.contact.emailAddress === reqBody.contact.emailAddress &&
-      booking.contact.notes === reqBody.contact.notes;
+    const isContactUpdated =
+      booking?.contact?.firstName === reqBody?.contact?.firstName &&
+      booking?.contact?.fullName === reqBody?.contact?.fullName &&
+      booking?.contact?.lastName === reqBody?.contact?.lastName &&
+      booking?.contact?.emailAddress === reqBody?.contact?.emailAddress &&
+      booking?.contact?.notes === reqBody?.contact?.notes;
 
-    let errors = [
-      checkContact
-        ? null
-        : new ValidatorError({ message: "Contact was not updated" }),
-      booking.status === BookingStatus.CONFIRMED
-        ? null
-        : new ValidatorError({
-            message: `Booking status should be CONFIRMED. Returned value was ${booking.status}`,
-          }),
-      booking.resellerReference === reqBody.resellerReference
-        ? null
-        : new ValidatorError({ message: "Reseller reference was not updated" }),
-    ];
-
-    if (!result.data.unitItems) {
-      errors = [
-        ...errors,
-        booking.unitItems.length === oldBooking.unitItems.length
-          ? null
-          : new ValidatorError({ message: "UnitItems count is not matching" }),
-      ];
+    const errors = [];
+    if (!isContactUpdated) {
+      errors.push(new ValidatorError({ message: "Contact was not updated" }));
     }
-    return errors.filter(Boolean);
+    if (booking.status !== BookingStatus.CONFIRMED) {
+      errors.push(
+        new ValidatorError({
+          message: `Booking status should be CONFIRMED. Returned value was ${booking.status}`,
+        })
+      );
+    }
+    if (booking?.resellerReference !== reqBody?.resellerReference) {
+      errors.push(
+        new ValidatorError({ message: "Reseller reference was not updated" })
+      );
+    }
+
+    if (!result?.data?.unitItems) {
+      if (booking?.unitItems?.length !== oldBooking?.unitItems?.length) {
+        errors.push(
+          new ValidatorError({ message: "UnitItems count is not matching" })
+        );
+      }
+    }
+    return errors;
   };
 
   public validateBookingConfirmation = (
@@ -81,10 +83,14 @@ export class BookingConfirmationScenarioHelper extends ScenarioHelper {
       }),
     ];
 
-    const errors = this.getErrors(result.data, configData.capabilities);
+    const validatorErrors = this.getErrors(
+      result.data,
+      configData.capabilities
+    );
+    const errors = [...checkErrors, ...validatorErrors];
     return this.handleResult({
       ...data,
-      success: R.isEmpty([...checkErrors, ...errors]),
+      success: R.isEmpty(errors),
       errors,
     });
   };
