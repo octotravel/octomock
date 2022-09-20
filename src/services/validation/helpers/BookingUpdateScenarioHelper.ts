@@ -1,136 +1,20 @@
-import { Booking, CapabilityId } from "@octocloud/types";
+import { Booking, UpdateBookingBodySchema } from "@octocloud/types";
+import { BookingEndpointValidator } from "../../../validators/backendValidator/Booking/BookingEndpointValidator";
 import { BookingValidator } from "../../../validators/backendValidator/Booking/BookingValidator";
-import { ValidatorError } from "../../../validators/backendValidator/ValidatorHelpers";
-import { BookingScenarioHelper } from "./BookingScenarioHelper";
-import {
-  ScenarioConfigData,
-  ScenarioHelper,
-  ScenarioHelperData,
-} from "./ScenarioHelper";
+import { ScenarioHelper, ScenarioHelperData } from "./ScenarioHelper";
 
 export class BookingUpdateScenarioHelper extends ScenarioHelper {
-  private bookingScenarioHelper = new BookingScenarioHelper();
-
-  private getErrors = (
-    booking: any,
-    capabilities: CapabilityId[]
-  ): ValidatorError[] => {
-    return new BookingValidator({ capabilities }).validate(booking);
-  };
-
-  private updateCheck = (
-    data: ScenarioHelperData<Booking>,
-    oldBooking: Booking
-  ): ValidatorError[] => {
-    const { result } = data;
-    const booking = result.data;
-    const reqBody = result.request.body;
-    let errors = [];
-
-    if (!reqBody.unitItems) {
-      errors = [
-        ...errors,
-        booking.unitItems.length === oldBooking.unitItems.length
-          ? null
-          : new ValidatorError({ message: "UnitItems count is not matching" }),
-      ];
-    } else {
-      const unitIdCheck =
-        booking.unitItems.length === reqBody.unitItems.length
-          ? booking.unitItems
-              .map((unitItem) => {
-                return reqBody.unitItems
-                  .map((item) => item.unitId)
-                  .includes(unitItem.unitId);
-              })
-              .every((status) => status)
-          : false;
-      errors = [
-        ...errors,
-        unitIdCheck
-          ? null
-          : new ValidatorError({ message: "UnitIds are not matching" }),
-      ];
-    }
-
-    if (reqBody.availabilityId) {
-      errors = [
-        ...errors,
-        booking.availabilityId === reqBody.availabilityId
-          ? null
-          : new ValidatorError({ message: "AvailabilityId was not updated" }),
-        booking.availability.id === reqBody.availabilityId
-          ? null
-          : new ValidatorError({ message: "Availability was not updated" }),
-      ];
-    } else {
-      errors = [
-        ...errors,
-        booking.availabilityId === oldBooking.availabilityId
-          ? null
-          : new ValidatorError({
-              message: "AvailabilityId is not matching request",
-            }),
-      ];
-    }
-
-    if (reqBody.contact) {
-      const contactCheck = [
-        reqBody.contact.fullName
-          ? reqBody.contact.fullName === booking.contact.fullName
-          : null,
-        reqBody.contact.firstName
-          ? reqBody.contact.firstName === booking.contact.firstName
-          : null,
-        reqBody.contact.lastName
-          ? reqBody.contact.lastName === booking.contact.lastName
-          : null,
-        reqBody.contact.emailAddress
-          ? reqBody.contact.emailAddress === booking.contact.emailAddress
-          : null,
-        reqBody.contact.phoneNumber
-          ? reqBody.contact.phoneNumber === booking.contact.phoneNumber
-          : null,
-        reqBody.contact.country
-          ? reqBody.contact.country === booking.contact.country
-          : null,
-        reqBody.contact.notes
-          ? reqBody.contact.notes === booking.contact.notes
-          : null,
-        reqBody.contact.locales
-          ? reqBody.contact.locales
-              .map((locale) => booking.contact.locales.includes(locale))
-              .every((status) => status)
-          : null,
-      ]
-        .filter((field) => field !== null)
-        .every((status) => status);
-      errors = [
-        ...errors,
-        contactCheck
-          ? null
-          : new ValidatorError({ message: "Contact was not updated" }),
-      ];
-    }
-
-    if (reqBody.notes) {
-      errors = [
-        ...errors,
-        reqBody.notes === booking.notes
-          ? null
-          : new ValidatorError({ message: "Notes was not updated" }),
-      ];
-    }
-    return errors.filter(Boolean);
-  };
-
+  private bookingEndpointValidator = new BookingEndpointValidator();
   public validateBookingUpdate = (
     data: ScenarioHelperData<Booking>,
-    configData: ScenarioConfigData,
-    createdBooking: Booking
+    booking: Booking
   ) => {
     const { result } = data;
-    if (result.response.error) {
+    const bookingUpdated = result?.data;
+    const request = result?.request;
+    const response = result?.response;
+    const schema = request?.body as UpdateBookingBodySchema;
+    if (response?.error) {
       return this.handleResult({
         ...data,
         success: false,
@@ -138,21 +22,22 @@ export class BookingUpdateScenarioHelper extends ScenarioHelper {
       });
     }
 
-    const checkErrors = [
-      ...this.updateCheck(data, createdBooking),
-      ...this.bookingScenarioHelper.bookingCheck({
-        newBooking: result.data,
-        oldBooking: createdBooking,
-        configData,
-        rebooked: result.request.body.productId !== undefined,
+    const errors = [
+      ...this.bookingEndpointValidator.validateUpdate({
+        booking,
+        bookingUpdated,
+        schema,
       }),
+      ...this.bookingEndpointValidator.validate({
+        booking: result.data,
+        productId: schema.productId ?? booking.productId,
+        optionId: schema.optionId ?? booking.optionId,
+        availabilityId: schema.availabilityId ?? booking.availabilityId,
+      }),
+      ...new BookingValidator({
+        capabilities: this.config.getCapabilityIDs(),
+      }).validate(booking),
     ];
-
-    const validatorErrors = this.getErrors(
-      result.data,
-      configData.capabilities
-    );
-    const errors = [...checkErrors, ...validatorErrors];
     return this.handleResult({
       ...data,
       errors,

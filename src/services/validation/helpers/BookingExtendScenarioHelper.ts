@@ -1,7 +1,6 @@
-import { Booking, BookingStatus } from "@octocloud/types";
+import { Booking, ExtendBookingBodySchema } from "@octocloud/types";
+import { BookingEndpointValidator } from "../../../validators/backendValidator/Booking/BookingEndpointValidator";
 import { BookingValidator } from "../../../validators/backendValidator/Booking/BookingValidator";
-import { ValidatorError } from "../../../validators/backendValidator/ValidatorHelpers";
-import { BookingScenarioHelper } from "./BookingScenarioHelper";
 import {
   ScenarioConfigData,
   ScenarioHelper,
@@ -9,7 +8,7 @@ import {
 } from "./ScenarioHelper";
 
 export class BookingExtendScenarioHelper extends ScenarioHelper {
-  private bookingScenarioHelper = new BookingScenarioHelper();
+  private bookingEndpointValidator = new BookingEndpointValidator();
 
   public validateBookingExtend = (
     data: ScenarioHelperData<Booking>,
@@ -17,8 +16,10 @@ export class BookingExtendScenarioHelper extends ScenarioHelper {
     reservation: Booking
   ) => {
     const { result } = data;
-    const extendedReservation = result.data;
-    if (result.response.error) {
+    const request = result?.request;
+    const response = result?.response;
+    const reservationExtended = result?.data;
+    if (response?.error) {
       return this.handleResult({
         ...data,
         success: false,
@@ -26,44 +27,26 @@ export class BookingExtendScenarioHelper extends ScenarioHelper {
       });
     }
 
-    const checkErrors = [
-      ...this.extendCheck(reservation, extendedReservation),
-      ...this.bookingScenarioHelper.bookingCheck({
-        newBooking: reservation,
-        oldBooking: extendedReservation,
-        configData,
+    const errors = [
+      ...this.bookingEndpointValidator.validateReservationExtend({
+        reservation,
+        reservationExtended,
+        schema: request?.body as ExtendBookingBodySchema,
       }),
+      ...this.bookingEndpointValidator.validate({
+        booking: reservationExtended,
+        productId: reservationExtended?.productId,
+        optionId: reservationExtended?.optionId,
+        availabilityId: reservationExtended?.availabilityId,
+      }),
+      ...new BookingValidator({
+        capabilities: configData.capabilities,
+      }).validate(result.data),
     ];
 
-    const validatorErrors = new BookingValidator({
-      capabilities: configData.capabilities,
-    }).validate(result.data);
-
-    const errors = [...checkErrors, ...validatorErrors];
     return this.handleResult({
       ...data,
       errors,
     });
-  };
-
-  private extendCheck = (
-    createdBooking: Booking,
-    extendedBooking: Booking
-  ): ValidatorError[] => {
-    const errors = new Array<ValidatorError>();
-    if (extendedBooking?.status !== BookingStatus.ON_HOLD) {
-      errors.push(
-        new ValidatorError({
-          message: `booking.status must be a \`${BookingStatus.ON_HOLD}\` type, but the final value was: \`${extendedBooking?.status}\``,
-        })
-      );
-    }
-    if (createdBooking.utcExpiresAt >= extendedBooking.utcExpiresAt) {
-      errors.push(
-        new ValidatorError({ message: "booking.utcExpiresAt was not extended" })
-      );
-    }
-
-    return errors;
   };
 }

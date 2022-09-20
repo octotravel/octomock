@@ -1,4 +1,4 @@
-import { Booking, CapabilityId } from "@octocloud/types";
+import { Booking } from "@octocloud/types";
 import { Scenario } from "../../Scenario";
 import { BookingListScenarioHelper } from "../../../helpers/BookingListScenarioHelper";
 import { Config } from "../../../config/Config";
@@ -10,16 +10,8 @@ export class BookingListSupplierReferenceScenario
   private config = Config.getInstance();
   private apiClient = this.config.getApiClient();
   private supplierReference: string;
-  private capabilities: CapabilityId[];
-  constructor({
-    supplierReference,
-    capabilities,
-  }: {
-    supplierReference: string;
-    capabilities: CapabilityId[];
-  }) {
+  constructor({ supplierReference }: { supplierReference: string }) {
     this.supplierReference = supplierReference;
-    this.capabilities = capabilities;
   }
   private bookingListScenarionHelper = new BookingListScenarioHelper();
 
@@ -30,16 +22,10 @@ export class BookingListSupplierReferenceScenario
     const name = "List Bookings - Supplier Reference";
     const description = descriptions.bookingListSupplierReference;
 
-    return this.bookingListScenarionHelper.validateBookingList(
-      {
-        result,
-        name,
-        description,
-      },
-      {
-        capabilities: this.capabilities,
-        supplierReference: this.supplierReference,
-      }
-    );
+    return this.bookingListScenarionHelper.validateBookingList({
+      result,
+      name,
+      description,
+    });
   };
 }

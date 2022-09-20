@@ -2,7 +2,6 @@ import { Flow, FlowResult } from "../Flow";
 import { BookingListSupplierReferenceScenario } from "../../Scenarios/Booking/List/BookingListSupplierReference";
 import { BookingListResellerReferenceScenario } from "../../Scenarios/Booking/List/BookingListResellerReference";
 import { BookingListBadRequestScenario } from "../../Scenarios/Booking/List/BookingListBadRequest";
-import { DateHelper } from "../../../../helpers/DateHelper";
 import { BaseFlow } from "../BaseFlow";
 import { Booker } from "../../Booker";
 import docs from "../../consts/docs";
@@ -41,7 +40,6 @@ export class BookingListFlow extends BaseFlow implements Flow {
       const booking = result.data;
       return new BookingListSupplierReferenceScenario({
         supplierReference: booking.supplierReference,
-        capabilities: this.config.getCapabilityIDs(),
       });
     };
 
@@ -54,9 +52,7 @@ export class BookingListFlow extends BaseFlow implements Flow {
       );
       const reservation = reservationResult.data;
 
-      const resellerReference = `TEST_REFERENCE-${DateHelper.getDate(
-        new Date().toISOString()
-      )}`;
+      const resellerReference = `RESREF${reservation.resellerReference}`;
       await this.apiClient.bookingConfirmation({
         uuid: reservation.uuid,
         contact: {
@@ -66,7 +62,6 @@ export class BookingListFlow extends BaseFlow implements Flow {
       });
       return new BookingListResellerReferenceScenario({
         resellerReference,
-        capabilities: this.config.getCapabilityIDs(),
       });
     };
 

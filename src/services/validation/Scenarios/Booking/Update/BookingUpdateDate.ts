@@ -7,11 +7,9 @@ import descriptions from "../../../consts/descriptions";
 export class BookingUpdateDateScenario implements Scenario<Booking> {
   private config = Config.getInstance();
   private apiClient = this.config.getApiClient();
-  private capabilities: CapabilityId[];
   private booking: Booking;
   private availabilityId: string;
   constructor({
-    capabilities,
     booking,
     availabilityId,
   }: {
@@ -19,7 +17,6 @@ export class BookingUpdateDateScenario implements Scenario<Booking> {
     booking: Booking;
     availabilityId: string;
   }) {
-    this.capabilities = capabilities;
     this.booking = booking;
     this.availabilityId = availabilityId;
   }
@@ -38,9 +35,6 @@ export class BookingUpdateDateScenario implements Scenario<Booking> {
         result,
         name,
         description,
-      },
-      {
-        capabilities: this.capabilities,
       },
       this.booking
     );

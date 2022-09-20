@@ -31,7 +31,6 @@ export class BookingCancellationFlow extends BaseFlow implements Flow {
       const result = await this.booker.createReservation(bookableProduct);
       const booking = result.data;
       return new BookingCancellationReservationScenario({
-        capabilities: this.config.getCapabilityIDs(),
         booking,
       });
     };
@@ -54,7 +53,6 @@ export class BookingCancellationFlow extends BaseFlow implements Flow {
 
       const booking = result.data;
       return new BookingCancellationBookingScenario({
-        capabilities: this.config.getCapabilityIDs(),
         booking: booking,
       });
     };

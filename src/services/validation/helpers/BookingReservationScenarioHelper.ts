@@ -1,8 +1,6 @@
-import { ErrorType } from "./../../../validators/backendValidator/ValidatorHelpers";
-import { Booking, BookingStatus } from "@octocloud/types";
+import { BookingEndpointValidator } from "./../../../validators/backendValidator/Booking/BookingEndpointValidator";
+import { Booking, CreateBookingBodySchema } from "@octocloud/types";
 import { BookingValidator } from "../../../validators/backendValidator/Booking/BookingValidator";
-import { ValidatorError } from "../../../validators/backendValidator/ValidatorHelpers";
-import { BookingScenarioHelper } from "./BookingScenarioHelper";
 import {
   ScenarioConfigData,
   ScenarioHelper,
@@ -10,14 +8,17 @@ import {
 } from "./ScenarioHelper";
 
 export class BookingReservationScenarioHelper extends ScenarioHelper {
-  private bookingScenarioHelper = new BookingScenarioHelper();
+  private bookingEndpointValidator = new BookingEndpointValidator();
 
   public validateBookingReservation = (
     data: ScenarioHelperData<Booking>,
     configData: ScenarioConfigData
   ) => {
     const { result } = data;
-    if (result.response.error) {
+    const reservation = result?.data;
+    const request = result?.request;
+    const response = result?.response;
+    if (response?.error) {
       return this.handleResult({
         ...data,
         success: false,
@@ -25,71 +26,28 @@ export class BookingReservationScenarioHelper extends ScenarioHelper {
       });
     }
 
-    const checkErrors = [
-      ...this.reservationCheck(data),
-      ...this.bookingScenarioHelper.bookingCheck({
-        newBooking: result.data,
-        // TODO: this is clearly wrong redo it
-        oldBooking: result.request.body as Booking,
-        configData,
+    const errors = [
+      ...this.bookingEndpointValidator.validateReservation({
+        reservation,
+        schema: request?.body as CreateBookingBodySchema,
       }),
+      ...this.bookingEndpointValidator.validate({
+        booking: reservation,
+        productId: request?.body?.productId,
+        optionId: request?.body?.optionId,
+        availabilityId: request?.body?.availabilityId,
+      }),
+      ...new BookingValidator({
+        capabilities: configData.capabilities,
+      }).validate(result.data),
     ];
 
-    const validatorErrors = new BookingValidator({
-      capabilities: configData.capabilities,
-    }).validate(result.data);
-    const errors = [...checkErrors, ...validatorErrors];
-    if (!this.isSuccess) {
+    if (!this.isSuccess(errors)) {
       this.config.terminateValidation = true;
     }
     return this.handleResult({
       ...data,
       errors,
     });
-  };
-
-  public reservationCheck = (
-    data: ScenarioHelperData<Booking>
-  ): ValidatorError[] => {
-    const { result } = data;
-    const booking = result.data;
-    const request = result.request;
-
-    // TODO: this should be checked in general check, not in reservation one
-    const unitIdCheck =
-      booking?.unitItems?.length === request?.body?.unitItems?.length
-        ? result?.data?.unitItems
-            .map((unitItem) => {
-              return (booking?.unitItems ?? [])
-                .map((item) => item.unitId)
-                .includes(unitItem.unitId);
-            })
-            .every((status) => status)
-        : false;
-
-    const errors = new Array<ValidatorError>();
-
-    if (booking.notes !== request.body.notes) {
-      errors.push(
-        new ValidatorError({ message: "Notes are not matching request" })
-      );
-    }
-    if (booking.status !== BookingStatus.ON_HOLD) {
-      errors.push(
-        new ValidatorError({
-          message: `Booking status should be ON_HOLD. Returned value was ${booking.status}`,
-          type: ErrorType.CRITICAL,
-        })
-      );
-    }
-    if (!unitIdCheck) {
-      errors.push(
-        new ValidatorError({
-          message: "UnitIds are not matching",
-          type: ErrorType.CRITICAL,
-        })
-      );
-    }
-    return errors;
   };
 }

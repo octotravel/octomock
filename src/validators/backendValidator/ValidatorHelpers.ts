@@ -93,6 +93,7 @@ interface NumberValidatorParams {
   nullable?: boolean;
   integer?: boolean;
   equalsTo?: number;
+  errorType?: ErrorType;
 }
 
 export class NumberValidator extends BaseValidator {
@@ -116,7 +117,7 @@ export class NumberValidator extends BaseValidator {
       if (params?.equalsTo) {
         if (params.equalsTo !== value) {
           return new ValidatorError({
-            type: ErrorType.WARNING,
+            type: params.errorType ?? ErrorType.WARNING,
             message: `${label} has to be equal to ${params.equalsTo}, but the provided value was: ${value}`,
           });
         }
@@ -129,6 +130,7 @@ export class NumberValidator extends BaseValidator {
 
 interface BooleanValidatorParams {
   equalsTo?: boolean;
+  errorType?: ErrorType;
 }
 
 export class BooleanValidator extends BaseValidator {
@@ -143,7 +145,7 @@ export class BooleanValidator extends BaseValidator {
       if (params?.equalsTo) {
         if (params.equalsTo !== value) {
           return new ValidatorError({
-            type: ErrorType.WARNING,
+            type: params.errorType ?? ErrorType.WARNING,
             message: `${label} has to be equal to ${params.equalsTo}, but the provided value was: ${value}`,
           });
         }
@@ -157,6 +159,8 @@ export class BooleanValidator extends BaseValidator {
 
 interface EnumValidatorParams {
   nullable?: boolean;
+  equalsTo?: boolean;
+  errorType?: ErrorType;
 }
 
 export class EnumValidator extends BaseValidator {
@@ -174,6 +178,14 @@ export class EnumValidator extends BaseValidator {
         schema = yup.mixed().label(label).oneOf(values).required();
       }
       schema.validateSync(value, { strict: true });
+      if (params?.equalsTo) {
+        if (params.equalsTo !== value) {
+          return new ValidatorError({
+            type: params.errorType ?? ErrorType.WARNING,
+            message: `${label} has to be equal to ${params.equalsTo}, but the provided value was: ${value}`,
+          });
+        }
+      }
       return null;
     } catch (err) {
       return this.handleValidatedError(err);

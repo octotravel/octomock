@@ -54,7 +54,6 @@ export class BookingUpdateFlow extends BaseFlow implements Flow {
 
       return new BookingUpdateUnitItemsScenario({
         unitItems,
-        capabilities: this.config.getCapabilityIDs(),
         booking,
       });
     };
@@ -96,7 +95,6 @@ export class BookingUpdateFlow extends BaseFlow implements Flow {
         optionId: bookableProduct2.getOption().id,
         unitItems: bookableProduct2.getValidUnitItems(),
         availabilityId: bookableProduct2.randomAvailabilityID,
-        capabilities: this.config.getCapabilityIDs(),
         booking,
       });
     };

@@ -1,4 +1,4 @@
-import { Booking, CapabilityId } from "@octocloud/types";
+import { Booking } from "@octocloud/types";
 import { Scenario } from "../../Scenario";
 import { BookingCancellationScenarioHelper } from "../../../helpers/BookingCancellationScenarioHelper";
 import { Config } from "../../../config/Config";
@@ -7,16 +7,8 @@ import descriptions from "../../../consts/descriptions";
 export class BookingCancellationBookingScenario implements Scenario<Booking> {
   private config = Config.getInstance();
   private apiClient = this.config.getApiClient();
-  private capabilities: CapabilityId[];
   private booking: Booking;
-  constructor({
-    capabilities,
-    booking,
-  }: {
-    capabilities: CapabilityId[];
-    booking: Booking;
-  }) {
-    this.capabilities = capabilities;
+  constructor({ booking }: { booking: Booking }) {
     this.booking = booking;
   }
   private bookingCancellationScenarioHelper =
@@ -35,9 +27,6 @@ export class BookingCancellationBookingScenario implements Scenario<Booking> {
         result,
         name,
         description,
-      },
-      {
-        capabilities: this.capabilities,
       },
       this.booking
     );
