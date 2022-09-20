@@ -3,7 +3,6 @@ import { Availability, AvailabilityStatus, Product } from "@octocloud/types";
 import { ScenarioHelper } from "./ScenarioHelper";
 import { Result } from "../api/types";
 import { Config } from "../config/Config";
-// import { AvailabilityValidator } from "../../../validators/backendValidator/Availability/AvailabilityValidator";
 import {
   ErrorType,
   ValidatorError,
@@ -25,52 +24,6 @@ interface ProductResults {
 
 export class AvailabilityStatusScenarioHelper extends ScenarioHelper {
   private config = Config.getInstance();
-
-  // private setProduct = (data: ProductResults[]): ValidatorError[] => {
-  //   const ids = [];
-  //   const errors = Array<ValidatorError>()
-
-  //   for (const {product, result} of data) {
-  //     const availabilities = result.data
-
-  //     const validator = new AvailabilityValidator({
-  //       capabilities: this.config.getCapabilityIDs(),
-  //       availabilityType: product.availabilityType,
-  //     });
-
-  //     errors.push(...availabilities.map(validator.validate).flat(1))
-
-  //     const availabilitiesAvailable = availabilities.filter(
-  //       (availability) =>
-  //         availability.status === AvailabilityStatus.AVAILABLE ||
-  //         availability.status === AvailabilityStatus.FREESALE
-  //     );
-
-  //     const availabilitiessSoldOut = availabilities.filter(
-  //       (availability) => availability.status === AvailabilityStatus.SOLD_OUT
-  //     );
-
-  //     if (availabilitiesAvailable.length > 1 && !R.isEmpty(soldout)) {
-  //       this.config.setAvailability(
-  //         product,
-  //         [available[0].id, available[1].id],
-  //         soldout[0].id
-  //       );
-  //       ids.push(product.id);
-  //     }
-
-  //     if (ids.length > 1) {
-  //       break;
-  //     }
-  //   }
-  //   if (ids.length < 2) {
-  //     return [
-  //       new ValidatorError({
-  //         message: `Missing START_TIME products with AVAILABLE and SOLD_OUT availability status`,
-  //       }),
-  //     ];
-  //   }
-  // };
 
   public findSoldOutProduct = (
     data: ProductResults[]

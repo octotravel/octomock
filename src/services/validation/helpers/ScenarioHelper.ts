@@ -49,6 +49,7 @@ export class ScenarioHelper {
     }
     return ValidationResult.SUCCESS;
   };
+
   protected handleResult = <T>(data: ScenarioData<T>): ScenarioResult<T> => {
     const { result } = data;
     if (result.response.error) {
