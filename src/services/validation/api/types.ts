@@ -4,8 +4,8 @@ export type ApiParams = {
   headers?: Record<string, string>;
 };
 export type Result<T> = {
-  request: ResultRequest;
-  response: ResultResponse<T>;
+  request: Nullable<ResultRequest>;
+  response: Nullable<ResultResponse<T>>;
   data: Nullable<T>;
 };
 

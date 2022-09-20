@@ -48,7 +48,7 @@ export class ScenarioHelper {
 
   protected handleResult = <T>(data: ScenarioData<T>): ScenarioResult<T> => {
     const { result } = data;
-    if (result.response.error) {
+    if (result?.response?.error) {
       if (result.response.error.status === STATUS_NOT_FOUND) {
         data.errors = [
           ...data.errors,
@@ -59,23 +59,27 @@ export class ScenarioHelper {
         ];
       }
     }
+    const response =
+      result?.response === null
+        ? null
+        : {
+            headers: result.response.headers,
+            body: result.response.data ? result.data : null,
+            status: result.response.data
+              ? result.response.data.status
+              : result.response.error.status,
+            error: result.response.error
+              ? {
+                  body: result.response.error.body,
+                }
+              : null,
+          };
     return {
       name: data.name,
       success: data.success ?? this.isSuccess(data.errors),
       validationResult: this.getValidationResult(data),
       request: result.request,
-      response: {
-        headers: result.response.headers,
-        body: result.response.data ? result.data : null,
-        status: result.response.data
-          ? result.response.data.status
-          : result.response.error.status,
-        error: result.response.error
-          ? {
-              body: result.response.error.body,
-            }
-          : null,
-      },
+      response: response,
       errors: data.errors.map((error) => error?.mapError()),
       description: data.description,
     };
