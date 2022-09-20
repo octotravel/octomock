@@ -2,12 +2,11 @@ import * as R from "ramda";
 import { Availability, AvailabilityStatus, Product } from "@octocloud/types";
 import { ScenarioHelper } from "./ScenarioHelper";
 import { Result } from "../api/types";
-import { Config } from "../config/Config";
+import { Config, ErrorResult } from "../config/Config";
 import {
   ErrorType,
   ValidatorError,
 } from "../../../validators/backendValidator/ValidatorHelpers";
-import { ErrorResult } from "../config/ProductValidatorData";
 import { ProductBookable } from "../config/ProductBookable";
 import descriptions from "../consts/descriptions";
 
