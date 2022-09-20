@@ -29,7 +29,7 @@ export class Config implements IConfig {
   public invalidAvailabilityId = "invalidAvailabilityId";
   public invalidUUID = "invalidUUID";
   public note = "Test Note";
-  public terminateValidation = false;
+  public _terminateValidation = false;
 
   public localDateStart = DateHelper.getDate(new Date().toISOString());
   public localDateEnd = DateHelper.getDate(
@@ -57,6 +57,14 @@ export class Config implements IConfig {
       capabilities: this.getCapabilityIDs(),
     });
   };
+
+  public get terminateValidation() {
+    return this._terminateValidation;
+  }
+
+  public set terminateValidation(terminateValidation: boolean) {
+    this._terminateValidation = terminateValidation;
+  }
 
   public setCapabilities = (capabilities: Capability[]): ValidatorError[] => {
     this.capabilities = capabilities.map((capability) => {

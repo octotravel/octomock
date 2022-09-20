@@ -1,4 +1,4 @@
-import { Booking, BookingStatus, CapabilityId } from "@octocloud/types";
+import { Booking, BookingStatus } from "@octocloud/types";
 import { BookingValidator } from "../../../validators/backendValidator/Booking/BookingValidator";
 import { ValidatorError } from "../../../validators/backendValidator/ValidatorHelpers";
 import { BookingScenarioHelper } from "./BookingScenarioHelper";
@@ -11,11 +11,41 @@ import {
 export class BookingConfirmationScenarioHelper extends ScenarioHelper {
   private bookingScenarioHelper = new BookingScenarioHelper();
 
-  private getErrors = (
-    booking: any,
-    capabilities: CapabilityId[]
-  ): ValidatorError[] => {
-    return new BookingValidator({ capabilities }).validate(booking);
+  public validateBookingConfirmation = (
+    data: ScenarioHelperData<Booking>,
+    configData: ScenarioConfigData,
+    createdBooking: Booking
+  ) => {
+    const { result } = data;
+    const booking = result.data;
+    if (result.response.error) {
+      return this.handleResult({
+        ...data,
+        success: false,
+        errors: [],
+      });
+    }
+
+    const checkErrors = [
+      ...this.confirmationCheck(data, createdBooking),
+      ...this.bookingScenarioHelper.bookingCheck({
+        newBooking: result.data,
+        oldBooking: createdBooking,
+        configData,
+      }),
+    ];
+
+    const validatorErrors = new BookingValidator({
+      capabilities: configData.capabilities,
+    }).validate(booking);
+    const errors = [...checkErrors, ...validatorErrors];
+    if (!this.isSuccess) {
+      this.config.terminateValidation = true;
+    }
+    return this.handleResult({
+      ...data,
+      errors,
+    });
   };
 
   private confirmationCheck = (
@@ -57,39 +87,5 @@ export class BookingConfirmationScenarioHelper extends ScenarioHelper {
       }
     }
     return errors;
-  };
-
-  public validateBookingConfirmation = (
-    data: ScenarioHelperData<Booking>,
-    configData: ScenarioConfigData,
-    createdBooking: Booking
-  ) => {
-    const { result } = data;
-    if (result.response.error) {
-      return this.handleResult({
-        ...data,
-        success: false,
-        errors: [],
-      });
-    }
-
-    const checkErrors = [
-      ...this.confirmationCheck(data, createdBooking),
-      ...this.bookingScenarioHelper.bookingCheck({
-        newBooking: result.data,
-        oldBooking: createdBooking,
-        configData,
-      }),
-    ];
-
-    const validatorErrors = this.getErrors(
-      result.data,
-      configData.capabilities
-    );
-    const errors = [...checkErrors, ...validatorErrors];
-    return this.handleResult({
-      ...data,
-      errors,
-    });
   };
 }

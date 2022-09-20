@@ -7,6 +7,7 @@ import {
   ValidatorError,
 } from "../../../validators/backendValidator/ValidatorHelpers";
 import { Result } from "../api/types";
+import { Config } from "../config/Config";
 import { ScenarioResult, ValidationResult } from "../Scenarios/Scenario";
 
 interface ScenarioData<T> {
@@ -30,6 +31,7 @@ export interface ScenarioConfigData {
 }
 
 export class ScenarioHelper {
+  protected config = Config.getInstance();
   private getValidationResult = <T>(
     data: ScenarioData<T>
   ): ValidationResult => {
@@ -109,4 +111,3 @@ export class ScenarioHelper {
     return !errors.some((e) => e.type === ErrorType.CRITICAL);
   };
 }
-``;

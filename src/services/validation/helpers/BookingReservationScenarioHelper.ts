@@ -39,6 +39,9 @@ export class BookingReservationScenarioHelper extends ScenarioHelper {
       capabilities: configData.capabilities,
     }).validate(result.data);
     const errors = [...checkErrors, ...validatorErrors];
+    if (!this.isSuccess) {
+      this.config.terminateValidation = true;
+    }
     return this.handleResult({
       ...data,
       errors,
