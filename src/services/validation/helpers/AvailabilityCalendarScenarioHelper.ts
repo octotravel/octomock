@@ -6,11 +6,8 @@ import {
   ValidatorError,
 } from "./../../../validators/backendValidator/ValidatorHelpers";
 import { AvailabilityCalendarValidator } from "../../../validators/backendValidator/AvailabilityCalendar/AvailabilityCalendarValidator";
-import { Config } from "../config/Config";
 
 export class AvailabilityCalendarScenarioHelper extends ScenarioHelper {
-  private config = Config.getInstance();
-
   public validateAvailability = (
     data: ScenarioHelperData<AvailabilityCalendar[]>,
     product: Product

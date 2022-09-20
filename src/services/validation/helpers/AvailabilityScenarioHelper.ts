@@ -1,11 +1,8 @@
 import { Availability, Product } from "@octocloud/types";
 import { AvailabilityValidator } from "../../../validators/backendValidator/Availability/AvailabilityValidator";
 import { ScenarioHelper, ScenarioHelperData } from "./ScenarioHelper";
-import { Config } from "../config/Config";
 
 export class AvailabilityScenarioHelper extends ScenarioHelper {
-  private config = Config.getInstance();
-
   public validateAvailability = (
     data: ScenarioHelperData<Availability[]>,
     product: Product

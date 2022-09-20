@@ -2,7 +2,7 @@ import * as R from "ramda";
 import { Availability, AvailabilityStatus, Product } from "@octocloud/types";
 import { ScenarioHelper } from "./ScenarioHelper";
 import { Result } from "../api/types";
-import { Config, ErrorResult } from "../config/Config";
+import { ErrorResult } from "../config/Config";
 import {
   ErrorType,
   ValidatorError,
@@ -21,8 +21,6 @@ interface ProductResults {
 }
 
 export class AvailabilityStatusScenarioHelper extends ScenarioHelper {
-  private config = Config.getInstance();
-
   public validateAvailability = (data: AvailabilityScenarioData) => {
     const errors: ValidatorError[] = [];
 
