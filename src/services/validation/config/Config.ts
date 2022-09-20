@@ -1,16 +1,7 @@
 import { ProductConfig } from "./ProductConfig";
-import {
-  AvailabilityType,
-  Capability,
-  CapabilityId,
-  Product,
-} from "@octocloud/types";
-import * as R from "ramda";
+import { Capability, CapabilityId, Product } from "@octocloud/types";
 import { ValidationEndpoint } from "../../../schemas/Validation";
-import {
-  ErrorType,
-  ValidatorError,
-} from "../../../validators/backendValidator/ValidatorHelpers";
+import { ValidatorError } from "../../../validators/backendValidator/ValidatorHelpers";
 import { ApiClient } from "../api/ApiClient";
 import { DateHelper } from "../../../helpers/DateHelper";
 import { addDays } from "date-fns";
@@ -24,7 +15,6 @@ interface IConfig {
   getCapabilityIDs(): CapabilityId[];
   setProducts(products: Product[]): ValidatorError[];
   getProduct(): Product;
-  getProducts(availabilityType?: AvailabilityType): ErrorResult<Product[]>;
 }
 export class Config implements IConfig {
   private static instance: Config;
@@ -39,7 +29,7 @@ export class Config implements IConfig {
   public invalidAvailabilityId = "invalidAvailabilityId";
   public invalidUUID = "invalidUUID";
   public note = "Test Note";
-  public ignoreKill = true;
+  public terminateValidation = false;
 
   public localDateStart = DateHelper.getDate(new Date().toISOString());
   public localDateEnd = DateHelper.getDate(
@@ -80,46 +70,14 @@ export class Config implements IConfig {
   };
 
   public setProducts = (products: Product[]): ValidatorError[] => {
-    if (this.productConfig.invalidDataProvided) {
-      this.ignoreKill = false;
+    if (this.productConfig.areProductsValid(products)) {
+      this.terminateValidation = true;
     }
 
     return this.productConfig.setProducts(products);
   };
 
-  public getProduct = (availabilityType?: AvailabilityType): Product => {
-    if (availabilityType) {
-      if (availabilityType === AvailabilityType.START_TIME) {
-        const products = this.productConfig.products.filter(
-          (product) => product.availabilityType === AvailabilityType.START_TIME
-        );
-        return products[0];
-      }
-      return this.productConfig.products[0];
-    }
-  };
-
-  public getProducts = (
-    availabilityType?: AvailabilityType
-  ): ErrorResult<Product[]> => {
-    if (availabilityType) {
-      const products = this.productConfig.products.filter(
-        (product) => product.availabilityType === availabilityType
-      );
-      if (R.isEmpty(products)) {
-        return {
-          data: null,
-          error: new ValidatorError({
-            type: ErrorType.WARNING,
-            message: `There is no product with availabilityType=${availabilityType}`,
-          }),
-        };
-      }
-      return;
-    }
-    return {
-      data: this.productConfig.products,
-      error: null,
-    };
+  public getProduct = (): Product => {
+    return this.productConfig.products[0];
   };
 }

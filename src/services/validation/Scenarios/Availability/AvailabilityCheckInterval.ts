@@ -32,8 +32,6 @@ export class AvailabilityChecIntervalScenario
       availabilityType: this.product.availabilityType,
       availabilityID: randomAvailability.id,
     };
-    console.log("fap", randomAvailability);
-
     const name = `Availability Check Interval (${this.product.availabilityType})`;
     const description = descriptions.availabilityCheckInterval;
 

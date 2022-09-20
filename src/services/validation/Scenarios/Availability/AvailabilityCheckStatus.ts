@@ -6,25 +6,21 @@ import { Product } from "@octocloud/types";
 export class AvailabilityCheckStatusScenario implements Scenario<any> {
   private config = Config.getInstance();
   private apiClient = this.config.getApiClient();
+  private products: Product[];
   private availabilityStatusScenarioHelper =
     new AvailabilityStatusScenarioHelper();
 
+  constructor(products: Product[]) {
+    this.products = products;
+  }
+
   public validate = async () => {
-    const name = `Availability Check Status`;
-    const productsStartTime = this.config.productConfig.startTimeProducts;
-    const productsOpeningHour = this.config.productConfig.openingHourProducts;
-
-    const startTimes = await this.fetchAvailabilityForProducts(
-      productsStartTime
-    );
-    const openingHours = await this.fetchAvailabilityForProducts(
-      productsOpeningHour
-    );
-
+    const availabilityType = this.products[0].availabilityType;
+    const name = `Availability Check Status ${availabilityType}`;
+    const products = await this.fetchAvailabilityForProducts(this.products);
     return this.availabilityStatusScenarioHelper.validateAvailability({
       name,
-      startTimes,
-      openingHours,
+      products,
     });
   };
 

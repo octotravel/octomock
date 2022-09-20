@@ -11,12 +11,12 @@ export class ProductConfig {
   private _startTimeProducts: Product[] = [];
   private _products: Product[] = [];
   private _soldOutProduct: ProductBookable;
-  private _availableProducts: [ProductBookable, ProductBookable];
+  private _availableProducts: ProductBookable[] = [];
   private _availabilityIDs: { [key: string]: string } = {};
 
   public setProducts = (products: Product[]): ValidatorError[] => {
     this._products = products;
-    if (this.invalidDataProvided) {
+    if (this.areProductsValid(products)) {
       return [
         new ValidatorError({
           type: ErrorType.CRITICAL,
@@ -53,12 +53,8 @@ export class ProductConfig {
     return errors;
   };
 
-  public get invalidDataProvided() {
-    return (
-      R.isEmpty(this._products) ||
-      R.isNil(this._products) ||
-      !R.is(Array, this._products)
-    );
+  public areProductsValid(product: Product[]) {
+    return R.isEmpty(product) || R.isNil(product) || !R.is(Array, product);
   }
 
   public set soldOutProduct(soldOutProduct: ProductBookable) {
@@ -69,10 +65,11 @@ export class ProductConfig {
     return this._soldOutProduct;
   }
 
-  public set availableProducts(
-    availableProducts: [ProductBookable, ProductBookable]
-  ) {
-    this._availableProducts = availableProducts;
+  public set availableProducts(availableProducts: ProductBookable[]) {
+    this._availableProducts = [
+      ...this._availableProducts,
+      ...availableProducts,
+    ];
   }
 
   public get availableProducts() {
@@ -99,6 +96,10 @@ export class ProductConfig {
     return this._openingHourProducts;
   }
 
+  public get isRebookAvailable() {
+    return this.availableProducts.length >= 2;
+  }
+
   public get productsForAvailabilityCheck() {
     const products = Array<Product>();
     if (this.hasOpeningHourProducts) {
@@ -117,7 +118,6 @@ export class ProductConfig {
     availabilityType: AvailabilityType;
     availabilityID: string;
   }) {
-    console.log(availabilityType, availabilityID);
     this._availabilityIDs[availabilityType] = availabilityID;
   }
 

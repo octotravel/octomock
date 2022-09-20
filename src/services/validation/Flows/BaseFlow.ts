@@ -33,8 +33,8 @@ export abstract class BaseFlow {
     }
     return ValidationResult.SUCCESS;
   };
-  // TODO: make private after it's removed from all flows
-  protected getFlowResult = (
+
+  private getFlowResult = (
     scenarios: ScenarioResult<unknown>[]
   ): FlowResult => {
     return {
@@ -53,7 +53,7 @@ export abstract class BaseFlow {
     for await (const scenario of scenarios) {
       const result = await scenario.validate();
       results.push(result);
-      if (!result.success && this.config.ignoreKill === false) {
+      if (this.config.terminateValidation) {
         break;
       }
     }

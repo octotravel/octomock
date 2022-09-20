@@ -18,8 +18,11 @@ export class BookingUpdateFlow extends BaseFlow implements Flow {
       await this.validateBookingUpdateDate(),
       await this.validateBookingUpdateUnitItems(),
       await this.validateBookingUpdateContact(),
-      await this.validateBookingUpdateProduct(),
     ];
+
+    if (this.config.productConfig.isRebookAvailable) {
+      scenarios.push(await this.validateBookingUpdateProduct());
+    }
 
     return this.validateScenarios(scenarios);
   };

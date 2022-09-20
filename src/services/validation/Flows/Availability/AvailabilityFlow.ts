@@ -18,10 +18,10 @@ export class AvailabilityFlow extends BaseFlow implements Flow {
 
   public validate = async (): Promise<FlowResult> => {
     const scenarios = [
-      new AvailabilityCheckStatusScenario(),
       ...this.checkInterval(),
       ...this.checkDate(),
       ...this.checkAvailabilityID(),
+      ...this.checkAvailabilityStatus(),
       new AvailabilityCheckInvalidProductScenario(),
       new AvailabilityCheckInvalidOptionScenario(),
       new AvailabilityCheckBadRequestScenario(),
@@ -45,5 +45,24 @@ export class AvailabilityFlow extends BaseFlow implements Flow {
     return this.config.productConfig.productsForAvailabilityCheck.map(
       (product) => new AvailabilityCheckAvailabilityIdScenario(product)
     );
+  };
+
+  private checkAvailabilityStatus = () => {
+    const scenarios = [];
+    if (this.config.productConfig.hasStartTimeProducts) {
+      scenarios.push(
+        new AvailabilityCheckStatusScenario(
+          this.config.productConfig.startTimeProducts
+        )
+      );
+    }
+    if (this.config.productConfig.hasOpeningHourProducts) {
+      scenarios.push(
+        new AvailabilityCheckStatusScenario(
+          this.config.productConfig.openingHourProducts
+        )
+      );
+    }
+    return scenarios;
   };
 }
