@@ -40,20 +40,8 @@ export class AvailabilityStatusScenarioHelper extends ScenarioHelper {
     return this.handleResult({
       name: data.name,
       result: {
-        response: {
-          headers: {},
-          data: {
-            status: null,
-            body: null,
-          },
-          error: null,
-        },
-        request: {
-          headers: {},
-          url: null,
-          method: null,
-          body: null,
-        },
+        response: null,
+        request: null,
         data: null,
       },
       errors,
