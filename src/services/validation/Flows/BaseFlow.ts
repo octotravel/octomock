@@ -17,16 +17,18 @@ export abstract class BaseFlow {
   private getValidationResult = (
     scenarios: ScenarioResult<unknown>[]
   ): ValidationResult => {
-    const failed = scenarios.filter(
-      (scenario) => scenario.validationResult === ValidationResult.FAILED
-    );
-    const warning = scenarios.filter(
-      (scenario) => scenario.validationResult === ValidationResult.WARNING
-    );
-    if (failed.length > 0) {
+    if (
+      scenarios.some(
+        (scenario) => scenario.validationResult === ValidationResult.FAILED
+      )
+    ) {
       return ValidationResult.FAILED;
     }
-    if (warning.length > 0) {
+    if (
+      scenarios.some(
+        (scenario) => scenario.validationResult === ValidationResult.WARNING
+      )
+    ) {
       return ValidationResult.WARNING;
     }
     return ValidationResult.SUCCESS;

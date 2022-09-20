@@ -34,16 +34,10 @@ export class ScenarioHelper {
     data: ScenarioData<T>
   ): ValidationResult => {
     if (!R.isEmpty(data.errors)) {
-      const warnings = data.errors.filter(
-        (error) => error.type === ErrorType.WARNING
-      );
-      const criticals = data.errors.filter(
-        (error) => error.type === ErrorType.CRITICAL
-      );
-      if (criticals.length > 0) {
+      if (data.errors.some((error) => error.type === ErrorType.CRITICAL)) {
         return ValidationResult.FAILED;
       }
-      if (warnings.length > 0) {
+      if (data.errors.some((error) => error.type === ErrorType.WARNING)) {
         return ValidationResult.WARNING;
       }
     }
