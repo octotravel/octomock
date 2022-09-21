@@ -10,5 +10,6 @@ module.exports = {
     "@typescript-eslint/ban-ts-comment": "warn",
     "new-cap": "error",
     "unused-imports/no-unused-imports": "error",
+    curly: "error",
   },
 };

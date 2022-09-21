@@ -7,6 +7,7 @@ import {
   Cancellation,
   CapabilityId,
   DeliveryMethod,
+  BookingUnitItemSchema,
 } from "@octocloud/types";
 import { Capable, CapableToPOJOType } from "./../interfaces/Capable";
 import { BookingPickupModel } from "./BookingPickup";
@@ -120,6 +121,15 @@ export class BookingModel implements Capable {
     );
     this.bookingPickupModel = new BookingPickupModel();
   }
+
+  public getUnitItems = (): BookingUnitItemSchema[] => {
+    return this.unitItemModels.map((model) => ({
+      unitId: model.unitModel.id,
+      resellerReference: model.resellerReference,
+      uuid: model.uuid,
+      contact: model.contact,
+    }));
+  };
 
   public toPOJO = ({
     useCapabilities = false,

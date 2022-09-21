@@ -43,7 +43,7 @@ export class UnitItemModel implements Capable {
     this.uuid = uuid;
     this.resellerReference = resellerReference;
     this.supplierReference = supplierReference;
-    this.unitModel = unitModel;
+    this.unitModel = unitModel.setOnBooking();
     this.status = status;
     this.utcRedeemedAt = utcRedeemedAt ?? null;
     this.contact = contact ?? {
@@ -55,9 +55,12 @@ export class UnitItemModel implements Capable {
       locales: [],
       country: null,
       notes: null,
+      postalCode: null,
     };
     this.ticket = ticket;
-    this.pricing = unitModel.pricingFrom[0];
+    if (this.unitModel.pricingFrom) {
+      this.pricing = this.unitModel.pricingFrom[0];
+    }
   }
 
   public toPOJO = ({

@@ -1,24 +1,24 @@
 // const STATUS_SUCCESS = 200;
-const STATUS_BAD_REQUEST = 400;
-const STATUS_UNAUTHORIZED = 401;
-const STATUS_FORBIDDEN = 403;
-// const STATUS_NOT_FOUD = 404;
+export const STATUS_BAD_REQUEST = 400;
+// const STATUS_UNAUTHORIZED = 401;
+// const STATUS_FORBIDDEN = 403;
+export const STATUS_NOT_FOUND = 404;
 const STATUS_INTERNAL_SERVER_ERROR = 500;
 // const MESSAGE_BAD_REQUEST = "Bad Request";
-// const MESSAGE_NOT_FOUND = "Not Found";
 // const MESSAGE_UNAUTHORIZED = "Unauthorized";
 // const MESSAGE_INTERNAL_SERVER_ERROR = "Internal Server Error";
 
-const INVALID_PRODUCT_ID = "INVALID_PRODUCT_ID";
-const INVALID_OPTION_ID = "INVALID_OPTION_ID";
-const INVALID_UNIT_ID = "INVALID_UNIT_ID";
-const INVALID_AVAILABILITY_ID = "INVALID_AVAILABILITY_ID";
-const INVALID_BOOKING_UUID = "INVALID_BOOKING_UUID";
-const BAD_REQUEST = "BAD_REQUEST";
-const UNPROCESSABLE_ENTITY = "UNPROCESSABLE_ENTITY";
-const INTERNAL_SERVER_ERROR = "INTERNAL_SERVER_ERROR";
-const UNAUTHORIZED = "UNAUTHORIZED";
-const FORBIDDEN = "FORBIDDEN";
+export const INVALID_PRODUCT_ID = "INVALID_PRODUCT_ID";
+export const INVALID_OPTION_ID = "INVALID_OPTION_ID";
+export const INVALID_UNIT_ID = "INVALID_UNIT_ID";
+export const INVALID_AVAILABILITY_ID = "INVALID_AVAILABILITY_ID";
+export const INVALID_BOOKING_UUID = "INVALID_BOOKING_UUID";
+export const BAD_REQUEST = "BAD_REQUEST";
+export const UNPROCESSABLE_ENTITY = "UNPROCESSABLE_ENTITY";
+export const INTERNAL_SERVER_ERROR = "INTERNAL_SERVER_ERROR";
+export const UNAUTHORIZED = "UNAUTHORIZED";
+export const FORBIDDEN = "FORBIDDEN";
+export const NOT_FOUND = "NOT_FOUND";
 
 const ERROR_MESSAGE_INVALID_PRODUCT_ID = `The productId was missing or invalid'`;
 const ERROR_MESSAGE_INVALID_OPTION_ID = `The optionId was missing or invalid'`;
@@ -30,6 +30,7 @@ const ERROR_MESSAGE_UNPROCESSABLE_ENTITY = `The request body is technically corr
 const ERROR_MESSAGE_INTERNAL_SERVER_ERROR = `There was an un-recoverable error, please try again`;
 const ERROR_MESSAGE_UNAUTHORIZED = `You didn't send the API Key in the Authorization header to an endpoint that requires authentication`;
 const ERROR_MESSAGE_FORBIDDEN = `You sent an API Key that was invalid or has been revoked by the backend system. Or you're trying to access an endpoint/resource that you do not have access to`;
+const ERROR_MESSAGE_NOT_FOUND = "Resource not found";
 
 interface HttpErrorParams {
   status: number;
@@ -137,6 +138,16 @@ export class BadRequestError extends OctoError {
   }
 }
 
+export class NotFoundError extends OctoError {
+  constructor(message?: string) {
+    super({
+      status: STATUS_NOT_FOUND,
+      error: NOT_FOUND,
+      errorMessage: message ?? ERROR_MESSAGE_NOT_FOUND,
+    });
+  }
+}
+
 export class UnprocessableEntityError extends OctoError {
   constructor(message?: string) {
     super({
@@ -160,7 +171,7 @@ export class InternalServerError extends OctoError {
 export class UnauthorizedError extends OctoError {
   constructor() {
     super({
-      status: STATUS_UNAUTHORIZED,
+      status: STATUS_BAD_REQUEST,
       error: UNAUTHORIZED,
       errorMessage: ERROR_MESSAGE_UNAUTHORIZED,
     });
@@ -170,7 +181,7 @@ export class UnauthorizedError extends OctoError {
 export class OctoForbiddenError extends OctoError {
   constructor() {
     super({
-      status: STATUS_FORBIDDEN,
+      status: STATUS_BAD_REQUEST,
       error: FORBIDDEN,
       errorMessage: ERROR_MESSAGE_FORBIDDEN,
     });

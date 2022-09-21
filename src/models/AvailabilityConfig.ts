@@ -51,6 +51,7 @@ const fillCapacity = (value: Nullable<number>): Capacity => {
 export class AvailabilityConfigModel {
   public days: number;
   public daysClosed: Day[];
+  public daysSoldOut: Day[];
   public monthsClosed: Month[];
   public availabilityType: AvailabilityType;
   public openingHours: OpeningHours[];
@@ -62,6 +63,7 @@ export class AvailabilityConfigModel {
   constructor({
     days,
     daysClosed,
+    daysSoldOut,
     monthsClosed,
     availabilityType,
     openingHours,
@@ -71,6 +73,7 @@ export class AvailabilityConfigModel {
   }: {
     days?: number;
     daysClosed?: Day[];
+    daysSoldOut?: Day[];
     monthsClosed?: Month[];
     availabilityType?: AvailabilityType;
     openingHours?: OpeningHours[];
@@ -98,6 +101,7 @@ export class AvailabilityConfigModel {
 
     this.days = days ?? 365;
     this.daysClosed = daysClosed ?? [];
+    this.daysSoldOut = daysSoldOut ?? [];
     this.monthsClosed = monthsClosed ?? [];
     this.availabilityType = availabilityType ?? AvailabilityType.START_TIME;
     this.openingHours = openingHours ?? [];

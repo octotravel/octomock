@@ -17,4 +17,12 @@ export abstract class DateHelper {
   public static utcDateFormat = (date: Date): string => {
     return date.toISOString().split(".")[0] + "Z";
   };
+
+  public static getTime(dateTime: string): string {
+    return dateTime.split("T")[1].slice(0, 5);
+  }
+
+  public static getDate(dateTime: string): string {
+    return dateTime.split("T")[0];
+  }
 }

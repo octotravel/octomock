@@ -3,7 +3,7 @@ import { InvalidAvailabilityIdError, BadRequestError } from "./../models/Error";
 import { ProductModel } from "./../models/Product";
 import { ProductService } from "./ProductService";
 import { AvailabilityGenerator } from "../generators/AvailabilityGenerator";
-import { eachDayOfInterval } from "date-fns";
+import { eachDayOfInterval, isMatch } from "date-fns";
 import { AvailabilityModel } from "../models/Availability";
 import { DateHelper } from "../helpers/DateHelper";
 
@@ -53,6 +53,9 @@ export class AvailabilityService implements IAvailabilityService {
         availabilities
       );
     }
+    if (schema.availabilityIds) {
+      return this.getAvailabilityIDs(schema.availabilityIds, availabilities);
+    }
     return [];
   };
 
@@ -62,11 +65,16 @@ export class AvailabilityService implements IAvailabilityService {
   ): Promise<AvailabilityModel> => {
     const optionId = data.optionId;
 
+    if (!isMatch(data.availabilityId, "yyyy-MM-dd'T'HH:mm:ssxxx")) {
+      throw new InvalidAvailabilityIdError(data.availabilityId);
+    }
+
+    const date = new Date(data.availabilityId);
     const availabilities = this.generator.generate({
       product: data.product,
       optionId,
       capabilities,
-      date: DateHelper.availabilityDateFormat(new Date(data.availabilityId)),
+      date: DateHelper.availabilityDateFormat(date),
     });
     const availability =
       availabilities.find(
@@ -79,6 +87,13 @@ export class AvailabilityService implements IAvailabilityService {
       throw new BadRequestError("not available");
     }
     return availability;
+  };
+
+  private getAvailabilityIDs = (
+    availabilityIds: string[],
+    availabilities: AvailabilityModel[]
+  ) => {
+    return availabilities.filter((a) => availabilityIds.includes(a.id));
   };
 
   private getSingleDate = (

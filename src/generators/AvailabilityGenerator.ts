@@ -1,3 +1,4 @@
+import { AvailabilityConfigModel } from "./../models/AvailabilityConfig";
 import {
   CapabilityId,
   AvailabilityStatus,
@@ -42,9 +43,7 @@ export class AvailabilityGenerator {
           product,
           optionId,
           date: DateHelper.availabilityDateFormat(day),
-          status: config.freesale
-            ? AvailabilityStatus.FREESALE
-            : AvailabilityStatus.AVAILABLE,
+          status: this.getStatus(config, day),
           units,
           capabilities,
           capacity: config.freesale ? null : config.capacity.get(getDay(day)),
@@ -53,6 +52,19 @@ export class AvailabilityGenerator {
       })
       .flat(1);
 
-    return dates.filter(Boolean);
+    return dates.flatMap((v) => (v ? [v] : []));
+  };
+
+  private getStatus = (config: AvailabilityConfigModel, day: Date) => {
+    const isSoldOut =
+      config.daysSoldOut.includes(getDay(day)) ||
+      config.daysSoldOut.includes(getMonth(day));
+    if (isSoldOut) {
+      return AvailabilityStatus.SOLD_OUT;
+    }
+
+    return config.freesale
+      ? AvailabilityStatus.FREESALE
+      : AvailabilityStatus.AVAILABLE;
   };
 }

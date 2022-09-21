@@ -4,11 +4,13 @@
     "target": "es2017",
     "module": "commonjs",
     "sourceMap": true,
+    // "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "esModuleInterop": true,
     "typeRoots": ["node_modules/@types"],
-    "types": ["jest"]
+    "types": ["jest"],
+    "resolveJsonModule": true
   },
   "include": ["src/**/**.ts", "test/**/**.ts", "src/models/Availability.ts"],
   "exclude": ["node_modules"]
