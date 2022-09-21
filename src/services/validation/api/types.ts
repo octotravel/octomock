@@ -3,11 +3,11 @@ import { ValidatedError } from "./../../../validators/backendValidator/Error/ind
 export type ApiParams = {
   headers?: Record<string, string>;
 };
-export type Result<T> = {
+export interface Result<T> {
   request: Nullable<ResultRequest>;
   response: Nullable<ResultResponse<T>>;
   data: Nullable<T>;
-};
+}
 
 export type ResultRequest = {
   url: string;
@@ -15,6 +15,7 @@ export type ResultRequest = {
   body: Nullable<Record<string, any>>;
   headers: Record<string, string>;
 };
+
 export type ResultResponse<T> = {
   data: Nullable<{
     status: number;

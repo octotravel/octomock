@@ -26,7 +26,7 @@ export class TicketValidator implements ModelValidator {
       ...this.validateDeliveryOptions(ticket),
     ];
 
-    return errors.filter(Boolean);
+    return errors.flatMap((v) => (v ? [v] : []));
   };
   private validateDeliveryOptions = (ticket: Ticket): ValidatorError[] => {
     const deliveryOptions = ticket?.deliveryOptions ?? [];
@@ -43,6 +43,6 @@ export class TicketValidator implements ModelValidator {
         ),
       ])
       .flat(1)
-      .filter(Boolean);
+      .flatMap((v) => (v ? [v] : []));
   };
 }

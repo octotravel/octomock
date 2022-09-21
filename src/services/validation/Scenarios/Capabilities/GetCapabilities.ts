@@ -14,6 +14,7 @@ export class GetCapabilitiesScenario implements Scenario<Capability[]> {
     const name = "Get Capabilities";
     const description = descriptions.getCapabilities;
 
+    result.data;
     return this.capabilitiesScenarioHelper.validateCapabilities({
       result,
       name,

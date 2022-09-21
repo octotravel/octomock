@@ -42,6 +42,6 @@ export class ContactValidator implements ModelValidator {
       StringValidator.validate(`${this.path}.notes`, contact?.notes, {
         nullable: true,
       }),
-    ].filter(Boolean);
+    ].flatMap((v) => (v ? [v] : []));
   };
 }

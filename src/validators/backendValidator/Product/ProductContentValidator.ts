@@ -86,7 +86,7 @@ export class ProductContentValidator implements ModelValidator {
         product?.galleryImages ?? ([] as Image[])
       ),
       ...this.validateImages(`bannerImages`, product?.bannerImages as Image[]),
-    ].filter(Boolean);
+    ].flatMap((v) => (v ? [v] : []));
   };
 
   private validateDestination = (destination: Destination): ValidatorError[] =>
@@ -123,7 +123,7 @@ export class ProductContentValidator implements ModelValidator {
         destination?.contact?.address,
         { nullable: true }
       ),
-    ].filter(Boolean);
+    ].flatMap((v) => (v ? [v] : []));
 
   private validateCategories = (categories: Category[]): ValidatorError[] => {
     return categories
@@ -157,7 +157,7 @@ export class ProductContentValidator implements ModelValidator {
         ),
       ])
       .flat(1)
-      .filter(Boolean);
+      .flatMap((v) => (v ? [v] : []));
   };
 
   private validateFAQS = (faqs: FAQ[]): ValidatorError[] => {
@@ -170,7 +170,7 @@ export class ProductContentValidator implements ModelValidator {
         StringValidator.validate(`${this.path}.faqs[${i}].answer`, faq?.answer),
       ])
       .flat(1)
-      .filter(Boolean);
+      .flatMap((v) => (v ? [v] : []));
   };
 
   private validateImages = (
@@ -192,6 +192,6 @@ export class ProductContentValidator implements ModelValidator {
         ),
       ])
       .flat(1)
-      .filter(Boolean);
+      .flatMap((v) => (v ? [v] : []));
   };
 }

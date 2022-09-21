@@ -75,7 +75,7 @@ export class UnitItemValidator implements ModelValidator {
       ...this.validatePricingCapability(unitItem, pricingPer),
       ...this.validateTicket(unitItem?.ticket, deliveryMethods ?? []),
     ];
-    return errors.filter(Boolean);
+    return errors.flatMap((v) => (v ? [v] : []));
   };
 
   private validateTicket = (

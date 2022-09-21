@@ -78,7 +78,7 @@ export class AvailabilityCalendarValidator implements ModelValidator {
         this.availabilityType
       ),
       ...this.validatePricingCapability(availability),
-    ].filter(Boolean);
+    ].flatMap((v) => (v ? [v] : []));
   };
 
   private validatePricingCapability = (

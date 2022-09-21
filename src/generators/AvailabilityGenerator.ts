@@ -52,7 +52,7 @@ export class AvailabilityGenerator {
       })
       .flat(1);
 
-    return dates.filter(Boolean);
+    return dates.flatMap((v) => (v ? [v] : []));
   };
 
   private getStatus = (config: AvailabilityConfigModel, day: Date) => {

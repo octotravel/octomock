@@ -4,6 +4,7 @@
     "target": "es2017",
     "module": "commonjs",
     "sourceMap": true,
+    // "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "esModuleInterop": true,

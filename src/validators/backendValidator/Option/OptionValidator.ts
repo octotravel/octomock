@@ -76,7 +76,7 @@ export class OptionValidator implements ModelValidator {
 
       ...this.validatePricingCapability(option, pricingPer),
       ...this.validatePickupCapability(option),
-    ].filter(Boolean);
+    ].flatMap((v) => (v ? [v] : []));
   };
 
   private validateAvailabilityLocalStartTimes = (
@@ -112,7 +112,7 @@ export class OptionValidator implements ModelValidator {
         restrictions?.maxUnits,
         { nullable: true, integer: true }
       ),
-    ].filter(Boolean);
+    ].flatMap((v) => (v ? [v] : []));
 
   private validateUnits = (
     units: Unit[],
@@ -127,7 +127,7 @@ export class OptionValidator implements ModelValidator {
         return validator.validate(unit, pricingPer);
       })
       .flat(1)
-      .filter(Boolean);
+      .flatMap((v) => (v ? [v] : []));
   };
 
   private validatePricingCapability = (

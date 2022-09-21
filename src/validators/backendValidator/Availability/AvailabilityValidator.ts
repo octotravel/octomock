@@ -117,7 +117,7 @@ export class AvailabilityValidator implements ModelValidator {
       ...this.validatePickupCapability(availability),
     ]
       .flat(1)
-      .filter(Boolean);
+      .flatMap((v) => (v ? [v] : []));
   };
 
   private validateAllDay = (availability: Availability) => {

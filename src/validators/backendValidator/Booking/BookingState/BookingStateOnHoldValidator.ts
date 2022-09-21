@@ -36,6 +36,6 @@ export class BookingStateOnHoldValidator implements ModelValidator {
         `${this.path}.cancellation`,
         booking?.cancellation
       ),
-    ].filter(Boolean);
+    ].flatMap((v) => (v ? [v] : []));
   };
 }

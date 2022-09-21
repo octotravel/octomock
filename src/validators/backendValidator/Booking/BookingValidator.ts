@@ -100,7 +100,7 @@ export class BookingValidator implements ModelValidator {
       ...this.validateVoucher(booking),
       ...this.validatePricingCapability(booking),
       ...this.validatePickupCapability(booking),
-    ].filter(Boolean);
+    ].flatMap((v) => (v ? [v] : []));
   };
 
   private validateVoucher = (booking: Booking): ValidatorError[] => {
@@ -167,7 +167,7 @@ export class BookingValidator implements ModelValidator {
         booking?.availability?.openingHours ?? [],
         booking?.product?.availabilityType
       ),
-    ].filter(Boolean);
+    ].flatMap((v) => (v ? [v] : []));
 
   private validateUnitItems = (booking: Booking): ValidatorError[] => {
     const unitItems = booking?.unitItems ?? [];
@@ -184,7 +184,7 @@ export class BookingValidator implements ModelValidator {
         );
       })
       .flat(1)
-      .filter(Boolean);
+      .flatMap((v) => (v ? [v] : []));
   };
 
   private validatePricingCapability = (booking: Booking): ValidatorError[] => {

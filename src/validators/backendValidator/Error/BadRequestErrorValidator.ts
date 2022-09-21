@@ -18,6 +18,6 @@ export class BadRequestErrorValidator implements ModelValidator {
         integer: true,
         equalsTo: STATUS_BAD_REQUEST,
       }),
-    ].filter(Boolean);
+    ].flatMap((v) => (v ? [v] : []));
   };
 }

@@ -37,7 +37,7 @@ export class PricingValidator implements ModelValidator {
         }
       ),
       ...this.validateTaxes(pricing?.includedTaxes ?? []),
-    ].filter(Boolean);
+    ].flatMap((v) => (v ? [v] : []));
   };
 
   private validateTaxes = (taxes: Tax[]): ValidatorError[] => {
@@ -62,6 +62,6 @@ export class PricingValidator implements ModelValidator {
         }),
       ])
       .flat(1)
-      .filter(Boolean);
+      .flatMap((v) => (v ? [v] : []));
   };
 }

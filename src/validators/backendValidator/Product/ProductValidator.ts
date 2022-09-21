@@ -92,7 +92,7 @@ export class ProductValidator implements ModelValidator {
 
       ...this.validatePricingCapability(product),
       ...this.validateContentCapability(product),
-    ].filter(Boolean);
+    ].flatMap((v) => (v ? [v] : []));
   };
 
   private validateOptions = (product: Product): ValidatorError[] => {

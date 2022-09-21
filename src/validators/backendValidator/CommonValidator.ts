@@ -40,7 +40,7 @@ export class CommonValidator {
       );
     }
 
-    return errors.filter(Boolean);
+    return errors.flatMap((v) => (v ? [v] : []));
   };
 
   public static validateLocalDate = (

@@ -18,6 +18,6 @@ export class NotFoundErrorValidator implements ModelValidator {
         integer: true,
         equalsTo: STATUS_NOT_FOUND,
       }),
-    ].filter(Boolean);
+    ].flatMap((v) => (v ? [v] : []));
   };
 }

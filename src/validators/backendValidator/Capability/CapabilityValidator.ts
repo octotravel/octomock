@@ -33,6 +33,6 @@ export class CapabilityValidator implements ModelValidator {
       StringValidator.validate(`${this.path}.docs`, capability?.docs, {
         nullable: true,
       }),
-    ].filter(Boolean);
+    ].flatMap((v) => (v ? [v] : []));
   };
 }

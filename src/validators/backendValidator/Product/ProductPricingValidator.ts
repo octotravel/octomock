@@ -31,6 +31,6 @@ export class ProductPricingValidator implements ModelValidator {
         product?.pricingPer,
         Object.values(PricingPer)
       ),
-    ].filter(Boolean);
+    ].flatMap((v) => (v ? [v] : []));
   };
 }

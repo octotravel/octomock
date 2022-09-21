@@ -34,7 +34,7 @@ export class BookingPickupValidator implements ModelValidator {
         { nullable: true }
       ),
       ...this.validatePickupPoint(booking),
-    ].filter(Boolean);
+    ].flatMap((v) => (v ? [v] : []));
   };
 
   private validatePickupPoint = (booking: Booking): ValidatorError[] => {
@@ -106,7 +106,7 @@ export class BookingPickupValidator implements ModelValidator {
           booking?.pickupPoint?.country,
           { nullable: true }
         ),
-      ].filter(Boolean);
+      ].flatMap((v) => (v ? [v] : []));
     }
     return [];
   };

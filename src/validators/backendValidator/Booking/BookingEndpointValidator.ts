@@ -96,7 +96,7 @@ export class BookingEndpointValidator {
         }
       ),
     ];
-    return errors.filter(Boolean);
+    return errors.flatMap((v) => (v ? [v] : []));
   };
 
   public validateReservation = (data: ValidateReservationData) => {
@@ -117,7 +117,7 @@ export class BookingEndpointValidator {
       );
     }
 
-    return errors.filter(Boolean);
+    return errors.flatMap((v) => (v ? [v] : []));
   };
 
   private validateUnitItems = (
@@ -177,7 +177,7 @@ export class BookingEndpointValidator {
       );
     }
 
-    return errors.filter(Boolean);
+    return errors.flatMap((v) => (v ? [v] : []));
   };
 
   public validateConfirmation = (
@@ -203,7 +203,7 @@ export class BookingEndpointValidator {
     if (schema?.unitItems) {
       errors.push(...this.validateUnitItems(booking, schema));
     }
-    return errors.filter(Boolean);
+    return errors.flatMap((v) => (v ? [v] : []));
   };
 
   public validateUpdate = (data: ValidateUpdateData): ValidatorError[] => {
@@ -222,7 +222,7 @@ export class BookingEndpointValidator {
       );
     }
 
-    return errors.filter(Boolean);
+    return errors.flatMap((v) => (v ? [v] : []));
   };
 
   private validateContact = (
@@ -267,7 +267,7 @@ export class BookingEndpointValidator {
           }
         ),
       ];
-      return errors.filter(Boolean);
+      return errors.flatMap((v) => (v ? [v] : []));
     }
 
     return [];
@@ -307,7 +307,7 @@ export class BookingEndpointValidator {
       );
     }
 
-    return errors.filter(Boolean);
+    return errors.flatMap((v) => (v ? [v] : []));
   };
 
   public validateGetBookings = (
@@ -342,6 +342,6 @@ export class BookingEndpointValidator {
       );
     }
 
-    return errors.filter(Boolean);
+    return errors.flatMap((v) => (v ? [v] : []));
   };
 }

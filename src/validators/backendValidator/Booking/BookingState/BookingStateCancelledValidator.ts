@@ -36,7 +36,7 @@ export class BookingStateCancelledValidator implements ModelValidator {
         { nullable: true }
       ),
       ...this.validateCancellation(booking),
-    ].filter(Boolean);
+    ].flatMap((v) => (v ? [v] : []));
   };
 
   private validateCancellation = (booking: Booking): ValidatorError[] =>
@@ -54,5 +54,5 @@ export class BookingStateCancelledValidator implements ModelValidator {
         `${this.path}.cancellation.utcCancelledAt`,
         booking?.cancellation?.utcCancelledAt
       ),
-    ].filter(Boolean);
+    ].flatMap((v) => (v ? [v] : []));
 }

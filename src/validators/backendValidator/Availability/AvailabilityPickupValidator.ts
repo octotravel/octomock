@@ -26,7 +26,7 @@ export class AvailabilityPickupValidator implements ModelValidator {
       ...this.validatePickupPoints(
         availability?.pickupPoints ?? ([] as PickupPoint[])
       ),
-    ].filter(Boolean);
+    ].flatMap((v) => (v ? [v] : []));
   };
 
   private validatePickupPoints = (
@@ -98,6 +98,6 @@ export class AvailabilityPickupValidator implements ModelValidator {
         ),
       ])
       .flat(1)
-      .filter(Boolean);
+      .flatMap((v) => (v ? [v] : []));
   };
 }

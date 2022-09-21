@@ -46,7 +46,7 @@ export class UnitValidator implements ModelValidator {
         Object.values(ContactField)
       ),
       ...this.validatePricingCapability(unit, pricingPer),
-    ].filter(Boolean);
+    ].flatMap((v) => (v ? [v] : []));
   };
 
   private validatePricingCapability = (
@@ -106,6 +106,6 @@ export class UnitValidator implements ModelValidator {
         `${this.path}.restrictions.accompaniedBy`,
         restrictions?.accompaniedBy
       ),
-    ].filter(Boolean);
+    ].flatMap((v) => (v ? [v] : []));
   };
 }

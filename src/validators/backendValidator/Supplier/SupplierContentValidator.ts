@@ -20,7 +20,7 @@ export class SupplierContentValidator implements ModelValidator {
     return [
       StringValidator.validate(`${this.path}.country`, supplier?.country),
       ...this.validateDestination(supplier?.destinations ?? []),
-    ].filter(Boolean);
+    ].flatMap((v) => (v ? [v] : []));
   };
 
   private validateDestination = (
@@ -72,7 +72,7 @@ export class SupplierContentValidator implements ModelValidator {
         ),
       ])
       .flat(1)
-      .filter(Boolean);
+      .flatMap((v) => (v ? [v] : []));
   };
 
   private validateCategories = (
@@ -113,6 +113,6 @@ export class SupplierContentValidator implements ModelValidator {
         ),
       ])
       .flat(1)
-      .filter(Boolean);
+      .flatMap((v) => (v ? [v] : []));
   };
 }

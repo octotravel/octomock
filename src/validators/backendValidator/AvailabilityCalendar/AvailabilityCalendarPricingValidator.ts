@@ -38,7 +38,7 @@ export class AvailabilityCalendarPricingValidator implements ModelValidator {
         ];
       })
       .flat(1)
-      .filter(Boolean);
+      .flatMap((v) => (v ? [v] : []));
   };
 
   private validatePricing = (pricing: Pricing): ValidatorError[] => {

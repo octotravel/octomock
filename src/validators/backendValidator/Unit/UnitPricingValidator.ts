@@ -19,7 +19,7 @@ export class UnitPricingValidator implements ModelValidator {
           return this.pricingValidator.validate(pricing as Pricing);
         })
         .flat(1)
-        .filter(Boolean);
+        .flatMap((v) => (v ? [v] : []));
     } else {
       return unit?.pricingFrom
         ?.map((pricingFrom, i) => {
@@ -27,7 +27,7 @@ export class UnitPricingValidator implements ModelValidator {
           return this.pricingValidator.validate(pricingFrom as Pricing);
         })
         .flat(1)
-        .filter(Boolean);
+        .flatMap((v) => (v ? [v] : []));
     }
   };
 }

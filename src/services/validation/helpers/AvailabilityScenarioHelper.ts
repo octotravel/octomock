@@ -12,15 +12,16 @@ export class AvailabilityScenarioHelper extends ScenarioHelper {
       availabilityType: product.availabilityType,
     });
     const { result } = data;
-    if (result.response.error) {
+    if (result?.response?.error) {
       return this.handleResult({
         ...data,
         success: false,
         errors: [],
       });
     }
+    const availabilities = result?.data ?? [];
 
-    const errors = result.data.map(validator.validate).flat();
+    const errors = availabilities.map(validator.validate).flat();
 
     return this.handleResult({
       ...data,
