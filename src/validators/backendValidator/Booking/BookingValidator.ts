@@ -100,7 +100,6 @@ export class BookingValidator implements ModelValidator {
       ...this.validateVoucher(booking),
       ...this.validatePricingCapability(booking),
       ...this.validatePickupCapability(booking),
-      ...this.ticketValidator.validate(booking?.voucher),
     ].filter(Boolean);
   };
 

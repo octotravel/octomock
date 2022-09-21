@@ -134,11 +134,11 @@ export class Client {
     text: Nullable<string>;
     error: Nullable<Error>;
   }> => {
+    let text = "";
     try {
-      const data = await response.clone().json();
-      return { data, error: null, text: null };
+      text = await response.text();
+      return { data: JSON.parse(text), error: null, text: null };
     } catch (err) {
-      const text = await response.text();
       return {
         data: text as any,
         text,

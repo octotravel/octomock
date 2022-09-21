@@ -54,7 +54,7 @@ export class AvailabilityStatusScenarioHelper extends ScenarioHelper {
   ): ErrorResult<ProductBookable> => {
     const result =
       data.find(({ result }) => {
-        const availabilities = result.data;
+        const availabilities = result.data ?? [];
         const availabilitiessSoldOut = availabilities.filter(
           (availability) => availability.status === AvailabilityStatus.SOLD_OUT
         );
@@ -90,7 +90,7 @@ export class AvailabilityStatusScenarioHelper extends ScenarioHelper {
   ): ErrorResult<ProductBookable[]> => {
     const result =
       data.filter(({ result }) => {
-        const availabilities = result.data;
+        const availabilities = result.data ?? [];
         const availabilitiesAvailable = availabilities.filter(
           (availability) =>
             (availability.status === AvailabilityStatus.AVAILABLE ||
