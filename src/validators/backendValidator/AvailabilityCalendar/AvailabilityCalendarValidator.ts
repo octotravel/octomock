@@ -2,6 +2,7 @@ import {
   AvailabilityStatus,
   CapabilityId,
   AvailabilityCalendar,
+  AvailabilityType,
 } from "@octocloud/types";
 import { CommonValidator } from "../CommonValidator";
 import {
@@ -17,15 +18,19 @@ import { AvailabilityCalendarPricingValidator } from "./AvailabilityCalendarPric
 export class AvailabilityCalendarValidator implements ModelValidator {
   private pricingValidator: AvailabilityCalendarPricingValidator;
   private path: string;
+  private availabilityType: AvailabilityType;
   private capabilities: CapabilityId[];
   constructor({
     path,
     capabilities,
+    availabilityType,
   }: {
-    path?: string;
+    path: string;
     capabilities: CapabilityId[];
+    availabilityType: AvailabilityType;
   }) {
-    this.path = `${path}availability`;
+    this.path = `${path}`;
+    this.availabilityType = availabilityType;
     this.capabilities = capabilities;
     this.pricingValidator = new AvailabilityCalendarPricingValidator({
       path: this.path,
@@ -36,39 +41,44 @@ export class AvailabilityCalendarValidator implements ModelValidator {
     return [
       StringValidator.validate(
         `${this.path}.localDate`,
-        availability.localDate
+        availability?.localDate
       ),
       CommonValidator.validateLocalDate(
         `${this.path}.localDate`,
-        availability.localDate
+        availability?.localDate
       ),
 
       BooleanValidator.validate(
         `${this.path}.available`,
-        availability.available
+        availability?.available
       ),
       EnumValidator.validate(
         `${this.path}.status`,
-        availability.status,
+        availability?.status,
         Object.values(AvailabilityStatus)
       ),
       NumberValidator.validate(
         `${this.path}.vacancies`,
-        availability.vacancies,
+        availability?.vacancies,
         {
           nullable: true,
         }
       ),
-      NumberValidator.validate(`${this.path}.capacity`, availability.capacity, {
-        nullable: true,
-      }),
+      NumberValidator.validate(
+        `${this.path}.capacity`,
+        availability?.capacity,
+        {
+          nullable: true,
+        }
+      ),
 
       ...CommonValidator.validateOpeningHours(
         this.path,
-        availability.openingHours
+        availability?.openingHours ?? [],
+        this.availabilityType
       ),
       ...this.validatePricingCapability(availability),
-    ].filter(Boolean);
+    ].flatMap((v) => (v ? [v] : []));
   };
 
   private validatePricingCapability = (

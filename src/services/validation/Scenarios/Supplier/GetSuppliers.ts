@@ -1,33 +1,23 @@
-import { CapabilityId, Supplier } from "@octocloud/types";
-import { ApiClient } from "../../ApiClient";
+import { Supplier } from "@octocloud/types";
 import { Scenario } from "../Scenario";
 import { SupplierScenarioHelper } from "../../helpers/SupplierScenarioHelper";
+import { Config } from "../../config/Config";
+import descriptions from "../../consts/descriptions";
 
-export class GetSuppliersScenario implements Scenario<Supplier[]> {
-  private apiClient: ApiClient;
-  private capabilities: CapabilityId[];
-  constructor({
-    apiClient,
-    capabilities,
-  }: {
-    apiClient: ApiClient;
-    capabilities: CapabilityId[];
-  }) {
-    this.apiClient = apiClient;
-    this.capabilities = capabilities;
-  }
+export class GetSupplierScenario implements Scenario<Supplier> {
+  private config = Config.getInstance();
+  private apiClient = this.config.getApiClient();
   private supplierScenarioHelper = new SupplierScenarioHelper();
 
   public validate = async () => {
-    const result = await this.apiClient.getSuppliers();
-    const name = "Get Suppliers";
+    const result = await this.apiClient.getSupplier();
+    const name = "Get Supplier";
+    const description = descriptions.getSupplier;
 
-    return this.supplierScenarioHelper.validateSupplier(
-      {
-        ...result,
-        name,
-      },
-      this.capabilities
-    );
+    return this.supplierScenarioHelper.validateSupplier({
+      result,
+      name,
+      description,
+    });
   };
 }

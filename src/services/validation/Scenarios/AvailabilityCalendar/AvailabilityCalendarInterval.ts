@@ -1,70 +1,42 @@
-import {
-  AvailabilityCalendar,
-  AvailabilityUnit,
-  CapabilityId,
-} from "@octocloud/types";
-import { ApiClient } from "../../ApiClient";
+import { AvailabilityCalendar, Product } from "@octocloud/types";
 import { Scenario } from "../Scenario";
 import { AvailabilityCalendarScenarioHelper } from "../../helpers/AvailabilityCalendarScenarioHelper";
+import { Config } from "../../config/Config";
+import descriptions from "../../consts/descriptions";
 
 export class AvailabilityCalendarIntervalScenario
   implements Scenario<AvailabilityCalendar[]>
 {
-  private apiClient: ApiClient;
-  private productId: string;
-  private optionId: string;
-  private localDateStart: string;
-  private localDateEnd: string;
-  private units: AvailabilityUnit[];
-  private availabilityType: string;
-  private capabilities: CapabilityId[];
-  constructor({
-    apiClient,
-    productId,
-    optionId,
-    localDateStart,
-    localDateEnd,
-    units,
-    availabilityType,
-    capabilities,
-  }: {
-    apiClient: ApiClient;
-    productId: string;
-    optionId: string;
-    localDateStart: string;
-    localDateEnd: string;
-    units?: AvailabilityUnit[];
-    availabilityType: string;
-    capabilities: CapabilityId[];
-  }) {
-    this.apiClient = apiClient;
-    this.productId = productId;
-    this.optionId = optionId;
-    this.localDateStart = localDateStart;
-    this.localDateEnd = localDateEnd;
-    this.units = units;
-    this.availabilityType = availabilityType;
-    this.capabilities = capabilities;
+  private config = Config.getInstance();
+  private apiClient = this.config.getApiClient();
+  private product: Product;
+
+  constructor(product: Product) {
+    this.product = product;
   }
+
   private availabilityCalendarScenarioHelper =
     new AvailabilityCalendarScenarioHelper();
 
   public validate = async () => {
+    const option =
+      this.product.options.find((o) => o.default) ?? this.product.options[0];
     const result = await this.apiClient.getAvailabilityCalendar({
-      productId: this.productId,
-      optionId: this.optionId,
-      localDateStart: this.localDateStart,
-      localDateEnd: this.localDateEnd,
-      units: this.units,
+      productId: this.product.id,
+      optionId: option.id,
+      localDateStart: this.config.localDateStart,
+      localDateEnd: this.config.localDateEnd,
     });
-    const name = `Availability Calendar Interval (${this.availabilityType})`;
+    const name = `Availability Calendar Interval (${this.product.availabilityType})`;
+    const description = descriptions.availabilityCalendarInterval;
 
     return this.availabilityCalendarScenarioHelper.validateAvailability(
       {
-        ...result,
+        result,
         name,
+        description,
       },
-      this.capabilities
+      this.product
     );
   };
 }

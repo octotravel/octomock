@@ -1,348 +1,119 @@
-import { AvailabilityType, CapabilityId } from "@octocloud/types";
-import * as R from "ramda";
-import { BadRequestError } from "../../../../models/Error";
-import { ApiClient } from "../../ApiClient";
-import { Config } from "../../config/Config";
-import { BookingValidateData, ScenarioResult } from "../../Scenarios/Scenario";
-import { BookingReservationScenario } from "../../Scenarios/Booking/Reservation/BookingReservation";
-import { FlowResult } from "../Flow";
-import { BookingReservationInvalidProductScenario } from "../../Scenarios/Booking/Reservation/BookingReservationInvalidProduct";
-import { BookingReservationInvalidOptionScenario } from "../../Scenarios/Booking/Reservation/BookingReservationInvalidOption";
-import { BookingReservationInvalidAvailabilityIdScenario } from "../../Scenarios/Booking/Reservation/BookingReservationInvalidAvailabilityId";
-import { BookingReservationMissingUnitItemsScenario } from "../../Scenarios/Booking/Reservation/BookingReservationMissingUnitItems";
-import { BookingReservationEmptyUnitItemsScenario } from "../../Scenarios/Booking/Reservation/BookingReservationEmptyUnitItems";
-import { BookingReservationInvalidUnitIdScenario } from "../../Scenarios/Booking/Reservation/BookingReservationInvalidUnitId";
+import { BookingReservationScenario } from "../../Scenarios/Booking/Reservation/BookingReservationScenario";
+import { Flow, FlowResult } from "../Flow";
+import { BookingReservationInvalidProductScenario } from "../../Scenarios/Booking/Reservation/BookingReservationInvalidProductScenario";
+import { BookingReservationInvalidOptionScenario } from "../../Scenarios/Booking/Reservation/BookingReservationInvalidOptionScenario";
+import { BookingReservationInvalidAvailabilityIdScenario } from "../../Scenarios/Booking/Reservation/BookingReservationInvalidAvailabilityIdScenario";
+import { BaseFlow } from "../BaseFlow";
+import { BookingReservationSoldOutScenario } from "../../Scenarios/Booking/Reservation/BookingReservationSoldOutScenario";
+import { BookingReservationMissingUnitItemsScenario } from "../../Scenarios/Booking/Reservation/BookingReservationMissingUnitItemsScenario";
+import { BookingReservationEmptyUnitItemsScenario } from "../../Scenarios/Booking/Reservation/BookingReservationEmptyUnitItemsScenario";
+import { BookingReservationInvalidUnitIdScenario } from "../../Scenarios/Booking/Reservation/BookingReservationInvalidUnitIdScenario";
+import { Scenario } from "../../Scenarios/Scenario";
+import { Booker } from "../../Booker";
+import docs from "../../consts/docs";
 
-export class BookingReservationFlow {
-  private config: Config;
-  private apiClient: ApiClient;
-  private startTimes: Nullable<BookingValidateData>;
-  private openingHours: Nullable<BookingValidateData>;
-  constructor({ config }: { config: Config }) {
-    this.config = config;
-    this.apiClient = new ApiClient({
-      url: config.url,
-      capabilities: config.capabilities,
-      apiKey: this.config.apiKey,
-    });
+export class BookingReservationFlow extends BaseFlow implements Flow {
+  private booker = new Booker();
+  constructor() {
+    super("Booking Reservation", docs.bookingReservation);
   }
 
-  private fetchData = async (): Promise<void> => {
-    await Promise.all(
-      this.config.getProductConfigs().map(async (productConfig) => {
-        const optionId =
-          productConfig.optionId ??
-          (
-            await this.apiClient.getProduct({ id: productConfig.productId })
-          ).response.data.body.options.find((option) => option.default).id;
-        const availability = await this.apiClient.getAvailability({
-          productId: productConfig.productId,
-          optionId: optionId,
-          localDateStart: productConfig.available.from,
-          localDateEnd: productConfig.available.to,
-        });
-        if (
-          R.isEmpty(availability.response.data.body) &&
-          !availability.response.error
-        ) {
-          throw new BadRequestError("Invalid available dates!");
-        }
-        const product = (
-          await this.apiClient.getProduct({
-            id: productConfig.productId,
-          })
-        ).response.data.body;
-
-        // if (this.config.capabilities.includes(CapabilityId.Pickups)) {
-        //   if (R.isEmpty(product.options.find(option => option.id === optionId).pickupPoints)) {
-        //     throw new BadRequestError(`No available Pickup Points for product ${product.id}`)
-        //   }
-        // }
-
-        if (productConfig.availabilityType === AvailabilityType.START_TIME) {
-          this.startTimes = {
-            productId: productConfig.productId,
-            optionId,
-            availability: availability.response.data.body,
-            product,
-          };
-        } else {
-          this.openingHours = {
-            productId: productConfig.productId,
-            optionId,
-            availability: availability.response.data.body,
-            product,
-          };
-        }
-      })
-    );
-  };
-
-  private setFlow = (scenarios: ScenarioResult<any>[]): FlowResult => {
-    return {
-      name: "Booking Reservation",
-      success: scenarios.every((scenario) => scenario.success),
-      totalScenarios: scenarios.length,
-      succesScenarios: scenarios.filter((scenario) => scenario.success).length,
-      scenarios: scenarios,
-    };
-  };
-
   public validate = async (): Promise<FlowResult> => {
-    await this.fetchData();
-
     const scenarios = [
-      ...(await this.validateBooking()),
-      ...(await this.validateBookingInvalidProduct()),
-      ...(await this.validateBookingInvalidOption()),
-      ...(await this.validateBookingInvalidAvailabilityId()),
-      ...(await this.validateBookingnMissingUnitItems()),
-      ...(await this.validateBookingEmptyUnitItems()),
-      ...(await this.validateBookingInvalidUnitId()),
+      await this.reserveAvailableProduct(),
+      await this.reserveSoldOutProduct(),
+      await this.reserveInvalidProduct(),
+      await this.reserveInvalidOption(),
+      await this.reserveInvalidAvailabilityID(),
+      await this.reserveWithMissingUnitItems(),
+      await this.reserveWithEmptyUnitItems(),
+      await this.validateBookingInvalidUnitId(),
     ];
-
-    const results = [];
-    for await (const scenario of scenarios) {
-      const result = await scenario.validate();
-      results.push(result);
-      if (!result.success && !this.config.ignoreKill) {
-        break;
-      }
-    }
-    return this.setFlow(results);
+    return this.validateScenarios(scenarios);
   };
 
-  private validateBooking = async (): Promise<BookingReservationScenario[]> => {
-    return Promise.all(
-      this.config.getProductConfigs().map(async (productConfig) => {
-        const validateData =
-          productConfig.availabilityType === AvailabilityType.OPENING_HOURS
-            ? this.openingHours
-            : this.startTimes;
-        let unitItems = [
-          {
-            unitId: validateData.product.options.find(
-              (option) => option.id === validateData.optionId
-            ).units[0].id,
-          },
-          {
-            unitId: validateData.product.options.find(
-              (option) => option.id === validateData.optionId
-            ).units[0].id,
-          },
-          {
-            unitId: validateData.product.options.find(
-              (option) => option.id === validateData.optionId
-            ).units[0].id,
-          },
-        ];
-        if (
-          validateData.product.options.find(
-            (option) => option.id === validateData.optionId
-          ).units[1]
-        ) {
-          unitItems = [
-            ...unitItems,
-            {
-              unitId: validateData.product.options.find(
-                (option) => option.id === validateData.optionId
-              ).units[1].id,
-            },
-          ];
-        }
+  private reserveAvailableProduct = async (): Promise<Scenario<unknown>> => {
+    const [bookableProduct] = this.config.productConfig.availableProducts;
 
-        const bookingData = {
-          productId: validateData.productId,
-          optionId: validateData.optionId,
-          availabilityId: validateData.availability[0].id,
-          unitItems,
-          notes: "Test note",
-          apiClient: this.apiClient,
-          deliveryMethods: productConfig.deliveryMethods,
-          availabilityType: productConfig.availabilityType,
-          capabilities: this.config.capabilities,
-        };
-
-        if (this.config.capabilities.includes(CapabilityId.Pickups)) {
-          return new BookingReservationScenario({
-            ...bookingData,
-            pickupPointId: validateData.product.options.find(
-              (option) => option.id === validateData.optionId
-            ).pickupPoints[0]
-              ? validateData.product.options.find(
-                  (option) => option.id === validateData.optionId
-                ).pickupPoints[0].id
-              : "",
-          });
-        }
-        return new BookingReservationScenario(bookingData);
-      })
-    );
+    const result = await this.booker.createReservation(bookableProduct);
+    return new BookingReservationScenario({ result });
   };
 
-  private validateBookingInvalidProduct = async (): Promise<
-    BookingReservationInvalidProductScenario[]
+  private reserveSoldOutProduct = async (): Promise<Scenario<unknown>> => {
+    const bookableProduct = this.config.productConfig.soldOutProduct;
+
+    const result = await this.booker.createReservation(bookableProduct, {
+      soldOutAvailability: true,
+    });
+    return new BookingReservationSoldOutScenario({ result });
+  };
+
+  private reserveInvalidProduct = async (): Promise<Scenario<unknown>> => {
+    const [bookableProduct] = this.config.productConfig.availableProducts;
+
+    const result = await this.booker.createReservation(bookableProduct, {
+      invalidProductId: true,
+    });
+    return new BookingReservationInvalidProductScenario({ result });
+  };
+
+  private reserveInvalidOption = async (): Promise<Scenario<unknown>> => {
+    const [bookableProduct] = this.config.productConfig.availableProducts;
+
+    const result = await this.booker.createReservation(bookableProduct, {
+      invalidOptionId: true,
+    });
+    return new BookingReservationInvalidOptionScenario({
+      result,
+    });
+  };
+
+  private reserveInvalidAvailabilityID = async (): Promise<
+    Scenario<unknown>
   > => {
-    return Promise.all(
-      this.config.getProductConfigs().map(async (productConfig) => {
-        const validateData =
-          productConfig.availabilityType === AvailabilityType.OPENING_HOURS
-            ? this.openingHours
-            : this.startTimes;
-        return new BookingReservationInvalidProductScenario({
-          apiClient: this.apiClient,
-          productId: "invalid_productId",
-          optionId: validateData.optionId,
-          availabilityId: validateData.availability[0].id,
-          unitItems: [
-            {
-              unitId: validateData.product.options.find(
-                (option) => option.id === validateData.optionId
-              ).units[0].id,
-            },
-            {
-              unitId: validateData.product.options.find(
-                (option) => option.id === validateData.optionId
-              ).units[0].id,
-            },
-          ],
-          capabilities: this.config.capabilities,
-        });
-      })
-    );
+    const [bookableProduct] = this.config.productConfig.availableProducts;
+
+    const result = await this.booker.createReservation(bookableProduct, {
+      invalidAvailabilityId: true,
+    });
+    return new BookingReservationInvalidAvailabilityIdScenario({
+      result,
+    });
   };
 
-  private validateBookingInvalidOption = async (): Promise<
-    BookingReservationInvalidOptionScenario[]
+  private reserveWithMissingUnitItems = async (): Promise<
+    Scenario<unknown>
   > => {
-    return Promise.all(
-      this.config.getProductConfigs().map(async (productConfig) => {
-        const validateData =
-          productConfig.availabilityType === AvailabilityType.OPENING_HOURS
-            ? this.openingHours
-            : this.startTimes;
-        return new BookingReservationInvalidOptionScenario({
-          apiClient: this.apiClient,
-          productId: validateData.productId,
-          optionId: "invalid_optionId",
-          availabilityId: validateData.availability[0].id,
-          unitItems: [
-            {
-              unitId: validateData.product.options.find(
-                (option) => option.id === validateData.optionId
-              ).units[0].id,
-            },
-            {
-              unitId: validateData.product.options.find(
-                (option) => option.id === validateData.optionId
-              ).units[0].id,
-            },
-          ],
-          capabilities: this.config.capabilities,
-        });
-      })
-    );
+    const [bookableProduct] = this.config.productConfig.availableProducts;
+
+    const result = await this.booker.createReservation(bookableProduct, {
+      unitItemsMissing: true,
+    });
+    return new BookingReservationMissingUnitItemsScenario({
+      result,
+    });
   };
 
-  private validateBookingInvalidAvailabilityId = async (): Promise<
-    BookingReservationInvalidAvailabilityIdScenario[]
-  > => {
-    return Promise.all(
-      this.config.getProductConfigs().map(async (productConfig) => {
-        const validateData =
-          productConfig.availabilityType === AvailabilityType.OPENING_HOURS
-            ? this.openingHours
-            : this.startTimes;
-        return new BookingReservationInvalidAvailabilityIdScenario({
-          apiClient: this.apiClient,
-          productId: validateData.productId,
-          optionId: validateData.optionId,
-          availabilityId: "invalid_availabilityId",
-          unitItems: [
-            {
-              unitId: validateData.product.options.find(
-                (option) => option.id === validateData.optionId
-              ).units[0].id,
-            },
-            {
-              unitId: validateData.product.options.find(
-                (option) => option.id === validateData.optionId
-              ).units[0].id,
-            },
-          ],
-          capabilities: this.config.capabilities,
-        });
-      })
-    );
-  };
+  private reserveWithEmptyUnitItems = async (): Promise<Scenario<unknown>> => {
+    const [bookableProduct] = this.config.productConfig.availableProducts;
 
-  private validateBookingnMissingUnitItems = async (): Promise<
-    BookingReservationMissingUnitItemsScenario[]
-  > => {
-    return Promise.all(
-      this.config.getProductConfigs().map(async (productConfig) => {
-        const validateData =
-          productConfig.availabilityType === AvailabilityType.OPENING_HOURS
-            ? this.openingHours
-            : this.startTimes;
-        return new BookingReservationMissingUnitItemsScenario({
-          apiClient: this.apiClient,
-          productId: validateData.productId,
-          optionId: validateData.optionId,
-          availabilityId: validateData.availability[0].id,
-          unitItems: [],
-          capabilities: this.config.capabilities,
-        });
-      })
-    );
-  };
-
-  private validateBookingEmptyUnitItems = async (): Promise<
-    BookingReservationEmptyUnitItemsScenario[]
-  > => {
-    return Promise.all(
-      this.config.getProductConfigs().map(async (productConfig) => {
-        const validateData =
-          productConfig.availabilityType === AvailabilityType.OPENING_HOURS
-            ? this.openingHours
-            : this.startTimes;
-        return new BookingReservationEmptyUnitItemsScenario({
-          apiClient: this.apiClient,
-          productId: validateData.productId,
-          optionId: validateData.optionId,
-          availabilityId: validateData.availability[0].id,
-          unitItems: [],
-          capabilities: this.config.capabilities,
-        });
-      })
-    );
+    const result = await this.booker.createReservation(bookableProduct, {
+      unitItemsEmpty: true,
+    });
+    return new BookingReservationEmptyUnitItemsScenario({ result });
   };
 
   private validateBookingInvalidUnitId = async (): Promise<
-    BookingReservationInvalidUnitIdScenario[]
+    Scenario<unknown>
   > => {
-    return Promise.all(
-      this.config.getProductConfigs().map(async (productConfig) => {
-        const validateData =
-          productConfig.availabilityType === AvailabilityType.OPENING_HOURS
-            ? this.openingHours
-            : this.startTimes;
-        return new BookingReservationInvalidUnitIdScenario({
-          apiClient: this.apiClient,
-          productId: validateData.productId,
-          optionId: validateData.optionId,
-          availabilityId: validateData.availability[0].id,
-          unitItems: [
-            {
-              unitId: "invalid_unitId",
-            },
-            {
-              unitId: "invalid_unitId",
-            },
-          ],
-          capabilities: this.config.capabilities,
-        });
-      })
-    );
+    const [bookableProduct] = this.config.productConfig.availableProducts;
+
+    const result = await this.booker.createReservation(bookableProduct, {
+      invalidUnitItems: true,
+    });
+
+    return new BookingReservationInvalidUnitIdScenario({
+      result,
+    });
   };
 }

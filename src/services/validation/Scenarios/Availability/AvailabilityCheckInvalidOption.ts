@@ -1,44 +1,31 @@
 import { InvalidOptionIdErrorValidator } from "../../../../validators/backendValidator/Error/InvalidOptionIdErrorValidator";
-import { ApiClient } from "../../ApiClient";
+import { Config } from "../../config/Config";
+import descriptions from "../../consts/descriptions";
 import { AvailabilityScenarioHelper } from "../../helpers/AvailabilityScenarioHelper";
 import { Scenario, ScenarioResult } from "../Scenario";
 
-export class AvailabilityCheckInvalidOptionScenario implements Scenario<null> {
-  private apiClient: ApiClient;
-  private productId: string;
-  private optionId: string;
-  private localDate: string;
-  constructor({
-    apiClient,
-    productId,
-    optionId,
-    localDate,
-  }: {
-    apiClient: ApiClient;
-    productId: string;
-    optionId: string;
-    localDate: string;
-  }) {
-    this.apiClient = apiClient;
-    this.productId = productId;
-    this.optionId = optionId;
-    this.localDate = localDate;
-  }
+export class AvailabilityCheckInvalidOptionScenario implements Scenario<any> {
+  private config = Config.getInstance();
+  private apiClient = this.config.getApiClient();
   private availabilityScenarioHelper = new AvailabilityScenarioHelper();
 
-  public validate = async (): Promise<ScenarioResult<null>> => {
+  public validate = async (): Promise<ScenarioResult<any>> => {
+    const [product] = this.config.productConfig.productsForAvailabilityCheck;
     const result = await this.apiClient.getAvailability({
-      productId: this.productId,
-      optionId: this.optionId,
-      localDate: this.localDate,
+      productId: product.id,
+      optionId: this.config.invalidOptionId,
+      localDateStart: this.config.localDateStart,
+      localDateEnd: this.config.localDateEnd,
     });
     const name = `Availability Check Invalid Option (400 INVALID_OPTION_ID)`;
     const error = "Response should be INVALID_OPTION_ID";
+    const description = descriptions.invalidOption;
 
-    return this.availabilityScenarioHelper.validateAvailabilityError(
+    return this.availabilityScenarioHelper.validateError(
       {
         name,
-        ...result,
+        result,
+        description,
       },
       error,
       new InvalidOptionIdErrorValidator()

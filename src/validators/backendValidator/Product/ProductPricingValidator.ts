@@ -17,20 +17,20 @@ export class ProductPricingValidator implements ModelValidator {
     return [
       StringValidator.validate(
         `${this.path}.defaultCurrency`,
-        product.defaultCurrency
+        product?.defaultCurrency
       ),
       StringArrayValidator.validate(
         `${this.path}.availableCurrencies`,
-        product.availableCurrencies,
+        product?.availableCurrencies,
         {
           min: 1,
         }
       ),
       EnumValidator.validate(
         `${this.path}.pricingPer`,
-        product.pricingPer,
+        product?.pricingPer,
         Object.values(PricingPer)
       ),
-    ].filter(Boolean);
+    ].flatMap((v) => (v ? [v] : []));
   };
 }

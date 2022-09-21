@@ -16,14 +16,16 @@ export class OptionPickupValidator implements ModelValidator {
     return [
       BooleanValidator.validate(
         `${this.path}.pickupAvailable`,
-        option.pickupAvailable
+        option?.pickupAvailable
       ),
       BooleanValidator.validate(
         `${this.path}.pickupRequired`,
-        option.pickupRequired
+        option?.pickupRequired
       ),
-      ...this.validatePickupPoints(option.pickupPoints as PickupPoint[]),
-    ].filter(Boolean);
+      ...this.validatePickupPoints(
+        option.pickupPoints ?? ([] as PickupPoint[])
+      ),
+    ].flatMap((v) => (v ? [v] : []));
   };
 
   private validatePickupPoints = (
@@ -33,68 +35,68 @@ export class OptionPickupValidator implements ModelValidator {
       .map((pickupPoint, i) => [
         StringValidator.validate(
           `${this.path}.pickupPoints[${i}].id`,
-          pickupPoint.id
+          pickupPoint?.id
         ),
         StringValidator.validate(
           `${this.path}.pickupPoints[${i}].name`,
-          pickupPoint.name
+          pickupPoint?.name
         ),
         StringValidator.validate(
           `${this.path}.pickupPoints[${i}].directions`,
-          pickupPoint.directions,
+          pickupPoint?.directions,
           { nullable: true }
         ),
         StringValidator.validate(
           `${this.path}.pickupPoints[${i}].address`,
-          pickupPoint.address
+          pickupPoint?.address
         ),
         NumberValidator.validate(
           `${this.path}.pickupPoints[${i}].latitude`,
-          pickupPoint.latitude,
+          pickupPoint?.latitude,
           { nullable: true }
         ),
         NumberValidator.validate(
           `${this.path}.pickupPoints[${i}].longitude`,
-          pickupPoint.longitude,
+          pickupPoint?.longitude,
           { nullable: true }
         ),
         StringValidator.validate(
           `${this.path}.pickupPoints[${i}].googlePlaceId`,
-          pickupPoint.googlePlaceId,
+          pickupPoint?.googlePlaceId,
           { nullable: true }
         ),
         StringValidator.validate(
           `${this.path}.pickupPoints[${i}].street`,
-          pickupPoint.street,
+          pickupPoint?.street,
           { nullable: true }
         ),
         StringValidator.validate(
           `${this.path}.pickupPoints[${i}].postalCode`,
-          pickupPoint.postalCode,
+          pickupPoint?.postalCode,
           { nullable: true }
         ),
         StringValidator.validate(
           `${this.path}.pickupPoints[${i}].locality`,
-          pickupPoint.locality,
+          pickupPoint?.locality,
           { nullable: true }
         ),
         StringValidator.validate(
           `${this.path}.pickupPoints[${i}].region`,
-          pickupPoint.region,
+          pickupPoint?.region,
           { nullable: true }
         ),
         StringValidator.validate(
           `${this.path}.pickupPoints[${i}].state`,
-          pickupPoint.state,
+          pickupPoint?.state,
           { nullable: true }
         ),
         StringValidator.validate(
           `${this.path}.pickupPoints[${i}].country`,
-          pickupPoint.country,
+          pickupPoint?.country,
           { nullable: true }
         ),
       ])
       .flat(1)
-      .filter(Boolean);
+      .flatMap((v) => (v ? [v] : []));
   };
 }

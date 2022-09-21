@@ -1,114 +1,53 @@
-import { Booking, BookingStatus, CapabilityId } from "@octocloud/types";
-import * as R from "ramda";
+import { BookingEndpointValidator } from "./../../../validators/backendValidator/Booking/BookingEndpointValidator";
+import { Booking, CreateBookingBodySchema } from "@octocloud/types";
 import { BookingValidator } from "../../../validators/backendValidator/Booking/BookingValidator";
-import {
-  ModelValidator,
-  ValidatorError,
-} from "../../../validators/backendValidator/ValidatorHelpers";
-import { BookingScenarioHelper } from "./BookingScenarioHelper";
 import {
   ScenarioConfigData,
   ScenarioHelper,
   ScenarioHelperData,
 } from "./ScenarioHelper";
 
-export class BookingReservationScenarioHelper {
-  private scenarioHelper = new ScenarioHelper();
-  private bookingScenarioHelper = new BookingScenarioHelper();
-
-  private getErrors = (
-    booking: any,
-    capabilities: CapabilityId[]
-  ): ValidatorError[] => {
-    return new BookingValidator({ capabilities }).validate(booking);
-  };
-
-  private reservationCheck = (data: ScenarioHelperData<Booking>): string[] => {
-    const unitIdCheck =
-      data.response.data.body.unitItems.length ===
-      data.request.body.unitItems.length
-        ? data.response.data.body.unitItems
-            .map((unitItem) => {
-              return data.request.body.unitItems
-                .map((item) => item.unitId)
-                .includes(unitItem.unitId);
-            })
-            .every((status) => status)
-        : false;
-    const booking = data.response.data.body;
-    return [
-      booking.notes === data.request.body.notes
-        ? null
-        : "Notes are not matching request",
-      booking.status === BookingStatus.ON_HOLD
-        ? null
-        : `Booking status should be ON_HOLD. Returned value was ${booking.status}`,
-      unitIdCheck ? null : "UnitIds are not matching",
-    ].filter(Boolean);
-  };
+export class BookingReservationScenarioHelper extends ScenarioHelper {
+  private bookingEndpointValidator = new BookingEndpointValidator();
 
   public validateBookingReservation = (
     data: ScenarioHelperData<Booking>,
     configData: ScenarioConfigData
   ) => {
-    if (data.response.error) {
-      return this.scenarioHelper.handleResult({
+    const { result } = data;
+    const reservation = result?.data;
+    const request = result?.request;
+    const response = result?.response;
+    if (response?.error) {
+      return this.handleResult({
         ...data,
         success: false,
         errors: [],
       });
     }
 
-    const checkErrors = [
-      ...this.reservationCheck(data),
-      ...this.bookingScenarioHelper.bookingCheck({
-        newBooking: data.response.data.body,
-        oldBooking: data.request.body,
-        configData,
+    const errors = [
+      ...this.bookingEndpointValidator.validateReservation({
+        reservation,
+        schema: request?.body as CreateBookingBodySchema,
       }),
+      ...this.bookingEndpointValidator.validate({
+        booking: reservation,
+        productId: request?.body?.productId,
+        optionId: request?.body?.optionId,
+        availabilityId: request?.body?.availabilityId,
+      }),
+      ...new BookingValidator({
+        capabilities: configData.capabilities,
+      }).validate(result.data),
     ];
 
-    if (!R.isEmpty(checkErrors)) {
-      return this.scenarioHelper.handleResult({
-        ...data,
-        success: false,
-        errors: checkErrors.map((error) => {
-          return {
-            message: error,
-          };
-        }),
-      });
+    if (!this.isSuccess(errors)) {
+      this.config.terminateValidation = true;
     }
-
-    const errors = this.getErrors(
-      data.response.data.body,
-      configData.capabilities
-    );
-    return this.scenarioHelper.handleResult({
+    return this.handleResult({
       ...data,
-      success: R.isEmpty(errors),
       errors,
-    });
-  };
-
-  public validateBookingReservationError = (
-    data: ScenarioHelperData<Booking>,
-    error: string,
-    validator: ModelValidator
-  ) => {
-    if (data.response.data) {
-      return this.scenarioHelper.handleResult({
-        ...data,
-        success: false,
-        errors: [error],
-      });
-    }
-
-    const errors = validator.validate(data.response.error);
-    return this.scenarioHelper.handleResult({
-      ...data,
-      success: R.isEmpty(errors),
-      errors: errors.map((error) => error.message),
     });
   };
 }

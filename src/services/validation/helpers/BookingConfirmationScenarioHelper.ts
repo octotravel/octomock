@@ -1,150 +1,55 @@
-import {
-  Booking,
-  BookingStatus,
-  CapabilityId,
-  DeliveryMethod,
-} from "@octocloud/types";
-import * as R from "ramda";
+import { Booking, ConfirmBookingBodySchema } from "@octocloud/types";
+import { BookingEndpointValidator } from "../../../validators/backendValidator/Booking/BookingEndpointValidator";
 import { BookingValidator } from "../../../validators/backendValidator/Booking/BookingValidator";
-import {
-  ModelValidator,
-  ValidatorError,
-} from "../../../validators/backendValidator/ValidatorHelpers";
-import { BookingScenarioHelper } from "./BookingScenarioHelper";
 import {
   ScenarioConfigData,
   ScenarioHelper,
   ScenarioHelperData,
 } from "./ScenarioHelper";
 
-export class BookingConfirmationScenarioHelper {
-  private scenarioHelper = new ScenarioHelper();
-  private bookingScenarioHelper = new BookingScenarioHelper();
-
-  private getErrors = (
-    booking: any,
-    capabilities: CapabilityId[]
-  ): ValidatorError[] => {
-    return new BookingValidator({ capabilities }).validate(booking);
-  };
-
-  private confirmationCheck = (
-    data: ScenarioHelperData<Booking>,
-    oldBooking: Booking,
-    deliveryMethods: DeliveryMethod[]
-  ): string[] => {
-    const booking = data.response.data.body;
-    const reqBody = data.request.body;
-    const checkContact =
-      booking.contact.firstName === reqBody.contact.firstName &&
-      booking.contact.fullName === reqBody.contact.fullName &&
-      booking.contact.lastName === reqBody.contact.lastName &&
-      booking.contact.emailAddress === reqBody.contact.emailAddress &&
-      booking.contact.notes === reqBody.contact.notes;
-
-    let errors = [
-      checkContact ? null : "Contact was not updated",
-      booking.status === BookingStatus.CONFIRMED
-        ? null
-        : `Booking status should be CONFIRMED. Returned value was ${booking.status}`,
-      booking.resellerReference === reqBody.resellerReference
-        ? null
-        : "Reseller reference was not updated",
-    ];
-
-    if (!data.request.body.unitItems) {
-      errors = [
-        ...errors,
-        booking.unitItems.length === oldBooking.unitItems.length
-          ? null
-          : "UnitItems count is not matching",
-      ];
-    }
-
-    if (deliveryMethods.includes(DeliveryMethod.VOUCHER)) {
-      errors = [
-        ...errors,
-        !R.isEmpty(booking.voucher.deliveryOptions)
-          ? null
-          : "Voucher is missing",
-      ];
-    }
-    if (deliveryMethods.includes(DeliveryMethod.TICKET)) {
-      const tickets = booking.unitItems.reduce((acc, unit) => {
-        return [...acc, ...unit.ticket.deliveryOptions];
-      }, []);
-      errors = [...errors, !R.isEmpty(tickets) ? null : "Tickets are missing"];
-    }
-    return errors.filter(Boolean);
-  };
+export class BookingConfirmationScenarioHelper extends ScenarioHelper {
+  private bookingEndpointValidator = new BookingEndpointValidator();
 
   public validateBookingConfirmation = (
     data: ScenarioHelperData<Booking>,
     configData: ScenarioConfigData,
-    createdBooking: Booking
+    reservation: Booking
   ) => {
-    if (data.response.error) {
-      return this.scenarioHelper.handleResult({
+    const { result } = data;
+    const booking = result?.data;
+    const request = result?.request;
+    const response = result?.response;
+    if (response?.error) {
+      return this.handleResult({
         ...data,
         success: false,
         errors: [],
       });
     }
 
-    const checkErrors = [
-      ...this.confirmationCheck(
-        data,
-        createdBooking,
-        configData.deliveryMethods
-      ),
-      ...this.bookingScenarioHelper.bookingCheck({
-        newBooking: data.response.data.body,
-        oldBooking: createdBooking,
-        configData,
+    const errors = [
+      ...this.bookingEndpointValidator.validateConfirmation({
+        booking,
+        reservation,
+        schema: request?.body as ConfirmBookingBodySchema,
       }),
+      ...this.bookingEndpointValidator.validate({
+        booking: result.data,
+        productId: reservation?.productId,
+        optionId: reservation?.optionId,
+        availabilityId: reservation?.availabilityId,
+      }),
+      ...new BookingValidator({
+        capabilities: configData.capabilities,
+      }).validate(booking),
     ];
 
-    if (!R.isEmpty(checkErrors)) {
-      return this.scenarioHelper.handleResult({
-        ...data,
-        success: false,
-        errors: checkErrors.map((error) => {
-          return {
-            message: error,
-          };
-        }),
-      });
+    if (!this.isSuccess(errors)) {
+      this.config.terminateValidation = true;
     }
-
-    const errors = this.getErrors(
-      data.response.data.body,
-      configData.capabilities
-    );
-    return this.scenarioHelper.handleResult({
+    return this.handleResult({
       ...data,
-      success: R.isEmpty(errors),
       errors,
-    });
-  };
-
-  public validateBookingConfirmationError = (
-    data: ScenarioHelperData<Booking>,
-    error: string,
-    validator: ModelValidator
-  ) => {
-    if (data.response.data) {
-      return this.scenarioHelper.handleResult({
-        ...data,
-        success: false,
-        errors: [error],
-      });
-    }
-
-    const errors = validator.validate(data.response.error);
-    return this.scenarioHelper.handleResult({
-      ...data,
-      success: R.isEmpty(errors),
-      errors: errors.map((error) => error.message),
     });
   };
 }

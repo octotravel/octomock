@@ -1,21 +1,15 @@
 import { CapabilityId } from "@octocloud/types";
-import { ApiClient } from "../../../ApiClient";
 import { Scenario } from "../../Scenario";
 import { InvalidBookingUUIDErrorValidator } from "../../../../../validators/backendValidator/Error/InvalidBookingUUIDErrorValidator";
 import { BookingGetScenarioHelper } from "../../../helpers/BookingGetScenarioHelper";
+import { Config } from "../../../config/Config";
+import descriptions from "../../../consts/descriptions";
 
-export class BookingGetInvalidUUIDScenario implements Scenario<null> {
-  private apiClient: ApiClient;
+export class BookingGetInvalidUUIDScenario implements Scenario<any> {
+  private config = Config.getInstance();
+  private apiClient = this.config.getApiClient();
   private uuid: string;
-  constructor({
-    apiClient,
-    uuid,
-  }: {
-    apiClient: ApiClient;
-    uuid: string;
-    capabilities: CapabilityId[];
-  }) {
-    this.apiClient = apiClient;
+  constructor({ uuid }: { uuid: string; capabilities: CapabilityId[] }) {
     this.uuid = uuid;
   }
   private bookingGetScenarioHelper = new BookingGetScenarioHelper();
@@ -27,11 +21,13 @@ export class BookingGetInvalidUUIDScenario implements Scenario<null> {
 
     const name = "Get Booking Invalid Booking UUID (400 INVALID_BOOKING_UUID)";
     const error = "Response should be INVALID_BOOKING_UUID";
+    const description = descriptions.invalidUUID;
 
-    return this.bookingGetScenarioHelper.validateBookingGetError(
+    return this.bookingGetScenarioHelper.validateError(
       {
-        ...result,
+        result,
         name,
+        description,
       },
       error,
       new InvalidBookingUUIDErrorValidator()

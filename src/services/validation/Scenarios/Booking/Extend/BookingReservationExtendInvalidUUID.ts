@@ -1,15 +1,16 @@
-import { ApiClient } from "../../../ApiClient";
 import { Scenario } from "../../Scenario";
 import { BookingExtendScenarioHelper } from "../../../helpers/BookingExtendScenarioHelper";
 import { InvalidBookingUUIDErrorValidator } from "../../../../../validators/backendValidator/Error/InvalidBookingUUIDErrorValidator";
+import { Config } from "../../../config/Config";
+import descriptions from "../../../consts/descriptions";
 
 export class BookingReservationExtendInvalidUUIDScenario
-  implements Scenario<null>
+  implements Scenario<any>
 {
-  private apiClient: ApiClient;
+  private config = Config.getInstance();
+  private apiClient = this.config.getApiClient();
   private uuid: string;
-  constructor({ apiClient, uuid }: { apiClient: ApiClient; uuid: string }) {
-    this.apiClient = apiClient;
+  constructor({ uuid }: { uuid: string }) {
     this.uuid = uuid;
   }
   private bookingExtendScenarioHelper = new BookingExtendScenarioHelper();
@@ -22,11 +23,13 @@ export class BookingReservationExtendInvalidUUIDScenario
 
     const name = "Extend Reservation Invalid UUID (INVALID_BOOKING_UUID)";
     const error = "Response should be INVALID_BOOKING_UUID";
+    const description = descriptions.invalidUUID;
 
-    return this.bookingExtendScenarioHelper.validateBookingReservationError(
+    return this.bookingExtendScenarioHelper.validateError(
       {
-        ...result,
+        result,
         name,
+        description,
       },
       error,
       new InvalidBookingUUIDErrorValidator()

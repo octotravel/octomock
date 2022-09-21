@@ -109,7 +109,8 @@ export class ProductGenerator {
             availabilityType: AvailabilityType.OPENING_HOURS,
             openingHours: [{ from: "09:00", to: "17:00" }],
             freesale: true,
-            daysClosed: [Day.Sat, Day.Sun],
+            daysClosed: [Day.Sat],
+            daysSoldOut: [Day.Sun],
           }),
           optionsConfig: [
             new OptionConfigModel({
@@ -143,7 +144,8 @@ export class ProductGenerator {
               [Day.Mon, 10],
               [Day.Tue, 20],
             ]),
-            daysClosed: [Day.Sat, Day.Sun],
+            daysClosed: [Day.Sat],
+            daysSoldOut: [Day.Sun],
           }),
           optionsConfig: [
             new OptionConfigModel({

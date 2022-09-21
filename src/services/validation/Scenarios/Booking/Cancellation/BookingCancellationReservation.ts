@@ -1,33 +1,16 @@
-import { Booking, CapabilityId, DeliveryMethod } from "@octocloud/types";
-import { ApiClient } from "../../../ApiClient";
+import { Booking } from "@octocloud/types";
 import { Scenario } from "../../Scenario";
 import { BookingCancellationScenarioHelper } from "../../../helpers/BookingCancellationScenarioHelper";
+import { Config } from "../../../config/Config";
+import descriptions from "../../../consts/descriptions";
 
 export class BookingCancellationReservationScenario
   implements Scenario<Booking>
 {
-  private apiClient: ApiClient;
-  private uuid: string;
-  private capabilities: CapabilityId[];
-  private deliveryMethods: DeliveryMethod[];
+  private config = Config.getInstance();
+  private apiClient = this.config.getApiClient();
   private booking: Booking;
-  constructor({
-    apiClient,
-    uuid,
-    capabilities,
-    deliveryMethods,
-    booking,
-  }: {
-    apiClient: ApiClient;
-    uuid: string;
-    capabilities: CapabilityId[];
-    deliveryMethods: DeliveryMethod[];
-    booking: Booking;
-  }) {
-    this.apiClient = apiClient;
-    this.uuid = uuid;
-    this.capabilities = capabilities;
-    this.deliveryMethods = deliveryMethods;
+  constructor({ booking }: { booking: Booking }) {
     this.booking = booking;
   }
   private bookingCancellationScenarioHelper =
@@ -35,19 +18,17 @@ export class BookingCancellationReservationScenario
 
   public validate = async () => {
     const result = await this.apiClient.cancelBooking({
-      uuid: this.uuid,
+      uuid: this.booking.uuid,
       reason: "Reason for cancellation",
     });
     const name = `Booking Cancellation - Reservation`;
+    const description = descriptions.bookingCancellationReservation;
 
     return this.bookingCancellationScenarioHelper.validateBookingCancellation(
       {
-        ...result,
+        result,
         name,
-      },
-      {
-        capabilities: this.capabilities,
-        deliveryMethods: this.deliveryMethods,
+        description,
       },
       this.booking
     );

@@ -1,54 +1,39 @@
-import { Availability, CapabilityId } from "@octocloud/types";
-import { ApiClient } from "../../ApiClient";
+import { Availability, Product } from "@octocloud/types";
 import { Scenario } from "../Scenario";
 import { AvailabilityScenarioHelper } from "../../helpers/AvailabilityScenarioHelper";
+import { Config } from "../../config/Config";
+import { DateHelper } from "../../../../helpers/DateHelper";
+import descriptions from "../../consts/descriptions";
 
 export class AvailabilityCheckDateScenario implements Scenario<Availability[]> {
-  private apiClient: ApiClient;
-  private productId: string;
-  private optionId: string;
-  private localDate: string;
-  private availabilityType: string;
-  private capabilities: CapabilityId[];
+  private config = Config.getInstance();
+  private apiClient = this.config.getApiClient();
+
+  private product: Product;
   private availabilityScenarioHelper = new AvailabilityScenarioHelper();
-  constructor({
-    apiClient,
-    productId,
-    optionId,
-    localDate,
-    availabilityType,
-    capabilities,
-  }: {
-    apiClient: ApiClient;
-    productId: string;
-    optionId: string;
-    localDate: string;
-    availabilityType: string;
-    capabilities: CapabilityId[];
-  }) {
-    this.apiClient = apiClient;
-    this.productId = productId;
-    this.optionId = optionId;
-    this.localDate = localDate;
-    this.availabilityType = availabilityType;
-    this.capabilities = capabilities;
+
+  constructor(product: Product) {
+    this.product = product;
   }
 
   public validate = async () => {
-    const { request, response } = await this.apiClient.getAvailability({
-      productId: this.productId,
-      optionId: this.optionId,
-      localDate: this.localDate,
+    const availabilityID =
+      this.config.productConfig.availabilityIDs[this.product.availabilityType];
+    const result = await this.apiClient.getAvailability({
+      productId: this.product.id,
+      optionId: this.product.options[0].id,
+      localDate: DateHelper.getDate(availabilityID),
     });
-    const name = `Availability Check Date (${this.availabilityType})`;
+    const name = `Availability Check Date (${this.product.availabilityType})`;
+    const description = descriptions.availabilityCheckDate;
 
     return this.availabilityScenarioHelper.validateAvailability(
       {
         name,
-        request,
-        response,
+        result,
+        description,
       },
-      this.capabilities
+      this.product
     );
   };
 }

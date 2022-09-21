@@ -1,42 +1,25 @@
-import {
-  Booking,
-  BookingContactSchema,
-  CapabilityId,
-  DeliveryMethod,
-} from "@octocloud/types";
-import { ApiClient } from "../../../ApiClient";
+import { Booking, BookingContactSchema, CapabilityId } from "@octocloud/types";
 import { Scenario } from "../../Scenario";
 import { BookingUpdateScenarioHelper } from "../../../helpers/BookingUpdateScenarioHelper";
+import { Config } from "../../../config/Config";
+import descriptions from "../../../consts/descriptions";
 
 export class BookingUpdateContactScenario implements Scenario<Booking> {
-  private apiClient: ApiClient;
-  private uuid: string;
-  private capabilities: CapabilityId[];
-  private deliveryMethods: DeliveryMethod[];
+  private config = Config.getInstance();
+  private apiClient = this.config.getApiClient();
   private booking: Booking;
   private contact: BookingContactSchema;
   private notes: string;
   constructor({
-    apiClient,
-    uuid,
-    capabilities,
-    deliveryMethods,
     booking,
     contact,
     notes,
   }: {
-    apiClient: ApiClient;
-    uuid: string;
     capabilities: CapabilityId[];
-    deliveryMethods: DeliveryMethod[];
     booking: Booking;
     contact: BookingContactSchema;
     notes: string;
   }) {
-    this.apiClient = apiClient;
-    this.uuid = uuid;
-    this.capabilities = capabilities;
-    this.deliveryMethods = deliveryMethods;
     this.booking = booking;
     this.contact = contact;
     this.notes = notes;
@@ -45,20 +28,18 @@ export class BookingUpdateContactScenario implements Scenario<Booking> {
 
   public validate = async () => {
     const result = await this.apiClient.bookingUpdate({
-      uuid: this.uuid,
+      uuid: this.booking.uuid,
       contact: this.contact,
       notes: this.notes,
     });
     const name = `Booking Update - Contact`;
+    const description = descriptions.bookingUpdateContact;
 
     return this.bookingUpdateScenarioHelper.validateBookingUpdate(
       {
-        ...result,
+        result,
         name,
-      },
-      {
-        capabilities: this.capabilities,
-        deliveryMethods: this.deliveryMethods,
+        description,
       },
       this.booking
     );

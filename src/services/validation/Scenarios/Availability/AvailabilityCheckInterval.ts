@@ -1,60 +1,47 @@
-import { Availability, CapabilityId } from "@octocloud/types";
-import { ApiClient } from "../../ApiClient";
+import { Availability, Product } from "@octocloud/types";
 import { Scenario } from "../Scenario";
 import { AvailabilityScenarioHelper } from "../../helpers/AvailabilityScenarioHelper";
+import { Config } from "../../config/Config";
+import descriptions from "../../consts/descriptions";
 
-export class AvailabilityCheckIntervalScenario
+export class AvailabilityChecIntervalScenario
   implements Scenario<Availability[]>
 {
-  private apiClient: ApiClient;
-  private productId: string;
-  private optionId: string;
-  private localDateStart: string;
-  private localDateEnd: string;
-  private availabilityType: string;
-  private capabilities: CapabilityId[];
+  private config = Config.getInstance();
+  private apiClient = this.config.getApiClient();
+
+  private product: Product;
   private availabilityScenarioHelper = new AvailabilityScenarioHelper();
-  constructor({
-    apiClient,
-    productId,
-    optionId,
-    localDateStart,
-    localDateEnd,
-    availabilityType,
-    capabilities,
-  }: {
-    apiClient: ApiClient;
-    productId: string;
-    optionId: string;
-    localDateStart: string;
-    localDateEnd: string;
-    availabilityType: string;
-    capabilities: CapabilityId[];
-  }) {
-    this.apiClient = apiClient;
-    this.productId = productId;
-    this.optionId = optionId;
-    this.localDateStart = localDateStart;
-    this.localDateEnd = localDateEnd;
-    this.availabilityType = availabilityType;
-    this.capabilities = capabilities;
+
+  constructor(product: Product) {
+    this.product = product;
   }
 
   public validate = async () => {
     const result = await this.apiClient.getAvailability({
-      productId: this.productId,
-      optionId: this.optionId,
-      localDateStart: this.localDateStart,
-      localDateEnd: this.localDateEnd,
+      productId: this.product.id,
+      optionId: this.product.options[0].id,
+      localDateStart: this.config.localDateStart,
+      localDateEnd: this.config.localDateEnd,
     });
-    const name = `Availability Check Interval (${this.availabilityType})`;
+
+    const availabilities = result.data;
+    const randomAvailability =
+      availabilities[Math.floor(Math.random() * availabilities.length)];
+    this.config.productConfig.addAvailabilityID = {
+      availabilityType: this.product.availabilityType,
+      availabilityID: randomAvailability.id,
+    };
+    const name = `Availability Check Interval (${this.product.availabilityType})`;
+    const description = descriptions.availabilityCheckInterval;
 
     return this.availabilityScenarioHelper.validateAvailability(
       {
-        ...result,
         name,
+        result,
+        description,
       },
-      this.capabilities
+      this.product
     );
   };
 }

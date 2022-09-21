@@ -1,34 +1,22 @@
-import { Booking, CapabilityId, DeliveryMethod } from "@octocloud/types";
-import { ApiClient } from "../../../ApiClient";
+import { Booking, CapabilityId } from "@octocloud/types";
 import { Scenario } from "../../Scenario";
 import { BookingUpdateScenarioHelper } from "../../../helpers/BookingUpdateScenarioHelper";
+import { Config } from "../../../config/Config";
+import descriptions from "../../../consts/descriptions";
 
 export class BookingUpdateDateScenario implements Scenario<Booking> {
-  private apiClient: ApiClient;
-  private uuid: string;
-  private capabilities: CapabilityId[];
-  private deliveryMethods: DeliveryMethod[];
+  private config = Config.getInstance();
+  private apiClient = this.config.getApiClient();
   private booking: Booking;
   private availabilityId: string;
   constructor({
-    apiClient,
-    uuid,
-    capabilities,
-    deliveryMethods,
     booking,
     availabilityId,
   }: {
-    apiClient: ApiClient;
-    uuid: string;
     capabilities: CapabilityId[];
-    deliveryMethods: DeliveryMethod[];
     booking: Booking;
     availabilityId: string;
   }) {
-    this.apiClient = apiClient;
-    this.uuid = uuid;
-    this.capabilities = capabilities;
-    this.deliveryMethods = deliveryMethods;
     this.booking = booking;
     this.availabilityId = availabilityId;
   }
@@ -36,19 +24,17 @@ export class BookingUpdateDateScenario implements Scenario<Booking> {
 
   public validate = async () => {
     const result = await this.apiClient.bookingUpdate({
-      uuid: this.uuid,
+      uuid: this.booking.uuid,
       availabilityId: this.availabilityId,
     });
     const name = `Booking Update - Change Date`;
+    const description = descriptions.bookingUpdateDate;
 
     return this.bookingUpdateScenarioHelper.validateBookingUpdate(
       {
-        ...result,
+        result,
         name,
-      },
-      {
-        capabilities: this.capabilities,
-        deliveryMethods: this.deliveryMethods,
+        description,
       },
       this.booking
     );

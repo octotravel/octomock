@@ -1,6 +1,7 @@
 import {
   Availability,
   AvailabilityStatus,
+  AvailabilityType,
   CapabilityId,
 } from "@octocloud/types";
 import { CommonValidator } from "../CommonValidator";
@@ -19,17 +20,21 @@ import { AvailabilityPricingValidator } from "./AvailabilityPricingValidator";
 export class AvailabilityValidator implements ModelValidator {
   private pricingValidator: AvailabilityPricingValidator;
   private pickupValidator: AvailabilityPickupValidator;
+  private availabilityType?: AvailabilityType;
   private path: string;
   private capabilities: CapabilityId[];
   constructor({
     path,
     capabilities,
+    availabilityType,
   }: {
     path?: string;
     capabilities: CapabilityId[];
+    availabilityType?: AvailabilityType;
   }) {
-    this.path = `${path}availability`;
+    this.path = path ? path : `availability`;
     this.capabilities = capabilities;
+    this.availabilityType = availabilityType;
     this.pricingValidator = new AvailabilityPricingValidator({
       path: this.path,
     });
@@ -40,70 +45,89 @@ export class AvailabilityValidator implements ModelValidator {
 
   public validate = (availability: Availability): ValidatorError[] => {
     return [
-      StringValidator.validate(`${this.path}.id`, availability.id),
-      this.validateLocalDateTime(`${this.path}.id`, availability.id),
+      StringValidator.validate(`${this.path}.id`, availability?.id),
+      this.validateLocalDateTime(`${this.path}.id`, availability?.id),
 
       StringValidator.validate(
         `${this.path}.localDateTimeStart`,
-        availability.localDateTimeStart
+        availability?.localDateTimeStart
       ),
       this.validateLocalDateTime(
         `${this.path}.localDateTimeStart`,
-        availability.localDateTimeStart
+        availability?.localDateTimeStart
       ),
 
       StringValidator.validate(
         `${this.path}.localDateTimeEnd`,
-        availability.localDateTimeEnd
+        availability?.localDateTimeEnd
       ),
       this.validateLocalDateTime(
         `${this.path}.localDateTimeEnd`,
-        availability.localDateTimeEnd
+        availability?.localDateTimeEnd
       ),
 
-      BooleanValidator.validate(`${this.path}.allDay`, availability.allDay),
+      this.validateAllDay(availability),
       BooleanValidator.validate(
         `${this.path}.available`,
-        availability.available
+        availability?.available
       ),
       EnumValidator.validate(
         `${this.path}.status`,
-        availability.status,
+        availability?.status,
         Object.values(AvailabilityStatus)
       ),
       NumberValidator.validate(
         `${this.path}.vacancies`,
-        availability.vacancies,
+        availability?.vacancies,
         {
           nullable: true,
         }
       ),
-      NumberValidator.validate(`${this.path}.capacity`, availability.capacity, {
-        nullable: true,
-      }),
-      NumberValidator.validate(`${this.path}.maxUnits`, availability.maxUnits, {
-        nullable: true,
-      }),
+      NumberValidator.validate(
+        `${this.path}.capacity`,
+        availability?.capacity,
+        {
+          nullable: true,
+        }
+      ),
+      NumberValidator.validate(
+        `${this.path}.maxUnits`,
+        availability?.maxUnits,
+        {
+          nullable: true,
+        }
+      ),
 
       StringValidator.validate(
         `${this.path}.utcCutoffAt`,
-        availability.utcCutoffAt
+        availability?.utcCutoffAt
       ),
       this.validateUTCDate(
         `${this.path}.utcCutoffAt`,
-        availability.utcCutoffAt
+        availability?.utcCutoffAt
       ),
 
       ...CommonValidator.validateOpeningHours(
         this.path,
-        availability.openingHours
+        availability?.openingHours ?? [],
+        this.availabilityType
       ),
 
       ...this.validatePricingCapability(availability),
       ...this.validatePickupCapability(availability),
     ]
       .flat(1)
-      .filter(Boolean);
+      .flatMap((v) => (v ? [v] : []));
+  };
+
+  private validateAllDay = (availability: Availability) => {
+    const path = `${this.path}.allDay`;
+    if (this.availabilityType) {
+      return BooleanValidator.validate(path, availability?.allDay, {
+        equalsTo: this.availabilityType === AvailabilityType.OPENING_HOURS,
+      });
+    }
+    return BooleanValidator.validate(path, availability?.allDay);
   };
 
   private validatePricingCapability = (

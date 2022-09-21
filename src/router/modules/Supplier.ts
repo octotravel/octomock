@@ -11,8 +11,8 @@ supplierRouter.get("/suppliers", async (ctx, _) => {
   ctx.toJSON();
 });
 
-supplierRouter.get("/suppliers/:id", async (ctx, _) => {
-  const supplier = await supplierController.getSupplier(ctx.params.id);
-  ctx.body = supplier;
+supplierRouter.get("/supplier", async (ctx, _) => {
+  const data = await supplierController.getSupplier();
+  ctx.body = data;
   ctx.toJSON();
 });

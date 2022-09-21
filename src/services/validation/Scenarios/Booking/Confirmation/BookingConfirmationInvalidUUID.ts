@@ -1,25 +1,14 @@
-import { BookingContactSchema, CapabilityId } from "@octocloud/types";
-import { ApiClient } from "../../../ApiClient";
 import { Scenario } from "../../Scenario";
 import { InvalidBookingUUIDErrorValidator } from "../../../../../validators/backendValidator/Error/InvalidBookingUUIDErrorValidator";
 import { BookingConfirmationScenarioHelper } from "../../../helpers/BookingConfirmationScenarioHelper";
+import { Config } from "../../../config/Config";
+import descriptions from "../../../consts/descriptions";
 
-export class BookingConfirmationInvalidUUIDScenario implements Scenario<null> {
-  private apiClient: ApiClient;
+export class BookingConfirmationInvalidUUIDScenario implements Scenario<any> {
+  private config = Config.getInstance();
+  private apiClient = this.config.getApiClient();
   private uuid: string;
-  private contact: BookingContactSchema;
-  constructor({
-    apiClient,
-    uuid,
-    contact,
-  }: {
-    apiClient: ApiClient;
-    uuid: string;
-    contact: BookingContactSchema;
-    capabilities: CapabilityId[];
-  }) {
-    this.apiClient = apiClient;
-    this.contact = contact;
+  constructor({ uuid }: { uuid: string }) {
     this.uuid = uuid;
   }
   private bookingConfirmationScenarioHelper =
@@ -28,17 +17,19 @@ export class BookingConfirmationInvalidUUIDScenario implements Scenario<null> {
   public validate = async () => {
     const result = await this.apiClient.bookingConfirmation({
       uuid: this.uuid,
-      contact: this.contact,
+      contact: {},
     });
 
     const name =
       "Booking Confirmation Invalid Booking UUID (400 INVALID_BOOKING_UUID)";
     const error = "Response should be INVALID_BOOKING_UUID";
+    const description = descriptions.invalidUUID;
 
-    return this.bookingConfirmationScenarioHelper.validateBookingConfirmationError(
+    return this.bookingConfirmationScenarioHelper.validateError(
       {
-        ...result,
+        result,
         name,
+        description,
       },
       error,
       new InvalidBookingUUIDErrorValidator()

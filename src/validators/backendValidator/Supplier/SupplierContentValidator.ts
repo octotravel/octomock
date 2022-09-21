@@ -18,11 +18,9 @@ export class SupplierContentValidator implements ModelValidator {
   }
   public validate = (supplier: Supplier): ValidatorError[] => {
     return [
-      StringValidator.validate(`${this.path}.country`, supplier.country),
-      ...this.validateDestination(
-        supplier.destinations as SupplierDestination[]
-      ),
-    ].filter(Boolean);
+      StringValidator.validate(`${this.path}.country`, supplier?.country),
+      ...this.validateDestination(supplier?.destinations ?? []),
+    ].flatMap((v) => (v ? [v] : []));
   };
 
   private validateDestination = (
@@ -32,89 +30,89 @@ export class SupplierContentValidator implements ModelValidator {
       .map((destination, i) => [
         StringValidator.validate(
           `${this.path}.destinations[${i}].id`,
-          destination.id
+          destination?.id
         ),
         BooleanValidator.validate(
           `${this.path}.destinations[${i}].default`,
-          destination.default
+          destination?.default
         ),
         StringValidator.validate(
           `${this.path}.destinations[${i}].name`,
-          destination.name
+          destination?.name
         ),
         StringValidator.validate(
           `${this.path}.destinations[${i}].country`,
-          destination.country
+          destination?.country
         ),
 
         StringValidator.validate(
           `${this.path}.destinations[${i}].contact.website`,
-          destination.contact.website,
+          destination?.contact?.website,
           { nullable: true }
         ),
         StringValidator.validate(
           `${this.path}.destinations[${i}].contact.email`,
-          destination.contact.email,
+          destination?.contact?.email,
           {
             nullable: true,
           }
         ),
         StringValidator.validate(
           `${this.path}.destinations[${i}].contact.telephone`,
-          destination.contact.telephone,
+          destination?.contact?.telephone,
           { nullable: true }
         ),
         StringValidator.validate(
           `${this.path}.destinations[${i}].contact.address`,
-          destination.contact.address,
+          destination?.contact?.address,
           { nullable: true }
         ),
         ...this.validateCategories(
-          destination.categories as SupplierCategory[]
+          destination?.categories as SupplierCategory[]
         ),
       ])
       .flat(1)
-      .filter(Boolean);
+      .flatMap((v) => (v ? [v] : []));
   };
 
   private validateCategories = (
     categories: SupplierCategory[]
   ): ValidatorError[] => {
-    return categories
+    return (categories ?? [])
       .map((category, i) => [
         StringValidator.validate(
           `${this.path}.categories[${i}].id`,
-          category.id
+          category?.id
         ),
         BooleanValidator.validate(
           `${this.path}.categories[${i}].default`,
-          category.default
+          category?.default
         ),
         StringValidator.validate(
           `${this.path}.categories[${i}].title`,
-          category.title
+          category?.title
         ),
         StringValidator.validate(
           `${this.path}.categories[${i}].shortDescription`,
-          category.shortDescription,
+          category?.shortDescription,
           { nullable: true }
         ),
         StringValidator.validate(
           `${this.path}.categories[${i}].coverImageUrl`,
-          category.coverImageUrl,
+          category?.coverImageUrl,
           { nullable: true }
         ),
         StringValidator.validate(
           `${this.path}.categories[${i}].bannerImageUrl`,
-          category.bannerImageUrl,
+          category?.bannerImageUrl,
           { nullable: true }
         ),
         StringArrayValidator.validate(
           `${this.path}.categories[${i}].productIds`,
-          category.productIds
+          category?.productIds
         ),
       ])
       .flat(1)
-      .filter(Boolean);
+      .flatMap((v) => (v ? [v] : []));
   };
 }

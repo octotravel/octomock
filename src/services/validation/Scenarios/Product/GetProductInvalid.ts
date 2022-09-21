@@ -1,34 +1,27 @@
 import { InvalidProductIdErrorValidator } from "../../../../validators/backendValidator/Error/InvalidProductIdErrorValidator";
-import { ApiClient } from "../../ApiClient";
+import { Config } from "../../config/Config";
+import descriptions from "../../consts/descriptions";
 import { ProductScenarioHelper } from "../../helpers/ProductScenarioHelper";
 import { Scenario, ScenarioResult } from "../Scenario";
 
 export class GetProductInvalidScenario implements Scenario<any> {
-  private apiClient: ApiClient;
-  private productId: string;
-  constructor({
-    apiClient,
-    productId,
-  }: {
-    apiClient: ApiClient;
-    productId: string;
-  }) {
-    this.apiClient = apiClient;
-    this.productId = productId;
-  }
+  private config = Config.getInstance();
+  private apiClient = this.config.getApiClient();
   private productScenarioHelper = new ProductScenarioHelper();
 
   public validate = async (): Promise<ScenarioResult<any>> => {
     const result = await this.apiClient.getProduct({
-      id: this.productId,
+      id: this.config.invalidProductId,
     });
     const name = `Get Product Invalid (400 INVALID_PRODUCT_ID)`;
     const error = "Response should be INVALID_PRODUCT_ID";
+    const description = descriptions.invalidProduct;
 
-    return this.productScenarioHelper.validateProductError(
+    return this.productScenarioHelper.validateError(
       {
-        ...result,
+        result,
         name,
+        description,
       },
       error,
       new InvalidProductIdErrorValidator()

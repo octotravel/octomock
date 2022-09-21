@@ -1,31 +1,22 @@
-import { Booking, CapabilityId, DeliveryMethod } from "@octocloud/types";
-import { ApiClient } from "../../../ApiClient";
+import { Booking, CapabilityId } from "@octocloud/types";
 import { Scenario } from "../../Scenario";
 import { BookingExtendScenarioHelper } from "../../../helpers/BookingExtendScenarioHelper";
+import { Config } from "../../../config/Config";
+import descriptions from "../../../consts/descriptions";
 
 export class BookingReservationExtendScenario implements Scenario<Booking> {
-  private apiClient: ApiClient;
+  private config = Config.getInstance();
+  private apiClient = this.config.getApiClient();
   private booking: Booking;
-  private availabilityType: string;
-  private deliveryMethods: DeliveryMethod[];
   private capabilities: CapabilityId[];
   constructor({
-    apiClient,
     booking,
-    availabilityType,
-    deliveryMethods,
     capabilities,
   }: {
-    apiClient: ApiClient;
     booking: Booking;
-    availabilityType: string;
-    deliveryMethods: DeliveryMethod[];
     capabilities: CapabilityId[];
   }) {
-    this.apiClient = apiClient;
-    this.availabilityType = availabilityType;
     this.booking = booking;
-    this.deliveryMethods = deliveryMethods;
     this.capabilities = capabilities;
   }
   private bookingExtendScenarioHelper = new BookingExtendScenarioHelper();
@@ -35,16 +26,17 @@ export class BookingReservationExtendScenario implements Scenario<Booking> {
       uuid: this.booking.uuid,
       expirationMinutes: 31,
     });
-    const name = `Extend Reservation (${this.availabilityType})`;
+    const name = `Extend Reservation`;
+    const description = descriptions.bookingReservationExtend;
 
     return this.bookingExtendScenarioHelper.validateBookingExtend(
       {
-        ...result,
+        result,
         name,
+        description,
       },
       {
         capabilities: this.capabilities,
-        deliveryMethods: this.deliveryMethods,
       },
       this.booking
     );

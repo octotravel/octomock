@@ -12,27 +12,30 @@ export class BookingStateOnHoldValidator implements ModelValidator {
     return [
       CommonValidator.validateUTCDateTime(
         `${this.path}.utcCreatedAt`,
-        booking.utcCreatedAt
+        booking?.utcCreatedAt
       ),
       CommonValidator.validateUTCDateTime(
         `${this.path}.utcUpdatedAt`,
-        booking.utcUpdatedAt,
+        booking?.utcUpdatedAt,
         { nullable: true }
       ),
       CommonValidator.validateUTCDateTime(
         `${this.path}.utcExpiresAt`,
-        booking.utcExpiresAt,
+        booking?.utcExpiresAt,
         { nullable: true }
       ),
       NullValidator.validate(
         `${this.path}.utcRedeemedAt`,
-        booking.utcRedeemedAt
+        booking?.utcRedeemedAt
       ),
       NullValidator.validate(
         `${this.path}.utcConfirmedAt`,
-        booking.utcConfirmedAt
+        booking?.utcConfirmedAt
       ),
-      NullValidator.validate(`${this.path}.cancellation`, booking.cancellation),
-    ].filter(Boolean);
+      NullValidator.validate(
+        `${this.path}.cancellation`,
+        booking?.cancellation
+      ),
+    ].flatMap((v) => (v ? [v] : []));
   };
 }

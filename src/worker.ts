@@ -5,8 +5,8 @@ import {
   InternalServerError,
 } from "./models/Error";
 import { ValidationController } from "./services/validation/Controller";
-import { ConfigParser } from "./services/validation/config/ConfigParser";
 import { validationConfigSchema } from "./schemas/Validation";
+import { Config } from "./services/validation/config/Config";
 
 export default {
   async fetch(
@@ -21,9 +21,9 @@ export default {
       const reqBody = await request.json();
       await validationConfigSchema.validate(reqBody);
       const schema = validationConfigSchema.cast(reqBody);
-      const config = await new ConfigParser().parse(schema);
-      console.log(config);
-      const body = await new ValidationController({ config }).validate();
+      const config = Config.getInstance();
+      config.init(schema);
+      const body = await new ValidationController().validate();
 
       return new Response(JSON.stringify(body), {
         status: 200,

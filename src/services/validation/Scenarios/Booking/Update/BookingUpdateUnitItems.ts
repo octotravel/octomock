@@ -1,39 +1,21 @@
-import {
-  Booking,
-  BookingUnitItemSchema,
-  CapabilityId,
-  DeliveryMethod,
-} from "@octocloud/types";
-import { ApiClient } from "../../../ApiClient";
+import { Booking, BookingUnitItemSchema } from "@octocloud/types";
 import { Scenario } from "../../Scenario";
 import { BookingUpdateScenarioHelper } from "../../../helpers/BookingUpdateScenarioHelper";
+import { Config } from "../../../config/Config";
+import descriptions from "../../../consts/descriptions";
 
 export class BookingUpdateUnitItemsScenario implements Scenario<Booking> {
-  private apiClient: ApiClient;
-  private uuid: string;
-  private capabilities: CapabilityId[];
-  private deliveryMethods: DeliveryMethod[];
+  private config = Config.getInstance();
+  private apiClient = this.config.getApiClient();
   private booking: Booking;
   private unitItems: BookingUnitItemSchema[];
   constructor({
-    apiClient,
-    uuid,
-    capabilities,
-    deliveryMethods,
     booking,
     unitItems,
   }: {
-    apiClient: ApiClient;
-    uuid: string;
-    capabilities: CapabilityId[];
-    deliveryMethods: DeliveryMethod[];
     booking: Booking;
     unitItems: BookingUnitItemSchema[];
   }) {
-    this.apiClient = apiClient;
-    this.uuid = uuid;
-    this.capabilities = capabilities;
-    this.deliveryMethods = deliveryMethods;
     this.booking = booking;
     this.unitItems = unitItems;
   }
@@ -41,19 +23,17 @@ export class BookingUpdateUnitItemsScenario implements Scenario<Booking> {
 
   public validate = async () => {
     const result = await this.apiClient.bookingUpdate({
-      uuid: this.uuid,
+      uuid: this.booking.uuid,
       unitItems: this.unitItems,
     });
     const name = `Booking Update - Unit Items`;
+    const description = descriptions.bookingUpdateUnitItems;
 
     return this.bookingUpdateScenarioHelper.validateBookingUpdate(
       {
-        ...result,
+        result,
         name,
-      },
-      {
-        capabilities: this.capabilities,
-        deliveryMethods: this.deliveryMethods,
+        description,
       },
       this.booking
     );

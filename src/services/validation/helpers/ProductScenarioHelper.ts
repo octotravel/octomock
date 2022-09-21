@@ -1,70 +1,56 @@
 import * as R from "ramda";
-import { ScenarioHelper } from "./ScenarioHelper";
-import { ModelValidator } from "./../../../validators/backendValidator/ValidatorHelpers";
-import { CapabilityId } from "@octocloud/types";
-import { ProductValidator } from "../../../validators/backendValidator/Product/ProductValidator";
+import { ProductValidator } from "./../../../validators/backendValidator/Product/ProductValidator";
+import { Product } from "@octocloud/types";
+import { ScenarioHelper, ScenarioHelperData } from "./ScenarioHelper";
+import { ValidatorError } from "../../../validators/backendValidator/ValidatorHelpers";
 
-export interface ProductScenarioData {
-  name: string;
-  request: any;
-  response: any;
-}
-
-export class ProductScenarioHelper {
-  private scenarioHelper = new ScenarioHelper();
-
-  private getErrors = (products: any, capabilities: CapabilityId[]) => {
-    if (Array.isArray(products)) {
-      return products.reduce((acc, result) => {
-        return [
-          ...acc,
-          ...new ProductValidator({
-            capabilities,
-          }).validate(result),
-        ];
-      }, []);
+export class ProductScenarioHelper extends ScenarioHelper {
+  public validateProducts = (data: ScenarioHelperData<Product[]>) => {
+    const { result } = data;
+    if (result.response.error) {
+      return this.handleResult({
+        ...data,
+        success: false,
+        errors: [],
+      });
     }
-    return new ProductValidator({ capabilities }).validate(products);
+    const products = R.is(Array, result.data) ? result.data : [];
+    const errors = new Array<ValidatorError>();
+    const configErrors = this.config.setProducts(products);
+    errors.push(...configErrors);
+
+    const validatorErrors = products
+      .map((product, i) =>
+        new ProductValidator({
+          capabilities: this.config.getCapabilityIDs(),
+          path: `[${i}]`,
+        }).validate(product)
+      )
+      .flat(1);
+    errors.push(...validatorErrors);
+
+    return this.handleResult({
+      ...data,
+      errors,
+    });
   };
 
-  public validateProduct = (
-    data: ProductScenarioData,
-    capabilities: CapabilityId[]
-  ) => {
-    if (data.response.error) {
-      return this.scenarioHelper.handleResult({
+  public validateProduct = (data: ScenarioHelperData<Product>) => {
+    const { result } = data;
+    if (result.response.error) {
+      return this.handleResult({
         ...data,
         success: false,
         errors: [],
       });
     }
 
-    const errors = this.getErrors(data.response.data.body, capabilities);
-    return this.scenarioHelper.handleResult({
+    const errors = new ProductValidator({
+      capabilities: this.config.getCapabilityIDs(),
+    }).validate(result.data);
+    return this.handleResult({
       ...data,
-      success: R.isEmpty(errors),
       errors,
-    });
-  };
-
-  public validateProductError = (
-    data: ProductScenarioData,
-    error: string,
-    validator: ModelValidator
-  ) => {
-    if (data.response.data) {
-      return this.scenarioHelper.handleResult({
-        ...data,
-        success: false,
-        errors: [error],
-      });
-    }
-
-    const errors = validator.validate(data.response.error);
-    return this.scenarioHelper.handleResult({
-      ...data,
-      success: R.isEmpty(errors),
-      errors: errors.map((error) => error.message),
     });
   };
 }

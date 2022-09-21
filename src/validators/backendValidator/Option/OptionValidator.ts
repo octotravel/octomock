@@ -5,6 +5,7 @@ import {
   Option,
   UnitRestrictions,
   PricingPer,
+  AvailabilityType,
 } from "@octocloud/types";
 import { OptionPickupValidator } from "./OptionPickupValidator";
 import { UnitValidator } from "../Unit/UnitValidator";
@@ -16,6 +17,7 @@ import {
   NumberValidator,
   ValidatorError,
   ModelValidator,
+  ArrayValidator,
 } from "../ValidatorHelpers";
 import { OptionPricingValidator } from "./OptionPricingValidator";
 
@@ -34,48 +36,66 @@ export class OptionValidator implements ModelValidator {
   }
   public validate = (
     option: Option,
+    availabilityType: AvailabilityType,
     pricingPer?: PricingPer
   ): ValidatorError[] => {
     return [
-      StringValidator.validate(`${this.path}.id`, option.id),
-      BooleanValidator.validate(`${this.path}.default`, option.default),
+      StringValidator.validate(`${this.path}.id`, option?.id),
+      BooleanValidator.validate(`${this.path}.default`, option?.default),
       StringValidator.validate(
         `${this.path}.internalName`,
-        option.internalName
+        option?.internalName
       ),
-      StringValidator.validate(`${this.path}.reference`, option.reference, {
+      StringValidator.validate(`${this.path}.reference`, option?.reference, {
         nullable: true,
       }),
-      RegExpArrayValidator.validate(
-        `${this.path}.availabilityLocalStartTimes`,
-        option.availabilityLocalStartTimes,
-        new RegExp(/^\d{2}:\d{2}$/g),
-        { min: 1 }
+      this.validateAvailabilityLocalStartTimes(
+        option?.availabilityLocalStartTimes ?? [],
+        availabilityType
       ),
       StringValidator.validate(
         `${this.path}.cancellationCutoff`,
-        option.cancellationCutoff
+        option?.cancellationCutoff
       ),
       NumberValidator.validate(
         `${this.path}.cancellationCutoffAmount`,
-        option.cancellationCutoffAmount,
+        option?.cancellationCutoffAmount,
         { integer: true }
       ),
       StringValidator.validate(
         `${this.path}.cancellationCutoffUnit`,
-        option.cancellationCutoffUnit
+        option?.cancellationCutoffUnit
       ),
       EnumArrayValidator.validate(
         `${this.path}.requiredContactFields`,
-        option.requiredContactFields,
+        option?.requiredContactFields,
         Object.values(ContactField)
       ),
-      ...this.validateUnitRestrictions(option.restrictions),
-      ...this.validateUnits(option.units, pricingPer),
+      ...this.validateUnitRestrictions(option?.restrictions),
+      ...this.validateUnits(option?.units ?? [], pricingPer),
 
       ...this.validatePricingCapability(option, pricingPer),
       ...this.validatePickupCapability(option),
-    ].filter(Boolean);
+    ].flatMap((v) => (v ? [v] : []));
+  };
+
+  private validateAvailabilityLocalStartTimes = (
+    availabilityLocalStartTimes: string[],
+    availabilityType: AvailabilityType
+  ) => {
+    const path = `${this.path}.availabilityLocalStartTimes`;
+    if (availabilityType === AvailabilityType.OPENING_HOURS) {
+      return ArrayValidator.validate(path, availabilityLocalStartTimes, {
+        empty: true,
+      });
+    }
+
+    return RegExpArrayValidator.validate(
+      path,
+      availabilityLocalStartTimes,
+      new RegExp(/^\d{2}:\d{2}$/g),
+      { min: 1 }
+    );
   };
 
   private validateUnitRestrictions = (
@@ -84,15 +104,15 @@ export class OptionValidator implements ModelValidator {
     [
       NumberValidator.validate(
         `${this.path}.restrictions.minUnits`,
-        restrictions.minUnits,
+        restrictions?.minUnits,
         { integer: true }
       ),
       NumberValidator.validate(
         `${this.path}.restrictions.maxUnits`,
-        restrictions.maxUnits,
+        restrictions?.maxUnits,
         { nullable: true, integer: true }
       ),
-    ].filter(Boolean);
+    ].flatMap((v) => (v ? [v] : []));
 
   private validateUnits = (
     units: Unit[],
@@ -107,7 +127,7 @@ export class OptionValidator implements ModelValidator {
         return validator.validate(unit, pricingPer);
       })
       .flat(1)
-      .filter(Boolean);
+      .flatMap((v) => (v ? [v] : []));
   };
 
   private validatePricingCapability = (

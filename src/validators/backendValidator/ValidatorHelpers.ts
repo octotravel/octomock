@@ -5,13 +5,47 @@ interface StringValidatorParams {
   equalsTo?: string;
 }
 
-export class ValidatorError extends Error {}
+export enum ErrorType {
+  WARNING = "WARNING",
+  CRITICAL = "CRITICAL",
+}
+
+export class ValidatorError extends Error {
+  public type: ErrorType;
+  constructor({ message, type }: { message: string; type?: ErrorType }) {
+    super(message);
+    this.type = type ?? ErrorType.WARNING;
+  }
+  public mapError = () => {
+    return {
+      type: this.type,
+      message: this.message,
+    };
+  };
+}
 
 export interface ModelValidator {
   validate(...args: any[]): ValidatorError[];
 }
 
-export class StringValidator {
+class BaseValidator {
+  protected static handleValidatedError = (error: any) => {
+    if (error instanceof yup.ValidationError) {
+      if (error.type === "required" || error.type === "typeError") {
+        return new ValidatorError({
+          type: ErrorType.CRITICAL,
+          message: error.errors as any,
+        });
+      }
+    }
+    return new ValidatorError({
+      type: ErrorType.WARNING,
+      message: error.errors,
+    });
+  };
+}
+
+export class StringValidator extends BaseValidator {
   public static validate = (
     label: string,
     value: unknown,
@@ -27,27 +61,29 @@ export class StringValidator {
       schema.validateSync(value, { strict: true });
       if (params?.equalsTo) {
         if (params.equalsTo !== value) {
-          return new ValidatorError(
-            `${label} has to be equal to "${params.equalsTo}", but the provided value was: "${value}"`
-          );
+          return new ValidatorError({
+            type: ErrorType.WARNING,
+            message: `${label} has to be equal to "${params.equalsTo}", but the provided value was: "${value}"`,
+          });
         }
       }
       return null;
     } catch (err) {
-      return new ValidatorError(err.errors);
+      return this.handleValidatedError(err);
     }
   };
 }
 
-export class NullValidator {
+export class NullValidator extends BaseValidator {
   public static validate = (
     label: string,
     value: unknown
   ): Nullable<ValidatorError> => {
     if (value !== null) {
-      return new ValidatorError(
-        `${label} must be a \`null\` type, but the final value was: \`${value}\``
-      );
+      return new ValidatorError({
+        type: ErrorType.WARNING,
+        message: `${label} must be a \`null\` type, but the final value was: \`${value}\``,
+      });
     }
     return null;
   };
@@ -57,9 +93,10 @@ interface NumberValidatorParams {
   nullable?: boolean;
   integer?: boolean;
   equalsTo?: number;
+  errorType?: ErrorType;
 }
 
-export class NumberValidator {
+export class NumberValidator extends BaseValidator {
   public static validate = (
     label: string,
     value: unknown,
@@ -79,37 +116,54 @@ export class NumberValidator {
       schema.validateSync(value, { strict: true });
       if (params?.equalsTo) {
         if (params.equalsTo !== value) {
-          return new ValidatorError(
-            `${label} has to be equal to ${params.equalsTo}, but the provided value was: ${value}`
-          );
+          return new ValidatorError({
+            type: params.errorType ?? ErrorType.WARNING,
+            message: `${label} has to be equal to ${params.equalsTo}, but the provided value was: ${value}`,
+          });
         }
       }
     } catch (err) {
-      return new ValidatorError(err.errors);
+      return this.handleValidatedError(err);
     }
   };
 }
 
-export class BooleanValidator {
+interface BooleanValidatorParams {
+  equalsTo?: boolean;
+  errorType?: ErrorType;
+}
+
+export class BooleanValidator extends BaseValidator {
   public static validate = (
     label: string,
-    value: unknown
+    value: unknown,
+    params?: BooleanValidatorParams
   ): Nullable<ValidatorError> => {
     try {
       const schema = yup.boolean().label(label).required();
       schema.validateSync(value, { strict: true });
+      if (params?.equalsTo) {
+        if (params.equalsTo !== value) {
+          return new ValidatorError({
+            type: params.errorType ?? ErrorType.WARNING,
+            message: `${label} has to be equal to ${params.equalsTo}, but the provided value was: ${value}`,
+          });
+        }
+      }
       return null;
     } catch (err) {
-      return new ValidatorError(err.errors);
+      return this.handleValidatedError(err);
     }
   };
 }
 
 interface EnumValidatorParams {
   nullable?: boolean;
+  equalsTo?: boolean;
+  errorType?: ErrorType;
 }
 
-export class EnumValidator {
+export class EnumValidator extends BaseValidator {
   public static validate = (
     label: string,
     value: unknown,
@@ -124,9 +178,17 @@ export class EnumValidator {
         schema = yup.mixed().label(label).oneOf(values).required();
       }
       schema.validateSync(value, { strict: true });
+      if (params?.equalsTo) {
+        if (params.equalsTo !== value) {
+          return new ValidatorError({
+            type: params.errorType ?? ErrorType.WARNING,
+            message: `${label} has to be equal to ${params.equalsTo}, but the provided value was: ${value}`,
+          });
+        }
+      }
       return null;
     } catch (err) {
-      return new ValidatorError(err.errors);
+      return this.handleValidatedError(err);
     }
   };
 }
@@ -136,7 +198,7 @@ interface GeneralArrayValidatorParams {
   max?: number;
 }
 
-export class EnumArrayValidator {
+export class EnumArrayValidator extends BaseValidator {
   public static validate = (
     label: string,
     value: unknown,
@@ -154,7 +216,7 @@ export class EnumArrayValidator {
       schema.validateSync(value, { strict: true });
       return null;
     } catch (err) {
-      return new ValidatorError(err.errors);
+      return this.handleValidatedError(err);
     }
   };
 }
@@ -164,7 +226,7 @@ interface RegExpValidatorParams {
   isNull?: boolean;
 }
 
-export class RegExpValidator {
+export class RegExpValidator extends BaseValidator {
   public static validate = (
     label: string,
     value: unknown,
@@ -183,12 +245,12 @@ export class RegExpValidator {
       schema.validateSync(value, { strict: true });
       return null;
     } catch (err) {
-      return new ValidatorError(err.errors);
+      return this.handleValidatedError(err);
     }
   };
 }
 
-export class RegExpArrayValidator {
+export class RegExpArrayValidator extends BaseValidator {
   public static validate = (
     label: string,
     value: unknown,
@@ -212,10 +274,14 @@ export class RegExpArrayValidator {
       if (err instanceof yup.ValidationError) {
         if (err.path.length > 1) {
           const errorMessage = `${label}${err.errors.join()}`;
-          return new ValidatorError(errorMessage);
+          return new ValidatorError({
+            type: ErrorType.WARNING,
+            message: errorMessage,
+          });
         }
       }
-      return new ValidatorError(err.errors);
+
+      return this.handleValidatedError(err);
     }
   };
 }
@@ -224,7 +290,7 @@ interface ArrayValidatorParams extends GeneralArrayValidatorParams {
   empty?: boolean;
 }
 
-export class ArrayValidator {
+export class ArrayValidator extends BaseValidator {
   public static validate = (
     label: string,
     value: unknown,
@@ -242,9 +308,10 @@ export class ArrayValidator {
       schema.validateSync(value, { strict: true });
       if (params.empty) {
         if (Array.isArray(value) && value.length !== 0) {
-          return new ValidatorError(
-            `${label} must be an empty array, but it contains: \`${value.length}\` elements.`
-          );
+          return new ValidatorError({
+            type: ErrorType.WARNING,
+            message: `${label} must be an empty array, but it contains: \`${value.length}\` elements.`,
+          });
         }
       }
       return null;
@@ -252,11 +319,11 @@ export class ArrayValidator {
       if (err instanceof ValidatorError) {
         return err;
       }
-      return new ValidatorError(err.errors);
+      return this.handleValidatedError(err);
     }
   };
 }
-export class StringArrayValidator {
+export class StringArrayValidator extends BaseValidator {
   public static validate = (
     label: string,
     value: unknown,
@@ -273,7 +340,7 @@ export class StringArrayValidator {
       schema.validateSync(value, { strict: true });
       return null;
     } catch (err) {
-      return new ValidatorError(err.errors);
+      return this.handleValidatedError(err);
     }
   };
 }
@@ -281,7 +348,7 @@ export class StringArrayValidator {
 interface NumberArrayValidatorParams extends GeneralArrayValidatorParams {
   integer?: boolean;
 }
-export class NumberArrayValidator {
+export class NumberArrayValidator extends BaseValidator {
   public static validate = (
     label: string,
     value: unknown,
@@ -302,7 +369,7 @@ export class NumberArrayValidator {
       schema.validateSync(value, { strict: true });
       return null;
     } catch (err) {
-      return new ValidatorError(err.errors);
+      return this.handleValidatedError(err);
     }
   };
 }

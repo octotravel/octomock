@@ -1,10 +1,10 @@
 import {
-  RedemptionMethod,
-  DeliveryFormat,
   BookingStatus,
   CapabilityId,
   UnitItem,
   PricingPer,
+  DeliveryMethod,
+  Ticket,
 } from "@octocloud/types";
 import { UnitValidator } from "../Unit/UnitValidator";
 
@@ -17,11 +17,13 @@ import {
 } from "../ValidatorHelpers";
 import { ContactValidator } from "../Contact/ContactValidator";
 import { PricingValidator } from "../Pricing/PricingValidator";
+import { TicketValidator } from "../Ticket/TicketValidator";
 
 export class UnitItemValidator implements ModelValidator {
   private path: string;
   private capabilities: CapabilityId[];
   private unitValidator: UnitValidator;
+  private ticketValidator: TicketValidator;
   private contactValidator: ContactValidator;
   constructor({
     path,
@@ -34,80 +36,57 @@ export class UnitItemValidator implements ModelValidator {
     this.capabilities = capabilities;
     this.unitValidator = new UnitValidator({ path: this.path, capabilities });
     this.contactValidator = new ContactValidator({ path: this.path });
+    this.ticketValidator = new TicketValidator({ path: `${this.path}.ticket` });
   }
   public validate = (
     unitItem: UnitItem,
-    pricingPer: PricingPer
+    pricingPer: PricingPer,
+    deliveryMethods: DeliveryMethod[]
   ): ValidatorError[] => {
     const errors = [
-      StringValidator.validate(`${this.path}.uuid`, unitItem.uuid),
+      StringValidator.validate(`${this.path}.uuid`, unitItem?.uuid),
       StringValidator.validate(
         `${this.path}.resellerReference`,
-        unitItem.uuid,
+        unitItem?.uuid,
         {
           nullable: true,
         }
       ),
       StringValidator.validate(
         `${this.path}.supplierReference`,
-        unitItem.uuid,
+        unitItem?.uuid,
         {
           nullable: true,
         }
       ),
-      StringValidator.validate(`${this.path}.unitId`, unitItem.unitId),
-      ...this.unitValidator.validate(unitItem.unit, pricingPer),
+      StringValidator.validate(`${this.path}.unitId`, unitItem?.unitId),
+      ...this.unitValidator.validate(unitItem?.unit, pricingPer),
       EnumValidator.validate(
         `${this.path}.status`,
-        unitItem.status,
+        unitItem?.status,
         Object.values(BookingStatus)
       ),
       NullValidator.validate(
         `${this.path}.utcRedeemedAt`,
-        unitItem.utcRedeemedAt
+        unitItem?.utcRedeemedAt
       ),
-      ...this.contactValidator.validate(unitItem.contact),
+      ...this.contactValidator.validate(unitItem?.contact),
 
       ...this.validatePricingCapability(unitItem, pricingPer),
+      ...this.validateTicket(unitItem?.ticket, deliveryMethods ?? []),
     ];
-
-    if (unitItem.ticket) {
-      errors.push(...this.validateTicket(unitItem));
-    }
-    return errors.filter(Boolean);
+    return errors.flatMap((v) => (v ? [v] : []));
   };
 
-  private validateTicket = (unitItem: UnitItem): ValidatorError[] =>
-    [
-      EnumValidator.validate(
-        `${this.path}.ticket.redemptionMethod`,
-        unitItem.ticket.redemptionMethod,
-        Object.values(RedemptionMethod)
-      ),
-      NullValidator.validate(
-        `${this.path}.ticket.utcRedeemedAt`,
-        unitItem.ticket.utcRedeemedAt
-      ),
-      this.validateDeliveryOptions(unitItem),
-    ]
-      .flat(1)
-      .filter(Boolean);
+  private validateTicket = (
+    ticket: Ticket,
+    deliveryMethods: DeliveryMethod[]
+  ): ValidatorError[] => {
+    if (deliveryMethods.includes(DeliveryMethod.TICKET)) {
+      return this.ticketValidator.validate(ticket);
+    }
 
-  private validateDeliveryOptions = (unitItem: UnitItem): ValidatorError[] => {
-    return unitItem.ticket.deliveryOptions
-      .map((deliveryOption, i) => [
-        EnumValidator.validate(
-          `${this.path}.ticket.deliveryOptions[${i}].deliveryFormat`,
-          deliveryOption.deliveryFormat,
-          Object.values(DeliveryFormat)
-        ),
-        StringValidator.validate(
-          `${this.path}.ticket.deliveryOptions[${i}].deliveryValue`,
-          deliveryOption.deliveryValue
-        ),
-      ])
-      .flat(1)
-      .filter(Boolean);
+    return [NullValidator.validate(`${this.path}.ticket`, ticket)];
   };
 
   private validatePricingCapability = (

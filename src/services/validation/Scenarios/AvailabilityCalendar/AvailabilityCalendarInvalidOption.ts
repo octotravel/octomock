@@ -1,58 +1,39 @@
-import { AvailabilityUnit } from "@octocloud/types";
+import { AvailabilityCalendar } from "@octocloud/types";
+import { addDays } from "date-fns";
+import { DateHelper } from "../../../../helpers/DateHelper";
 import { InvalidOptionIdErrorValidator } from "../../../../validators/backendValidator/Error/InvalidOptionIdErrorValidator";
-import { ApiClient } from "../../ApiClient";
+import { Config } from "../../config/Config";
+import descriptions from "../../consts/descriptions";
 import { AvailabilityCalendarScenarioHelper } from "../../helpers/AvailabilityCalendarScenarioHelper";
 import { Scenario, ScenarioResult } from "../Scenario";
 
 export class AvailabilityCalendarInvalidOptionScenario
-  implements Scenario<null>
+  implements Scenario<AvailabilityCalendar[]>
 {
-  private apiClient: ApiClient;
-  private productId: string;
-  private optionId: string;
-  private localDateStart: string;
-  private localDateEnd: string;
-  private units: AvailabilityUnit[];
-  constructor({
-    apiClient,
-    productId,
-    optionId,
-    localDateStart,
-    localDateEnd,
-    units,
-  }: {
-    apiClient: ApiClient;
-    productId: string;
-    optionId: string;
-    localDateStart: string;
-    localDateEnd: string;
-    units?: AvailabilityUnit[];
-  }) {
-    this.apiClient = apiClient;
-    this.productId = productId;
-    this.optionId = optionId;
-    this.localDateStart = localDateStart;
-    this.localDateEnd = localDateEnd;
-    this.units = units;
-  }
+  private config = Config.getInstance();
+  private apiClient = this.config.getApiClient();
   private availabilityCalendarScenarioHelper =
     new AvailabilityCalendarScenarioHelper();
 
-  public validate = async (): Promise<ScenarioResult<null>> => {
+  public validate = async (): Promise<
+    ScenarioResult<AvailabilityCalendar[]>
+  > => {
+    const product = this.config.getProduct();
     const result = await this.apiClient.getAvailabilityCalendar({
-      productId: this.productId,
-      optionId: this.optionId,
-      localDateStart: this.localDateStart,
-      localDateEnd: this.localDateEnd,
-      units: this.units,
+      productId: product.id,
+      optionId: this.config.invalidOptionId,
+      localDateStart: DateHelper.getDate(new Date().toISOString()),
+      localDateEnd: DateHelper.getDate(addDays(new Date(), 30).toISOString()),
     });
     const name = `Availability Calendar Invalid Option (400 INVALID_OPTION_ID)`;
     const error = "Response should be INVALID_OPTION_ID";
+    const description = descriptions.invalidOption;
 
-    return this.availabilityCalendarScenarioHelper.validateAvailabilityError(
+    return this.availabilityCalendarScenarioHelper.validateError(
       {
-        ...result,
+        result,
         name,
+        description,
       },
       error,
       new InvalidOptionIdErrorValidator()

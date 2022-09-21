@@ -1,60 +1,39 @@
+import { Availability } from "@octocloud/types";
+import { DateHelper } from "../../../../helpers/DateHelper";
 import { BadRequestErrorValidator } from "../../../../validators/backendValidator/Error/BadRequestErrorValidator";
-import { ApiClient } from "../../ApiClient";
+import { Config } from "../../config/Config";
+import descriptions from "../../consts/descriptions";
 import { AvailabilityScenarioHelper } from "../../helpers/AvailabilityScenarioHelper";
 import { Scenario, ScenarioResult } from "../Scenario";
 
-export class AvailabilityCheckBadRequestScenario implements Scenario<null> {
-  private apiClient: ApiClient;
-  private productId: string;
-  private optionId: string;
-  private localDate: string;
-  private localDateStart: string;
-  private localDateEnd: string;
-  private availabilityIds: string[];
-
-  constructor({
-    apiClient,
-    productId,
-    optionId,
-    localDate,
-    localDateStart,
-    localDateEnd,
-    availabilityIds,
-  }: {
-    apiClient: ApiClient;
-    productId: string;
-    optionId: string;
-    localDate?: string;
-    localDateStart?: string;
-    localDateEnd?: string;
-    availabilityIds?: string[];
-  }) {
-    this.apiClient = apiClient;
-    this.productId = productId;
-    this.optionId = optionId;
-    this.localDate = localDate;
-    this.localDateStart = localDateStart;
-    this.localDateEnd = localDateEnd;
-    this.availabilityIds = availabilityIds;
-  }
+export class AvailabilityCheckBadRequestScenario
+  implements Scenario<Availability[]>
+{
+  private config = Config.getInstance();
+  private apiClient = this.config.getApiClient();
   private availabilityScenarioHelper = new AvailabilityScenarioHelper();
 
-  public validate = async (): Promise<ScenarioResult<null>> => {
+  public validate = async (): Promise<ScenarioResult<Availability[]>> => {
+    const [product] = this.config.productConfig.productsForAvailabilityCheck;
+    const availabilityID =
+      this.config.productConfig.availabilityIDs[product.availabilityType];
     const result = await this.apiClient.getAvailability({
-      productId: this.productId,
-      optionId: this.optionId,
-      localDate: this.localDate,
-      localDateStart: this.localDateStart,
-      localDateEnd: this.localDateEnd,
-      availabilityIds: this.availabilityIds,
+      productId: product.id,
+      optionId: product.options[0].id,
+      localDateStart: this.config.localDateStart,
+      localDateEnd: this.config.localDateEnd,
+      localDate: DateHelper.getDate(availabilityID),
+      availabilityIds: [availabilityID],
     });
 
     const name = `Availability Check BAD_REQUEST (400 BAD_REQUEST)`;
     const error = "Response should be BAD_REQUEST";
-    return this.availabilityScenarioHelper.validateAvailabilityError(
+    const description = descriptions.availabilityCheckBadRequest;
+    return this.availabilityScenarioHelper.validateError(
       {
         name,
-        ...result,
+        result,
+        description,
       },
       error,
       new BadRequestErrorValidator()
