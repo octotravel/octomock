@@ -10,8 +10,7 @@ export class BookingReservationInvalidOptionScenario implements Scenario<any> {
   constructor({ result }: { result: Result<Booking> }) {
     this.result = result;
   }
-  private bookingReservationScenarioHelper =
-    new BookingReservationScenarioHelper();
+  private bookingReservationScenarioHelper = new BookingReservationScenarioHelper();
 
   public validate = async () => {
     const name = "Booking Reservation Invalid Option (400 INVALID_OPTION_ID)";

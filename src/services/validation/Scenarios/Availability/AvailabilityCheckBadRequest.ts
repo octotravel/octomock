@@ -6,17 +6,14 @@ import descriptions from "../../consts/descriptions";
 import { AvailabilityScenarioHelper } from "../../helpers/AvailabilityScenarioHelper";
 import { Scenario, ScenarioResult } from "../Scenario";
 
-export class AvailabilityCheckBadRequestScenario
-  implements Scenario<Availability[]>
-{
+export class AvailabilityCheckBadRequestScenario implements Scenario<Availability[]> {
   private config = Config.getInstance();
   private apiClient = this.config.getApiClient();
   private availabilityScenarioHelper = new AvailabilityScenarioHelper();
 
   public validate = async (): Promise<ScenarioResult<Availability[]>> => {
     const [product] = this.config.productConfig.productsForAvailabilityCheck;
-    const availabilityID =
-      this.config.productConfig.availabilityIDs[product.availabilityType];
+    const availabilityID = this.config.productConfig.availabilityIDs[product.availabilityType];
     const result = await this.apiClient.getAvailability({
       productId: product.id,
       optionId: product.options[0].id,

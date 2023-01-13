@@ -4,9 +4,7 @@ import { BookingConfirmationScenarioHelper } from "../../../helpers/BookingConfi
 import { Config } from "../../../config/Config";
 import descriptions from "../../../consts/descriptions";
 
-export class BookingConfirmationUnitItemUpdateScenario
-  implements Scenario<Booking>
-{
+export class BookingConfirmationUnitItemUpdateScenario implements Scenario<Booking> {
   private config = Config.getInstance();
   private apiClient = this.config.getApiClient();
   private capabilities: CapabilityId[];
@@ -25,8 +23,7 @@ export class BookingConfirmationUnitItemUpdateScenario
     this.unitItems = unitItems;
     this.booking = booking;
   }
-  private bookingConfirmationScenarioHelper =
-    new BookingConfirmationScenarioHelper();
+  private bookingConfirmationScenarioHelper = new BookingConfirmationScenarioHelper();
 
   public validate = async () => {
     const result = await this.apiClient.bookingConfirmation({

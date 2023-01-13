@@ -12,9 +12,7 @@ interface IAvailabilityCalendarController {
   ): Promise<AvailabilityCalendar[]>;
 }
 
-export class AvailabilityCalendarController
-  implements IAvailabilityCalendarController
-{
+export class AvailabilityCalendarController implements IAvailabilityCalendarController {
   private service = new AvailabilityCalendarService();
   public getAvailability = async (
     schema: AvailabilityCalendarBodySchema,

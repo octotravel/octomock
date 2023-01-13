@@ -7,17 +7,12 @@ import descriptions from "../../consts/descriptions";
 import { AvailabilityCalendarScenarioHelper } from "../../helpers/AvailabilityCalendarScenarioHelper";
 import { Scenario, ScenarioResult } from "../Scenario";
 
-export class AvailabilityCalendarInvalidOptionScenario
-  implements Scenario<AvailabilityCalendar[]>
-{
+export class AvailabilityCalendarInvalidOptionScenario implements Scenario<AvailabilityCalendar[]> {
   private config = Config.getInstance();
   private apiClient = this.config.getApiClient();
-  private availabilityCalendarScenarioHelper =
-    new AvailabilityCalendarScenarioHelper();
+  private availabilityCalendarScenarioHelper = new AvailabilityCalendarScenarioHelper();
 
-  public validate = async (): Promise<
-    ScenarioResult<AvailabilityCalendar[]>
-  > => {
+  public validate = async (): Promise<ScenarioResult<AvailabilityCalendar[]>> => {
     const product = this.config.getProduct();
     const result = await this.apiClient.getAvailabilityCalendar({
       productId: product.id,

@@ -1,11 +1,7 @@
 import { ValidatedError } from "./index";
 import { NumberValidator } from "../ValidatorHelpers";
 import { INVALID_PRODUCT_ID, STATUS_BAD_REQUEST } from "../../../models/Error";
-import {
-  ModelValidator,
-  StringValidator,
-  ValidatorError,
-} from "../ValidatorHelpers";
+import { ModelValidator, StringValidator, ValidatorError } from "../ValidatorHelpers";
 
 export class InvalidProductIdErrorValidator implements ModelValidator {
   public validate = (data: ValidatedError): ValidatorError[] => {

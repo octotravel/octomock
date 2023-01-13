@@ -39,9 +39,7 @@ export class BookingCancellationFlow extends BaseFlow implements Flow {
     async (): Promise<BookingCancellationBookingScenario> => {
       const [bookableProduct] = this.config.productConfig.availableProducts;
 
-      const reservationResult = await this.booker.createReservation(
-        bookableProduct
-      );
+      const reservationResult = await this.booker.createReservation(bookableProduct);
       const reservation = reservationResult.data;
 
       // TODO: add confirmReservation to Booker

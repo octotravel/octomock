@@ -1,13 +1,8 @@
-import {
-  PricingUnit,
-  PricingPer,
-  Pricing,
-  AvailabilityType,
-  OpeningHours,
-} from "@octocloud/types";
-import { PricingConfig } from "./../builders/ProductBuilder";
-import { OptionConfigModel } from "./OptionConfig";
+import { ProductModel } from "@octocloud/generators";
+import { PricingUnit, PricingPer, Pricing, AvailabilityType, OpeningHours } from "@octocloud/types";
+
 import * as R from "ramda";
+import { InvalidOptionIdError } from "./Error";
 
 export enum Day {
   Mon = 1,
@@ -34,7 +29,7 @@ export enum Month {
   Dec = 11,
 }
 
-type Capacity = Map<Day, Nullable<number>>;
+export type Capacity = Map<Day, Nullable<number>>;
 
 const fillCapacity = (value: Nullable<number>): Capacity => {
   return new Map([
@@ -48,7 +43,7 @@ const fillCapacity = (value: Nullable<number>): Capacity => {
   ]);
 };
 
-export class AvailabilityConfigModel {
+export class ProductAvailabilityModel {
   public days: number;
   public daysClosed: Day[];
   public daysSoldOut: Day[];
@@ -57,10 +52,11 @@ export class AvailabilityConfigModel {
   public openingHours: OpeningHours[];
   public capacity: Capacity;
   public freesale: boolean;
-  private pricing: Map<string, Pricing>;
-  private unitPricing: Map<string, PricingUnit[]>;
+  private pricing!: Map<string, Pricing>;
+  private unitPricing!: Map<string, PricingUnit[]>;
 
   constructor({
+    productModel,
     days,
     daysClosed,
     daysSoldOut,
@@ -71,6 +67,7 @@ export class AvailabilityConfigModel {
     capacityValue,
     freesale,
   }: {
+    productModel: ProductModel;
     days?: number;
     daysClosed?: Day[];
     daysSoldOut?: Day[];
@@ -83,11 +80,9 @@ export class AvailabilityConfigModel {
   }) {
     if (
       availabilityType === AvailabilityType.OPENING_HOURS &&
-      R.isEmpty(openingHours.length)
+      (openingHours === undefined || R.isEmpty(openingHours.length))
     ) {
-      throw new Error(
-        "openingHours cannot be empty when AvailabilityType = OPENING_HOURS"
-      );
+      throw new Error("openingHours cannot be empty when AvailabilityType = OPENING_HOURS");
     }
 
     if (capacity) {
@@ -106,46 +101,67 @@ export class AvailabilityConfigModel {
     this.availabilityType = availabilityType ?? AvailabilityType.START_TIME;
     this.openingHours = openingHours ?? [];
     this.freesale = freesale ?? false;
+    this.setPricing(productModel);
   }
 
-  public setPricing = (
-    optionsConfig: OptionConfigModel[],
-    pricingConfig: PricingConfig
-  ): AvailabilityConfigModel => {
+  public setPricing(productModel: ProductModel): void {
     const pricingMap = new Map<string, Pricing>();
-    if (pricingConfig.pricingPer === PricingPer.BOOKING) {
-      optionsConfig.forEach((config) => {
-        pricingMap.set(config.id, config.pricingFrom[0]);
+
+    if (productModel.productPricingModel?.pricingPer === PricingPer.BOOKING) {
+      productModel.optionModels.forEach((optionModel) => {
+        const optionPricingModel = optionModel.getOptionPricingModel();
+
+        if (
+          optionPricingModel.pricingFrom !== undefined &&
+          optionPricingModel.pricingFrom.length > 0
+        ) {
+          pricingMap.set(optionModel.id, optionPricingModel.pricingFrom[0]);
+        }
       });
     }
+
     this.pricing = pricingMap;
 
     const unitPricingMap = new Map<string, PricingUnit[]>();
-    if (pricingConfig.pricingPer === PricingPer.UNIT) {
-      optionsConfig.forEach((config) => {
-        const unitPricing = config.unitConfigModels
-          .map((unitConfig) => {
-            return unitConfig.pricingFrom.map((pricing) => {
+
+    if (productModel.productPricingModel?.pricingPer === PricingPer.UNIT) {
+      productModel.optionModels.forEach((optionModel) => {
+        const unitPricing = optionModel.unitModels
+          .map((unitModel) => {
+            const unitPricingModel = unitModel.getUnitPricingModel();
+
+            if (unitPricingModel.pricingFrom === undefined) {
+              return;
+            }
+
+            return unitPricingModel.pricingFrom.map((pricingFrom) => {
               return {
-                ...pricing,
-                unitId: unitConfig.id,
-              };
+                unitId: unitModel.id,
+                ...pricingFrom,
+              } as PricingUnit;
             });
           })
-          .flat(1);
-        unitPricingMap.set(config.id, unitPricing);
+          .flat(1) as PricingUnit[];
+
+        unitPricingMap.set(productModel.id, unitPricing);
       });
     }
     this.unitPricing = unitPricingMap;
-
-    return this;
-  };
+  }
 
   public getPricing = (optionId: string): Pricing => {
-    return this.pricing.get(optionId);
+    if (this.pricing.has(optionId) === false) {
+      throw new InvalidOptionIdError(optionId);
+    }
+
+    return this.pricing.get(optionId)!;
   };
 
   public getUnitPricing = (optionId: string): PricingUnit[] => {
-    return this.unitPricing.get(optionId);
+    if (this.unitPricing.has(optionId) === false) {
+      throw new InvalidOptionIdError(optionId);
+    }
+
+    return this.unitPricing.get(optionId)!;
   };
 }

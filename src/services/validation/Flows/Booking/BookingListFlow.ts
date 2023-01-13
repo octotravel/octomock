@@ -26,9 +26,7 @@ export class BookingListFlow extends BaseFlow implements Flow {
     async (): Promise<BookingListSupplierReferenceScenario> => {
       const [bookableProduct] = this.config.productConfig.availableProducts;
 
-      const reservationResult = await this.booker.createReservation(
-        bookableProduct
-      );
+      const reservationResult = await this.booker.createReservation(bookableProduct);
       const reservation = reservationResult.data;
 
       const result = await this.apiClient.bookingConfirmation({
@@ -47,9 +45,7 @@ export class BookingListFlow extends BaseFlow implements Flow {
     async (): Promise<BookingListResellerReferenceScenario> => {
       const [bookableProduct] = this.config.productConfig.availableProducts;
 
-      const reservationResult = await this.booker.createReservation(
-        bookableProduct
-      );
+      const reservationResult = await this.booker.createReservation(bookableProduct);
       const reservation = reservationResult.data;
 
       const resellerReference = `RESREF${reservation.resellerReference}`;
@@ -65,8 +61,7 @@ export class BookingListFlow extends BaseFlow implements Flow {
       });
     };
 
-  private validateListBookingBadRequestError =
-    async (): Promise<BookingListBadRequestScenario> => {
-      return new BookingListBadRequestScenario();
-    };
+  private validateListBookingBadRequestError = async (): Promise<BookingListBadRequestScenario> => {
+    return new BookingListBadRequestScenario();
+  };
 }

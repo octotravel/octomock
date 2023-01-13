@@ -7,11 +7,7 @@ import { parseCapabilities } from "./router/middlewares";
 import { DB } from "./storage/Database";
 import { DataGenerator } from "./generators/DataGenerator";
 import { ValidationError } from "yup";
-import {
-  OctoError,
-  InternalServerError,
-  BadRequestError,
-} from "./models/Error";
+import { OctoError, InternalServerError, BadRequestError } from "./models/Error";
 
 const app = new Koa();
 
@@ -21,7 +17,7 @@ app.use(koaBody());
 app.use(async (ctx, next) => {
   try {
     await next();
-  } catch (err) {
+  } catch (err: any) {
     // console.log(err);
     if (err instanceof OctoError) {
       ctx.status = err.status;

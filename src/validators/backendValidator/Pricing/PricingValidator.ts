@@ -29,13 +29,9 @@ export class PricingValidator implements ModelValidator {
         integer: true,
       }),
       StringValidator.validate(`${this.path}.currency`, pricing?.currency),
-      NumberValidator.validate(
-        `${this.path}.currencyPrecision`,
-        pricing?.currencyPrecision,
-        {
-          integer: true,
-        }
-      ),
+      NumberValidator.validate(`${this.path}.currencyPrecision`, pricing?.currencyPrecision, {
+        integer: true,
+      }),
       ...this.validateTaxes(pricing?.includedTaxes ?? []),
     ].flatMap((v) => (v ? [v] : []));
   };
@@ -44,18 +40,12 @@ export class PricingValidator implements ModelValidator {
     return taxes
       .map((tax, i) => [
         StringValidator.validate(`${this.path}.taxes[${i}].name`, tax?.name),
-        NumberValidator.validate(
-          `${this.path}.taxes[${i}].retail`,
-          tax?.retail,
-          {
-            integer: true,
-          }
-        ),
-        NumberValidator.validate(
-          `${this.path}.taxes[${i}].original`,
-          tax?.original,
-          { integer: true }
-        ),
+        NumberValidator.validate(`${this.path}.taxes[${i}].retail`, tax?.retail, {
+          integer: true,
+        }),
+        NumberValidator.validate(`${this.path}.taxes[${i}].original`, tax?.original, {
+          integer: true,
+        }),
         NumberValidator.validate(`${this.path}.taxes[${i}].net`, tax?.net, {
           integer: true,
           nullable: true,

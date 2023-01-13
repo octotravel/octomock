@@ -24,13 +24,7 @@ import { OptionPricingValidator } from "./OptionPricingValidator";
 export class OptionValidator implements ModelValidator {
   private path: string;
   private capabilities: CapabilityId[];
-  constructor({
-    path,
-    capabilities,
-  }: {
-    path: string;
-    capabilities: CapabilityId[];
-  }) {
+  constructor({ path, capabilities }: { path: string; capabilities: CapabilityId[] }) {
     this.path = path;
     this.capabilities = capabilities;
   }
@@ -42,10 +36,7 @@ export class OptionValidator implements ModelValidator {
     return [
       StringValidator.validate(`${this.path}.id`, option?.id),
       BooleanValidator.validate(`${this.path}.default`, option?.default),
-      StringValidator.validate(
-        `${this.path}.internalName`,
-        option?.internalName
-      ),
+      StringValidator.validate(`${this.path}.internalName`, option?.internalName),
       StringValidator.validate(`${this.path}.reference`, option?.reference, {
         nullable: true,
       }),
@@ -53,10 +44,7 @@ export class OptionValidator implements ModelValidator {
         option?.availabilityLocalStartTimes ?? [],
         availabilityType
       ),
-      StringValidator.validate(
-        `${this.path}.cancellationCutoff`,
-        option?.cancellationCutoff
-      ),
+      StringValidator.validate(`${this.path}.cancellationCutoff`, option?.cancellationCutoff),
       NumberValidator.validate(
         `${this.path}.cancellationCutoffAmount`,
         option?.cancellationCutoffAmount,
@@ -98,26 +86,18 @@ export class OptionValidator implements ModelValidator {
     );
   };
 
-  private validateUnitRestrictions = (
-    restrictions: UnitRestrictions
-  ): ValidatorError[] =>
+  private validateUnitRestrictions = (restrictions: UnitRestrictions): ValidatorError[] =>
     [
-      NumberValidator.validate(
-        `${this.path}.restrictions.minUnits`,
-        restrictions?.minUnits,
-        { integer: true }
-      ),
-      NumberValidator.validate(
-        `${this.path}.restrictions.maxUnits`,
-        restrictions?.maxUnits,
-        { nullable: true, integer: true }
-      ),
+      NumberValidator.validate(`${this.path}.restrictions.minUnits`, restrictions?.minUnits, {
+        integer: true,
+      }),
+      NumberValidator.validate(`${this.path}.restrictions.maxUnits`, restrictions?.maxUnits, {
+        nullable: true,
+        integer: true,
+      }),
     ].flatMap((v) => (v ? [v] : []));
 
-  private validateUnits = (
-    units: Unit[],
-    pricingPer: PricingPer
-  ): ValidatorError[] => {
+  private validateUnits = (units: Unit[], pricingPer: PricingPer): ValidatorError[] => {
     return units
       .map((unit, i) => {
         const validator = new UnitValidator({
@@ -134,10 +114,7 @@ export class OptionValidator implements ModelValidator {
     option: Option,
     pricingPer?: PricingPer
   ): ValidatorError[] => {
-    if (
-      this.capabilities.includes(CapabilityId.Pricing) &&
-      pricingPer === PricingPer.BOOKING
-    ) {
+    if (this.capabilities.includes(CapabilityId.Pricing) && pricingPer === PricingPer.BOOKING) {
       const pricingValidator = new OptionPricingValidator({
         path: `${this.path}`,
       });

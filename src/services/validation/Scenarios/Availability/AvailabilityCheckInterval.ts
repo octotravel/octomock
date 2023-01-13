@@ -4,9 +4,7 @@ import { AvailabilityScenarioHelper } from "../../helpers/AvailabilityScenarioHe
 import { Config } from "../../config/Config";
 import descriptions from "../../consts/descriptions";
 
-export class AvailabilityChecIntervalScenario
-  implements Scenario<Availability[]>
-{
+export class AvailabilityChecIntervalScenario implements Scenario<Availability[]> {
   private config = Config.getInstance();
   private apiClient = this.config.getApiClient();
 
@@ -26,8 +24,7 @@ export class AvailabilityChecIntervalScenario
     });
 
     const availabilities = result.data;
-    const randomAvailability =
-      availabilities[Math.floor(Math.random() * availabilities.length)];
+    const randomAvailability = availabilities[Math.floor(Math.random() * availabilities.length)];
     this.config.productConfig.addAvailabilityID = {
       availabilityType: this.product.availabilityType,
       availabilityID: randomAvailability.id,

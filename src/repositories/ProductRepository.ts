@@ -1,5 +1,6 @@
-import { ProductModelStorage } from "./../storage/ProductStorage";
-import { ProductModel } from "./../models/Product";
+import { ProductModelStorage } from "../storage/ProductStorage";
+import { ProductModel } from "@octocloud/generators";
+import { ProductWithAvailabilityModel } from "../models/ProductWithAvailabilityModel";
 
 interface IProductRepository {
   getProducts(): ProductModel[];
@@ -13,7 +14,15 @@ export class ProductRepository implements IProductRepository {
     return this.storage.getAll();
   };
 
-  public getProduct = (id: string): Nullable<ProductModel> => {
+  public getProductsWithAvailability = (): ProductWithAvailabilityModel[] => {
+    return this.storage.getAllWithAvailabilities();
+  };
+
+  public getProduct = (id: string): ProductModel => {
     return this.storage.get(id);
+  };
+
+  public getProductWithAvailability = (id: string): ProductWithAvailabilityModel => {
+    return this.storage.getWithAvailability(id);
   };
 }

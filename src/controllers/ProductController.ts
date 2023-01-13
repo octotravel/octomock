@@ -1,5 +1,6 @@
 import { CapabilityId, Product } from "@octocloud/types";
-import { ProductService } from "./../services/ProductService";
+import { ProductParser } from "@octocloud/generators";
+import { ProductRepository } from "../repositories/ProductRepository";
 
 interface IProductController {
   getProducts(capabilities: CapabilityId[]): Product[];
@@ -7,16 +8,21 @@ interface IProductController {
 }
 
 export class ProductController implements IProductController {
-  private productService = new ProductService();
+  private readonly productRepository = new ProductRepository();
+  private readonly productParser = new ProductParser();
   public getProducts = (capabilities: CapabilityId[]): Product[] => {
-    return this.productService
+    return this.productRepository
       .getProducts()
-      .map((model) => model.toPOJO({ useCapabilities: true, capabilities }));
+      .map((productModel) =>
+        this.productParser.parseModelToPOJOWithSpecificCapabilities(productModel, capabilities)
+      );
   };
   public getProduct = (id: string, capabilities: CapabilityId[]): Product => {
-    const product = this.productService
-      .getProduct(id)
-      .toPOJO({ useCapabilities: true, capabilities });
+    const productModel = this.productRepository.getProduct(id);
+    const product = this.productParser.parseModelToPOJOWithSpecificCapabilities(
+      productModel,
+      capabilities
+    );
 
     return {
       ...product,

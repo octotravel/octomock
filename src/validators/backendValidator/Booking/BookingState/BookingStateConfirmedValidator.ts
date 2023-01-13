@@ -1,10 +1,6 @@
 import { Booking } from "@octocloud/types";
 import { CommonValidator } from "../../CommonValidator";
-import {
-  ModelValidator,
-  NullValidator,
-  ValidatorError,
-} from "../../ValidatorHelpers";
+import { ModelValidator, NullValidator, ValidatorError } from "../../ValidatorHelpers";
 
 export class BookingStateConfirmedValidator implements ModelValidator {
   private path: string;
@@ -13,30 +9,12 @@ export class BookingStateConfirmedValidator implements ModelValidator {
   }
   public validate = (booking: Booking): ValidatorError[] => {
     return [
-      CommonValidator.validateUTCDateTime(
-        `${this.path}.utcCreatedAt`,
-        booking?.utcCreatedAt
-      ),
-      CommonValidator.validateUTCDateTime(
-        `${this.path}.utcUpdatedAt`,
-        booking?.utcUpdatedAt
-      ),
-      NullValidator.validate(
-        `${this.path}.utcExpiresAt`,
-        booking?.utcExpiresAt
-      ),
-      NullValidator.validate(
-        `${this.path}.utcRedeemedAt`,
-        booking?.utcRedeemedAt
-      ),
-      CommonValidator.validateUTCDateTime(
-        `${this.path}.utcConfirmedAt`,
-        booking?.utcConfirmedAt
-      ),
-      NullValidator.validate(
-        `${this.path}.cancellation`,
-        booking?.cancellation
-      ),
+      CommonValidator.validateUTCDateTime(`${this.path}.utcCreatedAt`, booking?.utcCreatedAt),
+      CommonValidator.validateUTCDateTime(`${this.path}.utcUpdatedAt`, booking?.utcUpdatedAt),
+      NullValidator.validate(`${this.path}.utcExpiresAt`, booking?.utcExpiresAt),
+      NullValidator.validate(`${this.path}.utcRedeemedAt`, booking?.utcRedeemedAt),
+      CommonValidator.validateUTCDateTime(`${this.path}.utcConfirmedAt`, booking?.utcConfirmedAt),
+      NullValidator.validate(`${this.path}.cancellation`, booking?.cancellation),
     ].flatMap((v) => (v ? [v] : []));
   };
 }

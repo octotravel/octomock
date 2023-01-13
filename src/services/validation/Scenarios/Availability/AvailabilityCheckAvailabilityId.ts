@@ -4,9 +4,7 @@ import { AvailabilityScenarioHelper } from "../../helpers/AvailabilityScenarioHe
 import { Config } from "../../config/Config";
 import descriptions from "../../consts/descriptions";
 
-export class AvailabilityCheckAvailabilityIdScenario
-  implements Scenario<Availability[]>
-{
+export class AvailabilityCheckAvailabilityIdScenario implements Scenario<Availability[]> {
   private config = Config.getInstance();
   private apiClient = this.config.getApiClient();
 
@@ -18,8 +16,7 @@ export class AvailabilityCheckAvailabilityIdScenario
   }
 
   public validate = async () => {
-    const availabilityID =
-      this.config.productConfig.availabilityIDs[this.product.availabilityType];
+    const availabilityID = this.config.productConfig.availabilityIDs[this.product.availabilityType];
     const result = await this.apiClient.getAvailability({
       productId: this.product.id,
       optionId: this.product.options[0].id,

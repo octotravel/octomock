@@ -1,116 +1,162 @@
-import { Booking } from "@octocloud/types";
-import { InvalidBookingUUIDError } from "./../models/Error";
-import { GetBookingSchema, GetBookingsSchema } from "./../schemas/Booking";
-import { BookingModel } from "./../models/Booking";
-import { DB } from "../storage/Database";
+import { BookingStatus, Ticket } from "@octocloud/types";
+import {
+  CancelBookingSchema,
+  ConfirmBookingSchema,
+  ExtendBookingSchema,
+  UpdateBookingSchema,
+} from "../schemas/Booking";
 import { DateHelper } from "../helpers/DateHelper";
+import { BookingModel, UnitItemModel } from "@octocloud/generators";
+import { ContactFactory } from "../factories/ContactFactory";
+import { UnitItemModelFactory } from "../factories/UnitItemModelFactory";
+import { TicketFactory } from "../factories/TicketFactory";
+import addMinutes from "date-fns/addMinutes";
 
 interface IBookingService {
-  createBooking(bookingModel: BookingModel): Promise<BookingModel>;
-  updateBooking(bookingModel: BookingModel): Promise<BookingModel>;
-  getBooking(bookingModel: BookingModel): Promise<BookingModel>;
-  getBookings(schema: GetBookingsSchema): Promise<BookingModel[]>;
+  updateBookingModelWithConfirmBookingSchema(
+    bookingModel: BookingModel,
+    confirmBookingSchema: ConfirmBookingSchema
+  ): BookingModel;
 }
 
 export class BookingService implements IBookingService {
-  public createBooking = async (
-    bookingModel: BookingModel
-  ): Promise<BookingModel> => {
-    await DB.getInstance()
-      .getDB()
-      .run(
-        `
-      INSERT INTO booking (
-        id,
-        status,
-        resellerReference,
-        supplierReference,
-        createdAt,
-        data
-      ) VALUES (?, ?, ?, ?, ?, ?)
-    `,
-        bookingModel.uuid,
-        bookingModel.status,
-        bookingModel.resellerReference,
-        bookingModel.supplierReference,
-        DateHelper.getDate(bookingModel.utcCreatedAt),
-        JSON.stringify(bookingModel.toPOJO({}))
+  public updateBookingModelWithConfirmBookingSchema(
+    bookingModel: BookingModel,
+    confirmBookingSchema: ConfirmBookingSchema
+  ): BookingModel {
+    const status = BookingStatus.CONFIRMED;
+
+    const unitItemModels = UnitItemModelFactory.createMultipleForBookingWithTickets({
+      bookingModel: bookingModel,
+      bookingUnitItemSchemas: confirmBookingSchema.unitItems,
+    });
+
+    bookingModel.resellerReference =
+      confirmBookingSchema.resellerReference ?? bookingModel.resellerReference;
+    bookingModel.status = status;
+    bookingModel.contact = ContactFactory.createForBooking({
+      bookingModel: bookingModel,
+      bookingContactScheme: confirmBookingSchema.contact,
+    });
+    bookingModel.unitItemModels = unitItemModels;
+    bookingModel.utcUpdatedAt = DateHelper.utcDateFormat(new Date());
+    bookingModel.utcExpiresAt = null;
+    bookingModel.utcRedeemedAt = null;
+    bookingModel.utcConfirmedAt = DateHelper.utcDateFormat(new Date());
+    bookingModel.notes = confirmBookingSchema.notes ?? bookingModel.notes;
+    bookingModel.voucher = this.getVoucher(bookingModel, status);
+
+    return bookingModel;
+  }
+
+  public updateBookingModelWithUpdateBookingSchema(
+    bookingModel: BookingModel,
+    updateBookingSchema: UpdateBookingSchema,
+    rebookedBooking?: BookingModel
+  ): BookingModel {
+    const status = bookingModel.status;
+
+    let utcExpiresAt = bookingModel.utcExpiresAt;
+    if (updateBookingSchema.expirationMinutes) {
+      utcExpiresAt = DateHelper.utcDateFormat(
+        addMinutes(new Date(), updateBookingSchema.expirationMinutes)
       );
-    return bookingModel;
-  };
-
-  public updateBooking = async (
-    bookingModel: BookingModel
-  ): Promise<BookingModel> => {
-    await DB.getInstance()
-      .getDB()
-      .run(
-        `
-      UPDATE booking
-        SET status = ?,
-            resellerReference = ?,
-            data = ?
-        WHERE id = ?
-    `,
-        bookingModel.status,
-        bookingModel.resellerReference,
-        JSON.stringify(bookingModel.toPOJO({})),
-        bookingModel.uuid
-      );
-    return bookingModel;
-  };
-
-  public getBooking = async (data: GetBookingSchema): Promise<BookingModel> => {
-    const result =
-      (await DB.getInstance()
-        .getDB()
-        .get(`SELECT * FROM booking WHERE id = ?`, data.uuid)) ?? null;
-    if (result == null) {
-      throw new InvalidBookingUUIDError(data.uuid);
-    }
-    const booking = JSON.parse(result.data) as Booking;
-    const bookingModel = BookingModel.fromPOJO(booking);
-    this.handleExpiredBooking(bookingModel);
-    return bookingModel;
-  };
-
-  private handleExpiredBooking = (booking: BookingModel): void => {
-    const isExpired =
-      booking.utcExpiresAt < DateHelper.utcDateFormat(new Date());
-    if (isExpired) {
-      throw new InvalidBookingUUIDError(booking.uuid);
-    }
-  };
-
-  public getBookings = async (
-    data: GetBookingsSchema
-  ): Promise<BookingModel[]> => {
-    const selectQuery = "SELECT * FROM booking WHERE ";
-    const query = [];
-    const params = [];
-    if (data.resellerReference) {
-      query.push("resellerReference = ?");
-      params.push(data.resellerReference);
-    }
-    if (data.supplierReference) {
-      query.push("supplierReference = ?");
-      params.push(data.supplierReference);
     }
 
-    if (data.localDateStart && data.localDateEnd) {
-      query.push("createdAt BETWEEN ? AND ?");
-      params.push(data.localDateStart);
-      params.push(data.localDateEnd);
-    } else if (data.localDate) {
-      query.push("createdAt = ? ");
-      params.push(data.localDate);
-    }
-
-    const result = await DB.getInstance()
-      .getDB()
-      .all(selectQuery + query.join(" AND "), ...params);
-    return result.map((r) =>
-      BookingModel.fromPOJO(JSON.parse(r.data) as Booking)
+    const unitItemModels = this.getUpdatedUnitItems(
+      bookingModel,
+      updateBookingSchema,
+      rebookedBooking
     );
+
+    bookingModel.resellerReference =
+      updateBookingSchema.resellerReference ?? bookingModel.resellerReference;
+    bookingModel.status = status;
+    bookingModel.productModel = rebookedBooking?.productModel ?? bookingModel.productModel;
+    bookingModel.optionModel = rebookedBooking?.optionModel ?? bookingModel.optionModel;
+    (bookingModel.availability = rebookedBooking?.availability ?? bookingModel.availability),
+      (bookingModel.contact = ContactFactory.createForBooking({
+        bookingModel: bookingModel,
+        bookingContactScheme: updateBookingSchema.contact,
+      }));
+    bookingModel.unitItemModels = unitItemModels;
+    bookingModel.utcUpdatedAt = DateHelper.utcDateFormat(new Date());
+    bookingModel.utcExpiresAt = utcExpiresAt;
+    bookingModel.utcRedeemedAt = null;
+    bookingModel.notes = updateBookingSchema.notes ?? bookingModel.notes;
+    bookingModel.voucher = this.getVoucher(rebookedBooking ?? bookingModel, status);
+
+    return bookingModel;
+  }
+
+  public updateBookingModelWithExtendBookingSchema(
+    bookingModel: BookingModel,
+    extendBookingSchema: ExtendBookingSchema
+  ): BookingModel {
+    const status = BookingStatus.ON_HOLD;
+
+    bookingModel.status = status;
+    bookingModel.utcUpdatedAt = DateHelper.utcDateFormat(new Date());
+    bookingModel.utcExpiresAt = DateHelper.utcDateFormat(
+      addMinutes(new Date(), extendBookingSchema.expirationMinutes ?? 30)
+    );
+    bookingModel.utcRedeemedAt = null;
+    bookingModel.utcConfirmedAt = null;
+    bookingModel.voucher = this.getVoucher(bookingModel, status);
+
+    return bookingModel;
+  }
+
+  public updateBookingModelWithCancelBookingSchema(
+    bookingModel: BookingModel,
+    schema: CancelBookingSchema
+  ): BookingModel {
+    const status = BookingStatus.CANCELLED;
+
+    const cancellation = {
+      refund: "FULL",
+      reason: schema.reason ?? null,
+      utcCancelledAt: DateHelper.utcDateFormat(new Date()),
+    };
+
+    bookingModel.status = status;
+    bookingModel.utcUpdatedAt = DateHelper.utcDateFormat(new Date());
+    bookingModel.utcExpiresAt = null;
+    bookingModel.utcRedeemedAt = null;
+    bookingModel.voucher = this.getVoucher(bookingModel, status);
+    bookingModel.cancellation = cancellation;
+    bookingModel.cancellable = false;
+
+    return bookingModel;
+  }
+
+  private getVoucher(bookingModel: BookingModel, status: BookingStatus): Nullable<Ticket> {
+    if (status === BookingStatus.CONFIRMED) {
+      return TicketFactory.createFromBookingForBooking(bookingModel);
+    } else if (status === BookingStatus.CANCELLED) {
+      return TicketFactory.createFromProductForBooking(bookingModel.productModel);
+    }
+
+    return bookingModel.voucher;
+  }
+
+  private getUpdatedUnitItems = (
+    bookingModel: BookingModel,
+    schema: UpdateBookingSchema,
+    rebookedBooking?: BookingModel
+  ): UnitItemModel[] => {
+    if (schema.unitItems) {
+      return bookingModel.status === BookingStatus.CONFIRMED
+        ? UnitItemModelFactory.createMultipleForBookingWithTickets({
+            bookingModel: rebookedBooking ?? bookingModel,
+            bookingUnitItemSchemas: schema.unitItems,
+          })
+        : UnitItemModelFactory.createMultipleForBooking({
+            bookingModel: bookingModel,
+            bookingUnitItemSchemas: schema.unitItems,
+          });
+    }
+
+    return rebookedBooking?.unitItemModels ?? bookingModel.unitItemModels;
   };
 }

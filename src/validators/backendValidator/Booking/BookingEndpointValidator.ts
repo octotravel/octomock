@@ -8,12 +8,7 @@ import {
   UpdateBookingBodySchema,
   CancelBookingBodySchema,
 } from "@octocloud/types";
-import {
-  ArrayValidator,
-  ErrorType,
-  StringValidator,
-  ValidatorError,
-} from "../ValidatorHelpers";
+import { ArrayValidator, ErrorType, StringValidator, ValidatorError } from "../ValidatorHelpers";
 
 interface ValidateData {
   booking: Booking;
@@ -68,33 +63,21 @@ export class BookingEndpointValidator {
       StringValidator.validate(`${this.path}.productId`, booking?.productId, {
         equalsTo: productId,
       }),
-      StringValidator.validate(
-        `${this.path}.product.id`,
-        booking?.product?.id,
-        {
-          equalsTo: productId,
-        }
-      ),
+      StringValidator.validate(`${this.path}.product.id`, booking?.product?.id, {
+        equalsTo: productId,
+      }),
       StringValidator.validate(`${this.path}.optionId`, booking?.optionId, {
         equalsTo: optionId,
       }),
       StringValidator.validate(`${this.path}.option.id`, booking?.option?.id, {
         equalsTo: optionId,
       }),
-      StringValidator.validate(
-        `${this.path}.availabilityId`,
-        booking?.availabilityId,
-        {
-          equalsTo: availabilityId,
-        }
-      ),
-      StringValidator.validate(
-        `${this.path}.availability.id`,
-        booking?.availability?.id,
-        {
-          equalsTo: availabilityId,
-        }
-      ),
+      StringValidator.validate(`${this.path}.availabilityId`, booking?.availabilityId, {
+        equalsTo: availabilityId,
+      }),
+      StringValidator.validate(`${this.path}.availability.id`, booking?.availability?.id, {
+        equalsTo: availabilityId,
+      }),
     ];
     return errors.flatMap((v) => (v ? [v] : []));
   };
@@ -122,10 +105,7 @@ export class BookingEndpointValidator {
 
   private validateUnitItems = (
     booking: Booking,
-    schema:
-      | CreateBookingBodySchema
-      | ConfirmBookingBodySchema
-      | UpdateBookingBodySchema
+    schema: CreateBookingBodySchema | ConfirmBookingBodySchema | UpdateBookingBodySchema
   ): ValidatorError[] => {
     const errors = [];
     const label = `${this.path}.unitItems`;
@@ -157,9 +137,7 @@ export class BookingEndpointValidator {
     return errors;
   };
 
-  public validateReservationExtend = (
-    data: ValidateReservationExtendData
-  ): ValidatorError[] => {
+  public validateReservationExtend = (data: ValidateReservationExtendData): ValidatorError[] => {
     const reservation = data?.reservation;
     const reservationExtended = data?.reservationExtended;
     const schema = data?.schema;
@@ -180,20 +158,14 @@ export class BookingEndpointValidator {
     return errors.flatMap((v) => (v ? [v] : []));
   };
 
-  public validateConfirmation = (
-    data: ValidateConfirmationdData
-  ): ValidatorError[] => {
+  public validateConfirmation = (data: ValidateConfirmationdData): ValidatorError[] => {
     const booking = data?.booking;
     const schema = data?.schema;
 
     const errors = [
-      StringValidator.validate(
-        `${this.path}.resellerReference`,
-        booking?.resellerReference,
-        {
-          equalsTo: schema?.resellerReference,
-        }
-      ),
+      StringValidator.validate(`${this.path}.resellerReference`, booking?.resellerReference, {
+        equalsTo: schema?.resellerReference,
+      }),
       StringValidator.validate(`${this.path}.status`, booking?.status, {
         equalsTo: BookingStatus.CONFIRMED,
       }),
@@ -231,27 +203,15 @@ export class BookingEndpointValidator {
   ) => {
     if (schema.contact) {
       const errors = [
-        StringValidator.validate(
-          `${this.path}.contact.firstName`,
-          booking?.contact?.firstName,
-          {
-            equalsTo: schema?.contact?.firstName,
-          }
-        ),
-        StringValidator.validate(
-          `${this.path}.contact.fullName`,
-          booking?.contact?.fullName,
-          {
-            equalsTo: schema?.contact?.fullName,
-          }
-        ),
-        StringValidator.validate(
-          `${this.path}.contact.lastName`,
-          booking?.contact?.lastName,
-          {
-            equalsTo: schema?.contact?.lastName,
-          }
-        ),
+        StringValidator.validate(`${this.path}.contact.firstName`, booking?.contact?.firstName, {
+          equalsTo: schema?.contact?.firstName,
+        }),
+        StringValidator.validate(`${this.path}.contact.fullName`, booking?.contact?.fullName, {
+          equalsTo: schema?.contact?.fullName,
+        }),
+        StringValidator.validate(`${this.path}.contact.lastName`, booking?.contact?.lastName, {
+          equalsTo: schema?.contact?.lastName,
+        }),
         StringValidator.validate(
           `${this.path}.contact.emailAddress`,
           booking?.contact?.emailAddress,
@@ -259,13 +219,9 @@ export class BookingEndpointValidator {
             equalsTo: schema?.contact?.emailAddress,
           }
         ),
-        StringValidator.validate(
-          `${this.path}.contact.notes`,
-          booking?.contact?.notes,
-          {
-            equalsTo: schema?.contact?.notes,
-          }
-        ),
+        StringValidator.validate(`${this.path}.contact.notes`, booking?.contact?.notes, {
+          equalsTo: schema?.contact?.notes,
+        }),
       ];
       return errors.flatMap((v) => (v ? [v] : []));
     }
@@ -287,32 +243,22 @@ export class BookingEndpointValidator {
     ];
     if (data?.booking?.status === BookingStatus.ON_HOLD) {
       errors.push(
-        StringValidator.validate(
-          `${this.path}.status`,
-          bookingCancelled?.status,
-          {
-            equalsTo: BookingStatus.EXPIRED,
-          }
-        )
+        StringValidator.validate(`${this.path}.status`, bookingCancelled?.status, {
+          equalsTo: BookingStatus.EXPIRED,
+        })
       );
     } else if (data?.booking?.status === BookingStatus.CONFIRMED) {
       errors.push(
-        StringValidator.validate(
-          `${this.path}.status`,
-          bookingCancelled?.status,
-          {
-            equalsTo: BookingStatus.CANCELLED,
-          }
-        )
+        StringValidator.validate(`${this.path}.status`, bookingCancelled?.status, {
+          equalsTo: BookingStatus.CANCELLED,
+        })
       );
     }
 
     return errors.flatMap((v) => (v ? [v] : []));
   };
 
-  public validateGetBookings = (
-    data: ValidateGetBookingsData
-  ): ValidatorError[] => {
+  public validateGetBookings = (data: ValidateGetBookingsData): ValidatorError[] => {
     const bookings = data?.bookings ?? [];
     const schema = data?.schema;
 
@@ -321,11 +267,9 @@ export class BookingEndpointValidator {
     if (schema?.resellerReference) {
       errors.push(
         ...bookings.map((booking, i) =>
-          StringValidator.validate(
-            `bookings[${i}].resellerReference`,
-            booking.resellerReference,
-            { equalsTo: schema?.resellerReference }
-          )
+          StringValidator.validate(`bookings[${i}].resellerReference`, booking.resellerReference, {
+            equalsTo: schema?.resellerReference,
+          })
         )
       );
     }
@@ -333,11 +277,9 @@ export class BookingEndpointValidator {
     if (schema?.supplierReference) {
       errors.push(
         ...bookings.map((booking, i) =>
-          StringValidator.validate(
-            `bookings[${i}].supplierReference`,
-            booking.supplierReference,
-            { equalsTo: schema?.supplierReference }
-          )
+          StringValidator.validate(`bookings[${i}].supplierReference`, booking.supplierReference, {
+            equalsTo: schema?.supplierReference,
+          })
         )
       );
     }

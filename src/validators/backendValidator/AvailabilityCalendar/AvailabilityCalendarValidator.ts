@@ -39,38 +39,21 @@ export class AvailabilityCalendarValidator implements ModelValidator {
 
   public validate = (availability: AvailabilityCalendar): ValidatorError[] => {
     return [
-      StringValidator.validate(
-        `${this.path}.localDate`,
-        availability?.localDate
-      ),
-      CommonValidator.validateLocalDate(
-        `${this.path}.localDate`,
-        availability?.localDate
-      ),
+      StringValidator.validate(`${this.path}.localDate`, availability?.localDate),
+      CommonValidator.validateLocalDate(`${this.path}.localDate`, availability?.localDate),
 
-      BooleanValidator.validate(
-        `${this.path}.available`,
-        availability?.available
-      ),
+      BooleanValidator.validate(`${this.path}.available`, availability?.available),
       EnumValidator.validate(
         `${this.path}.status`,
         availability?.status,
         Object.values(AvailabilityStatus)
       ),
-      NumberValidator.validate(
-        `${this.path}.vacancies`,
-        availability?.vacancies,
-        {
-          nullable: true,
-        }
-      ),
-      NumberValidator.validate(
-        `${this.path}.capacity`,
-        availability?.capacity,
-        {
-          nullable: true,
-        }
-      ),
+      NumberValidator.validate(`${this.path}.vacancies`, availability?.vacancies, {
+        nullable: true,
+      }),
+      NumberValidator.validate(`${this.path}.capacity`, availability?.capacity, {
+        nullable: true,
+      }),
 
       ...CommonValidator.validateOpeningHours(
         this.path,
@@ -81,9 +64,7 @@ export class AvailabilityCalendarValidator implements ModelValidator {
     ].flatMap((v) => (v ? [v] : []));
   };
 
-  private validatePricingCapability = (
-    availability: AvailabilityCalendar
-  ): ValidatorError[] => {
+  private validatePricingCapability = (availability: AvailabilityCalendar): ValidatorError[] => {
     if (this.capabilities.includes(CapabilityId.Pricing)) {
       return this.pricingValidator.validate(availability);
     }

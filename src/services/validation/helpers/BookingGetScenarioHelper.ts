@@ -1,10 +1,6 @@
 import { Booking } from "@octocloud/types";
 import { BookingValidator } from "../../../validators/backendValidator/Booking/BookingValidator";
-import {
-  ScenarioConfigData,
-  ScenarioHelper,
-  ScenarioHelperData,
-} from "./ScenarioHelper";
+import { ScenarioConfigData, ScenarioHelper, ScenarioHelperData } from "./ScenarioHelper";
 
 export class BookingGetScenarioHelper extends ScenarioHelper {
   public validateBookingGet = (

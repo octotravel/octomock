@@ -1,23 +1,39 @@
 import { InMemoryStorage } from "./InMemoryStorage";
 import { InvalidProductIdError } from "../models/Error";
-import { ProductModel } from "../models/Product";
-import { ProductGenerator } from "../generators/ProductGenerator";
+
+import { ProductWithAvailabilityModel } from "../models/ProductWithAvailabilityModel";
+import { ProductWithAvailabilityModelGenerator } from "../generators/ProductWithAvailabilityModelGenerator";
+import { ProductModel } from "@octocloud/generators";
 
 export class ProductModelStorage implements InMemoryStorage<ProductModel> {
-  public get(id: string): Nullable<ProductModel> {
-    const model = this.generateProducts().find((p) => p.id === id) ?? null;
-    if (model === null) {
+  private readonly productWithAvailabilityModels: Map<string, ProductWithAvailabilityModel> =
+    new Map();
+  private readonly productWithAvailabilityModelGenerator =
+    new ProductWithAvailabilityModelGenerator();
+
+  constructor() {
+    this.productWithAvailabilityModelGenerator.generateMultipleProducts();
+  }
+
+  public get(id: string): ProductModel {
+    return this.getWithAvailability(id).toProductModel();
+  }
+
+  public getWithAvailability(id: string): ProductWithAvailabilityModel {
+    if (this.productWithAvailabilityModels.has(id)) {
       throw new InvalidProductIdError(id);
     }
-    return model;
+
+    return this.productWithAvailabilityModels.get(id)!;
   }
+
   public getAll(): ProductModel[] {
-    return this.generateProducts();
+    return this.getAllWithAvailabilities().map((productWithAvailabilityModel) => {
+      return productWithAvailabilityModel.toProductModel();
+    });
   }
 
-  private generateProducts = () => {
-    const generator = new ProductGenerator();
-
-    return generator.getProducts();
-  };
+  public getAllWithAvailabilities(): ProductWithAvailabilityModel[] {
+    return Array.from(this.productWithAvailabilityModels.values());
+  }
 }

@@ -12,24 +12,20 @@ export class BookingExtendFlow extends BaseFlow implements Flow {
   }
 
   public validate = async (): Promise<FlowResult> => {
-    const scenarios = [
-      await this.extendBooking(),
-      await this.extendBookingWithInvalidUUID(),
-    ];
+    const scenarios = [await this.extendBooking(), await this.extendBookingWithInvalidUUID()];
     return this.validateScenarios(scenarios);
   };
 
-  private extendBooking =
-    async (): Promise<BookingReservationExtendScenario> => {
-      const [bookableProduct] = this.config.productConfig.availableProducts;
+  private extendBooking = async (): Promise<BookingReservationExtendScenario> => {
+    const [bookableProduct] = this.config.productConfig.availableProducts;
 
-      const result = await this.booker.createReservation(bookableProduct);
-      const booking = result.data;
-      return new BookingReservationExtendScenario({
-        capabilities: this.config.getCapabilityIDs(),
-        booking,
-      });
-    };
+    const result = await this.booker.createReservation(bookableProduct);
+    const booking = result.data;
+    return new BookingReservationExtendScenario({
+      capabilities: this.config.getCapabilityIDs(),
+      booking,
+    });
+  };
 
   private extendBookingWithInvalidUUID =
     async (): Promise<BookingReservationExtendInvalidUUIDScenario> => {

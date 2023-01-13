@@ -22,69 +22,39 @@ export class ProductContentValidator implements ModelValidator {
       StringValidator.validate(`${this.path}.subtitle`, product?.subtitle, {
         nullable: true,
       }),
-      StringValidator.validate(
-        `${this.path}.shortDescription`,
-        product?.shortDescription,
-        { nullable: true }
-      ),
-      StringValidator.validate(
-        `${this.path}.description`,
-        product?.description,
-        { nullable: true }
-      ),
-      StringArrayValidator.validate(
-        `${this.path}.highlights`,
-        product?.highlights
-      ),
-      StringArrayValidator.validate(
-        `${this.path}.inclusions`,
-        product?.inclusions
-      ),
-      StringArrayValidator.validate(
-        `${this.path}.exclusions`,
-        product?.exclusions
-      ),
-      StringValidator.validate(
-        `${this.path}.bookingTerms`,
-        product?.bookingTerms,
-        { nullable: true }
-      ),
+      StringValidator.validate(`${this.path}.shortDescription`, product?.shortDescription, {
+        nullable: true,
+      }),
+      StringValidator.validate(`${this.path}.description`, product?.description, {
+        nullable: true,
+      }),
+      StringArrayValidator.validate(`${this.path}.highlights`, product?.highlights),
+      StringArrayValidator.validate(`${this.path}.inclusions`, product?.inclusions),
+      StringArrayValidator.validate(`${this.path}.exclusions`, product?.exclusions),
+      StringValidator.validate(`${this.path}.bookingTerms`, product?.bookingTerms, {
+        nullable: true,
+      }),
       StringValidator.validate(
         `${this.path}.redemptionInstructions`,
         product?.redemptionInstructions,
         { nullable: true }
       ),
-      StringValidator.validate(
-        `${this.path}.cancellationPolicy`,
-        product?.cancellationPolicy,
-        {
-          nullable: true,
-        }
-      ),
+      StringValidator.validate(`${this.path}.cancellationPolicy`, product?.cancellationPolicy, {
+        nullable: true,
+      }),
       ...this.validateDestination(product?.destination as Destination),
       ...this.validateCategories(product?.categories ?? ([] as Category[])),
       ...this.validateFAQS(product?.faqs ?? ([] as FAQ[])),
-      StringValidator.validate(
-        `${this.path}.coverImageUrl`,
-        product?.coverImageUrl,
-        {
-          nullable: true,
-        }
-      ),
-      StringValidator.validate(
-        `${this.path}.bannerImageUrl`,
-        product?.bannerImageUrl,
-        {
-          nullable: true,
-        }
-      ),
+      StringValidator.validate(`${this.path}.coverImageUrl`, product?.coverImageUrl, {
+        nullable: true,
+      }),
+      StringValidator.validate(`${this.path}.bannerImageUrl`, product?.bannerImageUrl, {
+        nullable: true,
+      }),
       StringValidator.validate(`${this.path}.videoUrl`, product?.videoUrl, {
         nullable: true,
       }),
-      ...this.validateImages(
-        `galleryImages`,
-        product?.galleryImages ?? ([] as Image[])
-      ),
+      ...this.validateImages(`galleryImages`, product?.galleryImages ?? ([] as Image[])),
       ...this.validateImages(`bannerImages`, product?.bannerImages as Image[]),
     ].flatMap((v) => (v ? [v] : []));
   };
@@ -92,14 +62,8 @@ export class ProductContentValidator implements ModelValidator {
   private validateDestination = (destination: Destination): ValidatorError[] =>
     [
       StringValidator.validate(`${this.path}.destination.id`, destination?.id),
-      StringValidator.validate(
-        `${this.path}.destination.name`,
-        destination?.name
-      ),
-      StringValidator.validate(
-        `${this.path}.destination.country`,
-        destination?.country
-      ),
+      StringValidator.validate(`${this.path}.destination.name`, destination?.name),
+      StringValidator.validate(`${this.path}.destination.country`, destination?.country),
 
       StringValidator.validate(
         `${this.path}.destination.contact.website`,
@@ -128,18 +92,9 @@ export class ProductContentValidator implements ModelValidator {
   private validateCategories = (categories: Category[]): ValidatorError[] => {
     return categories
       .map((category, i) => [
-        StringValidator.validate(
-          `${this.path}.categories[${i}].id`,
-          category?.id
-        ),
-        BooleanValidator.validate(
-          `${this.path}.categories[${i}].default`,
-          category?.default
-        ),
-        StringValidator.validate(
-          `${this.path}.categories[${i}].title`,
-          category?.title
-        ),
+        StringValidator.validate(`${this.path}.categories[${i}].id`, category?.id),
+        BooleanValidator.validate(`${this.path}.categories[${i}].default`, category?.default),
+        StringValidator.validate(`${this.path}.categories[${i}].title`, category?.title),
         StringValidator.validate(
           `${this.path}.categories[${i}].shortDescription`,
           category?.shortDescription,
@@ -163,33 +118,23 @@ export class ProductContentValidator implements ModelValidator {
   private validateFAQS = (faqs: FAQ[]): ValidatorError[] => {
     return faqs
       .map((faq, i) => [
-        StringValidator.validate(
-          `${this.path}.faqs[${i}].question`,
-          faq?.question
-        ),
+        StringValidator.validate(`${this.path}.faqs[${i}].question`, faq?.question),
         StringValidator.validate(`${this.path}.faqs[${i}].answer`, faq?.answer),
       ])
       .flat(1)
       .flatMap((v) => (v ? [v] : []));
   };
 
-  private validateImages = (
-    label: string,
-    images: Image[]
-  ): ValidatorError[] => {
+  private validateImages = (label: string, images: Image[]): ValidatorError[] => {
     return images
       .map((image, i) => [
         StringValidator.validate(`${this.path}.${label}[${i}].url`, image?.url),
-        StringValidator.validate(
-          `${this.path}.${label}[${i}].title`,
-          image?.title,
-          { nullable: true }
-        ),
-        StringValidator.validate(
-          `${this.path}.${label}[${i}].caption`,
-          image?.caption,
-          { nullable: true }
-        ),
+        StringValidator.validate(`${this.path}.${label}[${i}].title`, image?.title, {
+          nullable: true,
+        }),
+        StringValidator.validate(`${this.path}.${label}[${i}].caption`, image?.caption, {
+          nullable: true,
+        }),
       ])
       .flat(1)
       .flatMap((v) => (v ? [v] : []));

@@ -75,10 +75,7 @@ export class StringValidator extends BaseValidator {
 }
 
 export class NullValidator extends BaseValidator {
-  public static validate = (
-    label: string,
-    value: unknown
-  ): Nullable<ValidatorError> => {
+  public static validate = (label: string, value: unknown): Nullable<ValidatorError> => {
     if (value !== null) {
       return new ValidatorError({
         type: ErrorType.WARNING,
@@ -108,7 +105,6 @@ export class NumberValidator extends BaseValidator {
         schema = schema.integer();
       }
       if (params?.nullable) {
-        // @ts-ignore
         schema = schema.nullable().defined();
       } else {
         schema = schema.required();
@@ -122,6 +118,8 @@ export class NumberValidator extends BaseValidator {
           });
         }
       }
+
+      return null;
     } catch (err) {
       return this.handleValidatedError(err);
     }
@@ -258,10 +256,7 @@ export class RegExpArrayValidator extends BaseValidator {
     params?: GeneralArrayValidatorParams
   ): Nullable<ValidatorError> => {
     try {
-      let schema = yup
-        .array(yup.string().matches(regexp))
-        .label(label)
-        .required();
+      let schema = yup.array(yup.string().matches(regexp)).label(label).required();
       if (params?.min) {
         schema = schema.min(params.min);
       }

@@ -68,9 +68,7 @@ export class BookingReservationFlow extends BaseFlow implements Flow {
     });
   };
 
-  private reserveInvalidAvailabilityID = async (): Promise<
-    Scenario<unknown>
-  > => {
+  private reserveInvalidAvailabilityID = async (): Promise<Scenario<unknown>> => {
     const [bookableProduct] = this.config.productConfig.availableProducts;
 
     const result = await this.booker.createReservation(bookableProduct, {
@@ -81,9 +79,7 @@ export class BookingReservationFlow extends BaseFlow implements Flow {
     });
   };
 
-  private reserveWithMissingUnitItems = async (): Promise<
-    Scenario<unknown>
-  > => {
+  private reserveWithMissingUnitItems = async (): Promise<Scenario<unknown>> => {
     const [bookableProduct] = this.config.productConfig.availableProducts;
 
     const result = await this.booker.createReservation(bookableProduct, {
@@ -103,9 +99,7 @@ export class BookingReservationFlow extends BaseFlow implements Flow {
     return new BookingReservationEmptyUnitItemsScenario({ result });
   };
 
-  private validateBookingInvalidUnitId = async (): Promise<
-    Scenario<unknown>
-  > => {
+  private validateBookingInvalidUnitId = async (): Promise<Scenario<unknown>> => {
     const [bookableProduct] = this.config.productConfig.availableProducts;
 
     const result = await this.booker.createReservation(bookableProduct, {

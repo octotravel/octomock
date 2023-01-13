@@ -1,10 +1,4 @@
-import {
-  CapabilityId,
-  Restrictions,
-  Unit,
-  ContactField,
-  PricingPer,
-} from "@octocloud/types";
+import { CapabilityId, Restrictions, Unit, ContactField, PricingPer } from "@octocloud/types";
 import {
   StringValidator,
   BooleanValidator,
@@ -19,13 +13,7 @@ import { UnitPricingValidator } from "./UnitPricingValidator";
 export class UnitValidator implements ModelValidator {
   private path: string;
   private capabilities: CapabilityId[];
-  constructor({
-    path,
-    capabilities,
-  }: {
-    path: string;
-    capabilities: CapabilityId[];
-  }) {
+  constructor({ path, capabilities }: { path: string; capabilities: CapabilityId[] }) {
     this.path = path;
     this.capabilities = capabilities;
   }
@@ -49,14 +37,8 @@ export class UnitValidator implements ModelValidator {
     ].flatMap((v) => (v ? [v] : []));
   };
 
-  private validatePricingCapability = (
-    unit: Unit,
-    pricingPer: PricingPer
-  ): ValidatorError[] => {
-    if (
-      this.capabilities.includes(CapabilityId.Pricing) &&
-      pricingPer === PricingPer.UNIT
-    ) {
+  private validatePricingCapability = (unit: Unit, pricingPer: PricingPer): ValidatorError[] => {
+    if (this.capabilities.includes(CapabilityId.Pricing) && pricingPer === PricingPer.UNIT) {
       const pricingValidator = new UnitPricingValidator({
         path: this.path,
       });
@@ -65,43 +47,26 @@ export class UnitValidator implements ModelValidator {
     return [];
   };
 
-  private validateRestrictions = (
-    restrictions: Restrictions
-  ): ValidatorError[] => {
+  private validateRestrictions = (restrictions: Restrictions): ValidatorError[] => {
     return [
-      NumberValidator.validate(
-        `${this.path}.restrictions.minAge`,
-        restrictions?.minAge,
-        {
-          integer: true,
-        }
-      ),
-      NumberValidator.validate(
-        `${this.path}.restrictions.maxAge`,
-        restrictions?.maxAge,
-        {
-          integer: true,
-        }
-      ),
-      BooleanValidator.validate(
-        `${this.path}.restrictions.idRequired`,
-        restrictions?.idRequired
-      ),
-      NumberValidator.validate(
-        `${this.path}.restrictions.minQuantity`,
-        restrictions?.minQuantity,
-        { integer: true, nullable: true }
-      ),
-      NumberValidator.validate(
-        `${this.path}.restrictions.maxQuantity`,
-        restrictions?.maxQuantity,
-        { integer: true, nullable: true }
-      ),
-      NumberValidator.validate(
-        `${this.path}.restrictions.paxCount`,
-        restrictions?.paxCount,
-        { integer: true }
-      ),
+      NumberValidator.validate(`${this.path}.restrictions.minAge`, restrictions?.minAge, {
+        integer: true,
+      }),
+      NumberValidator.validate(`${this.path}.restrictions.maxAge`, restrictions?.maxAge, {
+        integer: true,
+      }),
+      BooleanValidator.validate(`${this.path}.restrictions.idRequired`, restrictions?.idRequired),
+      NumberValidator.validate(`${this.path}.restrictions.minQuantity`, restrictions?.minQuantity, {
+        integer: true,
+        nullable: true,
+      }),
+      NumberValidator.validate(`${this.path}.restrictions.maxQuantity`, restrictions?.maxQuantity, {
+        integer: true,
+        nullable: true,
+      }),
+      NumberValidator.validate(`${this.path}.restrictions.paxCount`, restrictions?.paxCount, {
+        integer: true,
+      }),
       StringArrayValidator.validate(
         `${this.path}.restrictions.accompaniedBy`,
         restrictions?.accompaniedBy
