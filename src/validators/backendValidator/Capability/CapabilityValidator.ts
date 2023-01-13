@@ -18,7 +18,11 @@ export class CapabilityValidator implements ModelValidator {
 
   public validate = (capability: Capability): ValidatorError[] => {
     return [
-      EnumValidator.validate(`${this.path}.id`, capability?.id, Object.values(CapabilityId)),
+      EnumValidator.validate(
+        `${this.path}.id`,
+        capability?.id,
+        Object.values(CapabilityId)
+      ),
       NumberValidator.validate(`${this.path}.revision`, capability?.revision),
       BooleanValidator.validate(`${this.path}.required`, capability?.required),
       EnumArrayValidator.validate(

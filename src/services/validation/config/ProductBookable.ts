@@ -1,4 +1,9 @@
-import { BookingUnitItemSchema, Option, Product, UnitType } from "@octocloud/types";
+import {
+  BookingUnitItemSchema,
+  Option,
+  Product,
+  UnitType,
+} from "@octocloud/types";
 
 const randomInteger = (min: number, max: number): number => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -63,18 +68,27 @@ export class ProductBookable {
   private pickRandomAvailabilityID = (array: string[]): string => {
     return array[Math.floor(Math.random() * array.length)];
   };
-  public getValidUnitItems = (data?: GetUnitItemsData): BookingUnitItemSchema[] => {
+  public getValidUnitItems = (
+    data?: GetUnitItemsData
+  ): BookingUnitItemSchema[] => {
     const option = this.getOption();
-    const unit = option.units.find((unit) => unit.type === UnitType.ADULT) ?? option.units[0];
+    const unit =
+      option.units.find((unit) => unit.type === UnitType.ADULT) ??
+      option.units[0];
     const unitId = unit.id;
 
     const quantity =
       data?.quantity ??
-      randomInteger(option.restrictions.minUnits || 1, option.restrictions.maxUnits ?? 5);
+      randomInteger(
+        option.restrictions.minUnits || 1,
+        option.restrictions.maxUnits ?? 5
+      );
     return Array(quantity).fill({ unitId });
   };
 
-  public getInvalidUnitItems = (data?: GetUnitItemsData): BookingUnitItemSchema[] => {
+  public getInvalidUnitItems = (
+    data?: GetUnitItemsData
+  ): BookingUnitItemSchema[] => {
     const quantity = data?.quantity ?? 1;
     const unitItems = Array.from({ length: quantity }, () => {
       return {
@@ -85,7 +99,9 @@ export class ProductBookable {
   };
 
   public getOption = (): Option => {
-    const option = this.product.options.find((option) => option.default) ?? this.product.options[0];
+    const option =
+      this.product.options.find((option) => option.default) ??
+      this.product.options[0];
 
     return option;
   };

@@ -23,12 +23,20 @@ export class ContactValidator implements ModelValidator {
       StringValidator.validate(`${this.path}.lastName`, contact?.lastName, {
         nullable: true,
       }),
-      StringValidator.validate(`${this.path}.emailAddress`, contact?.emailAddress, {
-        nullable: true,
-      }),
-      StringValidator.validate(`${this.path}.phoneNumber`, contact?.phoneNumber, {
-        nullable: true,
-      }),
+      StringValidator.validate(
+        `${this.path}.emailAddress`,
+        contact?.emailAddress,
+        {
+          nullable: true,
+        }
+      ),
+      StringValidator.validate(
+        `${this.path}.phoneNumber`,
+        contact?.phoneNumber,
+        {
+          nullable: true,
+        }
+      ),
       StringArrayValidator.validate(`${this.path}.locales`, contact?.locales),
       StringValidator.validate(`${this.path}.country`, contact?.country, {
         nullable: true,

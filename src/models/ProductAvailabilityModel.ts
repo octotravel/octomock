@@ -1,5 +1,11 @@
 import { ProductModel } from "@octocloud/generators";
-import { PricingUnit, PricingPer, Pricing, AvailabilityType, OpeningHours } from "@octocloud/types";
+import {
+  PricingUnit,
+  PricingPer,
+  Pricing,
+  AvailabilityType,
+  OpeningHours,
+} from "@octocloud/types";
 
 import * as R from "ramda";
 import { InvalidOptionIdError } from "./Error";
@@ -82,7 +88,9 @@ export class ProductAvailabilityModel {
       availabilityType === AvailabilityType.OPENING_HOURS &&
       (openingHours === undefined || R.isEmpty(openingHours.length))
     ) {
-      throw new Error("openingHours cannot be empty when AvailabilityType = OPENING_HOURS");
+      throw new Error(
+        "openingHours cannot be empty when AvailabilityType = OPENING_HOURS"
+      );
     }
 
     if (capacity) {

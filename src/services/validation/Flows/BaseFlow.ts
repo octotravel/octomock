@@ -1,5 +1,9 @@
 import { Config } from "../config/Config";
-import { Scenario, ScenarioResult, ValidationResult } from "../Scenarios/Scenario";
+import {
+  Scenario,
+  ScenarioResult,
+  ValidationResult,
+} from "../Scenarios/Scenario";
 import { FlowResult } from "./Flow";
 
 export abstract class BaseFlow {
@@ -10,17 +14,29 @@ export abstract class BaseFlow {
     this.name = name;
     this.docs = docs;
   }
-  private getValidationResult = (scenarios: ScenarioResult<unknown>[]): ValidationResult => {
-    if (scenarios.some((scenario) => scenario.validationResult === ValidationResult.FAILED)) {
+  private getValidationResult = (
+    scenarios: ScenarioResult<unknown>[]
+  ): ValidationResult => {
+    if (
+      scenarios.some(
+        (scenario) => scenario.validationResult === ValidationResult.FAILED
+      )
+    ) {
       return ValidationResult.FAILED;
     }
-    if (scenarios.some((scenario) => scenario.validationResult === ValidationResult.WARNING)) {
+    if (
+      scenarios.some(
+        (scenario) => scenario.validationResult === ValidationResult.WARNING
+      )
+    ) {
       return ValidationResult.WARNING;
     }
     return ValidationResult.SUCCESS;
   };
 
-  private getFlowResult = (scenarios: ScenarioResult<unknown>[]): FlowResult => {
+  private getFlowResult = (
+    scenarios: ScenarioResult<unknown>[]
+  ): FlowResult => {
     return {
       name: this.name,
       success: scenarios.every((scenario) => scenario.success),

@@ -11,7 +11,8 @@ export class BookingCancellationBookingScenario implements Scenario<Booking> {
   constructor({ booking }: { booking: Booking }) {
     this.booking = booking;
   }
-  private bookingCancellationScenarioHelper = new BookingCancellationScenarioHelper();
+  private bookingCancellationScenarioHelper =
+    new BookingCancellationScenarioHelper();
 
   public validate = async () => {
     const result = await this.apiClient.cancelBooking({

@@ -2,7 +2,9 @@ import { BookingContactSchema } from "@octocloud/types";
 import { Contact } from "@octocloud/types";
 
 export abstract class ContactMapper {
-  public static remapContactToBookingContactSchema(contact: Contact): BookingContactSchema {
+  public static remapContactToBookingContactSchema(
+    contact: Contact
+  ): BookingContactSchema {
     return {
       fullName: contact.fullName ?? undefined,
       firstName: contact.firstName ?? undefined,

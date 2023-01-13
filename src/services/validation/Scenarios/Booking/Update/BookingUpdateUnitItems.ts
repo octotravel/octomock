@@ -9,7 +9,13 @@ export class BookingUpdateUnitItemsScenario implements Scenario<Booking> {
   private apiClient = this.config.getApiClient();
   private booking: Booking;
   private unitItems: BookingUnitItemSchema[];
-  constructor({ booking, unitItems }: { booking: Booking; unitItems: BookingUnitItemSchema[] }) {
+  constructor({
+    booking,
+    unitItems,
+  }: {
+    booking: Booking;
+    unitItems: BookingUnitItemSchema[];
+  }) {
     this.booking = booking;
     this.unitItems = unitItems;
   }

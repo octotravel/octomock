@@ -4,14 +4,17 @@ import { BookingCancellationScenarioHelper } from "../../../helpers/BookingCance
 import { Config } from "../../../config/Config";
 import descriptions from "../../../consts/descriptions";
 
-export class BookingCancellationReservationScenario implements Scenario<Booking> {
+export class BookingCancellationReservationScenario
+  implements Scenario<Booking>
+{
   private config = Config.getInstance();
   private apiClient = this.config.getApiClient();
   private booking: Booking;
   constructor({ booking }: { booking: Booking }) {
     this.booking = booking;
   }
-  private bookingCancellationScenarioHelper = new BookingCancellationScenarioHelper();
+  private bookingCancellationScenarioHelper =
+    new BookingCancellationScenarioHelper();
 
   public validate = async () => {
     const result = await this.apiClient.cancelBooking({

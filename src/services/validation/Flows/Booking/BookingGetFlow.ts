@@ -22,39 +22,44 @@ export class BookingGetFlow extends BaseFlow implements Flow {
     return this.validateScenarios(scenarios);
   };
 
-  private validateGetBookingReservation = async (): Promise<BookingGetReservationScenario> => {
-    const [bookableProduct] = this.config.productConfig.availableProducts;
+  private validateGetBookingReservation =
+    async (): Promise<BookingGetReservationScenario> => {
+      const [bookableProduct] = this.config.productConfig.availableProducts;
 
-    const result = await this.booker.createReservation(bookableProduct);
-    const booking = result.data;
-    return new BookingGetReservationScenario({
-      uuid: booking.uuid,
-      capabilities: this.config.getCapabilityIDs(),
-    });
-  };
+      const result = await this.booker.createReservation(bookableProduct);
+      const booking = result.data;
+      return new BookingGetReservationScenario({
+        uuid: booking.uuid,
+        capabilities: this.config.getCapabilityIDs(),
+      });
+    };
 
-  private validateGetBookingBooking = async (): Promise<BookingGetBookingScenario> => {
-    const [bookableProduct] = this.config.productConfig.availableProducts;
+  private validateGetBookingBooking =
+    async (): Promise<BookingGetBookingScenario> => {
+      const [bookableProduct] = this.config.productConfig.availableProducts;
 
-    const reservationResult = await this.booker.createReservation(bookableProduct);
-    const reservation = reservationResult.data;
+      const reservationResult = await this.booker.createReservation(
+        bookableProduct
+      );
+      const reservation = reservationResult.data;
 
-    const result = await this.apiClient.bookingConfirmation({
-      uuid: reservation.uuid,
-      // TODO: create legit contact
-      contact: {} as Contact,
-    });
-    const booking = result.data;
-    return new BookingGetBookingScenario({
-      uuid: booking.uuid,
-      capabilities: this.config.getCapabilityIDs(),
-    });
-  };
+      const result = await this.apiClient.bookingConfirmation({
+        uuid: reservation.uuid,
+        // TODO: create legit contact
+        contact: {} as Contact,
+      });
+      const booking = result.data;
+      return new BookingGetBookingScenario({
+        uuid: booking.uuid,
+        capabilities: this.config.getCapabilityIDs(),
+      });
+    };
 
-  private validateGetBookingInvalidUUIDError = async (): Promise<BookingGetInvalidUUIDScenario> => {
-    return new BookingGetInvalidUUIDScenario({
-      uuid: this.config.invalidUUID,
-      capabilities: this.config.getCapabilityIDs(),
-    });
-  };
+  private validateGetBookingInvalidUUIDError =
+    async (): Promise<BookingGetInvalidUUIDScenario> => {
+      return new BookingGetInvalidUUIDScenario({
+        uuid: this.config.invalidUUID,
+        capabilities: this.config.getCapabilityIDs(),
+      });
+    };
 }

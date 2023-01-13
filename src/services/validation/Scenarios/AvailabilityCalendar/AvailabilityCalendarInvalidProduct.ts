@@ -12,9 +12,12 @@ export class AvailabilityCalendarInvalidProductScenario
 {
   private config = Config.getInstance();
   private apiClient = this.config.getApiClient();
-  private availabilityCalendarScenarioHelper = new AvailabilityCalendarScenarioHelper();
+  private availabilityCalendarScenarioHelper =
+    new AvailabilityCalendarScenarioHelper();
 
-  public validate = async (): Promise<ScenarioResult<AvailabilityCalendar[]>> => {
+  public validate = async (): Promise<
+    ScenarioResult<AvailabilityCalendar[]>
+  > => {
     const product = this.config.getProduct();
     const result = await this.apiClient.getAvailabilityCalendar({
       productId: this.config.invalidProductId,

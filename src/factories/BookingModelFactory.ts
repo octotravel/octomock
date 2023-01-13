@@ -16,7 +16,8 @@ import { DataGenerator } from "../generators/DataGenerator";
 import { UnitItemModelFactory } from "./UnitItemModelFactory";
 
 export abstract class BookingModelFactory {
-  private static bookingModelGenerator: BookingModelGenerator = new BookingModelGenerator();
+  private static bookingModelGenerator: BookingModelGenerator =
+    new BookingModelGenerator();
   private static productParser: ProductParser = new ProductParser();
   private static optionParser: OptionParser = new OptionParser();
   private static unitItemParser: UnitItemParser = new UnitItemParser();
@@ -28,7 +29,9 @@ export abstract class BookingModelFactory {
   ): BookingModel {
     const status = BookingStatus.ON_HOLD;
 
-    const optionModel = productModel.findOptionModelByOptionId(createBookingSchema.optionId);
+    const optionModel = productModel.findOptionModelByOptionId(
+      createBookingSchema.optionId
+    );
     if (optionModel === null) {
       throw new InvalidOptionIdError(createBookingSchema.optionId);
     }

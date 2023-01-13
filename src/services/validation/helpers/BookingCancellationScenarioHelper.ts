@@ -6,7 +6,10 @@ import { ScenarioHelper, ScenarioHelperData } from "./ScenarioHelper";
 export class BookingCancellationScenarioHelper extends ScenarioHelper {
   private bookingEndpointValidator = new BookingEndpointValidator();
 
-  public validateBookingCancellation = (data: ScenarioHelperData<Booking>, booking: Booking) => {
+  public validateBookingCancellation = (
+    data: ScenarioHelperData<Booking>,
+    booking: Booking
+  ) => {
     const { result } = data;
     const bookingCancelled = result?.data;
     const request = result?.request;

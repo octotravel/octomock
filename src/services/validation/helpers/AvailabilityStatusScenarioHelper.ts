@@ -3,7 +3,10 @@ import { Availability, AvailabilityStatus, Product } from "@octocloud/types";
 import { ScenarioHelper } from "./ScenarioHelper";
 import { Result } from "../api/types";
 import { ErrorResult } from "../config/Config";
-import { ErrorType, ValidatorError } from "../../../validators/backendValidator/ValidatorHelpers";
+import {
+  ErrorType,
+  ValidatorError,
+} from "../../../validators/backendValidator/ValidatorHelpers";
 import { ProductBookable } from "../config/ProductBookable";
 import descriptions from "../consts/descriptions";
 
@@ -46,7 +49,9 @@ export class AvailabilityStatusScenarioHelper extends ScenarioHelper {
     });
   };
 
-  public findSoldOutProduct = (data: ProductResults[]): ErrorResult<ProductBookable> => {
+  public findSoldOutProduct = (
+    data: ProductResults[]
+  ): ErrorResult<ProductBookable> => {
     const result =
       data.find(({ result }) => {
         const availabilities = result.data ?? [];
@@ -67,7 +72,9 @@ export class AvailabilityStatusScenarioHelper extends ScenarioHelper {
       };
     }
 
-    const availability = result.result.data.find((a) => a.status === AvailabilityStatus.SOLD_OUT);
+    const availability = result.result.data.find(
+      (a) => a.status === AvailabilityStatus.SOLD_OUT
+    );
     return {
       data: new ProductBookable({
         product: result.product,
@@ -78,7 +85,9 @@ export class AvailabilityStatusScenarioHelper extends ScenarioHelper {
     };
   };
 
-  public findAvailableProducts = (data: ProductResults[]): ErrorResult<ProductBookable[]> => {
+  public findAvailableProducts = (
+    data: ProductResults[]
+  ): ErrorResult<ProductBookable[]> => {
     const result =
       data.filter(({ result }) => {
         const availabilities = result.data ?? [];
@@ -90,7 +99,8 @@ export class AvailabilityStatusScenarioHelper extends ScenarioHelper {
             availability.available
         );
         return (
-          R.compose(R.not, R.isEmpty)(availabilitiesAvailable) && availabilitiesAvailable.length > 1
+          R.compose(R.not, R.isEmpty)(availabilitiesAvailable) &&
+          availabilitiesAvailable.length > 1
         );
       }) ?? null;
 

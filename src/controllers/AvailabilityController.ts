@@ -1,4 +1,8 @@
-import { CapabilityId, Availability, AvailabilityBodySchema } from "@octocloud/types";
+import {
+  CapabilityId,
+  Availability,
+  AvailabilityBodySchema,
+} from "@octocloud/types";
 import { AvailabilityService } from "./../services/AvailabilityService";
 
 interface IAvailabilityController {
@@ -14,7 +18,10 @@ export class AvailabilityController implements IAvailabilityController {
     schema: AvailabilityBodySchema,
     capabilities: CapabilityId[]
   ): Promise<Availability[]> => {
-    const models = await this.availabilityService.getAvailability(schema, capabilities);
+    const models = await this.availabilityService.getAvailability(
+      schema,
+      capabilities
+    );
     const availability = models.map((m) => {
       return m.toPOJO({ useCapabilities: true, capabilities });
     });

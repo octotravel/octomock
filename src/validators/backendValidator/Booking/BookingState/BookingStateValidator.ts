@@ -1,5 +1,9 @@
 import { Booking, BookingStatus } from "@octocloud/types";
-import { ErrorType, ModelValidator, ValidatorError } from "../../ValidatorHelpers";
+import {
+  ErrorType,
+  ModelValidator,
+  ValidatorError,
+} from "../../ValidatorHelpers";
 import { BookingStateCancelledValidator } from "./BookingStateCancelledValidator";
 import { BookingStateConfirmedValidator } from "./BookingStateConfirmedValidator";
 import { BookingStateExpiredValidator } from "./BookingStateExpiredValidator";

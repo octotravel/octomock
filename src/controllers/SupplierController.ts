@@ -8,7 +8,8 @@ interface ISupplierController {
 
 export class SupplierController implements ISupplierController {
   private supplierService = new SupplierService();
-  public getSuppliers = async (): Promise<Supplier[]> => this.supplierService.getSuppliers();
+  public getSuppliers = async (): Promise<Supplier[]> =>
+    this.supplierService.getSuppliers();
   public getSupplier = async (): Promise<Supplier> => {
     const suppliers = await this.supplierService.getSuppliers();
     return suppliers[0];

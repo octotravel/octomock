@@ -1,5 +1,9 @@
 import { PricingUnit, Availability, Pricing } from "@octocloud/types";
-import { StringValidator, ModelValidator, ValidatorError } from "../ValidatorHelpers";
+import {
+  StringValidator,
+  ModelValidator,
+  ValidatorError,
+} from "../ValidatorHelpers";
 import { PricingValidator } from "../Pricing/PricingValidator";
 
 export class AvailabilityPricingValidator implements ModelValidator {
@@ -12,13 +16,17 @@ export class AvailabilityPricingValidator implements ModelValidator {
 
   public validate = (availability: Availability): ValidatorError[] => {
     if (availability?.unitPricing) {
-      return this.validateUnitPricing(availability?.unitPricing as PricingUnit[]);
+      return this.validateUnitPricing(
+        availability?.unitPricing as PricingUnit[]
+      );
     } else {
       return this.validatePricing(availability?.pricing as Pricing);
     }
   };
 
-  private validateUnitPricing = (unitPricing: PricingUnit[]): ValidatorError[] => {
+  private validateUnitPricing = (
+    unitPricing: PricingUnit[]
+  ): ValidatorError[] => {
     return unitPricing
       .map((pricing, i) => {
         const path = `${this.path}.unitPricing[${i}]`;

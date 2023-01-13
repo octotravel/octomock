@@ -14,7 +14,10 @@ export class ProductController implements IProductController {
     return this.productRepository
       .getProducts()
       .map((productModel) =>
-        this.productParser.parseModelToPOJOWithSpecificCapabilities(productModel, capabilities)
+        this.productParser.parseModelToPOJOWithSpecificCapabilities(
+          productModel,
+          capabilities
+        )
       );
   };
   public getProduct = (id: string, capabilities: CapabilityId[]): Product => {

@@ -1,7 +1,14 @@
 import { ValidatedError } from "./index";
 import { NumberValidator } from "./../ValidatorHelpers";
-import { STATUS_BAD_REQUEST, UNPROCESSABLE_ENTITY } from "../../../models/Error";
-import { ModelValidator, StringValidator, ValidatorError } from "../ValidatorHelpers";
+import {
+  STATUS_BAD_REQUEST,
+  UNPROCESSABLE_ENTITY,
+} from "../../../models/Error";
+import {
+  ModelValidator,
+  StringValidator,
+  ValidatorError,
+} from "../ValidatorHelpers";
 
 export class UnprocessableEntityErrorValidator implements ModelValidator {
   public validate = (data: ValidatedError): ValidatorError[] => {

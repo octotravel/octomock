@@ -32,7 +32,9 @@ export class Config implements IConfig {
   public _terminateValidation = false;
 
   public localDateStart = DateHelper.getDate(new Date().toISOString());
-  public localDateEnd = DateHelper.getDate(addDays(new Date(), 30).toISOString());
+  public localDateEnd = DateHelper.getDate(
+    addDays(new Date(), 30).toISOString()
+  );
 
   public readonly productConfig = new ProductConfig();
 

@@ -4,7 +4,9 @@ import { Supplier } from "@octocloud/types";
 import { ScenarioResult } from "../Scenarios/Scenario";
 
 export class SupplierScenarioHelper extends ScenarioHelper {
-  public validateSupplier = (data: ScenarioHelperData<Supplier>): ScenarioResult<Supplier> => {
+  public validateSupplier = (
+    data: ScenarioHelperData<Supplier>
+  ): ScenarioResult<Supplier> => {
     const { result } = data;
     if (result.response.error) {
       return this.handleResult({

@@ -51,12 +51,16 @@ export class AvailabilityFlow extends BaseFlow implements Flow {
     const scenarios = [];
     if (this.config.productConfig.hasStartTimeProducts) {
       scenarios.push(
-        new AvailabilityCheckStatusScenario(this.config.productConfig.startTimeProducts)
+        new AvailabilityCheckStatusScenario(
+          this.config.productConfig.startTimeProducts
+        )
       );
     }
     if (this.config.productConfig.hasOpeningHourProducts) {
       scenarios.push(
-        new AvailabilityCheckStatusScenario(this.config.productConfig.openingHourProducts)
+        new AvailabilityCheckStatusScenario(
+          this.config.productConfig.openingHourProducts
+        )
       );
     }
     return scenarios;

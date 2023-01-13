@@ -7,7 +7,8 @@ export class AvailabilityCheckStatusScenario implements Scenario<any> {
   private config = Config.getInstance();
   private apiClient = this.config.getApiClient();
   private products: Product[];
-  private availabilityStatusScenarioHelper = new AvailabilityStatusScenarioHelper();
+  private availabilityStatusScenarioHelper =
+    new AvailabilityStatusScenarioHelper();
 
   constructor(products: Product[]) {
     this.products = products;
@@ -26,7 +27,9 @@ export class AvailabilityCheckStatusScenario implements Scenario<any> {
   private fetchAvailabilityForProducts = async (products: Product[]) => {
     return Promise.all(
       products.map(async (product) => {
-        const option = product.options.find((option) => option.default) ?? product.options[0];
+        const option =
+          product.options.find((option) => option.default) ??
+          product.options[0];
         const result = await this.apiClient.getAvailability({
           productId: product.id,
           optionId: option.id,

@@ -24,7 +24,9 @@ export class Booker {
   ): Promise<Result<Booking>> => {
     const { product } = productBookable;
 
-    const productId = params?.invalidProductId ? this.config.invalidProductId : product.id;
+    const productId = params?.invalidProductId
+      ? this.config.invalidProductId
+      : product.id;
     const optionId = params?.invalidOptionId
       ? this.config.invalidOptionId
       : productBookable.getOption().id;
@@ -43,7 +45,10 @@ export class Booker {
     return this.apiClient.bookingReservation(data);
   };
 
-  private getAvailabilityId(productBookable: ProductBookable, params?: CreateReservationParams) {
+  private getAvailabilityId(
+    productBookable: ProductBookable,
+    params?: CreateReservationParams
+  ) {
     if (params?.invalidAvailabilityId) {
       return this.config.invalidAvailabilityId;
     } else if (params?.soldOutAvailability) {
@@ -52,7 +57,10 @@ export class Booker {
     return productBookable.randomAvailabilityID;
   }
 
-  private getUnitItems(productBookable: ProductBookable, params?: CreateReservationParams) {
+  private getUnitItems(
+    productBookable: ProductBookable,
+    params?: CreateReservationParams
+  ) {
     if (params?.invalidUnitItems) {
       return productBookable.getInvalidUnitItems();
     } else if (params?.unitItemsMissing) {

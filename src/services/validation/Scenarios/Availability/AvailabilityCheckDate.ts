@@ -17,7 +17,8 @@ export class AvailabilityCheckDateScenario implements Scenario<Availability[]> {
   }
 
   public validate = async () => {
-    const availabilityID = this.config.productConfig.availabilityIDs[this.product.availabilityType];
+    const availabilityID =
+      this.config.productConfig.availabilityIDs[this.product.availabilityType];
     const result = await this.apiClient.getAvailability({
       productId: this.product.id,
       optionId: this.product.options[0].id,

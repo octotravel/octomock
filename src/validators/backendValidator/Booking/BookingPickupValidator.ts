@@ -15,14 +15,28 @@ export class BookingPickupValidator implements ModelValidator {
 
   public validate = (booking: Booking): ValidatorError[] => {
     return [
-      BooleanValidator.validate(`${this.path}.pickupRequested`, booking?.pickupRequested),
-      StringValidator.validate(`${this.path}.pickupPointId`, booking?.pickupPointId),
-      StringValidator.validate(`${this.path}.pickupHotel`, booking?.pickupHotel, {
-        nullable: true,
-      }),
-      StringValidator.validate(`${this.path}.pickupHotelRoom`, booking?.pickupHotelRoom, {
-        nullable: true,
-      }),
+      BooleanValidator.validate(
+        `${this.path}.pickupRequested`,
+        booking?.pickupRequested
+      ),
+      StringValidator.validate(
+        `${this.path}.pickupPointId`,
+        booking?.pickupPointId
+      ),
+      StringValidator.validate(
+        `${this.path}.pickupHotel`,
+        booking?.pickupHotel,
+        {
+          nullable: true,
+        }
+      ),
+      StringValidator.validate(
+        `${this.path}.pickupHotelRoom`,
+        booking?.pickupHotelRoom,
+        {
+          nullable: true,
+        }
+      ),
       ...this.validatePickupPoint(booking),
     ].flatMap((v) => (v ? [v] : []));
   };
@@ -30,7 +44,10 @@ export class BookingPickupValidator implements ModelValidator {
   private validatePickupPoint = (booking: Booking): ValidatorError[] => {
     if (booking?.pickupPoint) {
       return [
-        StringValidator.validate(`${this.path}.booking.pickupPoint.id`, booking?.pickupPoint?.id),
+        StringValidator.validate(
+          `${this.path}.booking.pickupPoint.id`,
+          booking?.pickupPoint?.id
+        ),
         StringValidator.validate(
           `${this.path}.booking.pickupPoint.name`,
           booking?.pickupPoint?.name

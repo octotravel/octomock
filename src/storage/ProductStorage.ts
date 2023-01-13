@@ -6,8 +6,10 @@ import { ProductWithAvailabilityModelGenerator } from "../generators/ProductWith
 import { ProductModel } from "@octocloud/generators";
 
 export class ProductModelStorage implements InMemoryStorage<ProductModel> {
-  private readonly productWithAvailabilityModels: Map<string, ProductWithAvailabilityModel> =
-    new Map();
+  private readonly productWithAvailabilityModels: Map<
+    string,
+    ProductWithAvailabilityModel
+  > = new Map();
   private readonly productWithAvailabilityModelGenerator =
     new ProductWithAvailabilityModelGenerator();
 
@@ -28,9 +30,11 @@ export class ProductModelStorage implements InMemoryStorage<ProductModel> {
   }
 
   public getAll(): ProductModel[] {
-    return this.getAllWithAvailabilities().map((productWithAvailabilityModel) => {
-      return productWithAvailabilityModel.toProductModel();
-    });
+    return this.getAllWithAvailabilities().map(
+      (productWithAvailabilityModel) => {
+        return productWithAvailabilityModel.toProductModel();
+      }
+    );
   }
 
   public getAllWithAvailabilities(): ProductWithAvailabilityModel[] {

@@ -1,5 +1,10 @@
 import { TicketValidator } from "./../Ticket/TicketValidator";
-import { CapabilityId, Booking, BookingStatus, DeliveryMethod } from "@octocloud/types";
+import {
+  CapabilityId,
+  Booking,
+  BookingStatus,
+  DeliveryMethod,
+} from "@octocloud/types";
 import { BookingStateValidator } from "./BookingState/BookingStateValidator";
 import { OptionValidator } from "../Option/OptionValidator";
 import { ProductValidator } from "../Product/ProductValidator";
@@ -57,19 +62,37 @@ export class BookingValidator implements ModelValidator {
       StringValidator.validate(`${this.path}.id`, booking?.id),
       StringValidator.validate(`${this.path}.uuid`, booking?.uuid),
       BooleanValidator.validate(`${this.path}.testMode`, booking?.testMode),
-      StringValidator.validate(`${this.path}.resellerReference`, booking?.resellerReference, {
-        nullable: true,
-      }),
-      StringValidator.validate(`${this.path}.supplierReference`, booking?.supplierReference, {
-        nullable: true,
-      }),
-      EnumValidator.validate(`${this.path}.status`, booking?.status, Object.values(BookingStatus)),
+      StringValidator.validate(
+        `${this.path}.resellerReference`,
+        booking?.resellerReference,
+        {
+          nullable: true,
+        }
+      ),
+      StringValidator.validate(
+        `${this.path}.supplierReference`,
+        booking?.supplierReference,
+        {
+          nullable: true,
+        }
+      ),
+      EnumValidator.validate(
+        `${this.path}.status`,
+        booking?.status,
+        Object.values(BookingStatus)
+      ),
       ...this.bookingStateValidator.validate(booking),
       StringValidator.validate(`${this.path}.productId`, booking?.productId),
       ...this.productValidator.validate(booking?.product),
       StringValidator.validate(`${this.path}.optionId`, booking?.optionId),
-      ...this.optionValidator.validate(booking?.option, booking?.product?.availabilityType),
-      BooleanValidator.validate(`${this.path}.cancellable`, booking?.cancellable),
+      ...this.optionValidator.validate(
+        booking?.option,
+        booking?.product?.availabilityType
+      ),
+      BooleanValidator.validate(
+        `${this.path}.cancellable`,
+        booking?.cancellable
+      ),
       BooleanValidator.validate(`${this.path}.freesale`, booking?.freesale),
       ...this.validateBookingAvailability(booking),
       ...this.contactValidator.validate(booking?.contact),
@@ -107,7 +130,9 @@ export class BookingValidator implements ModelValidator {
     const deliveryMethodsMatch =
       booking?.deliveryMethods?.every((method) =>
         booking?.product?.deliveryMethods.includes(method)
-      ) && booking?.deliveryMethods?.length === booking?.product?.deliveryMethods?.length;
+      ) &&
+      booking?.deliveryMethods?.length ===
+        booking?.product?.deliveryMethods?.length;
 
     if (!deliveryMethodsMatch) {
       errors.push(
@@ -121,7 +146,10 @@ export class BookingValidator implements ModelValidator {
 
   private validateBookingAvailability = (booking: Booking): ValidatorError[] =>
     [
-      CommonValidator.validateLocalDateTime(`${this.path}.availabilityId`, booking?.availabilityId),
+      CommonValidator.validateLocalDateTime(
+        `${this.path}.availabilityId`,
+        booking?.availabilityId
+      ),
       CommonValidator.validateLocalDateTime(
         `${this.path}.availability.id`,
         booking?.availability?.id
@@ -134,7 +162,10 @@ export class BookingValidator implements ModelValidator {
         `${this.path}.availability.localDateTimeEnd`,
         booking?.availability?.localDateTimeEnd
       ),
-      BooleanValidator.validate(`${this.path}.availability.allDay`, booking?.availability?.allDay),
+      BooleanValidator.validate(
+        `${this.path}.availability.allDay`,
+        booking?.availability?.allDay
+      ),
       ...CommonValidator.validateOpeningHours(
         `${this.path}.availability`,
         booking?.availability?.openingHours ?? [],
@@ -150,7 +181,11 @@ export class BookingValidator implements ModelValidator {
           path: `${this.path}.unitItems[${i}]`,
           capabilities: this.capabilities,
         });
-        return validator.validate(unitItem, booking?.product?.pricingPer, booking?.deliveryMethods);
+        return validator.validate(
+          unitItem,
+          booking?.product?.pricingPer,
+          booking?.deliveryMethods
+        );
       })
       .flat(1)
       .flatMap((v) => (v ? [v] : []));

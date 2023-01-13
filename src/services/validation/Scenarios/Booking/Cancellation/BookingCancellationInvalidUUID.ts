@@ -11,14 +11,16 @@ export class BookingCancellationInvalidUUIDScenario implements Scenario<any> {
   constructor({ uuid }: { uuid: string }) {
     this.uuid = uuid;
   }
-  private bookingCancellationScenarioHelper = new BookingCancellationScenarioHelper();
+  private bookingCancellationScenarioHelper =
+    new BookingCancellationScenarioHelper();
 
   public validate = async () => {
     const result = await this.apiClient.cancelBooking({
       uuid: this.uuid,
     });
 
-    const name = "Booking Cancellation Invalid Booking UUID (400 INVALID_BOOKING_UUID)";
+    const name =
+      "Booking Cancellation Invalid Booking UUID (400 INVALID_BOOKING_UUID)";
     const error = "Response should be INVALID_BOOKING_UUID";
     const description = descriptions.invalidUUID;
 

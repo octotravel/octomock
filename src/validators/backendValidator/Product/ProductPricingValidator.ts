@@ -15,7 +15,10 @@ export class ProductPricingValidator implements ModelValidator {
 
   public validate = (product: Product): ValidatorError[] => {
     return [
-      StringValidator.validate(`${this.path}.defaultCurrency`, product?.defaultCurrency),
+      StringValidator.validate(
+        `${this.path}.defaultCurrency`,
+        product?.defaultCurrency
+      ),
       StringArrayValidator.validate(
         `${this.path}.availableCurrencies`,
         product?.availableCurrencies,

@@ -25,7 +25,13 @@ export class UnitItemValidator implements ModelValidator {
   private unitValidator: UnitValidator;
   private ticketValidator: TicketValidator;
   private contactValidator: ContactValidator;
-  constructor({ path, capabilities }: { path: string; capabilities: CapabilityId[] }) {
+  constructor({
+    path,
+    capabilities,
+  }: {
+    path: string;
+    capabilities: CapabilityId[];
+  }) {
     this.path = path;
     this.capabilities = capabilities;
     this.unitValidator = new UnitValidator({ path: this.path, capabilities });
@@ -39,16 +45,31 @@ export class UnitItemValidator implements ModelValidator {
   ): ValidatorError[] => {
     const errors = [
       StringValidator.validate(`${this.path}.uuid`, unitItem?.uuid),
-      StringValidator.validate(`${this.path}.resellerReference`, unitItem?.uuid, {
-        nullable: true,
-      }),
-      StringValidator.validate(`${this.path}.supplierReference`, unitItem?.uuid, {
-        nullable: true,
-      }),
+      StringValidator.validate(
+        `${this.path}.resellerReference`,
+        unitItem?.uuid,
+        {
+          nullable: true,
+        }
+      ),
+      StringValidator.validate(
+        `${this.path}.supplierReference`,
+        unitItem?.uuid,
+        {
+          nullable: true,
+        }
+      ),
       StringValidator.validate(`${this.path}.unitId`, unitItem?.unitId),
       ...this.unitValidator.validate(unitItem?.unit, pricingPer),
-      EnumValidator.validate(`${this.path}.status`, unitItem?.status, Object.values(BookingStatus)),
-      NullValidator.validate(`${this.path}.utcRedeemedAt`, unitItem?.utcRedeemedAt),
+      EnumValidator.validate(
+        `${this.path}.status`,
+        unitItem?.status,
+        Object.values(BookingStatus)
+      ),
+      NullValidator.validate(
+        `${this.path}.utcRedeemedAt`,
+        unitItem?.utcRedeemedAt
+      ),
       ...this.contactValidator.validate(unitItem?.contact),
 
       ...this.validatePricingCapability(unitItem, pricingPer),
@@ -72,7 +93,10 @@ export class UnitItemValidator implements ModelValidator {
     unitItem: UnitItem,
     pricingPer: PricingPer
   ): ValidatorError[] => {
-    if (this.capabilities.includes(CapabilityId.Pricing) && pricingPer === PricingPer.UNIT) {
+    if (
+      this.capabilities.includes(CapabilityId.Pricing) &&
+      pricingPer === PricingPer.UNIT
+    ) {
       const pricingValidator = new PricingValidator(`${this.path}.pricing`);
       return pricingValidator.validate(unitItem.pricing);
     }

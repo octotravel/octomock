@@ -3,7 +3,10 @@ import { eachDayOfInterval } from "date-fns";
 import { DateHelper } from "../helpers/DateHelper";
 import { ProductRepository } from "../repositories/ProductRepository";
 import { AvailabilityModelFactory } from "../factories/AvailabilityModelFactory";
-import { AvailabilityCalendarModel, AvailabilityModel } from "@octocloud/generators";
+import {
+  AvailabilityCalendarModel,
+  AvailabilityModel,
+} from "@octocloud/generators";
 import { AvailabilityCalendarPricingModel } from "@octocloud/generators/dist/models/availability/AvailabilityCalendarPricingModel";
 
 interface IAvailabilityService {
@@ -20,9 +23,8 @@ export class AvailabilityCalendarService implements IAvailabilityService {
     schema: AvailabilityCalendarBodySchema,
     capabilities: CapabilityId[]
   ): Promise<AvailabilityCalendarModel[]> => {
-    const productWithAvailabilityModel = this.productRepository.getProductWithAvailability(
-      schema.productId
-    );
+    const productWithAvailabilityModel =
+      this.productRepository.getProductWithAvailability(schema.productId);
     const optionId = schema.optionId;
 
     const availabilities = AvailabilityModelFactory.createMultiple({
@@ -33,11 +35,17 @@ export class AvailabilityCalendarService implements IAvailabilityService {
       availabilityUnits: schema.units,
     });
     return this.mapToCalendar(
-      this.getIntervalDate(schema.localDateStart, schema.localDateEnd, availabilities)
+      this.getIntervalDate(
+        schema.localDateStart,
+        schema.localDateEnd,
+        availabilities
+      )
     );
   };
 
-  private mapToCalendar = (availabilities: AvailabilityModel[]): AvailabilityCalendarModel[] => {
+  private mapToCalendar = (
+    availabilities: AvailabilityModel[]
+  ): AvailabilityCalendarModel[] => {
     const groupedAvailabilities = availabilities.reduce(
       (acc: { [key: string]: AvailabilityModel[] }, availability) => {
         const [date, _] = availability.id.split("T");

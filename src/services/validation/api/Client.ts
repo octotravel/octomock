@@ -118,7 +118,9 @@ export class Client {
     }
   };
 
-  private parseBody = (body: Nullable<string>): Nullable<Record<string, any>> => {
+  private parseBody = (
+    body: Nullable<string>
+  ): Nullable<Record<string, any>> => {
     if (body === null) {
       return null;
     }

@@ -19,7 +19,10 @@ export class TicketValidator implements ModelValidator {
         ticket?.redemptionMethod,
         Object.values(RedemptionMethod)
       ),
-      NullValidator.validate(`${this.path}.utcRedeemedAt`, ticket?.utcRedeemedAt),
+      NullValidator.validate(
+        `${this.path}.utcRedeemedAt`,
+        ticket?.utcRedeemedAt
+      ),
       ...this.validateDeliveryOptions(ticket),
     ];
 

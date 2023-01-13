@@ -32,7 +32,9 @@ export interface ScenarioConfigData {
 
 export class ScenarioHelper {
   protected config = Config.getInstance();
-  private getValidationResult = <T>(data: ScenarioData<T>): ValidationResult => {
+  private getValidationResult = <T>(
+    data: ScenarioData<T>
+  ): ValidationResult => {
     if (!R.isEmpty(data.errors)) {
       if (data.errors.some((error) => error.type === ErrorType.CRITICAL)) {
         return ValidationResult.FAILED;

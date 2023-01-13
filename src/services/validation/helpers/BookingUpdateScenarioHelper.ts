@@ -5,7 +5,10 @@ import { ScenarioHelper, ScenarioHelperData } from "./ScenarioHelper";
 
 export class BookingUpdateScenarioHelper extends ScenarioHelper {
   private bookingEndpointValidator = new BookingEndpointValidator();
-  public validateBookingUpdate = (data: ScenarioHelperData<Booking>, booking: Booking) => {
+  public validateBookingUpdate = (
+    data: ScenarioHelperData<Booking>,
+    booking: Booking
+  ) => {
     const { result } = data;
     const bookingUpdated = result?.data;
     const request = result?.request;

@@ -26,7 +26,11 @@ import { Result } from "./types";
 
 export class ApiClient extends Client {
   private url: string;
-  constructor(data: { capabilities?: CapabilityId[]; url: string; apiKey: string }) {
+  constructor(data: {
+    capabilities?: CapabilityId[];
+    url: string;
+    apiKey: string;
+  }) {
     super(data);
     this.url = data.url;
   }
@@ -47,7 +51,9 @@ export class ApiClient extends Client {
     return this.fetch({ url });
   };
 
-  public getProduct = async (data: GetProductPathParamsSchema): Promise<Result<Product>> => {
+  public getProduct = async (
+    data: GetProductPathParamsSchema
+  ): Promise<Result<Product>> => {
     const url = `${this.url}/products/${data.id}`;
     return this.fetch({ url });
   };
@@ -68,7 +74,9 @@ export class ApiClient extends Client {
     return this.fetch({ url, body, method: "POST" });
   };
 
-  public bookingReservation = async (data: CreateBookingSchema): Promise<Result<Booking>> => {
+  public bookingReservation = async (
+    data: CreateBookingSchema
+  ): Promise<Result<Booking>> => {
     const url = `${this.url}/bookings`;
     const body = JSON.stringify(data);
     return this.fetch({ url, body, method: "POST" });
@@ -83,13 +91,17 @@ export class ApiClient extends Client {
     return this.fetch({ url, body, method: "POST" });
   };
 
-  public getBookings = async (data: GetBookingsQueryParamsSchema): Promise<Result<Booking[]>> => {
+  public getBookings = async (
+    data: GetBookingsQueryParamsSchema
+  ): Promise<Result<Booking[]>> => {
     const params = new URLSearchParams(data);
     const url = `${this.url}/bookings?` + params;
     return this.fetch({ url });
   };
 
-  public getBooking = async (data: GetBookingPathParamsSchema): Promise<Result<Booking>> => {
+  public getBooking = async (
+    data: GetBookingPathParamsSchema
+  ): Promise<Result<Booking>> => {
     const url = `${this.url}/bookings/${data.uuid}`;
     return this.fetch({ url });
   };

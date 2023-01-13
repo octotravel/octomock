@@ -10,10 +10,12 @@ export class BookingReservationEmptyUnitItemsScenario implements Scenario<any> {
   constructor({ result }: { result: Result<Booking> }) {
     this.result = result;
   }
-  private bookingReservationScenarioHelper = new BookingReservationScenarioHelper();
+  private bookingReservationScenarioHelper =
+    new BookingReservationScenarioHelper();
 
   public validate = async () => {
-    const name = "Booking Reservation Missing UnitItems (400 UNPROCESSABLE_ENTITY)";
+    const name =
+      "Booking Reservation Missing UnitItems (400 UNPROCESSABLE_ENTITY)";
     const error = "Response should be UNPROCESSABLE_ENTITY";
     const description = descriptions.bookingReservationEmptyUnitItems;
 

@@ -7,9 +7,11 @@ const invalidUUID =
 const invalidUnitId =
   "This test checks that INVALID_UNIT_ID response is returned for invalid unitId in request body";
 
-const getCapabilities = "This test checks that returned capabilities are correct";
+const getCapabilities =
+  "This test checks that returned capabilities are correct";
 
-const getSupplier = "This test checks that returned supplier object has the correct fields";
+const getSupplier =
+  "This test checks that returned supplier object has the correct fields";
 
 const getProduct =
   "This test checks that returned product object has the correct fields and capabilities";
@@ -32,17 +34,22 @@ const availabilityCalendarBadRequest =
 const availabilityCalendarInterval =
   "This test checks returned array of availabilities for 30 days from now";
 
-const bookingCancellationBooking = "This test checks that booking is correctly cancelled";
-const bookingCancellationReservation = "This test checks that reservation is correctly cancelled";
+const bookingCancellationBooking =
+  "This test checks that booking is correctly cancelled";
+const bookingCancellationReservation =
+  "This test checks that reservation is correctly cancelled";
 
-const bookingConfirmation = "This test checks that reservation is correctly confirmed";
+const bookingConfirmation =
+  "This test checks that reservation is correctly confirmed";
 const bookingConfirmationUnitItemsUpdate =
   "This test checks that unit items on bookign are updated according to request body";
 
-const bookingReservationExtend = "This test checks that reservation is extended correctly";
+const bookingReservationExtend =
+  "This test checks that reservation is extended correctly";
 
 const bookingGetBooking = "This test checks that correct booking is returned";
-const bookingGetReservation = "This test checks that correct reservation is returned";
+const bookingGetReservation =
+  "This test checks that correct reservation is returned";
 
 const bookingListResellerReference =
   "This test checks that correct bookings with provided reseller reference are returned";
@@ -57,7 +64,8 @@ const bookingReservationInvalidAvailabilityId =
   "This test checks that INVALID_AVAILABILITY_ID response is returned for invalid availabilityId in request body";
 const bookingReservationMissingUnitItems =
   "This test checks that UNPROCESSABLE_ENTITY response is returned for not providing unitItems in request body";
-const bookingReservation = "This test checks that booking reservation is done correctly";
+const bookingReservation =
+  "This test checks that booking reservation is done correctly";
 const bookingReservationSoldOut =
   "This test checks that UNPROCESSABLE_ENTITY response is returned for availability that has status SOLD_OUT";
 

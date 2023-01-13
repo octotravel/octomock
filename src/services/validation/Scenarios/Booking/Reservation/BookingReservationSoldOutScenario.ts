@@ -10,7 +10,8 @@ export class BookingReservationSoldOutScenario implements Scenario<any> {
   constructor({ result }: { result: Result<Booking> }) {
     this.result = result;
   }
-  private bookingReservationScenarioHelper = new BookingReservationScenarioHelper();
+  private bookingReservationScenarioHelper =
+    new BookingReservationScenarioHelper();
 
   public validate = async () => {
     const name = "Booking Reservation SOLD_OUT (400 UNPROCESSABLE_ENTITY)";

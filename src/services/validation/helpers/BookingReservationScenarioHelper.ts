@@ -1,7 +1,11 @@
 import { BookingEndpointValidator } from "./../../../validators/backendValidator/Booking/BookingEndpointValidator";
 import { Booking, CreateBookingBodySchema } from "@octocloud/types";
 import { BookingValidator } from "../../../validators/backendValidator/Booking/BookingValidator";
-import { ScenarioConfigData, ScenarioHelper, ScenarioHelperData } from "./ScenarioHelper";
+import {
+  ScenarioConfigData,
+  ScenarioHelper,
+  ScenarioHelperData,
+} from "./ScenarioHelper";
 
 export class BookingReservationScenarioHelper extends ScenarioHelper {
   private bookingEndpointValidator = new BookingEndpointValidator();

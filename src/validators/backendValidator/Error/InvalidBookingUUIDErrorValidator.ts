@@ -1,7 +1,14 @@
 import { ValidatedError } from "./index";
 import { NumberValidator } from "./../ValidatorHelpers";
-import { INVALID_BOOKING_UUID, STATUS_BAD_REQUEST } from "../../../models/Error";
-import { ModelValidator, StringValidator, ValidatorError } from "../ValidatorHelpers";
+import {
+  INVALID_BOOKING_UUID,
+  STATUS_BAD_REQUEST,
+} from "../../../models/Error";
+import {
+  ModelValidator,
+  StringValidator,
+  ValidatorError,
+} from "../ValidatorHelpers";
 
 export class InvalidBookingUUIDErrorValidator implements ModelValidator {
   public validate = (data: ValidatedError): ValidatorError[] => {

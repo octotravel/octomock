@@ -10,7 +10,8 @@ export class BookingReservationInvalidUnitIdScenario implements Scenario<any> {
   constructor({ result }: { result: Result<Booking> }) {
     this.result = result;
   }
-  private bookingReservationScenarioHelper = new BookingReservationScenarioHelper();
+  private bookingReservationScenarioHelper =
+    new BookingReservationScenarioHelper();
 
   public validate = async () => {
     const name = "Booking Reservation Invalid Unit ID (400 INVALID_UNIT_ID)";

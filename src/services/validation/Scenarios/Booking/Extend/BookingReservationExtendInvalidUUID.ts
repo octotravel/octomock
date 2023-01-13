@@ -4,7 +4,9 @@ import { InvalidBookingUUIDErrorValidator } from "../../../../../validators/back
 import { Config } from "../../../config/Config";
 import descriptions from "../../../consts/descriptions";
 
-export class BookingReservationExtendInvalidUUIDScenario implements Scenario<any> {
+export class BookingReservationExtendInvalidUUIDScenario
+  implements Scenario<any>
+{
   private config = Config.getInstance();
   private apiClient = this.config.getApiClient();
   private uuid: string;

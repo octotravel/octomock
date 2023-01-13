@@ -24,7 +24,8 @@ export class BookingConfirmationInvalidUnitIdScenario implements Scenario<any> {
     this.unitItems = unitItems;
     this.uuid = uuid;
   }
-  private bookingConfirmationScenarioHelper = new BookingConfirmationScenarioHelper();
+  private bookingConfirmationScenarioHelper =
+    new BookingConfirmationScenarioHelper();
 
   public validate = async () => {
     const result = await this.apiClient.bookingConfirmation({

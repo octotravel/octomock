@@ -24,15 +24,16 @@ export class BookingConfirmationFlow extends BaseFlow implements Flow {
     return this.validateScenarios(scenarios);
   };
 
-  private validateBookingConfirmation = async (): Promise<BookingConfirmationScenario> => {
-    const [bookableProduct] = this.config.productConfig.availableProducts;
+  private validateBookingConfirmation =
+    async (): Promise<BookingConfirmationScenario> => {
+      const [bookableProduct] = this.config.productConfig.availableProducts;
 
-    const result = await this.booker.createReservation(bookableProduct);
-    return new BookingConfirmationScenario({
-      capabilities: this.config.getCapabilityIDs(),
-      booking: result.data,
-    });
-  };
+      const result = await this.booker.createReservation(bookableProduct);
+      return new BookingConfirmationScenario({
+        capabilities: this.config.getCapabilityIDs(),
+        booking: result.data,
+      });
+    };
 
   private validateBookingConfirmationUnitItemsUpdate =
     async (): Promise<BookingConfirmationUnitItemUpdateScenario> => {

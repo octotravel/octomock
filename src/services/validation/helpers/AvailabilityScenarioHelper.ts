@@ -3,7 +3,10 @@ import { AvailabilityValidator } from "../../../validators/backendValidator/Avai
 import { ScenarioHelper, ScenarioHelperData } from "./ScenarioHelper";
 
 export class AvailabilityScenarioHelper extends ScenarioHelper {
-  public validateAvailability = (data: ScenarioHelperData<Availability[]>, product: Product) => {
+  public validateAvailability = (
+    data: ScenarioHelperData<Availability[]>,
+    product: Product
+  ) => {
     const validator = new AvailabilityValidator({
       capabilities: this.config.getCapabilityIDs(),
       availabilityType: product.availabilityType,

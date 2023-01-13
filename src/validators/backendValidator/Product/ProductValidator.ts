@@ -25,7 +25,13 @@ export class ProductValidator implements ModelValidator {
   private path: string;
   private capabilities: CapabilityId[];
 
-  constructor({ path = "", capabilities }: { path?: string; capabilities: CapabilityId[] }) {
+  constructor({
+    path = "",
+    capabilities,
+  }: {
+    path?: string;
+    capabilities: CapabilityId[];
+  }) {
     this.path = path ? path : `product`;
     this.capabilities = capabilities;
     this.pricingValidator = new ProductPricingValidator({ path: this.path });
@@ -35,20 +41,36 @@ export class ProductValidator implements ModelValidator {
   public validate = (product: Product): ValidatorError[] => {
     return [
       StringValidator.validate(`${this.path}.id`, product?.id),
-      StringValidator.validate(`${this.path}.internalName`, product?.internalName),
+      StringValidator.validate(
+        `${this.path}.internalName`,
+        product?.internalName
+      ),
       StringValidator.validate(`${this.path}.reference`, product?.reference, {
         nullable: true,
       }),
       StringValidator.validate(`${this.path}.locale`, product?.locale),
       StringValidator.validate(`${this.path}.timeZone`, product?.timeZone),
-      BooleanValidator.validate(`${this.path}.allowFreesale`, product?.allowFreesale),
-      BooleanValidator.validate(`${this.path}.instantConfirmation`, product?.instantConfirmation),
-      BooleanValidator.validate(`${this.path}.instantDelivery`, product?.instantDelivery),
-      BooleanValidator.validate(`${this.path}.availabilityRequired`, product?.availabilityRequired),
-      EnumValidator.validate(`${this.path}.availabilityType`, product?.availabilityType, [
-        AvailabilityType.START_TIME,
-        AvailabilityType.OPENING_HOURS,
-      ]),
+      BooleanValidator.validate(
+        `${this.path}.allowFreesale`,
+        product?.allowFreesale
+      ),
+      BooleanValidator.validate(
+        `${this.path}.instantConfirmation`,
+        product?.instantConfirmation
+      ),
+      BooleanValidator.validate(
+        `${this.path}.instantDelivery`,
+        product?.instantDelivery
+      ),
+      BooleanValidator.validate(
+        `${this.path}.availabilityRequired`,
+        product?.availabilityRequired
+      ),
+      EnumValidator.validate(
+        `${this.path}.availabilityType`,
+        product?.availabilityType,
+        [AvailabilityType.START_TIME, AvailabilityType.OPENING_HOURS]
+      ),
       EnumArrayValidator.validate(
         `${this.path}.deliveryFormats`,
         product?.deliveryFormats,
@@ -61,10 +83,11 @@ export class ProductValidator implements ModelValidator {
         Object.values(DeliveryMethod),
         { min: 1 }
       ),
-      EnumValidator.validate(`${this.path}.redemptionMethod`, product?.redemptionMethod, [
-        RedemptionMethod.DIGITAL,
-        RedemptionMethod.PRINT,
-      ]),
+      EnumValidator.validate(
+        `${this.path}.redemptionMethod`,
+        product?.redemptionMethod,
+        [RedemptionMethod.DIGITAL, RedemptionMethod.PRINT]
+      ),
       ...this.validateOptions(product),
 
       ...this.validatePricingCapability(product),
@@ -74,7 +97,9 @@ export class ProductValidator implements ModelValidator {
 
   private validateOptions = (product: Product): ValidatorError[] => {
     const options = product?.options ?? [];
-    const errors = [ArrayValidator.validate(`${this.path}.options`, options, { min: 1 })];
+    const errors = [
+      ArrayValidator.validate(`${this.path}.options`, options, { min: 1 }),
+    ];
     errors.push(
       ...options
         .map((option, i) => {
@@ -82,7 +107,11 @@ export class ProductValidator implements ModelValidator {
             path: `${this.path}.options[${i}]`,
             capabilities: this.capabilities,
           });
-          return optionValidator.validate(option, product?.availabilityType, product?.pricingPer);
+          return optionValidator.validate(
+            option,
+            product?.availabilityType,
+            product?.pricingPer
+          );
         })
         .flat(1)
     );

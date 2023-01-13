@@ -9,7 +9,13 @@ export class BookingGetBookingScenario implements Scenario<Booking> {
   private apiClient = this.config.getApiClient();
   private uuid: string;
   private capabilities: CapabilityId[];
-  constructor({ uuid, capabilities }: { uuid: string; capabilities: CapabilityId[] }) {
+  constructor({
+    uuid,
+    capabilities,
+  }: {
+    uuid: string;
+    capabilities: CapabilityId[];
+  }) {
     this.uuid = uuid;
     this.capabilities = capabilities;
   }

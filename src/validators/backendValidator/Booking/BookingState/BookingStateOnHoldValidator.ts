@@ -10,16 +10,36 @@ export class BookingStateOnHoldValidator implements ModelValidator {
   }
   public validate = (booking: Booking): ValidatorError[] => {
     return [
-      CommonValidator.validateUTCDateTime(`${this.path}.utcCreatedAt`, booking?.utcCreatedAt),
-      CommonValidator.validateUTCDateTime(`${this.path}.utcUpdatedAt`, booking?.utcUpdatedAt, {
-        nullable: true,
-      }),
-      CommonValidator.validateUTCDateTime(`${this.path}.utcExpiresAt`, booking?.utcExpiresAt, {
-        nullable: true,
-      }),
-      NullValidator.validate(`${this.path}.utcRedeemedAt`, booking?.utcRedeemedAt),
-      NullValidator.validate(`${this.path}.utcConfirmedAt`, booking?.utcConfirmedAt),
-      NullValidator.validate(`${this.path}.cancellation`, booking?.cancellation),
+      CommonValidator.validateUTCDateTime(
+        `${this.path}.utcCreatedAt`,
+        booking?.utcCreatedAt
+      ),
+      CommonValidator.validateUTCDateTime(
+        `${this.path}.utcUpdatedAt`,
+        booking?.utcUpdatedAt,
+        {
+          nullable: true,
+        }
+      ),
+      CommonValidator.validateUTCDateTime(
+        `${this.path}.utcExpiresAt`,
+        booking?.utcExpiresAt,
+        {
+          nullable: true,
+        }
+      ),
+      NullValidator.validate(
+        `${this.path}.utcRedeemedAt`,
+        booking?.utcRedeemedAt
+      ),
+      NullValidator.validate(
+        `${this.path}.utcConfirmedAt`,
+        booking?.utcConfirmedAt
+      ),
+      NullValidator.validate(
+        `${this.path}.cancellation`,
+        booking?.cancellation
+      ),
     ].flatMap((v) => (v ? [v] : []));
   };
 }

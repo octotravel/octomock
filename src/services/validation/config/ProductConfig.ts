@@ -1,6 +1,9 @@
 import * as R from "ramda";
 import { AvailabilityType, Product } from "@octocloud/types";
-import { ErrorType, ValidatorError } from "../../../validators/backendValidator/ValidatorHelpers";
+import {
+  ErrorType,
+  ValidatorError,
+} from "../../../validators/backendValidator/ValidatorHelpers";
 import { ProductBookable } from "./ProductBookable";
 
 export class ProductConfig {
@@ -63,7 +66,10 @@ export class ProductConfig {
   }
 
   public set availableProducts(availableProducts: ProductBookable[]) {
-    this._availableProducts = [...this._availableProducts, ...availableProducts];
+    this._availableProducts = [
+      ...this._availableProducts,
+      ...availableProducts,
+    ];
   }
 
   public get availableProducts() {

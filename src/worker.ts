@@ -1,7 +1,14 @@
 import { ValidationError } from "yup";
-import { BadRequestError, OctoError, InternalServerError } from "./models/Error";
+import {
+  BadRequestError,
+  OctoError,
+  InternalServerError,
+} from "./models/Error";
 import { ValidationController } from "./services/validation/Controller";
-import { validationConfigSchema, ValidationEndpoint } from "./schemas/Validation";
+import {
+  validationConfigSchema,
+  ValidationEndpoint,
+} from "./schemas/Validation";
 import { Config } from "./services/validation/config/Config";
 
 export default {

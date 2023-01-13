@@ -11,7 +11,8 @@ export class BookingReservationScenario implements Scenario<Booking> {
   constructor({ result }: { result: Result<Booking> }) {
     this.result = result;
   }
-  private bookingReservationScenarioHelper = new BookingReservationScenarioHelper();
+  private bookingReservationScenarioHelper =
+    new BookingReservationScenarioHelper();
   public validate = async () => {
     const name = `Booking Reservation`;
     const description = descriptions.bookingReservation;

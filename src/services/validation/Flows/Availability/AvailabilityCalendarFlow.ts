@@ -22,9 +22,10 @@ export class AvailabilityCalendarFlow extends BaseFlow implements Flow {
     return this.validateScenarios(scenarios);
   };
 
-  private checkCalendarAvaialbility = (): AvailabilityCalendarIntervalScenario[] => {
-    return this.config.productConfig.productsForAvailabilityCheck.map(
-      (product) => new AvailabilityCalendarIntervalScenario(product)
-    );
-  };
+  private checkCalendarAvaialbility =
+    (): AvailabilityCalendarIntervalScenario[] => {
+      return this.config.productConfig.productsForAvailabilityCheck.map(
+        (product) => new AvailabilityCalendarIntervalScenario(product)
+      );
+    };
 }

@@ -7,7 +7,11 @@ import { parseCapabilities } from "./router/middlewares";
 import { DB } from "./storage/Database";
 import { DataGenerator } from "./generators/DataGenerator";
 import { ValidationError } from "yup";
-import { OctoError, InternalServerError, BadRequestError } from "./models/Error";
+import {
+  OctoError,
+  InternalServerError,
+  BadRequestError,
+} from "./models/Error";
 
 const app = new Koa();
 

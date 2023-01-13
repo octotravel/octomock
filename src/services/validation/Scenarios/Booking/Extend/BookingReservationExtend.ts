@@ -9,7 +9,13 @@ export class BookingReservationExtendScenario implements Scenario<Booking> {
   private apiClient = this.config.getApiClient();
   private booking: Booking;
   private capabilities: CapabilityId[];
-  constructor({ booking, capabilities }: { booking: Booking; capabilities: CapabilityId[] }) {
+  constructor({
+    booking,
+    capabilities,
+  }: {
+    booking: Booking;
+    capabilities: CapabilityId[];
+  }) {
     this.booking = booking;
     this.capabilities = capabilities;
   }
