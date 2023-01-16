@@ -4,10 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "tsc",
     "dev": "tsc-watch --onSuccess \"node --inspect=0.0.0.0:5858 dist/index.js\"",
+    "format-check": "prettier --check \"**/*.{ts,js,css,json,md}\"",
     "format": "prettier --write \"**/*.{ts,js,css,json,md}\"",
-    "test": "jest",
-    "test:coverage": "jest --coverage",
+    "lint": "eslint . --ext .ts",
+    "lint-fix": "eslint . --ext .ts --fix",
+    "test": "jest --verbose",
+    "test-coverage": "jest --coverage",
     "prepare": "husky install"
   },
   "author": "",
