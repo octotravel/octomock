@@ -154,7 +154,7 @@ export class BookingController implements IBookingController {
       throw new UnprocessableEntityError("booking cannot be updated");
     }
 
-    let updatedBookingModel;
+    let updatedBookingModel: BookingModel;
 
     if (
       schema.availabilityId ||

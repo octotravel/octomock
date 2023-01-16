@@ -4,11 +4,10 @@ import {
   PricingPer,
   Pricing,
   AvailabilityType,
-  OpeningHours,
+  OpeningHours
 } from "@octocloud/types";
 
 import * as R from "ramda";
-import { InvalidOptionIdError } from "./Error";
 
 export enum Day {
   Mon = 1,
@@ -17,7 +16,7 @@ export enum Day {
   Thu = 4,
   Fri = 5,
   Sat = 6,
-  Sun = 0,
+  Sun = 0
 }
 
 export enum Month {
@@ -32,7 +31,7 @@ export enum Month {
   Sep = 8,
   Oct = 9,
   Nov = 10,
-  Dec = 11,
+  Dec = 11
 }
 
 export type Capacity = Map<Day, Nullable<number>>;
@@ -45,7 +44,7 @@ const fillCapacity = (value: Nullable<number>): Capacity => {
     [Day.Thu, value],
     [Day.Fri, value],
     [Day.Sat, value],
-    [Day.Sun, value],
+    [Day.Sun, value]
   ]);
 };
 
@@ -71,7 +70,7 @@ export class ProductAvailabilityModel {
     openingHours,
     capacity,
     capacityValue,
-    freesale,
+    freesale
   }: {
     productModel: ProductModel;
     days?: number;
@@ -96,7 +95,7 @@ export class ProductAvailabilityModel {
     if (capacity) {
       this.capacity = new Map([
         ...Array.from(fillCapacity(capacityValue ?? 0).entries()),
-        ...Array.from(capacity.entries()),
+        ...Array.from(capacity.entries())
       ]);
     } else {
       this.capacity = fillCapacity(capacityValue ?? null);
@@ -145,7 +144,7 @@ export class ProductAvailabilityModel {
             return unitPricingModel.pricingFrom.map((pricingFrom) => {
               return {
                 unitId: unitModel.id,
-                ...pricingFrom,
+                ...pricingFrom
               } as PricingUnit;
             });
           })
@@ -158,18 +157,10 @@ export class ProductAvailabilityModel {
   }
 
   public getPricing = (optionId: string): Pricing => {
-    if (this.pricing.has(optionId) === false) {
-      throw new InvalidOptionIdError(optionId);
-    }
-
     return this.pricing.get(optionId)!;
   };
 
   public getUnitPricing = (optionId: string): PricingUnit[] => {
-    if (this.unitPricing.has(optionId) === false) {
-      throw new InvalidOptionIdError(optionId);
-    }
-
     return this.unitPricing.get(optionId)!;
   };
 }
