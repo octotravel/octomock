@@ -3,18 +3,18 @@ import { ProductWithAvailabilityModel } from "../models/ProductWithAvailabilityM
 import {
   Currency,
   UnitType,
+  DurationUnit,
   Pricing,
   AvailabilityType,
   OpeningHours,
-  PricingPer,
+  PricingPer
 } from "@octocloud/types";
 import {
   Capacity,
   Month,
   ProductAvailabilityModel,
-  Day,
+  Day
 } from "../models/ProductAvailabilityModel";
-import { DurationUnit } from "@octocloud/types";
 
 const pricingAdult: Pricing = {
   original: 1000,
@@ -22,7 +22,7 @@ const pricingAdult: Pricing = {
   net: 1000,
   includedTaxes: [],
   currency: Currency.EUR,
-  currencyPrecision: 2,
+  currencyPrecision: 2
 };
 
 const pricingChild: Pricing = {
@@ -31,7 +31,7 @@ const pricingChild: Pricing = {
   net: 800,
   includedTaxes: [],
   currency: Currency.EUR,
-  currencyPrecision: 2,
+  currencyPrecision: 2
 };
 
 const pricingBooking: Pricing = {
@@ -40,7 +40,7 @@ const pricingBooking: Pricing = {
   net: 4000,
   includedTaxes: [],
   currency: Currency.EUR,
-  currencyPrecision: 2,
+  currencyPrecision: 2
 };
 
 interface ProductAvailabilityModelData {
@@ -66,20 +66,21 @@ export class ProductWithAvailabilityModelGenerator {
         productData: {
           id: "1",
           internalName: "PPU | OH",
+          availabilityType: AvailabilityType.OPENING_HOURS,
           options: [
             {
               units: [
                 {
                   id: "adult",
                   type: UnitType.ADULT,
-                  pricingFrom: [pricingAdult],
-                },
-              ],
-            },
+                  pricingFrom: [pricingAdult]
+                }
+              ]
+            }
           ],
           defaultCurrency: Currency.EUR,
           availableCurrencies: [Currency.EUR],
-          pricingPer: PricingPer.UNIT,
+          pricingPer: PricingPer.UNIT
         },
         productAvailabilityModelData: {
           availabilityType: AvailabilityType.OPENING_HOURS,
@@ -89,108 +90,111 @@ export class ProductWithAvailabilityModelGenerator {
           capacityValue: 10,
           capacity: new Map([
             [Day.Mon, 10],
-            [Day.Tue, 20],
+            [Day.Tue, 20]
           ]),
-          daysClosed: [Day.Sat, Day.Sun],
-        },
+          daysClosed: [Day.Sat, Day.Sun]
+        }
       }),
       this.generateProduct({
         productData: {
           id: "2",
           internalName: "PPB | OH",
+          availabilityType: AvailabilityType.OPENING_HOURS,
           options: [
             {
               units: [
                 {
                   id: "adult",
-                  type: UnitType.ADULT,
-                },
+                  type: UnitType.ADULT
+                }
               ],
               restrictions: {
                 minUnits: 2,
-                maxUnits: null,
+                maxUnits: null
               },
-              pricing: [pricingBooking],
-            },
+              pricing: [pricingBooking]
+            }
           ],
           defaultCurrency: Currency.EUR,
           availableCurrencies: [Currency.EUR],
-          pricingPer: PricingPer.BOOKING,
+          pricingPer: PricingPer.BOOKING
         },
         productAvailabilityModelData: {
           availabilityType: AvailabilityType.OPENING_HOURS,
           openingHours: [{ from: "09:00", to: "17:00" }],
           freesale: true,
           daysClosed: [Day.Sat],
-          daysSoldOut: [Day.Sun],
-        },
+          daysSoldOut: [Day.Sun]
+        }
       }),
       this.generateProduct({
         productData: {
           id: "3",
           internalName: "PPU | ST",
+          availabilityType: AvailabilityType.START_TIME,
           options: [
             {
               units: [
                 {
                   id: "adult",
                   type: UnitType.ADULT,
-                  pricingFrom: [pricingAdult],
+                  pricingFrom: [pricingAdult]
                 },
                 {
                   id: "child",
                   type: UnitType.CHILD,
-                  pricingFrom: [pricingChild],
-                },
+                  pricingFrom: [pricingChild]
+                }
               ],
               availabilityLocalStartTimes: ["12:00", "14:00"],
               restrictions: {
                 minUnits: 2,
-                maxUnits: null,
+                maxUnits: null
               },
               durationAmount: "2",
-              durationUnit: DurationUnit.HOUR,
-            },
+              durationUnit: DurationUnit.HOUR
+            }
           ],
           defaultCurrency: Currency.EUR,
           availableCurrencies: [Currency.EUR],
-          pricingPer: PricingPer.UNIT,
+          pricingPer: PricingPer.UNIT
         },
         productAvailabilityModelData: {
           availabilityType: AvailabilityType.START_TIME,
           capacityValue: 10,
           capacity: new Map([
             [Day.Mon, 10],
-            [Day.Tue, 20],
+            [Day.Tue, 20]
           ]),
           daysClosed: [Day.Sat],
-          daysSoldOut: [Day.Sun],
-        },
+          daysSoldOut: [Day.Sun]
+        }
       }),
       this.generateProduct({
         productData: {
           id: "4",
           internalName: "PPB | ST",
+          availabilityType: AvailabilityType.START_TIME,
           options: [
             {
               units: [
                 {
                   id: "adult",
-                  type: UnitType.ADULT,
-                },
+                  type: UnitType.ADULT
+                }
               ],
               availabilityLocalStartTimes: ["12:00", "14:00"],
-              pricing: [pricingBooking],
-            },
+              pricing: [pricingBooking]
+            }
           ],
           defaultCurrency: Currency.EUR,
           availableCurrencies: [Currency.EUR],
-          pricingPer: PricingPer.BOOKING,
+          pricingPer: PricingPer.BOOKING
         },
         productAvailabilityModelData: {
           availabilityType: AvailabilityType.START_TIME,
-          daysClosed: [Day.Sat, Day.Sun],
-        },
+          daysClosed: [Day.Sat, Day.Sun]
+        }
       })
     );
 
@@ -199,23 +203,23 @@ export class ProductWithAvailabilityModelGenerator {
 
   private generateProduct({
     productData,
-    productAvailabilityModelData,
+    productAvailabilityModelData
   }: {
     productData: PartialProduct;
     productAvailabilityModelData: ProductAvailabilityModelData;
   }): ProductWithAvailabilityModel {
     const productModel = this.productModelGenerator.generateProduct({
-      productData: productData,
+      productData: productData
     });
 
     const productAvailabilityModel = new ProductAvailabilityModel({
       productModel,
-      ...productAvailabilityModelData,
+      ...productAvailabilityModelData
     });
 
     const productWithAvailabilityModel = new ProductWithAvailabilityModel({
       productModel: productModel,
-      productAvailabilityModel: productAvailabilityModel,
+      productAvailabilityModel: productAvailabilityModel
     });
 
     return productWithAvailabilityModel;
