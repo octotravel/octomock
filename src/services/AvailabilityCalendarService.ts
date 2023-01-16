@@ -58,7 +58,7 @@ export class AvailabilityCalendarService implements IAvailabilityService {
     return Object.keys(groupedAvailabilities)
       .map((key) => {
         const max = groupedAvailabilities[key].reduce((prev, current) =>
-          prev.vacancies > current.vacancies ? prev : current
+          prev.vacancies! > current.vacancies! ? prev : current
         );
         return max;
       })
