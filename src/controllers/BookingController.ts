@@ -2,7 +2,7 @@ import {
   Booking,
   BookingStatus,
   BookingUnitItemSchema,
-  CapabilityId,
+  CapabilityId
 } from "@octocloud/types";
 import { UnprocessableEntityError } from "../models/Error";
 import {
@@ -12,7 +12,7 @@ import {
   ExtendBookingSchema,
   GetBookingSchema,
   GetBookingsSchema,
-  UpdateBookingSchema,
+  UpdateBookingSchema
 } from "../schemas/Booking";
 import { AvailabilityService } from "../services/AvailabilityService";
 import { BookingService } from "../services/BookingService";
@@ -20,7 +20,7 @@ import * as R from "ramda";
 import {
   BookingModel,
   BookingParser,
-  OptionModel,
+  OptionModel
 } from "@octocloud/generators";
 import { BookingModelFactory } from "../factories/BookingModelFactory";
 import assert from "assert";
@@ -92,7 +92,7 @@ export class BookingController implements IBookingController {
         {
           productWithAvailabilityModel: productWithAvailabilityModel,
           optionId: schema.optionId,
-          availabilityId: schema.availabilityId,
+          availabilityId: schema.availabilityId
         },
         capabilities
       );
@@ -101,7 +101,7 @@ export class BookingController implements IBookingController {
       localDateTimeStart: availabilityModel.localDateTimeStart,
       localDateTimeEnd: availabilityModel.localDateTimeEnd,
       allDay: availabilityModel.allDay,
-      openingHours: availabilityModel.openingHours,
+      openingHours: availabilityModel.openingHours
     };
 
     const optionModel = productWithAvailabilityModel.findOptionModelByOptionId(
@@ -150,6 +150,8 @@ export class BookingController implements IBookingController {
   ): Promise<Booking> => {
     const bookingModel = await this.bookingRepository.getBooking(schema);
 
+    console.debug(bookingModel.cancellable);
+
     if (bookingModel.cancellable === false) {
       throw new UnprocessableEntityError("booking cannot be updated");
     }
@@ -170,7 +172,7 @@ export class BookingController implements IBookingController {
           resellerReference: unitItemModel.resellerReference ?? undefined,
           contact: ContactMapper.remapContactToBookingContactSchema(
             unitItemModel.contact
-          ),
+          )
         })
       );
 
@@ -180,7 +182,7 @@ export class BookingController implements IBookingController {
           productId: schema.productId ?? bookingModel.productModel.id,
           optionId: schema.optionId ?? bookingModel.optionModel.id,
           availabilityId: schema.availabilityId,
-          unitItems: schema.unitItems ?? remappedUnitItems,
+          unitItems: schema.unitItems ?? remappedUnitItems
         },
         capabilities
       );
@@ -294,19 +296,23 @@ export class BookingController implements IBookingController {
     optionModel: OptionModel,
     unitItems?: BookingUnitItemSchema[]
   ): void => {
-    if (unitItems === undefined || R.isEmpty(unitItems)) {
+    if (R.isEmpty(unitItems)) {
       throw new UnprocessableEntityError(
         "Validation failed: Tickets at least one ticket is required"
       );
     }
 
     const minUnits = optionModel.restrictions.minUnits;
-    if (minUnits > unitItems.length) {
+    if (unitItems !== undefined && minUnits > unitItems.length) {
       throw new UnprocessableEntityError("minimal restrictions not met");
     }
 
     const maxUnits = optionModel.restrictions.maxUnits;
-    if (maxUnits !== null && maxUnits < unitItems.length) {
+    if (
+      unitItems !== undefined &&
+      maxUnits !== null &&
+      maxUnits < unitItems.length
+    ) {
       throw new UnprocessableEntityError("maximal restrictions not met");
     }
   };
