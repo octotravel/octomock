@@ -1,3 +1,4 @@
+import { AvailabilityParser } from "@octocloud/generators";
 import {
   CapabilityId,
   Availability,
@@ -13,18 +14,22 @@ interface IAvailabilityController {
 }
 
 export class AvailabilityController implements IAvailabilityController {
-  private availabilityService = new AvailabilityService();
+  private readonly availabilityService = new AvailabilityService();
+  private readonly availabilityCalendarParser = new AvailabilityParser();
+
   public getAvailability = async (
     schema: AvailabilityBodySchema,
     capabilities: CapabilityId[]
   ): Promise<Availability[]> => {
-    const models = await this.availabilityService.getAvailability(
+    const availabilityModels = await this.availabilityService.getAvailability(
       schema,
       capabilities
     );
-    const availability = models.map((m) => {
-      return m.toPOJO({ useCapabilities: true, capabilities });
+    return availabilityModels.map((availabilityModel) => {
+      return this.availabilityCalendarParser.parseModelToPOJOWithSpecificCapabilities(
+        availabilityModel,
+        capabilities
+      );
     });
-    return availability;
   };
 }
