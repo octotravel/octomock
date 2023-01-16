@@ -61,7 +61,7 @@ export abstract class BookingModelFactory {
         uuid: createBookingSchema.uuid ?? DataGenerator.generateUUID(),
         resellerReference: createBookingSchema.resellerReference ?? null,
         supplierReference: DataGenerator.generateSupplierReference(),
-        status: BookingStatus.ON_HOLD,
+        status: status,
         product: this.productParser.parseModelToPOJO(productModel),
         option: this.optionParser.parseModelToPOJO(optionModel),
         availability: bookingAvailability,

@@ -29,7 +29,7 @@ export class ProductController implements IProductController {
     );
 
     return {
-      ...product
+      ...product,
       // allowFreesale: "asdasd" as any,
     };
     // return product;

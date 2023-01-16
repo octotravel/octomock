@@ -10,7 +10,7 @@ import { ValidationError } from "yup";
 import {
   OctoError,
   InternalServerError,
-  BadRequestError
+  BadRequestError,
 } from "./models/Error";
 
 const app = new Koa();
@@ -35,7 +35,7 @@ app.use(async (ctx, next) => {
       ctx.status = error.status;
       ctx.body = {
         ...error.body,
-        stack: error.stack
+        stack: error.stack,
       };
     }
   }

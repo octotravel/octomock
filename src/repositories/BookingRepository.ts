@@ -4,7 +4,6 @@ import { DB } from "../storage/Database";
 import { DateHelper } from "../helpers/DateHelper";
 import { InvalidBookingUUIDError } from "../models/Error";
 import { Booking } from "@octocloud/types";
-import assert from "assert";
 interface IBookingRepository {
   createBooking(bookingModel: BookingModel): Promise<BookingModel>;
   updateBooking(bookingModel: BookingModel): Promise<BookingModel>;
@@ -78,10 +77,8 @@ export class BookingRepository implements IBookingRepository {
   };
 
   private handleExpiredBooking = (booking: BookingModel): void => {
-    assert(booking.utcExpiresAt !== null);
-
     const isExpired =
-      booking.utcExpiresAt < DateHelper.utcDateFormat(new Date());
+      booking.utcExpiresAt! < DateHelper.utcDateFormat(new Date());
     if (isExpired) {
       throw new InvalidBookingUUIDError(booking.uuid);
     }
