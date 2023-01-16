@@ -14,7 +14,14 @@ export class ProductModelStorage implements InMemoryStorage<ProductModel> {
     new ProductWithAvailabilityModelGenerator();
 
   constructor() {
-    this.productWithAvailabilityModelGenerator.generateMultipleProducts();
+    this.productWithAvailabilityModelGenerator
+      .generateMultipleProducts()
+      .forEach((productWithAvailabilityModel) => {
+        this.productWithAvailabilityModels.set(
+          productWithAvailabilityModel.id,
+          productWithAvailabilityModel
+        );
+      });
   }
 
   public get(id: string): ProductModel {
@@ -22,7 +29,7 @@ export class ProductModelStorage implements InMemoryStorage<ProductModel> {
   }
 
   public getWithAvailability(id: string): ProductWithAvailabilityModel {
-    if (this.productWithAvailabilityModels.has(id)) {
+    if (this.productWithAvailabilityModels.has(id) == false) {
       throw new InvalidProductIdError(id);
     }
 

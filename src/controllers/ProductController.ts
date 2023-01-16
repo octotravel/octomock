@@ -10,6 +10,7 @@ interface IProductController {
 export class ProductController implements IProductController {
   private readonly productRepository = new ProductRepository();
   private readonly productParser = new ProductParser();
+
   public getProducts = (capabilities: CapabilityId[]): Product[] => {
     return this.productRepository
       .getProducts()
@@ -28,7 +29,7 @@ export class ProductController implements IProductController {
     );
 
     return {
-      ...product,
+      ...product
       // allowFreesale: "asdasd" as any,
     };
     // return product;

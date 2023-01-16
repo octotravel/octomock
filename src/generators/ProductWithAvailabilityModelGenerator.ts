@@ -58,7 +58,7 @@ interface ProductAvailabilityModelData {
 export class ProductWithAvailabilityModelGenerator {
   private readonly productModelGenerator = new ProductModelGenerator();
 
-  public generateMultipleProducts(): void {
+  public generateMultipleProducts(): ProductWithAvailabilityModel[] {
     const productWithAvailabilityModels: ProductWithAvailabilityModel[] = [];
 
     productWithAvailabilityModels.push(
@@ -193,6 +193,8 @@ export class ProductWithAvailabilityModelGenerator {
         },
       })
     );
+
+    return productWithAvailabilityModels;
   }
 
   private generateProduct({
