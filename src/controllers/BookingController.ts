@@ -236,7 +236,6 @@ export class BookingController implements IBookingController {
     cancelBookingSchema: CancelBookingSchema,
     capabilities: CapabilityId[]
   ): Promise<Booking> => {
-    console.debug(cancelBookingSchema);
     const bookingModel = await this.bookingRepository.getBooking(
       cancelBookingSchema
     );
