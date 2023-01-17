@@ -4,7 +4,10 @@ import {
   BookingUnitItemSchema,
   CapabilityId,
 } from "@octocloud/types";
-import { UnprocessableEntityError } from "../models/Error";
+import {
+  UnprocessableEntityError,
+  InvalidOptionIdError,
+} from "../models/Error";
 import {
   CancelBookingSchema,
   ConfirmBookingSchema,
@@ -23,10 +26,10 @@ import {
   OptionModel,
 } from "@octocloud/generators";
 import { BookingModelFactory } from "../factories/BookingModelFactory";
-import assert from "assert";
 import { BookingRepository } from "../repositories/BookingRepository";
 import { ProductRepository } from "../repositories/ProductRepository";
 import { ContactMapper } from "../helpers/ContactHelper";
+import { InvalidUnitIdError } from "../models/Error";
 
 interface IBookingController {
   createBooking(
@@ -104,10 +107,25 @@ export class BookingController implements IBookingController {
       openingHours: availabilityModel.openingHours,
     };
 
-    const optionModel = productWithAvailabilityModel.findOptionModelByOptionId(
-      schema.optionId
-    );
-    assert(optionModel !== null);
+    const optionId = schema.optionId;
+    const optionModel =
+      productWithAvailabilityModel.findOptionModelByOptionId(optionId);
+
+    if (optionModel === null) {
+      throw new InvalidOptionIdError(optionId);
+    }
+
+    schema.unitItems.forEach((bookingUnitItemSchema: BookingUnitItemSchema) => {
+      const unitId = bookingUnitItemSchema.unitId;
+      const unitModel = optionModel.findUnitModelByUnitId(unitId);
+
+      if (unitModel === null) {
+        throw new InvalidUnitIdError(unitId);
+      }
+    });
+
+    productWithAvailabilityModel.optionModels;
+
     this.checkRestrictions(optionModel, schema.unitItems);
 
     return BookingModelFactory.create(

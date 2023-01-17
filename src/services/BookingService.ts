@@ -118,7 +118,11 @@ export class BookingService implements IBookingService {
     bookingModel: BookingModel,
     schema: CancelBookingSchema
   ): BookingModel {
-    const status = BookingStatus.CANCELLED;
+    let status = BookingStatus.EXPIRED;
+
+    if (bookingModel.status === BookingStatus.CONFIRMED) {
+      status = BookingStatus.CANCELLED;
+    }
 
     const cancellation = {
       refund: "FULL",

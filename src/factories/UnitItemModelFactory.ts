@@ -33,6 +33,7 @@ export abstract class UnitItemModelFactory {
     const unitModel = optionModel.findUnitModelByUnitId(
       bookingUnitItemSchema.unitId
     );
+
     if (unitModel === null) {
       throw new InvalidUnitIdError(bookingUnitItemSchema.unitId);
     }

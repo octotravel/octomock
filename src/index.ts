@@ -17,7 +17,9 @@ const app = new Koa();
 
 DB.getInstance().open();
 app.use(cors());
-app.use(koaBody({parsedMethods: ['POST', 'PUT', 'PATCH', 'GET', 'HEAD', 'DELETE']}));
+app.use(
+  koaBody({ parsedMethods: ["POST", "PUT", "PATCH", "GET", "HEAD", "DELETE"] })
+);
 app.use(async (ctx, next) => {
   try {
     await next();

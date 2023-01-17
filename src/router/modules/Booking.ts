@@ -30,9 +30,7 @@ const bookingController = new BookingController();
 
 bookingRouter.post("/bookings", async (ctx, _) => {
   const capabilities = getCapabilities(ctx);
-
   const data: CreateBookingSchema = ctx.request.body;
-
   await createBookingSchema.validate(data);
   const schema = createBookingSchema.cast(data) as CreateBookingSchema;
   const booking = await bookingController.createBooking(schema, capabilities);
