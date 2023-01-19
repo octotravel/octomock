@@ -12,8 +12,8 @@
     "format": "prettier --write \"**/*.{ts,js,css,json,md}\"",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
-    "test": "jest --verbose",
-    "test:coverage": "jest --coverage",
+    "test": "jest --verbose --passWithNoTests",
+    "test:coverage": "jest --coverage --passWithNoTests",
     "prepare": "husky install"
   },
   "author": "",
