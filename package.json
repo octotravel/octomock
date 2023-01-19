@@ -36,7 +36,7 @@
   "devDependencies": {
     "ngrok": "4.3.3",
     "nodemon": "2.0.20",
-    "@octocloud/generators": "github:octotravel/octo-generator#feat/mock",
+    "@octocloud/generators": "github:octotravel/octo-generator",
     "@octocloud/types": "^1.3.1",
     "@types/jest": "^28.1.6",
     "@types/koa": "^2.13.5",
