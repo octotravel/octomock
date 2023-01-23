@@ -1,5 +1,5 @@
 import { Supplier } from "@octocloud/types";
-import { BadRequestError } from "./../models/Error";
+import { BadRequestError } from "../models/Error";
 import { InMemoryStorage } from "./InMemoryStorage";
 
 export class SupplierStorage implements InMemoryStorage<Supplier> {
@@ -29,6 +29,7 @@ export class SupplierStorage implements InMemoryStorage<Supplier> {
   ];
   public get(id: string): Nullable<Supplier> {
     let supplier: Nullable<Supplier> = null;
+
     if (id === "0") {
       supplier = this.suppliers[0] ?? null;
     } else {

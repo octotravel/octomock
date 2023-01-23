@@ -3,7 +3,7 @@ import { SupplierRepository } from "../repositories/SupplierRepository";
 
 interface ISupplierService {
   getSuppliers(): Promise<Supplier[]>;
-  getSupplier(id: string): Promise<Supplier>;
+  getSupplier(id: string): Promise<Nullable<Supplier>>;
 }
 
 export class SupplierService implements ISupplierService {
@@ -12,6 +12,6 @@ export class SupplierService implements ISupplierService {
   public getSuppliers = async (): Promise<Supplier[]> =>
     this.repository.getSuppliers();
 
-  public getSupplier = async (id: string): Promise<Supplier> =>
+  public getSupplier = async (id: string): Promise<Nullable<Supplier>> =>
     this.repository.getSupplier(id);
 }

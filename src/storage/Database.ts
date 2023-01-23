@@ -3,7 +3,7 @@ import { open, Database } from "sqlite";
 
 export class DB {
   private static instance: DB;
-  private db: Database<sqlite3.Database, sqlite3.Statement>;
+  private db!: Database<sqlite3.Database, sqlite3.Statement>;
 
   private constructor() {
     //

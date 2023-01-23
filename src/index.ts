@@ -12,17 +12,19 @@ import {
   InternalServerError,
   BadRequestError,
 } from "./models/Error";
+import "dotenv/config";
 
 const app = new Koa();
 
 DB.getInstance().open();
 app.use(cors());
-app.use(koaBody());
+app.use(
+  koaBody({ parsedMethods: ["POST", "PUT", "PATCH", "GET", "HEAD", "DELETE"] })
+);
 app.use(async (ctx, next) => {
   try {
     await next();
-  } catch (err) {
-    // console.log(err);
+  } catch (err: any) {
     if (err instanceof OctoError) {
       ctx.status = err.status;
       ctx.body = err.body;
@@ -47,4 +49,4 @@ app.use(async (ctx, next) => {
 app.use(parseCapabilities);
 app.use(router.routes());
 
-app.listen(3000);
+app.listen(process.env.APP_PORT ?? 3000);

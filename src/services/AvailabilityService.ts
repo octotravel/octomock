@@ -1,14 +1,14 @@
 import { CapabilityId, AvailabilityBodySchema } from "@octocloud/types";
-import { InvalidAvailabilityIdError, BadRequestError } from "./../models/Error";
-import { ProductModel } from "./../models/Product";
-import { ProductService } from "./ProductService";
-import { AvailabilityGenerator } from "../generators/AvailabilityGenerator";
+import { InvalidAvailabilityIdError, BadRequestError } from "../models/Error";
 import { eachDayOfInterval, isMatch } from "date-fns";
-import { AvailabilityModel } from "../models/Availability";
 import { DateHelper } from "../helpers/DateHelper";
+import { AvailabilityModel } from "@octocloud/generators";
+import { ProductRepository } from "../repositories/ProductRepository";
+import { AvailabilityModelFactory } from "../factories/AvailabilityModelFactory";
+import { ProductWithAvailabilityModel } from "../models/ProductWithAvailabilityModel";
 
 interface FindBookingAvailabilityData {
-  product: ProductModel;
+  productWithAvailabilityModel: ProductWithAvailabilityModel;
   optionId: string;
   availabilityId: string;
 }
@@ -25,22 +25,22 @@ interface IAvailabilityService {
 }
 
 export class AvailabilityService implements IAvailabilityService {
-  private generator = new AvailabilityGenerator();
-  private productService = new ProductService();
+  private productRepository = new ProductRepository();
 
   public getAvailability = async (
     schema: AvailabilityBodySchema,
     capabilities: CapabilityId[]
   ): Promise<AvailabilityModel[]> => {
-    const product = this.productService.getProduct(schema.productId);
+    const productWithAvailabilityModel =
+      this.productRepository.getProductWithAvailability(schema.productId);
     const optionId = schema.optionId;
 
-    const availabilities = this.generator.generate({
-      product,
-      optionId,
-      capabilities,
+    const availabilities = AvailabilityModelFactory.createMultiple({
+      productWithAvailabilityModel: productWithAvailabilityModel,
+      optionId: optionId,
+      capabilities: capabilities,
       date: DateHelper.availabilityDateFormat(new Date()),
-      units: schema.units,
+      availabilityUnits: schema.units,
     });
 
     if (schema.localDate) {
@@ -49,7 +49,7 @@ export class AvailabilityService implements IAvailabilityService {
     if (schema.localDateStart && schema.localDateStart) {
       return this.getIntervalDate(
         schema.localDateStart,
-        schema.localDateEnd,
+        schema.localDateEnd!,
         availabilities
       );
     }
@@ -70,10 +70,10 @@ export class AvailabilityService implements IAvailabilityService {
     }
 
     const date = new Date(data.availabilityId);
-    const availabilities = this.generator.generate({
-      product: data.product,
-      optionId,
-      capabilities,
+    const availabilities = AvailabilityModelFactory.createMultiple({
+      productWithAvailabilityModel: data.productWithAvailabilityModel,
+      optionId: optionId,
+      capabilities: capabilities,
       date: DateHelper.availabilityDateFormat(date),
     });
     const availability =

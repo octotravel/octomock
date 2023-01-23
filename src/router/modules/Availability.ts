@@ -1,5 +1,5 @@
-import { AvailabilityCalendarController } from "./../../controllers/AvailabilityCalendarController";
-import { AvailabilityController } from "./../../controllers/AvailabilityController";
+import { AvailabilityCalendarController } from "../../controllers/AvailabilityCalendarController";
+import { AvailabilityController } from "../../controllers/AvailabilityController";
 import Router from "@koa/router";
 import { getCapabilities } from "../common";
 import {
