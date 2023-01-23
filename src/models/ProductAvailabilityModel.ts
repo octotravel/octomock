@@ -85,7 +85,7 @@ export class ProductAvailabilityModel {
   }) {
     if (
       availabilityType === AvailabilityType.OPENING_HOURS &&
-      (openingHours === undefined || R.isEmpty(openingHours.length))
+      (openingHours === undefined || R.isEmpty(openingHours))
     ) {
       throw new Error(
         "openingHours cannot be empty when AvailabilityType = OPENING_HOURS"
