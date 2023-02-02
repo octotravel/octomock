@@ -17,6 +17,19 @@ interface IBookingService {
     bookingModel: BookingModel,
     confirmBookingSchema: ConfirmBookingSchema
   ): BookingModel;
+  updateBookingModelWithUpdateBookingSchema(
+    bookingModel: BookingModel,
+    updateBookingSchema: UpdateBookingSchema,
+    rebookedBooking?: BookingModel
+  ): BookingModel;
+  updateBookingModelWithExtendBookingSchema(
+    bookingModel: BookingModel,
+    extendBookingSchema: ExtendBookingSchema
+  ): BookingModel;
+  updateBookingModelWithCancelBookingSchema(
+    bookingModel: BookingModel,
+    schema: CancelBookingSchema
+  ): BookingModel;
 }
 
 export class BookingService implements IBookingService {

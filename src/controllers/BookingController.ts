@@ -259,7 +259,7 @@ export class BookingController implements IBookingController {
     );
 
     if (bookingModel.cancellable === false) {
-      throw new UnprocessableEntityError("booking not cancellable");
+      throw new UnprocessableEntityError("Booking cannot be cancelled");
     }
 
     if (bookingModel.status === BookingStatus.CANCELLED) {
@@ -274,12 +274,10 @@ export class BookingController implements IBookingController {
         bookingModel,
         cancelBookingSchema
       );
-    const updatedBookingModel = await this.bookingRepository.updateBooking(
-      cancelledBooking
-    );
+    await this.bookingRepository.updateBooking(cancelledBooking);
 
     return this.bookingParser.parseModelToPOJOWithSpecificCapabilities(
-      updatedBookingModel,
+      cancelledBooking,
       capabilities
     );
   };
