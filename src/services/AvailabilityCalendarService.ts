@@ -3,10 +3,7 @@ import { eachDayOfInterval } from "date-fns";
 import { DateHelper } from "../helpers/DateHelper";
 import { ProductRepository } from "../repositories/ProductRepository";
 import { AvailabilityModelFactory } from "../factories/AvailabilityModelFactory";
-import {
-  AvailabilityCalendarModel,
-  AvailabilityModel,
-} from "@octocloud/generators";
+import { AvailabilityCalendarModel, AvailabilityModel } from "@octocloud/generators";
 import { AvailabilityCalendarPricingModel } from "@octocloud/generators/dist/models/availability/AvailabilityCalendarPricingModel";
 
 interface IAvailabilityService {
@@ -23,8 +20,7 @@ export class AvailabilityCalendarService implements IAvailabilityService {
     schema: AvailabilityCalendarBodySchema,
     capabilities: CapabilityId[]
   ): Promise<AvailabilityCalendarModel[]> => {
-    const productWithAvailabilityModel =
-      this.productRepository.getProductWithAvailability(schema.productId);
+    const productWithAvailabilityModel = this.productRepository.getProductWithAvailability(schema.productId);
     const optionId = schema.optionId;
 
     const availabilities = AvailabilityModelFactory.createMultiple({
@@ -34,26 +30,15 @@ export class AvailabilityCalendarService implements IAvailabilityService {
       date: DateHelper.availabilityDateFormat(new Date()),
       availabilityUnits: schema.units,
     });
-    return this.mapToCalendar(
-      this.getIntervalDate(
-        schema.localDateStart,
-        schema.localDateEnd,
-        availabilities
-      )
-    );
+    return this.mapToCalendar(this.getIntervalDate(schema.localDateStart, schema.localDateEnd, availabilities));
   };
 
-  private mapToCalendar = (
-    availabilities: AvailabilityModel[]
-  ): AvailabilityCalendarModel[] => {
-    const groupedAvailabilities = availabilities.reduce(
-      (acc: { [key: string]: AvailabilityModel[] }, availability) => {
-        const [date, _] = availability.id.split("T");
-        acc[date] = acc[date] ? [...acc[date], availability] : [availability];
-        return acc;
-      },
-      {}
-    );
+  private mapToCalendar = (availabilities: AvailabilityModel[]): AvailabilityCalendarModel[] => {
+    const groupedAvailabilities = availabilities.reduce((acc: { [key: string]: AvailabilityModel[] }, availability) => {
+      const [date, _] = availability.id.split("T");
+      acc[date] = acc[date] ? [...acc[date], availability] : [availability];
+      return acc;
+    }, {});
 
     return Object.keys(groupedAvailabilities)
       .map((key) => {
@@ -71,17 +56,12 @@ export class AvailabilityCalendarService implements IAvailabilityService {
             vacancies: model.vacancies,
             capacity: model.capacity,
             openingHours: model.openingHours,
-            availabilityCalendarPricingModel:
-              model.availabilityPricingModel as AvailabilityCalendarPricingModel,
+            availabilityCalendarPricingModel: model.availabilityPricingModel as AvailabilityCalendarPricingModel,
           })
       );
   };
 
-  private getIntervalDate = (
-    start: string,
-    end: string,
-    availabilities: AvailabilityModel[]
-  ): AvailabilityModel[] => {
+  private getIntervalDate = (start: string, end: string, availabilities: AvailabilityModel[]): AvailabilityModel[] => {
     const interval = eachDayOfInterval({
       start: new Date(start),
       end: new Date(end),

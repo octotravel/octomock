@@ -3,7 +3,8 @@ import { DateHelper } from "../helpers/DateHelper";
 import { Order } from "@octocloud/types";
 import { GetOrderSchema } from "../schemas/Order";
 import InvalidOrderIdError from "../errors/InvalidOrderIdError";
-import { OrderModel, OrderParser } from "@octocloud/generators";
+import { OrderModel, OrderParser, BookingModel } from "@octocloud/generators";
+import { BookingRepository } from "./BookingRepository";
 
 interface IOrderRepository {
   createOrder(orderModel: OrderModel): Promise<OrderModel>;
@@ -13,6 +14,7 @@ interface IOrderRepository {
 
 export default class OrderRepository implements IOrderRepository {
   private readonly orderParser = new OrderParser();
+  private readonly BookingRepository = new BookingRepository();
 
   public createOrder = async (orderModel: OrderModel): Promise<OrderModel> => {
     await DB.getInstance()
@@ -22,7 +24,7 @@ export default class OrderRepository implements IOrderRepository {
         INSERT INTO booking (
           id,
           status,
-          supplierReference,
+          supplierReference
           data
         ) VALUES (?, ?, ?, ?)
     `,
@@ -55,29 +57,40 @@ export default class OrderRepository implements IOrderRepository {
     return orderModel;
   };
 
-  public getOrder = async (
-    getOrderSchema: GetOrderSchema
-  ): Promise<OrderModel> => {
-    const result =
-      (await DB.getInstance()
-        .getDB()
-        .get(`SELECT * FROM order WHERE id = ?`, getOrderSchema.id)) ?? null;
+  public getOrder = async (getOrderSchema: GetOrderSchema): Promise<OrderModel> => {
+    return this.getOrderById(getOrderSchema.id);
+  };
+
+  public getOrderById = async (orderId: string): Promise<OrderModel> => {
+    const result = (await DB.getInstance().getDB().get(`SELECT * FROM order WHERE id = ?`, orderId)) ?? null;
 
     if (result === null) {
-      throw new InvalidOrderIdError(getOrderSchema.id);
+      throw new InvalidOrderIdError(orderId);
     }
     const order = JSON.parse(result.data) as Order;
     this.handleExpiredOrder(order);
 
-    return this.orderParser.parsePOJOToModel(order);
+    const orderModel = this.orderParser.parsePOJOToModel(order);
+    const upToDateBookingModels = this.getUpToDateBookingModels(orderModel);
+    orderModel.bookingModels = upToDateBookingModels;
+
+    return orderModel;
   };
 
   private handleExpiredOrder = (order: Order): void => {
-    if (
-      order.utcExpiresAt !== null &&
-      order.utcExpiresAt < DateHelper.utcDateFormat(new Date())
-    ) {
+    if (order.utcExpiresAt !== null && order.utcExpiresAt < DateHelper.utcDateFormat(new Date())) {
       throw new InvalidOrderIdError(order.id);
     }
+  };
+
+  private getUpToDateBookingModels = (orderModel: OrderModel): BookingModel[] => {
+    const upToDateBookingModels: BookingModel[] = [];
+
+    orderModel.bookingModels.forEach(async (bookingModel) => {
+      const upToDateBookingModel = await this.BookingRepository.getBookingByUuid(bookingModel.uuid);
+      upToDateBookingModels.push(upToDateBookingModel);
+    });
+
+    return upToDateBookingModels;
   };
 }

@@ -19,8 +19,7 @@ import { DataGenerator } from "../generators/DataGenerator";
 import assert from "assert";
 
 export abstract class UnitItemModelFactory {
-  private static unitItemModelGenerator: UnitItemModelGenerator =
-    new UnitItemModelGenerator();
+  private static unitItemModelGenerator: UnitItemModelGenerator = new UnitItemModelGenerator();
   private static unitItemParser: UnitItemParser = new UnitItemParser();
   private static unitParser: UnitParser = new UnitParser();
 
@@ -30,9 +29,7 @@ export abstract class UnitItemModelFactory {
     optionModel: OptionModel,
     deliveryMethods: DeliveryMethod[]
   ): UnitItemModel {
-    const unitModel = optionModel.findUnitModelByUnitId(
-      bookingUnitItemSchema.unitId
-    );
+    const unitModel = optionModel.findUnitModelByUnitId(bookingUnitItemSchema.unitId);
 
     if (unitModel === null) {
       throw new InvalidUnitIdError(bookingUnitItemSchema.unitId);
@@ -106,17 +103,13 @@ export abstract class UnitItemModelFactory {
     bookingModel: BookingModel;
     unitItemModel: UnitItemModel;
   }): UnitItemModel {
-    if (
-      bookingModel.deliveryMethods.includes(DeliveryMethod.TICKET) === false
-    ) {
+    if (bookingModel.deliveryMethods.includes(DeliveryMethod.TICKET) === false) {
       // TODO check this, because before there was not an return statement outside of this condition
       return unitItemModel;
     }
 
     const deliveryOptions: DeliveryOption[] = [];
-    if (
-      bookingModel.productModel.deliveryFormats.includes(DeliveryFormat.PDF_URL)
-    ) {
+    if (bookingModel.productModel.deliveryFormats.includes(DeliveryFormat.PDF_URL)) {
       deliveryOptions.push({
         deliveryFormat: DeliveryFormat.PDF_URL,
         deliveryValue: `https://api.octomock.com/octo/pdf?booking=${bookingModel.uuid}&ticket=${unitItemModel.uuid}`,
@@ -125,9 +118,7 @@ export abstract class UnitItemModelFactory {
 
     assert(unitItemModel.ticket !== null);
 
-    if (
-      bookingModel.productModel.deliveryFormats.includes(DeliveryFormat.QRCODE)
-    ) {
+    if (bookingModel.productModel.deliveryFormats.includes(DeliveryFormat.QRCODE)) {
       assert(unitItemModel.supplierReference !== null);
 
       deliveryOptions.push({

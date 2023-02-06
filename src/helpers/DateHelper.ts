@@ -1,10 +1,7 @@
 import format from "date-fns-tz/format";
 
 export abstract class DateHelper {
-  public static availabilityIdFormat = (
-    date: Date,
-    timeZone: string
-  ): string => {
+  public static availabilityIdFormat = (date: Date, timeZone: string): string => {
     return format(date, "yyyy-MM-dd'T'HH:mm:ssxxx", {
       timeZone,
     });

@@ -7,20 +7,14 @@ import { parseCapabilities } from "./router/middlewares";
 import { DB } from "./storage/Database";
 import { DataGenerator } from "./generators/DataGenerator";
 import { ValidationError } from "yup";
-import {
-  OctoError,
-  InternalServerError,
-  BadRequestError,
-} from "./models/Error";
+import { OctoError, InternalServerError, BadRequestError } from "./models/Error";
 import "dotenv/config";
 
 const app = new Koa();
 
 DB.getInstance().open();
 app.use(cors());
-app.use(
-  koaBody({ parsedMethods: ["POST", "PUT", "PATCH", "GET", "HEAD", "DELETE"] })
-);
+app.use(koaBody({ parsedMethods: ["POST", "PUT", "PATCH", "GET", "HEAD", "DELETE"] }));
 app.use(async (ctx, next) => {
   try {
     await next();
