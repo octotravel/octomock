@@ -6,17 +6,17 @@ import addMinutes from "date-fns/addMinutes";
 import { ConfirmOrderSchema, ExtendOrderSchema } from "../schemas/Order";
 
 interface IOrderService {
-  confirmOrder(
+  confirmOrderBySchema(
     orderModel: OrderModel,
     confirmedBookingModels: BookingModel[],
     confirmOrderSchema: ConfirmOrderSchema
   ): OrderModel;
-  extendOrder(orderModel: OrderModel, extendBookingSchema: ExtendOrderSchema): OrderModel;
-  cancelOrder(orderModel: OrderModel, cancelledBookingModels: BookingModel[]): OrderModel;
+  extendOrderBySchema(orderModel: OrderModel, extendBookingSchema: ExtendOrderSchema): OrderModel;
+  cancelOrderBySchema(orderModel: OrderModel, cancelledBookingModels: BookingModel[]): OrderModel;
 }
 
 export class OrderService implements IOrderService {
-  public confirmOrder(
+  public confirmOrderBySchema(
     orderModel: OrderModel,
     confirmedBookingModels: BookingModel[],
     confirmOrderSchema: ConfirmOrderSchema
@@ -33,7 +33,7 @@ export class OrderService implements IOrderService {
     return orderModel;
   }
 
-  public extendOrder(orderModel: OrderModel, extenOrderSchema: ExtendOrderSchema): OrderModel {
+  public extendOrderBySchema(orderModel: OrderModel, extenOrderSchema: ExtendOrderSchema): OrderModel {
     orderModel.status = OrderStatus.ON_HOLD;
     orderModel.utcExpiresAt = DateHelper.utcDateFormat(
       addMinutes(new Date(), extenOrderSchema.expirationMinutes ?? 30)
@@ -43,7 +43,7 @@ export class OrderService implements IOrderService {
     return orderModel;
   }
 
-  public cancelOrder(orderModel: OrderModel, cancelledBookingModels: BookingModel[]): OrderModel {
+  public cancelOrderBySchema(orderModel: OrderModel, cancelledBookingModels: BookingModel[]): OrderModel {
     let status = OrderStatus.EXPIRED;
 
     if (orderModel.status === OrderStatus.CONFIRMED) {

@@ -50,7 +50,7 @@ export class OrderController implements IOrderController {
       confirmedBookingModels.push(confirmedBookingModel);
     });
 
-    const confirmedOrderModel = this.orderService.confirmOrder(orderModel, confirmedBookingModels, schema);
+    const confirmedOrderModel = this.orderService.confirmOrderBySchema(orderModel, confirmedBookingModels, schema);
     await this.orderRepository.updateOrder(confirmedOrderModel);
 
     return this.orderParser.parseModelToPOJOWithSpecificCapabilities(confirmedOrderModel, capabilities);
@@ -63,7 +63,7 @@ export class OrderController implements IOrderController {
       throw new UnprocessableEntityError("Order cannot be extended");
     }
 
-    const extendedOrderModel = this.orderService.extendOrder(orderModel, schema);
+    const extendedOrderModel = this.orderService.extendOrderBySchema(orderModel, schema);
     await this.orderRepository.updateOrder(extendedOrderModel);
 
     return this.orderParser.parseModelToPOJOWithSpecificCapabilities(extendedOrderModel, capabilities);
@@ -87,7 +87,7 @@ export class OrderController implements IOrderController {
       cancelledBookingModels.push(cancelledBookingModel);
     });
 
-    const cancelledOrderModel = this.orderService.cancelOrder(orderModel, cancelledBookingModels);
+    const cancelledOrderModel = this.orderService.cancelOrderBySchema(orderModel, cancelledBookingModels);
     await this.orderRepository.updateOrder(cancelledOrderModel);
 
     return this.orderParser.parseModelToPOJOWithSpecificCapabilities(cancelledOrderModel, capabilities);
