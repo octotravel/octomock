@@ -21,10 +21,7 @@ availabilityRouter.post("/availability", async (ctx, _) => {
   await availabilityBodySchema.validate(data);
   const schema = availabilityBodySchema.cast(data) as AvailabilityBodySchema;
 
-  const body = await availabilityController.getAvailability(
-    schema,
-    capabilities
-  );
+  const body = await availabilityController.getAvailability(schema, capabilities);
 
   ctx.body = body;
   ctx.toJSON();
@@ -36,14 +33,9 @@ availabilityRouter.post("/availability/calendar", async (ctx, _) => {
   const data: AvailabilityCalendarBodySchema = ctx.request.body;
 
   await availabilityCalendarBodySchema.validate(data);
-  const schema = availabilityCalendarBodySchema.cast(
-    data
-  ) as AvailabilityCalendarBodySchema;
+  const schema = availabilityCalendarBodySchema.cast(data) as AvailabilityCalendarBodySchema;
 
-  const body = await availabilityCalendarController.getAvailability(
-    schema,
-    capabilities
-  );
+  const body = await availabilityCalendarController.getAvailability(schema, capabilities);
 
   ctx.body = body;
   ctx.toJSON();

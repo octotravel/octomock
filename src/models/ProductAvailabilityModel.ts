@@ -1,11 +1,5 @@
 import { ProductModel } from "@octocloud/generators";
-import {
-  PricingUnit,
-  PricingPer,
-  Pricing,
-  AvailabilityType,
-  OpeningHours,
-} from "@octocloud/types";
+import { PricingUnit, PricingPer, Pricing, AvailabilityType, OpeningHours } from "@octocloud/types";
 
 import * as R from "ramda";
 
@@ -87,9 +81,7 @@ export class ProductAvailabilityModel {
       availabilityType === AvailabilityType.OPENING_HOURS &&
       (openingHours === undefined || R.isEmpty(openingHours))
     ) {
-      throw new Error(
-        "openingHours cannot be empty when AvailabilityType = OPENING_HOURS"
-      );
+      throw new Error("openingHours cannot be empty when AvailabilityType = OPENING_HOURS");
     }
 
     if (capacity) {
@@ -118,10 +110,7 @@ export class ProductAvailabilityModel {
       productModel.optionModels.forEach((optionModel) => {
         const optionPricingModel = optionModel.getOptionPricingModel();
 
-        if (
-          optionPricingModel.pricingFrom !== undefined &&
-          optionPricingModel.pricingFrom.length > 0
-        ) {
+        if (optionPricingModel.pricingFrom !== undefined && optionPricingModel.pricingFrom.length > 0) {
           pricingMap.set(optionModel.id, optionPricingModel.pricingFrom[0]);
         }
       });

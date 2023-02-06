@@ -26,14 +26,12 @@ export class BookingService implements IBookingService {
   ): BookingModel {
     const status = BookingStatus.CONFIRMED;
 
-    const unitItemModels =
-      UnitItemModelFactory.createMultipleForBookingWithTickets({
-        bookingModel: bookingModel,
-        bookingUnitItemSchemas: confirmBookingSchema.unitItems,
-      });
+    const unitItemModels = UnitItemModelFactory.createMultipleForBookingWithTickets({
+      bookingModel: bookingModel,
+      bookingUnitItemSchemas: confirmBookingSchema.unitItems,
+    });
 
-    bookingModel.resellerReference =
-      confirmBookingSchema.resellerReference ?? bookingModel.resellerReference;
+    bookingModel.resellerReference = confirmBookingSchema.resellerReference ?? bookingModel.resellerReference;
     bookingModel.status = status;
     bookingModel.contact = ContactFactory.createForBooking({
       bookingModel: bookingModel,
@@ -59,26 +57,16 @@ export class BookingService implements IBookingService {
 
     let utcExpiresAt = bookingModel.utcExpiresAt;
     if (updateBookingSchema.expirationMinutes) {
-      utcExpiresAt = DateHelper.utcDateFormat(
-        addMinutes(new Date(), updateBookingSchema.expirationMinutes)
-      );
+      utcExpiresAt = DateHelper.utcDateFormat(addMinutes(new Date(), updateBookingSchema.expirationMinutes));
     }
 
-    const unitItemModels = this.getUpdatedUnitItems(
-      bookingModel,
-      updateBookingSchema,
-      rebookedBooking
-    );
+    const unitItemModels = this.getUpdatedUnitItems(bookingModel, updateBookingSchema, rebookedBooking);
 
-    bookingModel.resellerReference =
-      updateBookingSchema.resellerReference ?? bookingModel.resellerReference;
+    bookingModel.resellerReference = updateBookingSchema.resellerReference ?? bookingModel.resellerReference;
     bookingModel.status = status;
-    bookingModel.productModel =
-      rebookedBooking?.productModel ?? bookingModel.productModel;
-    bookingModel.optionModel =
-      rebookedBooking?.optionModel ?? bookingModel.optionModel;
-    (bookingModel.availability =
-      rebookedBooking?.availability ?? bookingModel.availability),
+    bookingModel.productModel = rebookedBooking?.productModel ?? bookingModel.productModel;
+    bookingModel.optionModel = rebookedBooking?.optionModel ?? bookingModel.optionModel;
+    (bookingModel.availability = rebookedBooking?.availability ?? bookingModel.availability),
       (bookingModel.contact = ContactFactory.createForBooking({
         bookingModel: bookingModel,
         bookingContactScheme: updateBookingSchema.contact,
@@ -88,10 +76,7 @@ export class BookingService implements IBookingService {
     bookingModel.utcExpiresAt = utcExpiresAt;
     bookingModel.utcRedeemedAt = null;
     bookingModel.notes = updateBookingSchema.notes ?? bookingModel.notes;
-    bookingModel.voucher = this.getVoucher(
-      rebookedBooking ?? bookingModel,
-      status
-    );
+    bookingModel.voucher = this.getVoucher(rebookedBooking ?? bookingModel, status);
 
     return bookingModel;
   }
@@ -141,16 +126,11 @@ export class BookingService implements IBookingService {
     return bookingModel;
   }
 
-  private getVoucher(
-    bookingModel: BookingModel,
-    status: BookingStatus
-  ): Nullable<Ticket> {
+  private getVoucher(bookingModel: BookingModel, status: BookingStatus): Nullable<Ticket> {
     if (status === BookingStatus.CONFIRMED) {
       return TicketFactory.createFromBookingForBooking(bookingModel);
     } else if (status === BookingStatus.CANCELLED) {
-      return TicketFactory.createFromProductForBooking(
-        bookingModel.productModel
-      );
+      return TicketFactory.createFromProductForBooking(bookingModel.productModel);
     }
 
     return bookingModel.voucher;

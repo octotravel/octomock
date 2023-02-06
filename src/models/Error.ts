@@ -44,12 +44,7 @@ export class HttpError extends Error {
   public error: string;
   public errorMessage: string;
   public body: Record<string, unknown> = {};
-  constructor({
-    status,
-    error,
-    errorMessage,
-    bodyParams = {},
-  }: HttpErrorParams) {
+  constructor({ status, error, errorMessage, bodyParams = {} }: HttpErrorParams) {
     super();
     this.status = status;
     this.error = error;

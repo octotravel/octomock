@@ -9,12 +9,7 @@ import {
   OpeningHours,
   PricingPer,
 } from "@octocloud/types";
-import {
-  Capacity,
-  Month,
-  ProductAvailabilityModel,
-  Day,
-} from "../models/ProductAvailabilityModel";
+import { Capacity, Month, ProductAvailabilityModel, Day } from "../models/ProductAvailabilityModel";
 
 const pricingAdult: Pricing = {
   original: 1000,

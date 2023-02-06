@@ -6,22 +6,13 @@ import { ProductWithAvailabilityModelGenerator } from "../generators/ProductWith
 import { ProductModel } from "@octocloud/generators";
 
 export class ProductModelStorage implements InMemoryStorage<ProductModel> {
-  private readonly productWithAvailabilityModels: Map<
-    string,
-    ProductWithAvailabilityModel
-  > = new Map();
-  private readonly productWithAvailabilityModelGenerator =
-    new ProductWithAvailabilityModelGenerator();
+  private readonly productWithAvailabilityModels: Map<string, ProductWithAvailabilityModel> = new Map();
+  private readonly productWithAvailabilityModelGenerator = new ProductWithAvailabilityModelGenerator();
 
   constructor() {
-    this.productWithAvailabilityModelGenerator
-      .generateMultipleProducts()
-      .forEach((productWithAvailabilityModel) => {
-        this.productWithAvailabilityModels.set(
-          productWithAvailabilityModel.id,
-          productWithAvailabilityModel
-        );
-      });
+    this.productWithAvailabilityModelGenerator.generateMultipleProducts().forEach((productWithAvailabilityModel) => {
+      this.productWithAvailabilityModels.set(productWithAvailabilityModel.id, productWithAvailabilityModel);
+    });
   }
 
   public get(id: string): ProductModel {
@@ -37,11 +28,9 @@ export class ProductModelStorage implements InMemoryStorage<ProductModel> {
   }
 
   public getAll(): ProductModel[] {
-    return this.getAllWithAvailabilities().map(
-      (productWithAvailabilityModel) => {
-        return productWithAvailabilityModel.toProductModel();
-      }
-    );
+    return this.getAllWithAvailabilities().map((productWithAvailabilityModel) => {
+      return productWithAvailabilityModel.toProductModel();
+    });
   }
 
   public getAllWithAvailabilities(): ProductWithAvailabilityModel[] {

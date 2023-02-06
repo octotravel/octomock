@@ -14,9 +14,7 @@ interface IBookingRepository {
 export class BookingRepository implements IBookingRepository {
   private readonly bookingParser = new BookingParser();
 
-  public createBooking = async (
-    bookingModel: BookingModel
-  ): Promise<BookingModel> => {
+  public createBooking = async (bookingModel: BookingModel): Promise<BookingModel> => {
     await DB.getInstance()
       .getDB()
       .run(
@@ -40,9 +38,7 @@ export class BookingRepository implements IBookingRepository {
     return bookingModel;
   };
 
-  public updateBooking = async (
-    bookingModel: BookingModel
-  ): Promise<BookingModel> => {
+  public updateBooking = async (bookingModel: BookingModel): Promise<BookingModel> => {
     await DB.getInstance()
       .getDB()
       .run(
@@ -63,10 +59,7 @@ export class BookingRepository implements IBookingRepository {
   };
 
   public getBooking = async (data: GetBookingSchema): Promise<BookingModel> => {
-    const result =
-      (await DB.getInstance()
-        .getDB()
-        .get(`SELECT * FROM booking WHERE id = ?`, data.uuid)) ?? null;
+    const result = (await DB.getInstance().getDB().get(`SELECT * FROM booking WHERE id = ?`, data.uuid)) ?? null;
     if (result == null) {
       throw new InvalidBookingUUIDError(data.uuid);
     }
@@ -77,16 +70,13 @@ export class BookingRepository implements IBookingRepository {
   };
 
   private handleExpiredBooking = (booking: BookingModel): void => {
-    const isExpired =
-      booking.utcExpiresAt! < DateHelper.utcDateFormat(new Date());
+    const isExpired = booking.utcExpiresAt! < DateHelper.utcDateFormat(new Date());
     if (isExpired) {
       throw new InvalidBookingUUIDError(booking.uuid);
     }
   };
 
-  public getBookings = async (
-    data: GetBookingsSchema
-  ): Promise<BookingModel[]> => {
+  public getBookings = async (data: GetBookingsSchema): Promise<BookingModel[]> => {
     const selectQuery = "SELECT * FROM booking WHERE ";
     const query = [];
     const params = [];
@@ -111,8 +101,6 @@ export class BookingRepository implements IBookingRepository {
     const result = await DB.getInstance()
       .getDB()
       .all(selectQuery + query.join(" AND "), ...params);
-    return result.map((r) =>
-      this.bookingParser.parsePOJOToModel(JSON.parse(r.data) as Booking)
-    );
+    return result.map((r) => this.bookingParser.parsePOJOToModel(JSON.parse(r.data) as Booking));
   };
 }

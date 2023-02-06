@@ -12,31 +12,15 @@ export abstract class ContactFactory {
     const bookingModelContact = bookingModel?.contact;
 
     return {
-      fullName:
-        bookingContactScheme?.fullName ?? bookingModelContact?.fullName ?? null,
-      firstName:
-        bookingContactScheme?.firstName ??
-        bookingModelContact?.firstName ??
-        null,
-      lastName:
-        bookingContactScheme?.lastName ?? bookingModelContact?.lastName ?? null,
-      emailAddress:
-        bookingContactScheme?.emailAddress ??
-        bookingModelContact?.emailAddress ??
-        null,
-      phoneNumber:
-        bookingContactScheme?.phoneNumber ??
-        bookingModelContact?.phoneNumber ??
-        null,
-      locales:
-        bookingContactScheme?.locales ?? bookingModelContact?.locales ?? [],
-      country:
-        bookingContactScheme?.country ?? bookingModelContact?.country ?? null,
+      fullName: bookingContactScheme?.fullName ?? bookingModelContact?.fullName ?? null,
+      firstName: bookingContactScheme?.firstName ?? bookingModelContact?.firstName ?? null,
+      lastName: bookingContactScheme?.lastName ?? bookingModelContact?.lastName ?? null,
+      emailAddress: bookingContactScheme?.emailAddress ?? bookingModelContact?.emailAddress ?? null,
+      phoneNumber: bookingContactScheme?.phoneNumber ?? bookingModelContact?.phoneNumber ?? null,
+      locales: bookingContactScheme?.locales ?? bookingModelContact?.locales ?? [],
+      country: bookingContactScheme?.country ?? bookingModelContact?.country ?? null,
       notes: bookingContactScheme?.notes ?? bookingModelContact?.notes ?? null,
-      postalCode:
-        bookingContactScheme?.postalCode ??
-        bookingModelContact?.postalCode ??
-        null,
+      postalCode: bookingContactScheme?.postalCode ?? bookingModelContact?.postalCode ?? null,
     };
   }
 }

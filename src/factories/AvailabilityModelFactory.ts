@@ -1,18 +1,5 @@
-import {
-  AvailabilityModel,
-  AvailabilityModelGenerator,
-  OptionModel,
-  ProductModel,
-} from "@octocloud/generators";
-import {
-  addDays,
-  addHours,
-  addMinutes,
-  eachDayOfInterval,
-  getDay,
-  getMonth,
-  startOfDay,
-} from "date-fns";
+import { AvailabilityModel, AvailabilityModelGenerator, OptionModel, ProductModel } from "@octocloud/generators";
+import { addDays, addHours, addMinutes, eachDayOfInterval, getDay, getMonth, startOfDay } from "date-fns";
 import { ProductWithAvailabilityModel } from "../models/ProductWithAvailabilityModel";
 import { ProductAvailabilityModel } from "../models/ProductAvailabilityModel";
 import {
@@ -43,8 +30,7 @@ interface AvailabilityPricingData {
 }
 
 export abstract class AvailabilityModelFactory {
-  private static availabilityModelGenerator: AvailabilityModelGenerator =
-    new AvailabilityModelGenerator();
+  private static availabilityModelGenerator: AvailabilityModelGenerator = new AvailabilityModelGenerator();
 
   public static createMultiple({
     productWithAvailabilityModel,
@@ -60,8 +46,7 @@ export abstract class AvailabilityModelFactory {
     availabilityUnits?: AvailabilityUnit[];
   }): AvailabilityModel[] {
     const productModel = productWithAvailabilityModel.toProductModel();
-    const productAvailabilityModel =
-      productWithAvailabilityModel.productAvailabilityModel;
+    const productAvailabilityModel = productWithAvailabilityModel.productAvailabilityModel;
     const days = eachDayOfInterval({
       start: new Date(date),
       end: addDays(new Date(date), productAvailabilityModel.days),
@@ -94,9 +79,7 @@ export abstract class AvailabilityModelFactory {
       })
       .flat(1);
 
-    return dates.flatMap((availabilityModel) =>
-      availabilityModel ? [availabilityModel] : []
-    );
+    return dates.flatMap((availabilityModel) => (availabilityModel ? [availabilityModel] : []));
   }
 
   private static buildModel({
@@ -129,83 +112,56 @@ export abstract class AvailabilityModelFactory {
         }, 0)
       : null;
 
-    const availabilities = optionModel.availabilityLocalStartTimes.map(
-      (startTime) => {
-        const datetime = new Date(`${date}T${startTime}`);
-        const localDateTimeStart = DateHelper.availabilityIdFormat(
-          datetime,
-          productModel.timeZone
-        );
+    const availabilities = optionModel.availabilityLocalStartTimes.map((startTime) => {
+      const datetime = new Date(`${date}T${startTime}`);
+      const localDateTimeStart = DateHelper.availabilityIdFormat(datetime, productModel.timeZone);
 
-        const localDateTimeEnd = this.calculateTimeEnd(
-          datetime,
-          optionModel,
-          productModel.timeZone
-        );
+      const localDateTimeEnd = this.calculateTimeEnd(datetime, optionModel, productModel.timeZone);
 
-        const availabilityStatus = this.getStatus({
-          status,
-          unitsCount,
-          capacity,
-        });
+      const availabilityStatus = this.getStatus({
+        status,
+        unitsCount,
+        capacity,
+      });
 
-        const availabilityPricing = this.getAvailabilityPricing({
-          productModel,
-          productAvailabilityModel,
-          optionId,
-          availabilityUnits,
-        });
-        const pricingPer = productModel.getProductPricingModel().pricingPer;
+      const availabilityPricing = this.getAvailabilityPricing({
+        productModel,
+        productAvailabilityModel,
+        optionId,
+        availabilityUnits,
+      });
+      const pricingPer = productModel.getProductPricingModel().pricingPer;
 
-        const shouldUsePricing: boolean =
-          (availabilityUnits !== undefined && availabilityUnits.length > 0) ||
-          pricingPer === PricingPer.BOOKING;
-        const shouldUseUnitPricing: boolean = pricingPer === PricingPer.UNIT;
+      const shouldUsePricing: boolean =
+        (availabilityUnits !== undefined && availabilityUnits.length > 0) || pricingPer === PricingPer.BOOKING;
+      const shouldUseUnitPricing: boolean = pricingPer === PricingPer.UNIT;
 
-        const availability =
-          this.availabilityModelGenerator.generateAvailability({
-            availabilityData: {
-              id: localDateTimeStart,
-              localDateTimeStart: localDateTimeStart,
-              localDateTimeEnd: localDateTimeEnd,
-              allDay: optionModel.availabilityLocalStartTimes.length === 1,
-              available: availabilityStatus !== AvailabilityStatus.SOLD_OUT,
-              status: availabilityStatus,
-              vacancies:
-                availabilityStatus === AvailabilityStatus.SOLD_OUT
-                  ? 0
-                  : capacity,
-              capacity:
-                availabilityStatus === AvailabilityStatus.SOLD_OUT
-                  ? 0
-                  : capacity,
-              maxUnits:
-                availabilityStatus === AvailabilityStatus.SOLD_OUT
-                  ? 0
-                  : optionModel.restrictions.maxUnits,
-              utcCutoffAt: DateHelper.utcDateFormat(datetime),
-              openingHours: productAvailabilityModel.openingHours,
-              unitPricing: shouldUseUnitPricing
-                ? availabilityPricing.unitPricing
-                : undefined,
-              pricing: shouldUsePricing
-                ? availabilityPricing.pricing
-                : undefined,
-            },
-            capabilities: capabilities,
-            pricingPer: pricingPer,
-          });
+      const availability = this.availabilityModelGenerator.generateAvailability({
+        availabilityData: {
+          id: localDateTimeStart,
+          localDateTimeStart: localDateTimeStart,
+          localDateTimeEnd: localDateTimeEnd,
+          allDay: optionModel.availabilityLocalStartTimes.length === 1,
+          available: availabilityStatus !== AvailabilityStatus.SOLD_OUT,
+          status: availabilityStatus,
+          vacancies: availabilityStatus === AvailabilityStatus.SOLD_OUT ? 0 : capacity,
+          capacity: availabilityStatus === AvailabilityStatus.SOLD_OUT ? 0 : capacity,
+          maxUnits: availabilityStatus === AvailabilityStatus.SOLD_OUT ? 0 : optionModel.restrictions.maxUnits,
+          utcCutoffAt: DateHelper.utcDateFormat(datetime),
+          openingHours: productAvailabilityModel.openingHours,
+          unitPricing: shouldUseUnitPricing ? availabilityPricing.unitPricing : undefined,
+          pricing: shouldUsePricing ? availabilityPricing.pricing : undefined,
+        },
+        capabilities: capabilities,
+        pricingPer: pricingPer,
+      });
 
-        return availability;
-      }
-    );
+      return availability;
+    });
     return availabilities;
   }
 
-  private static getStatusForDate(
-    productAvailabilityModel: ProductAvailabilityModel,
-    day: Date
-  ): AvailabilityStatus {
+  private static getStatusForDate(productAvailabilityModel: ProductAvailabilityModel, day: Date): AvailabilityStatus {
     const isSoldOut =
       productAvailabilityModel.daysSoldOut.includes(getDay(day)) ||
       productAvailabilityModel.daysSoldOut.includes(getMonth(day));
@@ -238,8 +194,7 @@ export abstract class AvailabilityModelFactory {
       const unitPricing = productAvailabilityModel.getUnitPricing(optionId);
       const pricing = availabilityUnits
         .map(({ id, quantity }) => {
-          const uPricing: Nullable<PricingUnit> =
-            unitPricing.find((p) => p.unitId === id) ?? null;
+          const uPricing: Nullable<PricingUnit> = unitPricing.find((p) => p.unitId === id) ?? null;
           if (uPricing === null) {
             throw new InvalidUnitIdError(id);
           }
@@ -294,11 +249,7 @@ export abstract class AvailabilityModelFactory {
     return status;
   }
 
-  private static calculateTimeEnd = (
-    date: Date,
-    optionModel: OptionModel,
-    timeZone: string
-  ) => {
+  private static calculateTimeEnd = (date: Date, optionModel: OptionModel, timeZone: string) => {
     if (
       optionModel.optionContentModel?.durationAmount !== undefined &&
       optionModel.optionContentModel.durationAmount !== "0"
@@ -308,19 +259,12 @@ export abstract class AvailabilityModelFactory {
           addHours(date, Number(optionModel.optionContentModel.durationAmount)),
           timeZone
         );
-      } else if (
-        optionModel.optionContentModel.durationUnit === DurationUnit.MINUTE
-      ) {
+      } else if (optionModel.optionContentModel.durationUnit === DurationUnit.MINUTE) {
         return DateHelper.availabilityIdFormat(
-          addMinutes(
-            date,
-            Number(optionModel.optionContentModel.durationAmount)
-          ),
+          addMinutes(date, Number(optionModel.optionContentModel.durationAmount)),
           timeZone
         );
-      } else if (
-        optionModel.optionContentModel.durationUnit === DurationUnit.DAY
-      ) {
+      } else if (optionModel.optionContentModel.durationUnit === DurationUnit.DAY) {
         return DateHelper.availabilityIdFormat(
           addDays(date, Number(optionModel.optionContentModel.durationAmount)),
           timeZone
@@ -328,9 +272,6 @@ export abstract class AvailabilityModelFactory {
       }
     }
 
-    return DateHelper.availabilityIdFormat(
-      startOfDay(addDays(date, 1)),
-      timeZone
-    );
+    return DateHelper.availabilityIdFormat(startOfDay(addDays(date, 1)), timeZone);
   };
 }

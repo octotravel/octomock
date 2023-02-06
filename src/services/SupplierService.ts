@@ -9,9 +9,7 @@ interface ISupplierService {
 export class SupplierService implements ISupplierService {
   private repository = new SupplierRepository();
 
-  public getSuppliers = async (): Promise<Supplier[]> =>
-    this.repository.getSuppliers();
+  public getSuppliers = async (): Promise<Supplier[]> => this.repository.getSuppliers();
 
-  public getSupplier = async (id: string): Promise<Nullable<Supplier>> =>
-    this.repository.getSupplier(id);
+  public getSupplier = async (id: string): Promise<Nullable<Supplier>> => this.repository.getSupplier(id);
 }

@@ -22,9 +22,7 @@ export class ProductRepository implements IProductRepository {
     return this.storage.get(id);
   };
 
-  public getProductWithAvailability = (
-    id: string
-  ): ProductWithAvailabilityModel => {
+  public getProductWithAvailability = (id: string): ProductWithAvailabilityModel => {
     return this.storage.getWithAvailability(id);
   };
 }
