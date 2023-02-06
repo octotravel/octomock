@@ -42,11 +42,11 @@ export default class OrderRepository implements IOrderRepository {
       .getDB()
       .run(
         `
-      UPDATE booking
-        SET status = ?,
-            supplierReference = ?,
-            data = ?
-        WHERE id = ?
+        UPDATE booking
+          SET status = ?,
+              supplierReference = ?,
+              data = ?
+          WHERE id = ?
     `,
         orderModel.status,
         orderModel.supplierReference,
