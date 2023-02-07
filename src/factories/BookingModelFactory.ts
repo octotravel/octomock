@@ -33,11 +33,7 @@ export abstract class BookingModelFactory {
       throw new InvalidOptionIdError(createBookingSchema.optionId);
     }
 
-    let utcExpiresAt = DateHelper.utcDateFormat(addMinutes(new Date(), 30));
-    if (createBookingSchema.expirationMinutes) {
-      utcExpiresAt = DateHelper.utcDateFormat(addMinutes(new Date(), createBookingSchema.expirationMinutes));
-    }
-
+    const utcExpiresAt = DateHelper.utcDateFormat(addMinutes(new Date(), createBookingSchema.expirationMinutes ?? 30));
     const voucher = TicketFactory.createFromProductForBooking(productModel);
 
     const unitItemModels = createBookingSchema.unitItems.map((unitItem) => {

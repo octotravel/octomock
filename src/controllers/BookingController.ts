@@ -19,6 +19,7 @@ import { ContactMapper } from "../helpers/ContactHelper";
 import OrderRepository from "../repositories/OrderRepository";
 import { OrderModelFactory } from "../factories/OrderModelFactory";
 import { BookingCartModel } from "@octocloud/generators/dist/models/booking/BookingCartModel";
+import InvalidOrderIdError from "../errors/InvalidOrderIdError";
 
 interface IBookingController {
   createBooking(schema: CreateBookingSchema, capabilities: CapabilityId[]): Promise<Booking>;
@@ -55,15 +56,21 @@ export class BookingController implements IBookingController {
     );
     this.checkRestrictions(bookingModel.optionModel, schema.unitItems);
 
-    if (schema.orderId !== undefined) {
-      let orderModel = await this.orderRepository.getOrderById(schema.orderId);
-
+    if (capabilities.includes(CapabilityId.Cart)) {
+      let orderModel;
       let primary;
-      if (orderModel === null) {
+
+      if (schema.orderId === undefined) {
         orderModel = OrderModelFactory.createByBooking(bookingModel, schema);
         await this.orderRepository.createOrder(orderModel);
         primary = true;
       } else {
+        orderModel = await this.orderRepository.getOrderById(schema.orderId);
+
+        if (orderModel === null) {
+          throw new InvalidOrderIdError(schema.orderId);
+        }
+
         orderModel.bookingModels = [...orderModel.bookingModels, bookingModel];
         await this.orderRepository.updateOrder(orderModel);
         primary = false;

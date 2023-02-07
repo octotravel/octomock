@@ -11,11 +11,7 @@ export abstract class OrderModelFactory {
 
   public static createBySchema(createOrderSchema: CreateOrderSchema): OrderModel {
     const status = OrderStatus.ON_HOLD;
-
-    let utcExpiresAt = DateHelper.utcDateFormat(addMinutes(new Date(), 30));
-    if (createOrderSchema.expirationMinutes) {
-      utcExpiresAt = DateHelper.utcDateFormat(addMinutes(new Date(), createOrderSchema.expirationMinutes));
-    }
+    const utcExpiresAt = DateHelper.utcDateFormat(addMinutes(new Date(), createOrderSchema.expirationMinutes ?? 30));
 
     return this.orderModelGenerator.generateOrder({
       orderData: {
@@ -33,15 +29,11 @@ export abstract class OrderModelFactory {
 
   public static createByBooking(bookingModel: BookingModel, createBookingSchema: CreateBookingSchema): OrderModel {
     const status = OrderStatus.ON_HOLD;
-
-    let utcExpiresAt = DateHelper.utcDateFormat(addMinutes(new Date(), 30));
-    if (createBookingSchema.expirationMinutes) {
-      utcExpiresAt = DateHelper.utcDateFormat(addMinutes(new Date(), createBookingSchema.expirationMinutes));
-    }
+    const utcExpiresAt = DateHelper.utcDateFormat(addMinutes(new Date(), createBookingSchema.expirationMinutes ?? 30));
 
     return this.orderModelGenerator.generateOrder({
       orderData: {
-        id: DataGenerator.generateUUID(),
+        id: bookingModel.bookingCartModel?.orderId ?? DataGenerator.generateUUID(),
         supplierReference: bookingModel.supplierReference ?? DataGenerator.generateSupplierReference(),
         settlementMethod: "settlementMethod",
         status: status,
