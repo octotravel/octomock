@@ -25,9 +25,7 @@ export class CapabilityController implements ICapabilityController {
         id: CapabilityId.Offers,
         revision: 1,
         required: false,
-        dependencies: [
-          CapabilityId.Pricing
-        ],
+        dependencies: [CapabilityId.Pricing],
         docs: null,
       },
       {

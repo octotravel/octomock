@@ -1,4 +1,10 @@
-import { AvailabilityModel, AvailabilityModelGenerator, OptionModel, ProductModel } from "@octocloud/generators";
+import {
+  AvailabilityModel,
+  AvailabilityModelGenerator,
+  OptionModel,
+  ProductModel,
+  OfferModel,
+} from "@octocloud/generators";
 import { addDays, addHours, addMinutes, eachDayOfInterval, getDay, getMonth, startOfDay } from "date-fns";
 import { ProductWithAvailabilityModel } from "../models/ProductWithAvailabilityModel";
 import { ProductAvailabilityModel } from "../models/ProductAvailabilityModel";
@@ -34,12 +40,14 @@ export abstract class AvailabilityModelFactory {
 
   public static createMultiple({
     productWithAvailabilityModel,
+    offerModels,
     optionId,
     date,
     capabilities,
     availabilityUnits,
   }: {
     productWithAvailabilityModel: ProductWithAvailabilityModel;
+    offerModels: OfferModel[];
     optionId: string;
     date: string;
     capabilities: CapabilityId[];
@@ -65,6 +73,7 @@ export abstract class AvailabilityModelFactory {
         const availabilityModels = this.buildModel({
           productModel: productModel,
           productAvailabilityModel: productAvailabilityModel,
+          offerModels: offerModels,
           optionId: optionId,
           date: DateHelper.availabilityDateFormat(day),
           status: this.getStatusForDate(productAvailabilityModel, day),
@@ -85,6 +94,7 @@ export abstract class AvailabilityModelFactory {
   private static buildModel({
     productModel,
     productAvailabilityModel,
+    offerModels,
     optionId,
     date,
     capabilities,
@@ -94,6 +104,7 @@ export abstract class AvailabilityModelFactory {
   }: {
     productModel: ProductModel;
     productAvailabilityModel: ProductAvailabilityModel;
+    offerModels: OfferModel[];
     optionId: string;
     date: string;
     capabilities: CapabilityId[];
@@ -136,6 +147,8 @@ export abstract class AvailabilityModelFactory {
         (availabilityUnits !== undefined && availabilityUnits.length > 0) || pricingPer === PricingPer.BOOKING;
       const shouldUseUnitPricing: boolean = pricingPer === PricingPer.UNIT;
 
+      const appliedOfferModel = offerModels[0];
+
       const availability = this.availabilityModelGenerator.generateAvailability({
         availabilityData: {
           id: localDateTimeStart,
@@ -151,6 +164,10 @@ export abstract class AvailabilityModelFactory {
           openingHours: productAvailabilityModel.openingHours,
           unitPricing: shouldUseUnitPricing ? availabilityPricing.unitPricing : undefined,
           pricing: shouldUsePricing ? availabilityPricing.pricing : undefined,
+          offerCode: appliedOfferModel.code,
+          offerTitle: appliedOfferModel.title,
+          offers: offerModels,
+          offer: appliedOfferModel,
         },
         capabilities: capabilities,
         pricingPer: pricingPer,

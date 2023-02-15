@@ -4,7 +4,9 @@ import { ProductWithAvailabilityModel } from "../models/ProductWithAvailabilityM
 
 interface IProductRepository {
   getProducts(): ProductModel[];
+  getProductsWithAvailability(): ProductWithAvailabilityModel[];
   getProduct(id: string): ProductModel;
+  getProductWithAvailability(id: string): ProductWithAvailabilityModel;
 }
 
 export class ProductRepository implements IProductRepository {

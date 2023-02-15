@@ -6,6 +6,7 @@ import { AvailabilityModel } from "@octocloud/generators";
 import { ProductRepository } from "../repositories/ProductRepository";
 import { AvailabilityModelFactory } from "../factories/AvailabilityModelFactory";
 import { ProductWithAvailabilityModel } from "../models/ProductWithAvailabilityModel";
+import { OfferRepository } from "../repositories/OfferRepository";
 
 interface FindBookingAvailabilityData {
   productWithAvailabilityModel: ProductWithAvailabilityModel;
@@ -19,17 +20,20 @@ interface IAvailabilityService {
 }
 
 export class AvailabilityService implements IAvailabilityService {
-  private productRepository = new ProductRepository();
+  private readonly productRepository = new ProductRepository();
+  private readonly offerRepository = new OfferRepository();
 
   public getAvailability = async (
     schema: AvailabilityBodySchema,
     capabilities: CapabilityId[]
   ): Promise<AvailabilityModel[]> => {
     const productWithAvailabilityModel = this.productRepository.getProductWithAvailability(schema.productId);
+    const offerModels = this.offerRepository.getOffers();
     const optionId = schema.optionId;
 
     const availabilities = AvailabilityModelFactory.createMultiple({
       productWithAvailabilityModel: productWithAvailabilityModel,
+      offerModels: offerModels,
       optionId: optionId,
       capabilities: capabilities,
       date: DateHelper.availabilityDateFormat(new Date()),
@@ -59,8 +63,10 @@ export class AvailabilityService implements IAvailabilityService {
     }
 
     const date = new Date(data.availabilityId);
+    const offerModels = this.offerRepository.getOffers();
     const availabilities = AvailabilityModelFactory.createMultiple({
       productWithAvailabilityModel: data.productWithAvailabilityModel,
+      offerModels: offerModels,
       optionId: optionId,
       capabilities: capabilities,
       date: DateHelper.availabilityDateFormat(date),
