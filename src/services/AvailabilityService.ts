@@ -1,12 +1,13 @@
 import { CapabilityId, AvailabilityBodySchema } from "@octocloud/types";
 import { InvalidAvailabilityIdError, BadRequestError } from "../models/Error";
 import { eachDayOfInterval, isMatch } from "date-fns";
-import { DateHelper } from "../helpers/DateHelper";
+import { DateHelper } from "../helpers/DateFormatter";
 import { AvailabilityModel } from "@octocloud/generators";
 import { ProductRepository } from "../repositories/ProductRepository";
 import { AvailabilityModelFactory } from "../factories/AvailabilityModelFactory";
 import { ProductWithAvailabilityModel } from "../models/ProductWithAvailabilityModel";
 import { OfferRepository } from "../repositories/OfferRepository";
+import { OfferWithDiscountModel } from "../models/OfferWithDiscountModel";
 
 interface FindBookingAvailabilityData {
   productWithAvailabilityModel: ProductWithAvailabilityModel;
@@ -28,12 +29,12 @@ export class AvailabilityService implements IAvailabilityService {
     capabilities: CapabilityId[]
   ): Promise<AvailabilityModel[]> => {
     const productWithAvailabilityModel = this.productRepository.getProductWithAvailability(schema.productId);
-    const offerModels = this.offerRepository.getOffers();
+    const offerWithDiscountModels = this.getOffers(schema.offerCode);
     const optionId = schema.optionId;
 
     const availabilities = AvailabilityModelFactory.createMultiple({
       productWithAvailabilityModel: productWithAvailabilityModel,
-      offerModels: offerModels,
+      offerWithDiscountModels: offerWithDiscountModels,
       optionId: optionId,
       capabilities: capabilities,
       date: DateHelper.availabilityDateFormat(new Date()),
@@ -63,10 +64,10 @@ export class AvailabilityService implements IAvailabilityService {
     }
 
     const date = new Date(data.availabilityId);
-    const offerModels = this.offerRepository.getOffers();
+    const offerWithDiscountModels = this.offerRepository.getOffersWithDiscount();
     const availabilities = AvailabilityModelFactory.createMultiple({
       productWithAvailabilityModel: data.productWithAvailabilityModel,
-      offerModels: offerModels,
+      offerWithDiscountModels: offerWithDiscountModels,
       optionId: optionId,
       capabilities: capabilities,
       date: DateHelper.availabilityDateFormat(date),
@@ -100,4 +101,12 @@ export class AvailabilityService implements IAvailabilityService {
       return interval.includes(a.id.split("T")[0]);
     });
   };
+
+  private getOffers(offerCode?: string): OfferWithDiscountModel[] {
+    if (offerCode) {
+      return [this.offerRepository.getOfferWithDiscount(offerCode)];
+    }
+
+    return this.offerRepository.getOffersWithDiscount();
+  }
 }

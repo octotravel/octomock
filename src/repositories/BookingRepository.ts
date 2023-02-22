@@ -1,7 +1,7 @@
 import { BookingModel, BookingParser } from "@octocloud/generators";
 import { GetBookingSchema, GetBookingsSchema } from "../schemas/Booking";
 import { DB } from "../storage/Database";
-import { DateHelper } from "../helpers/DateHelper";
+import { DateHelper } from "../helpers/DateFormatter";
 import { InvalidBookingUUIDError } from "../models/Error";
 import { Booking } from "@octocloud/types";
 interface IBookingRepository {

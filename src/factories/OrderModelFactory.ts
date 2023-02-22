@@ -1,4 +1,4 @@
-import { DateHelper } from "../helpers/DateHelper";
+import { DateHelper } from "../helpers/DateFormatter";
 import { addMinutes } from "date-fns";
 import { DataGenerator } from "../generators/DataGenerator";
 import { CreateOrderSchema } from "../schemas/Order";

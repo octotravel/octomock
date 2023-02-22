@@ -1,5 +1,5 @@
 import { OrderStatus } from "@octocloud/types";
-import { DateHelper } from "../helpers/DateHelper";
+import { DateHelper } from "../helpers/DateFormatter";
 import { OrderModel, BookingModel } from "@octocloud/generators";
 import { ContactFactory } from "../factories/ContactFactory";
 import addMinutes from "date-fns/addMinutes";

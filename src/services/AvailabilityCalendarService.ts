@@ -1,6 +1,6 @@
 import { CapabilityId, AvailabilityCalendarBodySchema } from "@octocloud/types";
 import { eachDayOfInterval } from "date-fns";
-import { DateHelper } from "../helpers/DateHelper";
+import { DateHelper } from "../helpers/DateFormatter";
 import { ProductRepository } from "../repositories/ProductRepository";
 import { AvailabilityModelFactory } from "../factories/AvailabilityModelFactory";
 import { AvailabilityCalendarModel, AvailabilityModel } from "@octocloud/generators";
@@ -23,12 +23,12 @@ export class AvailabilityCalendarService implements IAvailabilityService {
     capabilities: CapabilityId[]
   ): Promise<AvailabilityCalendarModel[]> => {
     const productWithAvailabilityModel = this.productRepository.getProductWithAvailability(schema.productId);
-    const offerModels = this.offerRepository.getOffers();
+    const offerWithDiscountModels = this.offerRepository.getOffersWithDiscount();
     const optionId = schema.optionId;
 
     const availabilities = AvailabilityModelFactory.createMultiple({
       productWithAvailabilityModel: productWithAvailabilityModel,
-      offerModels: offerModels,
+      offerWithDiscountModels: offerWithDiscountModels,
       optionId: optionId,
       capabilities: capabilities,
       date: DateHelper.availabilityDateFormat(new Date()),

@@ -2,14 +2,18 @@ import { BookingModel, UnitItemModel } from "@octocloud/generators";
 import { UpdateBookingSchema } from "../../schemas/Booking";
 import { ContactFactory } from "../../factories/ContactFactory";
 import { TicketFactory } from "../../factories/TicketFactory";
-import { BookingStatus, Ticket, Pricing } from "@octocloud/types";
-import { DateHelper } from "../../helpers/DateHelper";
+import { BookingStatus, Ticket, Pricing, OfferRestrictions } from "@octocloud/types";
+import { DateHelper } from "../../helpers/DateFormatter";
 import addMinutes from "date-fns/addMinutes";
 import { OfferRepository } from "../../repositories/OfferRepository";
 import { UnitItemModelFactory } from "../../factories/UnitItemModelFactory";
 import { BookingOffersModel } from "@octocloud/generators/dist/models/booking/BookingOffersModel";
-import { OfferDiscountType } from "../../models/OfferDiscountModel";
 import { BookingPricingModel } from "@octocloud/generators/dist/models/booking/BookingPricingModel";
+import InvalidOfferCodeError from "../../errors/InvalidOfferCodeError";
+import OfferConditionsNotMet from "../../errors/OfferConditionsNotMet";
+import { PricingFactory } from "../../factories/PricingFactory";
+import { UnitItemPricingModel } from "@octocloud/generators/dist/models/unitItem/UnitItemPricingModel";
+import { UnitPricingModel } from "@octocloud/generators/dist/models/unit/UnitPricingModel";
 
 interface IBookingUpdateService {
   updateBookingBySchema(
@@ -45,7 +49,10 @@ export class BookingUpdateService implements IBookingUpdateService {
     bookingModel.notes = updateBookingSchema.notes ?? bookingModel.notes;
     bookingModel.voucher = this.getVoucher(rebookedBooking ?? bookingModel, bookingModel.status);
     bookingModel.unitItemModels = this.updateUnitItems(bookingModel, updateBookingSchema, rebookedBooking);
-    this.applyOfferDiscountToBooking(bookingModel, updateBookingSchema.offerCode);
+
+    if (updateBookingSchema.offerCode !== undefined && bookingModel.bookingPricingModel !== undefined) {
+      this.applyOfferDiscountToBooking(bookingModel, updateBookingSchema.offerCode);
+    }
 
     return bookingModel;
   }
@@ -82,16 +89,17 @@ export class BookingUpdateService implements IBookingUpdateService {
     });
   }
 
-  private applyOfferDiscountToBooking(bookingModel: BookingModel, offerCode?: string) {
-    if (offerCode === undefined || bookingModel.bookingPricingModel === undefined) {
-      return;
-    }
-
+  private applyOfferDiscountToBooking(bookingModel: BookingModel, offerCode: string) {
     const offerWithDiscount = this.offerRepository.getOfferWithDiscount(offerCode);
 
     if (offerWithDiscount === null) {
-      return;
+      throw new InvalidOfferCodeError(offerCode);
     }
+
+    const bookingPricing = bookingModel.bookingPricingModel!.pricing;
+    const bookingUnitItemModels = bookingModel.unitItemModels;
+
+    this.checkOfferRestrictions(offerWithDiscount.restrictions, bookingPricing, bookingUnitItemModels.length);
 
     const offerDiscountModel = offerWithDiscount.offerDiscountModel;
     const offerModel = offerWithDiscount.toOfferModel();
@@ -105,24 +113,58 @@ export class BookingUpdateService implements IBookingUpdateService {
       offerModel: offerModel,
     });
 
-    const discountedBookingPricing: Pricing = { ...bookingModel.bookingPricingModel.pricing };
-    let discount: number;
+    bookingModel.unitItemModels.forEach((unitItemModel) => {
+      const unitItemPricingModel = unitItemModel.getUnitItemPricingModel();
+      const unitPricingModel = unitItemModel.unitModel.getUnitPricingModel();
 
-    switch (offerDiscountModel.type) {
-      case OfferDiscountType.FLAT:
-        discount = offerDiscountModel.amount;
-        break;
-      case OfferDiscountType.PERCENTAGE:
-        discount = (discountedBookingPricing.original / 100) * offerDiscountModel.amount;
-        break;
-      default:
-        discount = 0;
-    }
+      unitItemModel.unitItemPricingModel = new UnitItemPricingModel({
+        pricing: PricingFactory.createDiscountedPricing(unitItemPricingModel.pricing!, offerDiscountModel),
+      });
 
-    discountedBookingPricing.retail -= discount;
+      const unitPricing = unitPricingModel.pricing;
+      let discountedUnitPricing;
+      const unitPricingFrom = unitPricingModel.pricingFrom;
+      let discountedUnitPricingFrom;
+
+      if (unitPricing !== undefined) {
+        discountedUnitPricing = unitPricing.map((pricing) =>
+          PricingFactory.createDiscountedPricing(pricing, offerDiscountModel)
+        );
+      }
+
+      if (unitPricingFrom !== undefined) {
+        discountedUnitPricingFrom = unitPricingFrom.map((pricingFrom) =>
+          PricingFactory.createDiscountedPricing(pricingFrom, offerDiscountModel)
+        );
+      }
+
+      unitItemModel.unitModel.unitPricingModel = new UnitPricingModel({
+        pricing: discountedUnitPricing,
+        pricingFrom: discountedUnitPricingFrom,
+      });
+    });
+
+    const discountedBookingPricing = PricingFactory.createSummarizedPricing(
+      bookingModel.unitItemModels.map((unitItemModel) => unitItemModel.getUnitItemPricingModel().pricing)
+    );
 
     bookingModel.bookingPricingModel = new BookingPricingModel({
       pricing: discountedBookingPricing,
     });
+  }
+
+  private checkOfferRestrictions(
+    restrictions: OfferRestrictions,
+    bookingPricing: Pricing,
+    bookingUnitItemModelsCount: number
+  ) {
+    if (
+      (restrictions.minTotal !== null && restrictions.minTotal > bookingPricing.original) ||
+      (restrictions.maxTotal !== null && restrictions.maxTotal < bookingPricing.original) ||
+      (restrictions.minUnits !== null && restrictions.minUnits > bookingUnitItemModelsCount) ||
+      (restrictions.maxUnits !== null && restrictions.maxUnits < bookingUnitItemModelsCount)
+    ) {
+      throw new OfferConditionsNotMet();
+    }
   }
 }

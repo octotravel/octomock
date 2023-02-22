@@ -1,5 +1,5 @@
 import { DB } from "../storage/Database";
-import { DateHelper } from "../helpers/DateHelper";
+import { DateHelper } from "../helpers/DateFormatter";
 import { Order } from "@octocloud/types";
 import { GetOrderSchema } from "../schemas/Order";
 import InvalidOrderIdError from "../errors/InvalidOrderIdError";

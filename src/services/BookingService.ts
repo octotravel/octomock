@@ -1,6 +1,6 @@
 import { BookingStatus, Ticket, BookingUnitItemSchema, OrderStatus } from "@octocloud/types";
 import { CancelBookingSchema, ConfirmBookingSchema, ExtendBookingSchema } from "../schemas/Booking";
-import { DateHelper } from "../helpers/DateHelper";
+import { DateHelper } from "../helpers/DateFormatter";
 import { BookingModel, AvailabilityModel, OrderModel } from "@octocloud/generators";
 import { ContactFactory } from "../factories/ContactFactory";
 import { UnitItemModelFactory } from "../factories/UnitItemModelFactory";
@@ -53,8 +53,6 @@ export class BookingService implements IBookingService {
         throw new InvalidUnitIdError(unitId);
       }
     });
-
-    productWithAvailabilityModel.optionModels;
 
     const bookingModel = BookingModelFactory.create(productWithAvailabilityModel, bookingAvailability, schema);
 

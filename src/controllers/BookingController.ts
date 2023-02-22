@@ -15,7 +15,7 @@ import * as R from "ramda";
 import { BookingModel, BookingParser, OptionModel } from "@octocloud/generators";
 import { BookingRepository } from "../repositories/BookingRepository";
 import { ProductRepository } from "../repositories/ProductRepository";
-import { ContactMapper } from "../helpers/ContactHelper";
+import { ContactMapper } from "../helpers/ContactMapper";
 import OrderRepository from "../repositories/OrderRepository";
 import { OrderModelFactory } from "../factories/OrderModelFactory";
 import { BookingCartModel } from "@octocloud/generators/dist/models/booking/BookingCartModel";
