@@ -1,40 +1,8 @@
-import { OfferDiscountModel, OfferDiscountType } from "../models/OfferDiscountModel";
 import { AvailabilityUnit, Pricing, PricingUnit } from "@octocloud/types";
 import { InvalidUnitIdError } from "../models/Error";
 import R from "ramda";
 
 export abstract class PricingFactory {
-  public static createDiscountedUnitPricing(
-    pricingUnit: PricingUnit,
-    offerDiscountModel: OfferDiscountModel
-  ): PricingUnit {
-    return {
-      unitId: pricingUnit.unitId,
-      ...this.createDiscountedPricing(pricingUnit, offerDiscountModel),
-    };
-  }
-
-  public static createDiscountedPricing(pricing: Pricing, offerDiscountModel: OfferDiscountModel): Pricing {
-    const discountedPricing: Pricing = { ...pricing };
-
-    let discount: number;
-
-    switch (offerDiscountModel.type) {
-      case OfferDiscountType.FLAT:
-        discount = offerDiscountModel.amount;
-        break;
-      case OfferDiscountType.PERCENTAGE:
-        discount = (discountedPricing.original / 100) * offerDiscountModel.amount;
-        break;
-      default:
-        discount = 0;
-    }
-
-    discountedPricing.retail -= discount;
-
-    return discountedPricing;
-  }
-
   public static createFromAvailabilityUnits(
     pricingUnit: PricingUnit[],
     availabilityUnits: AvailabilityUnit[]

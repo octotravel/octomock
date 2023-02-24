@@ -14,6 +14,7 @@ import OfferConditionsNotMet from "../../errors/OfferConditionsNotMet";
 import { PricingFactory } from "../../factories/PricingFactory";
 import { UnitItemPricingModel } from "@octocloud/generators/dist/models/unitItem/UnitItemPricingModel";
 import { UnitPricingModel } from "@octocloud/generators/dist/models/unit/UnitPricingModel";
+import { PricingOfferDiscountCalculator } from "../pricing/PricingOfferDiscountCalculator";
 
 interface IBookingUpdateService {
   updateBookingBySchema(
@@ -25,6 +26,7 @@ interface IBookingUpdateService {
 
 export class BookingUpdateService implements IBookingUpdateService {
   private readonly offerRepository = new OfferRepository();
+  private readonly pricingOfferDiscountCalculator = new PricingOfferDiscountCalculator();
 
   public updateBookingBySchema(
     bookingModel: BookingModel,
@@ -90,19 +92,19 @@ export class BookingUpdateService implements IBookingUpdateService {
   }
 
   private applyOfferDiscountToBooking(bookingModel: BookingModel, offerCode: string) {
-    const offerWithDiscount = this.offerRepository.getOfferWithDiscount(offerCode);
+    const offerWithDiscountModel = this.offerRepository.getOfferWithDiscount(offerCode);
 
-    if (offerWithDiscount === null) {
+    if (offerWithDiscountModel === null) {
       throw new InvalidOfferCodeError(offerCode);
     }
 
     const bookingPricing = bookingModel.bookingPricingModel!.pricing;
     const bookingUnitItemModels = bookingModel.unitItemModels;
 
-    this.checkOfferRestrictions(offerWithDiscount.restrictions, bookingPricing, bookingUnitItemModels.length);
+    this.checkOfferRestrictions(offerWithDiscountModel.restrictions, bookingPricing, bookingUnitItemModels.length);
 
-    const offerDiscountModel = offerWithDiscount.offerDiscountModel;
-    const offerModel = offerWithDiscount.toOfferModel();
+    const offerDiscountModel = offerWithDiscountModel.offerDiscountModel;
+    const offerModel = offerWithDiscountModel.toOfferModel();
 
     bookingModel.bookingOffersModel = new BookingOffersModel({
       offerCode: offerModel.code,
@@ -118,7 +120,10 @@ export class BookingUpdateService implements IBookingUpdateService {
       const unitPricingModel = unitItemModel.unitModel.getUnitPricingModel();
 
       unitItemModel.unitItemPricingModel = new UnitItemPricingModel({
-        pricing: PricingFactory.createDiscountedPricing(unitItemPricingModel.pricing!, offerDiscountModel),
+        pricing: this.pricingOfferDiscountCalculator.createDiscountedPricing(
+          unitItemPricingModel.pricing!,
+          offerWithDiscountModel
+        ),
       });
 
       const unitPricing = unitPricingModel.pricing;
@@ -128,13 +133,13 @@ export class BookingUpdateService implements IBookingUpdateService {
 
       if (unitPricing !== undefined) {
         discountedUnitPricing = unitPricing.map((pricing) =>
-          PricingFactory.createDiscountedPricing(pricing, offerDiscountModel)
+          this.pricingOfferDiscountCalculator.createDiscountedPricing(pricing, offerWithDiscountModel)
         );
       }
 
       if (unitPricingFrom !== undefined) {
         discountedUnitPricingFrom = unitPricingFrom.map((pricingFrom) =>
-          PricingFactory.createDiscountedPricing(pricingFrom, offerDiscountModel)
+          this.pricingOfferDiscountCalculator.createDiscountedPricing(pricingFrom, offerWithDiscountModel)
         );
       }
 

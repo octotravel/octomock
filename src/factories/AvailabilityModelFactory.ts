@@ -15,7 +15,7 @@ import { InvalidOptionIdError } from "../models/Error";
 import { DateHelper } from "../helpers/DateFormatter";
 import { OfferWithDiscountModel } from "../models/OfferWithDiscountModel";
 import { PricingFactory } from "./PricingFactory";
-import { OfferDiscountModel } from "../models/OfferDiscountModel";
+import { PricingOfferDiscountCalculator } from "../services/pricing/PricingOfferDiscountCalculator";
 
 interface AvailabilityPricingData {
   unitPricing: PricingUnit[];
@@ -23,7 +23,9 @@ interface AvailabilityPricingData {
 }
 
 export abstract class AvailabilityModelFactory {
-  private static availabilityModelGenerator: AvailabilityModelGenerator = new AvailabilityModelGenerator();
+  private static readonly availabilityModelGenerator: AvailabilityModelGenerator = new AvailabilityModelGenerator();
+  private static readonly pricingOfferDiscountCalculator: PricingOfferDiscountCalculator =
+    new PricingOfferDiscountCalculator();
 
   public static createMultiple({
     productWithAvailabilityModel,
@@ -128,7 +130,7 @@ export abstract class AvailabilityModelFactory {
         productModel,
         productAvailabilityModel,
         optionId,
-        offerDiscountModel: activeOffer?.offerDiscountModel,
+        offerWithDiscountModel: activeOffer,
         availabilityUnits,
       });
       const pricingPer = productModel.getProductPricingModel().pricingPer;
@@ -186,13 +188,13 @@ export abstract class AvailabilityModelFactory {
     productModel,
     productAvailabilityModel,
     optionId,
-    offerDiscountModel,
+    offerWithDiscountModel,
     availabilityUnits,
   }: {
     productModel: ProductModel;
     productAvailabilityModel: ProductAvailabilityModel;
     optionId: string;
-    offerDiscountModel?: OfferDiscountModel;
+    offerWithDiscountModel?: OfferWithDiscountModel;
     availabilityUnits?: AvailabilityUnit[];
   }): AvailabilityPricingData {
     const pricingPer = productModel.getProductPricingModel().pricingPer;
@@ -202,7 +204,7 @@ export abstract class AvailabilityModelFactory {
     if (availabilityUnits === undefined || pricingPer !== PricingPer.UNIT) {
       unitPricing = productAvailabilityModel.getUnitPricing(optionId);
 
-      if (offerDiscountModel !== undefined) {
+      if (offerWithDiscountModel !== undefined) {
         pricing = PricingFactory.createSummarizedPricing(unitPricing);
       } else {
         pricing = productAvailabilityModel.getPricing(optionId);
@@ -213,9 +215,9 @@ export abstract class AvailabilityModelFactory {
       pricing = PricingFactory.createSummarizedPricing(availabilityUnitsPricing);
     }
 
-    if (offerDiscountModel !== undefined) {
+    if (offerWithDiscountModel !== undefined) {
       unitPricing.map((specificUnitPricing: PricingUnit) => {
-        return PricingFactory.createDiscountedUnitPricing(specificUnitPricing, offerDiscountModel);
+        return this.pricingOfferDiscountCalculator.createDiscountedPricing(specificUnitPricing, offerWithDiscountModel);
       });
     }
 
