@@ -1,6 +1,7 @@
 import { NetDiscount, Pricing, Tax } from "@octocloud/types";
 import { OfferDiscountModel, OfferDiscountType } from "../../models/OfferDiscountModel";
 import { OfferWithDiscountModel } from "../../models/OfferWithDiscountModel";
+
 export class PricingOfferDiscountCalculator {
   public createDiscountedPricing(pricing: Pricing, offerWithDiscountModel: OfferWithDiscountModel): Pricing {
     const discountedPricing: Pricing = { ...pricing };
