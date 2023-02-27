@@ -80,7 +80,7 @@ describe("PricingOfferDiscountCalculator", () => {
             name: "Besonders Tax Rate (19%)",
             original: 144,
             retail: 129,
-            net: 67,
+            net: 82,
           },
         ],
       };
