@@ -103,7 +103,6 @@ export class BookingUpdateService implements IBookingUpdateService {
 
     this.checkOfferRestrictions(offerWithDiscountModel.restrictions, bookingPricing, bookingUnitItemModels.length);
 
-    const offerDiscountModel = offerWithDiscountModel.offerDiscountModel;
     const offerModel = offerWithDiscountModel.toOfferModel();
 
     bookingModel.bookingOffersModel = new BookingOffersModel({
