@@ -139,7 +139,7 @@ export class ProductAvailabilityModel {
           })
           .flat(1) as PricingUnit[];
 
-        unitPricingMap.set(productModel.id, unitPricing);
+        unitPricingMap.set(optionModel.id, unitPricing);
       });
     }
     this.unitPricing = unitPricingMap;
