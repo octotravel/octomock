@@ -1,5 +1,3 @@
 import { CapabilityId } from "@octocloud/types";
 
-export const getCapabilities = (ctx: any): CapabilityId[] => {
-  return ctx.capabilities as CapabilityId[];
-};
+export const getCapabilities = (ctx: any): CapabilityId[] => ctx.capabilities as CapabilityId[];

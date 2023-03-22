@@ -1,15 +1,15 @@
 import { OrderStatus } from "@octocloud/types";
-import { DateHelper } from "../helpers/DateHelper";
 import { OrderModel, BookingModel } from "@octocloud/generators";
-import { ContactFactory } from "../factories/ContactFactory";
 import addMinutes from "date-fns/addMinutes";
+import { DateHelper } from "../helpers/DateHelper";
+import { ContactFactory } from "../factories/ContactFactory";
 import { ConfirmOrderSchema, ExtendOrderSchema } from "../schemas/Order";
 
 interface IOrderService {
   confirmOrderBySchema(
     orderModel: OrderModel,
     confirmedBookingModels: BookingModel[],
-    confirmOrderSchema: ConfirmOrderSchema
+    confirmOrderSchema: ConfirmOrderSchema,
   ): OrderModel;
   extendOrderBySchema(orderModel: OrderModel, extendBookingSchema: ExtendOrderSchema): OrderModel;
   cancelOrderBySchema(orderModel: OrderModel, cancelledBookingModels: BookingModel[]): OrderModel;
@@ -19,7 +19,7 @@ export class OrderService implements IOrderService {
   public confirmOrderBySchema(
     orderModel: OrderModel,
     confirmedBookingModels: BookingModel[],
-    confirmOrderSchema: ConfirmOrderSchema
+    confirmOrderSchema: ConfirmOrderSchema,
   ): OrderModel {
     orderModel.status = OrderStatus.CONFIRMED;
     orderModel.contact = ContactFactory.createForOrder({
@@ -33,17 +33,23 @@ export class OrderService implements IOrderService {
     return orderModel;
   }
 
-  public extendOrderBySchema(orderModel: OrderModel, extenOrderSchema: ExtendOrderSchema): OrderModel {
+  public extendOrderBySchema(
+    orderModel: OrderModel,
+    extenOrderSchema: ExtendOrderSchema,
+  ): OrderModel {
     orderModel.status = OrderStatus.ON_HOLD;
     orderModel.utcExpiresAt = DateHelper.utcDateFormat(
-      addMinutes(new Date(), extenOrderSchema.expirationMinutes ?? 30)
+      addMinutes(new Date(), extenOrderSchema.expirationMinutes ?? 30),
     );
     orderModel.utcConfirmedAt = null;
 
     return orderModel;
   }
 
-  public cancelOrderBySchema(orderModel: OrderModel, cancelledBookingModels: BookingModel[]): OrderModel {
+  public cancelOrderBySchema(
+    orderModel: OrderModel,
+    cancelledBookingModels: BookingModel[],
+  ): OrderModel {
     let status = OrderStatus.EXPIRED;
 
     if (orderModel.status === OrderStatus.CONFIRMED) {

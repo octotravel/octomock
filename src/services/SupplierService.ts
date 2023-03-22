@@ -11,5 +11,6 @@ export class SupplierService implements ISupplierService {
 
   public getSuppliers = async (): Promise<Supplier[]> => this.repository.getSuppliers();
 
-  public getSupplier = async (id: string): Promise<Nullable<Supplier>> => this.repository.getSupplier(id);
+  public getSupplier = async (id: string): Promise<Nullable<Supplier>> =>
+    this.repository.getSupplier(id);
 }

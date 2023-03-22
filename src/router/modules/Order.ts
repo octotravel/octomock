@@ -1,5 +1,9 @@
 import Router from "@koa/router";
-import { extendOrderBodySchema, orderCancellationBodySchema, orderConfirmationBodySchema } from "@octocloud/types";
+import {
+  extendOrderBodySchema,
+  orderCancellationBodySchema,
+  orderConfirmationBodySchema,
+} from "@octocloud/types";
 import { getCapabilities } from "../common";
 import { OrderController } from "../../controllers/OrderController";
 import {

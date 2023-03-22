@@ -1,9 +1,10 @@
 import { BookingModel, BookingParser } from "@octocloud/generators";
+import { Booking } from "@octocloud/types";
 import { GetBookingSchema, GetBookingsSchema } from "../schemas/Booking";
 import { DB } from "../storage/Database";
 import { DateHelper } from "../helpers/DateHelper";
 import { InvalidBookingUUIDError } from "../models/Error";
-import { Booking } from "@octocloud/types";
+
 interface IBookingRepository {
   createBooking(bookingModel: BookingModel): Promise<BookingModel>;
   updateBooking(bookingModel: BookingModel): Promise<BookingModel>;
@@ -33,7 +34,7 @@ export class BookingRepository implements IBookingRepository {
         bookingModel.resellerReference,
         bookingModel.supplierReference,
         DateHelper.getDate(bookingModel.utcCreatedAt),
-        JSON.stringify(this.bookingParser.parseModelToPOJO(bookingModel))
+        JSON.stringify(this.bookingParser.parseModelToPOJO(bookingModel)),
       );
     return bookingModel;
   };
@@ -53,17 +54,17 @@ export class BookingRepository implements IBookingRepository {
         bookingModel.resellerReference,
 
         JSON.stringify(this.bookingParser.parseModelToPOJO(bookingModel)),
-        bookingModel.uuid
+        bookingModel.uuid,
       );
     return bookingModel;
   };
 
-  public getBooking = async (data: GetBookingSchema): Promise<BookingModel> => {
-    return this.getBookingByUuid(data.uuid);
-  };
+  public getBooking = async (data: GetBookingSchema): Promise<BookingModel> =>
+    this.getBookingByUuid(data.uuid);
 
   public getBookingByUuid = async (uuid: string): Promise<BookingModel> => {
-    const result = (await DB.getInstance().getDB().get(`SELECT * FROM booking WHERE id = ?`, uuid)) ?? null;
+    const result =
+      (await DB.getInstance().getDB().get("SELECT * FROM booking WHERE id = ?", uuid)) ?? null;
     if (result == null) {
       throw new InvalidBookingUUIDError(uuid);
     }

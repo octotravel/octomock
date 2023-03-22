@@ -14,20 +14,22 @@ import {
   UnitItemParser,
   UnitParser,
 } from "@octocloud/generators";
+import assert from "assert";
 import { InvalidUnitIdError } from "../models/Error";
 import { DataGenerator } from "../generators/DataGenerator";
-import assert from "assert";
 
 export abstract class UnitItemModelFactory {
   private static unitItemModelGenerator: UnitItemModelGenerator = new UnitItemModelGenerator();
+
   private static unitItemParser: UnitItemParser = new UnitItemParser();
+
   private static unitParser: UnitParser = new UnitParser();
 
   public static createForBooking(
     bookingUnitItemSchema: BookingUnitItemSchema,
     bookingStatus: BookingStatus,
     optionModel: OptionModel,
-    deliveryMethods: DeliveryMethod[]
+    deliveryMethods: DeliveryMethod[],
   ): UnitItemModel {
     const unitModel = optionModel.findUnitModelByUnitId(bookingUnitItemSchema.unitId);
 
@@ -74,8 +76,8 @@ export abstract class UnitItemModelFactory {
         bookingUnitItemSchema,
         bookingModel.status,
         bookingModel.optionModel,
-        bookingModel.deliveryMethods
-      )
+        bookingModel.deliveryMethods,
+      ),
     );
   }
 
@@ -91,9 +93,9 @@ export abstract class UnitItemModelFactory {
       bookingUnitItemSchemas,
     });
 
-    return unitItemModels.map((unitItemModel) => {
-      return this.createForBookingWithTicket({ bookingModel, unitItemModel });
-    });
+    return unitItemModels.map((unitItemModel) =>
+      this.createForBookingWithTicket({ bookingModel, unitItemModel }),
+    );
   }
 
   public static createForBookingWithTicket({

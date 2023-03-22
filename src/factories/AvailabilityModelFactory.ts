@@ -1,7 +1,18 @@
-import { AvailabilityModel, AvailabilityModelGenerator, OptionModel, ProductModel } from "@octocloud/generators";
-import { addDays, addHours, addMinutes, eachDayOfInterval, getDay, getMonth, startOfDay } from "date-fns";
-import { ProductWithAvailabilityModel } from "../models/ProductWithAvailabilityModel";
-import { ProductAvailabilityModel } from "../models/ProductAvailabilityModel";
+import {
+  AvailabilityModel,
+  AvailabilityModelGenerator,
+  OptionModel,
+  ProductModel,
+} from "@octocloud/generators";
+import {
+  addDays,
+  addHours,
+  addMinutes,
+  eachDayOfInterval,
+  getDay,
+  getMonth,
+  startOfDay,
+} from "date-fns";
 import {
   AvailabilityStatus,
   AvailabilityUnit,
@@ -11,9 +22,11 @@ import {
   PricingUnit,
   Pricing,
 } from "@octocloud/types";
+import R from "ramda";
+import { ProductWithAvailabilityModel } from "../models/ProductWithAvailabilityModel";
+import { ProductAvailabilityModel } from "../models/ProductAvailabilityModel";
 import { InvalidOptionIdError, InvalidUnitIdError } from "../models/Error";
 import { DateHelper } from "../helpers/DateHelper";
-import R from "ramda";
 
 const defaultPricing = {
   original: 0,
@@ -30,7 +43,8 @@ interface AvailabilityPricingData {
 }
 
 export abstract class AvailabilityModelFactory {
-  private static availabilityModelGenerator: AvailabilityModelGenerator = new AvailabilityModelGenerator();
+  private static availabilityModelGenerator: AvailabilityModelGenerator =
+    new AvailabilityModelGenerator();
 
   public static createMultiple({
     productWithAvailabilityModel,
@@ -107,9 +121,7 @@ export abstract class AvailabilityModelFactory {
     }
 
     const unitsCount = availabilityUnits
-      ? availabilityUnits.reduce((acc, availabilityUnit) => {
-          return acc + availabilityUnit.quantity;
-        }, 0)
+      ? availabilityUnits.reduce((acc, availabilityUnit) => acc + availabilityUnit.quantity, 0)
       : null;
 
     const availabilities = optionModel.availabilityLocalStartTimes.map((startTime) => {
@@ -133,7 +145,8 @@ export abstract class AvailabilityModelFactory {
       const pricingPer = productModel.getProductPricingModel().pricingPer;
 
       const shouldUsePricing: boolean =
-        (availabilityUnits !== undefined && availabilityUnits.length > 0) || pricingPer === PricingPer.BOOKING;
+        (availabilityUnits !== undefined && availabilityUnits.length > 0) ||
+        pricingPer === PricingPer.BOOKING;
       const shouldUseUnitPricing: boolean = pricingPer === PricingPer.UNIT;
 
       const availability = this.availabilityModelGenerator.generateAvailability({
@@ -146,7 +159,10 @@ export abstract class AvailabilityModelFactory {
           status: availabilityStatus,
           vacancies: availabilityStatus === AvailabilityStatus.SOLD_OUT ? 0 : capacity,
           capacity: availabilityStatus === AvailabilityStatus.SOLD_OUT ? 0 : capacity,
-          maxUnits: availabilityStatus === AvailabilityStatus.SOLD_OUT ? 0 : optionModel.restrictions.maxUnits,
+          maxUnits:
+            availabilityStatus === AvailabilityStatus.SOLD_OUT
+              ? 0
+              : optionModel.restrictions.maxUnits,
           utcCutoffAt: DateHelper.utcDateFormat(datetime),
           openingHours: productAvailabilityModel.openingHours,
           unitPricing: shouldUseUnitPricing ? availabilityPricing.unitPricing : undefined,
@@ -161,7 +177,10 @@ export abstract class AvailabilityModelFactory {
     return availabilities;
   }
 
-  private static getStatusForDate(productAvailabilityModel: ProductAvailabilityModel, day: Date): AvailabilityStatus {
+  private static getStatusForDate(
+    productAvailabilityModel: ProductAvailabilityModel,
+    day: Date,
+  ): AvailabilityStatus {
     const isSoldOut =
       productAvailabilityModel.daysSoldOut.includes(getDay(day)) ||
       productAvailabilityModel.daysSoldOut.includes(getMonth(day));
@@ -198,20 +217,20 @@ export abstract class AvailabilityModelFactory {
           if (uPricing === null) {
             throw new InvalidUnitIdError(id);
           }
-          const pricing: Pricing = R.omit(["unitId"], uPricing);
-          return new Array(quantity).fill(pricing);
+
+          return new Array(quantity).fill(R.omit(["unitId"], uPricing));
         })
         .flat(1)
         .reduce(
-          (acc, unitPricing) => ({
-            original: acc.original + unitPricing.original,
-            retail: acc.retail + unitPricing.retail,
-            net: acc.net + unitPricing.net,
-            currency: unitPricing.currency,
-            currencyPrecision: unitPricing.currencyPrecision,
-            includedTaxes: [...acc.includedTaxes, ...unitPricing.includedTaxes],
+          (acc, uPricing) => ({
+            original: acc.original + uPricing.original,
+            retail: acc.retail + uPricing.retail,
+            net: acc.net + uPricing.net,
+            currency: uPricing.currency,
+            currencyPrecision: uPricing.currencyPrecision,
+            includedTaxes: [...acc.includedTaxes, ...uPricing.includedTaxes],
           }),
-          defaultPricing
+          defaultPricing,
         );
       return {
         unitPricing,
@@ -257,17 +276,19 @@ export abstract class AvailabilityModelFactory {
       if (optionModel.optionContentModel.durationUnit === DurationUnit.HOUR) {
         return DateHelper.availabilityIdFormat(
           addHours(date, Number(optionModel.optionContentModel.durationAmount)),
-          timeZone
+          timeZone,
         );
-      } else if (optionModel.optionContentModel.durationUnit === DurationUnit.MINUTE) {
+      }
+      if (optionModel.optionContentModel.durationUnit === DurationUnit.MINUTE) {
         return DateHelper.availabilityIdFormat(
           addMinutes(date, Number(optionModel.optionContentModel.durationAmount)),
-          timeZone
+          timeZone,
         );
-      } else if (optionModel.optionContentModel.durationUnit === DurationUnit.DAY) {
+      }
+      if (optionModel.optionContentModel.durationUnit === DurationUnit.DAY) {
         return DateHelper.availabilityIdFormat(
           addDays(date, Number(optionModel.optionContentModel.durationAmount)),
-          timeZone
+          timeZone,
         );
       }
     }

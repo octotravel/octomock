@@ -27,6 +27,7 @@ export class SupplierStorage implements InMemoryStorage<Supplier> {
       },
     },
   ];
+
   public get(id: string): Nullable<Supplier> {
     let supplier: Nullable<Supplier> = null;
 
@@ -40,6 +41,7 @@ export class SupplierStorage implements InMemoryStorage<Supplier> {
     }
     return supplier;
   }
+
   public getAll(): Supplier[] {
     return this.suppliers;
   }
