@@ -5,6 +5,7 @@ import { CapabilityController } from "./../controllers/CapabilityController";
 import Router from "@koa/router";
 import { supplierRouter } from "./modules/Supplier";
 import { orderRouter } from "./modules/Order";
+import { mappingRouter } from "./modules/Mapping";
 
 export const router = new Router();
 
@@ -14,6 +15,7 @@ router.use(supplierRouter.routes());
 router.use(productRouter.routes());
 router.use(availabilityRouter.routes());
 router.use(bookingRouter.routes());
+router.use(mappingRouter.routes());
 router.use(orderRouter.routes());
 router.get("/capabilities", async (ctx, _) => {
   const data = await capabilityController.getCapabilities();
