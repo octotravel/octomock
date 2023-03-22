@@ -7,7 +7,7 @@ export default class InvalidOfferCodeError extends OctoError {
     super({
       status: 400,
       error: "INVALID_OFFER_CODE",
-      errorMessage: `The offerCode is invalid`,
+      errorMessage: "The offerCode is invalid",
       bodyParams: { code },
     });
 

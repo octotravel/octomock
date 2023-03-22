@@ -5,6 +5,7 @@ export enum OfferDiscountType {
 
 export class OfferDiscountModel {
   public readonly type: OfferDiscountType;
+
   public readonly amount: number;
 
   constructor({ type, amount }: { type: OfferDiscountType; amount: number }) {

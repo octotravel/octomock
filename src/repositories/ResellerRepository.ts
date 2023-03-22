@@ -1,5 +1,6 @@
 import { ResellerStorage } from "../storage/ResellerStorage";
 import { Reseller } from "../types/Reseller";
+
 interface IResellerRepository {
   getReseller(apiKey: string): Reseller | null;
 }

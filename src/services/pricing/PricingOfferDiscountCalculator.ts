@@ -1,39 +1,51 @@
 import { NetDiscount, Pricing, Tax } from "@octocloud/types";
+import * as R from "ramda";
 import { OfferDiscountModel, OfferDiscountType } from "../../models/OfferDiscountModel";
 import { OfferWithDiscountModel } from "../../models/OfferWithDiscountModel";
-import * as R from "ramda";
 
 export class PricingOfferDiscountCalculator {
-  public createDiscountedPricing(pricing: Pricing, offerWithDiscountModel: OfferWithDiscountModel): Pricing {
+  public createDiscountedPricing(
+    pricing: Pricing,
+    offerWithDiscountModel: OfferWithDiscountModel,
+  ): Pricing {
     const discountedPricing: Pricing = R.clone(pricing);
 
-    discountedPricing.retail = this.calculateDiscountedRetail(discountedPricing.original, offerWithDiscountModel);
+    discountedPricing.retail = this.calculateDiscountedRetail(
+      discountedPricing.original,
+      offerWithDiscountModel,
+    );
 
     if (discountedPricing.net !== null) {
       discountedPricing.net = this.calculateDiscountedNet(
         discountedPricing.original,
         discountedPricing.retail,
         discountedPricing.net,
-        offerWithDiscountModel
+        offerWithDiscountModel,
       );
     }
 
     if (discountedPricing.includedTaxes.length !== 0) {
-      discountedPricing.includedTaxes.map((includedTax) => {
-        return this.calculateTax(
+      discountedPricing.includedTaxes.map((includedTax) =>
+        this.calculateTax(
           discountedPricing.original,
           discountedPricing.retail,
           includedTax,
-          offerWithDiscountModel
-        );
-      });
+          offerWithDiscountModel,
+        ),
+      );
     }
 
     return discountedPricing;
   }
 
-  private calculateDiscountedRetail(originalAmount: number, offerWithDiscountModel: OfferWithDiscountModel): number {
-    const discountAmount = this.getDiscountAmount(originalAmount, offerWithDiscountModel.offerDiscountModel);
+  private calculateDiscountedRetail(
+    originalAmount: number,
+    offerWithDiscountModel: OfferWithDiscountModel,
+  ): number {
+    const discountAmount = this.getDiscountAmount(
+      originalAmount,
+      offerWithDiscountModel.offerDiscountModel,
+    );
 
     return originalAmount - Math.round(discountAmount);
   }
@@ -42,10 +54,13 @@ export class PricingOfferDiscountCalculator {
     originalAmount: number,
     retailAmount: number,
     netAmount: number,
-    offerWithDiscountModel: OfferWithDiscountModel
+    offerWithDiscountModel: OfferWithDiscountModel,
   ): number {
     return (
-      netAmount - Math.round(this.getNetDiscountAmount(originalAmount, retailAmount, netAmount, offerWithDiscountModel))
+      netAmount -
+      Math.round(
+        this.getNetDiscountAmount(originalAmount, retailAmount, netAmount, offerWithDiscountModel),
+      )
     );
   }
 
@@ -53,14 +68,19 @@ export class PricingOfferDiscountCalculator {
     original: number,
     retail: number,
     tax: Tax,
-    offerWithDiscountModel: OfferWithDiscountModel
+    offerWithDiscountModel: OfferWithDiscountModel,
   ): Tax {
     const taxCoefficient: number = parseFloat((original / (original - tax.original)).toFixed(2));
 
     tax.retail = Math.round(retail - retail / taxCoefficient);
 
     if (tax.net !== null) {
-      tax.net = this.calculateDiscountedNet(tax.original, tax.retail, tax.net, offerWithDiscountModel);
+      tax.net = this.calculateDiscountedNet(
+        tax.original,
+        tax.retail,
+        tax.net,
+        offerWithDiscountModel,
+      );
     }
 
     return tax;
@@ -70,7 +90,7 @@ export class PricingOfferDiscountCalculator {
     originalAmount: number,
     retailAmount: number,
     netAmount: number,
-    offerWithDiscountModel: OfferWithDiscountModel
+    offerWithDiscountModel: OfferWithDiscountModel,
   ): number {
     const discountAmount = originalAmount - retailAmount;
     switch (offerWithDiscountModel.netDiscount) {

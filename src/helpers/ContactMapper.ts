@@ -1,5 +1,4 @@
-import { BookingContactSchema } from "@octocloud/types";
-import { Contact } from "@octocloud/types";
+import { BookingContactSchema, Contact } from "@octocloud/types";
 
 export abstract class ContactMapper {
   public static remapContactToBookingContactSchema(contact: Contact): BookingContactSchema {

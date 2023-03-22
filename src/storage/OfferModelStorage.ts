@@ -1,12 +1,13 @@
+import { OfferModel } from "@octocloud/generators";
 import { InMemoryStorage } from "./InMemoryStorage";
 
-import { OfferModel } from "@octocloud/generators";
 import { OfferWithDiscountModel } from "../models/OfferWithDiscountModel";
 import { OfferWithDiscountModelGenerator } from "../generators/OfferWithDiscountModelGenerator";
 import InvalidOfferCodeError from "../errors/InvalidOfferCodeError";
 
 export class OfferModelStorage implements InMemoryStorage<OfferModel> {
   private readonly offerWithDiscountModels: Map<string, OfferWithDiscountModel> = new Map();
+
   private readonly OfferWithDiscountModelGenerator = new OfferWithDiscountModelGenerator();
 
   constructor() {
@@ -20,7 +21,7 @@ export class OfferModelStorage implements InMemoryStorage<OfferModel> {
   }
 
   public getWithDiscount(id: string): OfferWithDiscountModel {
-    if (this.offerWithDiscountModels.has(id) == false) {
+    if (this.offerWithDiscountModels.has(id) === false) {
       throw new InvalidOfferCodeError(id);
     }
 
@@ -28,9 +29,9 @@ export class OfferModelStorage implements InMemoryStorage<OfferModel> {
   }
 
   public getAll(): OfferModel[] {
-    return this.getAllWithDiscounts().map((offerWithDiscountModel) => {
-      return offerWithDiscountModel.toOfferModel();
-    });
+    return this.getAllWithDiscounts().map((offerWithDiscountModel) =>
+      offerWithDiscountModel.toOfferModel(),
+    );
   }
 
   public getAllWithDiscounts(): OfferWithDiscountModel[] {

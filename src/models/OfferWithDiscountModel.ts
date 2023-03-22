@@ -4,7 +4,13 @@ import { OfferDiscountModel } from "./OfferDiscountModel";
 export class OfferWithDiscountModel extends OfferModel {
   public readonly offerDiscountModel: OfferDiscountModel;
 
-  constructor({ offerModel, offerDiscountModel }: { offerModel: OfferModel; offerDiscountModel: OfferDiscountModel }) {
+  constructor({
+    offerModel,
+    offerDiscountModel,
+  }: {
+    offerModel: OfferModel;
+    offerDiscountModel: OfferDiscountModel;
+  }) {
     super({ ...offerModel });
     this.offerDiscountModel = offerDiscountModel;
   }

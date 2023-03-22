@@ -1,44 +1,46 @@
 import { BookingModel, UnitItemModel } from "@octocloud/generators";
+import { BookingStatus, Ticket, Pricing, OfferRestrictions } from "@octocloud/types";
+import addMinutes from "date-fns/addMinutes";
+import { BookingOffersModel } from "@octocloud/generators/dist/models/booking/BookingOffersModel";
+import { BookingPricingModel } from "@octocloud/generators/dist/models/booking/BookingPricingModel";
+import { UnitItemPricingModel } from "@octocloud/generators/dist/models/unitItem/UnitItemPricingModel";
+import { UnitPricingModel } from "@octocloud/generators/dist/models/unit/UnitPricingModel";
 import { UpdateBookingSchema } from "../../schemas/Booking";
 import { ContactFactory } from "../../factories/ContactFactory";
 import { TicketFactory } from "../../factories/TicketFactory";
-import { BookingStatus, Ticket, Pricing, OfferRestrictions } from "@octocloud/types";
 import { DateHelper } from "../../helpers/DateFormatter";
-import addMinutes from "date-fns/addMinutes";
 import { OfferRepository } from "../../repositories/OfferRepository";
 import { UnitItemModelFactory } from "../../factories/UnitItemModelFactory";
-import { BookingOffersModel } from "@octocloud/generators/dist/models/booking/BookingOffersModel";
-import { BookingPricingModel } from "@octocloud/generators/dist/models/booking/BookingPricingModel";
 import InvalidOfferCodeError from "../../errors/InvalidOfferCodeError";
 import OfferConditionsNotMet from "../../errors/OfferConditionsNotMet";
 import { PricingFactory } from "../../factories/PricingFactory";
-import { UnitItemPricingModel } from "@octocloud/generators/dist/models/unitItem/UnitItemPricingModel";
-import { UnitPricingModel } from "@octocloud/generators/dist/models/unit/UnitPricingModel";
 import { PricingOfferDiscountCalculator } from "../pricing/PricingOfferDiscountCalculator";
 
 interface IBookingUpdateService {
   updateBookingBySchema(
     bookingModel: BookingModel,
     updateBookingSchema: UpdateBookingSchema,
-    rebookedBooking?: BookingModel
+    rebookedBooking?: BookingModel,
   ): BookingModel;
 }
 
 export class BookingUpdateService implements IBookingUpdateService {
   private readonly offerRepository = new OfferRepository();
+
   private readonly pricingOfferDiscountCalculator = new PricingOfferDiscountCalculator();
 
   public updateBookingBySchema(
     bookingModel: BookingModel,
     updateBookingSchema: UpdateBookingSchema,
-    rebookedBooking?: BookingModel
+    rebookedBooking?: BookingModel,
   ): BookingModel {
     if (updateBookingSchema.expirationMinutes) {
       bookingModel.utcExpiresAt = DateHelper.utcDateFormat(
-        addMinutes(new Date(), updateBookingSchema.expirationMinutes)
+        addMinutes(new Date(), updateBookingSchema.expirationMinutes),
       );
     }
-    bookingModel.resellerReference = updateBookingSchema.resellerReference ?? bookingModel.resellerReference;
+    bookingModel.resellerReference =
+      updateBookingSchema.resellerReference ?? bookingModel.resellerReference;
     bookingModel.productModel = rebookedBooking?.productModel ?? bookingModel.productModel;
     bookingModel.optionModel = rebookedBooking?.optionModel ?? bookingModel.optionModel;
     bookingModel.availability = rebookedBooking?.availability ?? bookingModel.availability;
@@ -50,9 +52,16 @@ export class BookingUpdateService implements IBookingUpdateService {
     bookingModel.utcRedeemedAt = null;
     bookingModel.notes = updateBookingSchema.notes ?? bookingModel.notes;
     bookingModel.voucher = this.getVoucher(rebookedBooking ?? bookingModel, bookingModel.status);
-    bookingModel.unitItemModels = this.updateUnitItems(bookingModel, updateBookingSchema, rebookedBooking);
+    bookingModel.unitItemModels = this.updateUnitItems(
+      bookingModel,
+      updateBookingSchema,
+      rebookedBooking,
+    );
 
-    if (updateBookingSchema.offerCode !== undefined && bookingModel.bookingPricingModel !== undefined) {
+    if (
+      updateBookingSchema.offerCode !== undefined &&
+      bookingModel.bookingPricingModel !== undefined
+    ) {
       this.applyOfferDiscountToBooking(bookingModel, updateBookingSchema.offerCode);
     }
 
@@ -62,7 +71,8 @@ export class BookingUpdateService implements IBookingUpdateService {
   private getVoucher(bookingModel: BookingModel, status: BookingStatus): Nullable<Ticket> {
     if (status === BookingStatus.CONFIRMED) {
       return TicketFactory.createFromBookingForBooking(bookingModel);
-    } else if (status === BookingStatus.CANCELLED) {
+    }
+    if (status === BookingStatus.CANCELLED) {
       return TicketFactory.createFromProductForBooking(bookingModel.productModel);
     }
 
@@ -72,7 +82,7 @@ export class BookingUpdateService implements IBookingUpdateService {
   private updateUnitItems(
     bookingModel: BookingModel,
     schema: UpdateBookingSchema,
-    rebookedBooking?: BookingModel
+    rebookedBooking?: BookingModel,
   ): UnitItemModel[] {
     if (schema.unitItems === undefined) {
       return rebookedBooking?.unitItemModels ?? bookingModel.unitItemModels;
@@ -101,7 +111,11 @@ export class BookingUpdateService implements IBookingUpdateService {
     const bookingPricing = bookingModel.bookingPricingModel!.pricing;
     const bookingUnitItemModels = bookingModel.unitItemModels;
 
-    this.checkOfferRestrictions(offerWithDiscountModel.restrictions, bookingPricing, bookingUnitItemModels.length);
+    this.checkOfferRestrictions(
+      offerWithDiscountModel.restrictions,
+      bookingPricing,
+      bookingUnitItemModels.length,
+    );
 
     const offerModel = offerWithDiscountModel.toOfferModel();
 
@@ -121,7 +135,7 @@ export class BookingUpdateService implements IBookingUpdateService {
       unitItemModel.unitItemPricingModel = new UnitItemPricingModel({
         pricing: this.pricingOfferDiscountCalculator.createDiscountedPricing(
           unitItemPricingModel.pricing!,
-          offerWithDiscountModel
+          offerWithDiscountModel,
         ),
       });
 
@@ -132,13 +146,19 @@ export class BookingUpdateService implements IBookingUpdateService {
 
       if (unitPricing !== undefined) {
         discountedUnitPricing = unitPricing.map((pricing) =>
-          this.pricingOfferDiscountCalculator.createDiscountedPricing(pricing, offerWithDiscountModel)
+          this.pricingOfferDiscountCalculator.createDiscountedPricing(
+            pricing,
+            offerWithDiscountModel,
+          ),
         );
       }
 
       if (unitPricingFrom !== undefined) {
         discountedUnitPricingFrom = unitPricingFrom.map((pricingFrom) =>
-          this.pricingOfferDiscountCalculator.createDiscountedPricing(pricingFrom, offerWithDiscountModel)
+          this.pricingOfferDiscountCalculator.createDiscountedPricing(
+            pricingFrom,
+            offerWithDiscountModel,
+          ),
         );
       }
 
@@ -149,7 +169,9 @@ export class BookingUpdateService implements IBookingUpdateService {
     });
 
     const discountedBookingPricing = PricingFactory.createSummarizedPricing(
-      bookingModel.unitItemModels.map((unitItemModel) => unitItemModel.getUnitItemPricingModel().pricing)
+      bookingModel.unitItemModels.map(
+        (unitItemModel) => unitItemModel.getUnitItemPricingModel().pricing,
+      ),
     );
 
     bookingModel.bookingPricingModel = new BookingPricingModel({
@@ -160,7 +182,7 @@ export class BookingUpdateService implements IBookingUpdateService {
   private checkOfferRestrictions(
     restrictions: OfferRestrictions,
     bookingPricing: Pricing,
-    bookingUnitItemModelsCount: number
+    bookingUnitItemModelsCount: number,
   ) {
     if (
       (restrictions.minTotal !== null && restrictions.minTotal > bookingPricing.original) ||

@@ -1,4 +1,5 @@
 import { CapabilityId, Order, OrderStatus } from "@octocloud/types";
+import { OrderParser, BookingModel } from "@octocloud/generators";
 import OrderRepository from "../repositories/OrderRepository";
 import {
   CreateOrderSchema,
@@ -8,7 +9,6 @@ import {
   GetOrderSchema,
 } from "../schemas/Order";
 import { OrderModelFactory } from "../factories/OrderModelFactory";
-import { OrderParser, BookingModel } from "@octocloud/generators";
 import { OrderService } from "../services/OrderService";
 import { UnprocessableEntityError } from "../models/Error";
 import { BookingService } from "../services/BookingService";
@@ -24,19 +24,32 @@ interface IOrderController {
 
 export class OrderController implements IOrderController {
   private readonly orderRepository = new OrderRepository();
+
   private readonly orderService = new OrderService();
+
   private readonly bookingRepository = new BookingRepository();
+
   private readonly bookingService = new BookingService();
+
   private readonly orderParser = new OrderParser();
 
-  public createOrder = async (schema: CreateOrderSchema, capabilities: CapabilityId[]): Promise<Order> => {
+  public createOrder = async (
+    schema: CreateOrderSchema,
+    capabilities: CapabilityId[],
+  ): Promise<Order> => {
     const orderModel = OrderModelFactory.createBySchema(schema);
     const createdOrderModel = await this.orderRepository.createOrder(orderModel);
 
-    return this.orderParser.parseModelToPOJOWithSpecificCapabilities(createdOrderModel, capabilities);
+    return this.orderParser.parseModelToPOJOWithSpecificCapabilities(
+      createdOrderModel,
+      capabilities,
+    );
   };
 
-  public confirmOrder = async (schema: ConfirmOrderSchema, capabilities: CapabilityId[]): Promise<Order> => {
+  public confirmOrder = async (
+    schema: ConfirmOrderSchema,
+    capabilities: CapabilityId[],
+  ): Promise<Order> => {
     const orderModel = await this.orderRepository.getOrder(schema);
 
     if (orderModel.status === OrderStatus.CONFIRMED) {
@@ -50,13 +63,23 @@ export class OrderController implements IOrderController {
       confirmedBookingModels.push(confirmedBookingModel);
     });
 
-    const confirmedOrderModel = this.orderService.confirmOrderBySchema(orderModel, confirmedBookingModels, schema);
+    const confirmedOrderModel = this.orderService.confirmOrderBySchema(
+      orderModel,
+      confirmedBookingModels,
+      schema,
+    );
     await this.orderRepository.updateOrder(confirmedOrderModel);
 
-    return this.orderParser.parseModelToPOJOWithSpecificCapabilities(confirmedOrderModel, capabilities);
+    return this.orderParser.parseModelToPOJOWithSpecificCapabilities(
+      confirmedOrderModel,
+      capabilities,
+    );
   };
 
-  public extendOrder = async (schema: ExtendOrderSchema, capabilities: CapabilityId[]): Promise<Order> => {
+  public extendOrder = async (
+    schema: ExtendOrderSchema,
+    capabilities: CapabilityId[],
+  ): Promise<Order> => {
     const orderModel = await this.orderRepository.getOrder(schema);
 
     if (orderModel.status !== OrderStatus.ON_HOLD) {
@@ -66,10 +89,16 @@ export class OrderController implements IOrderController {
     const extendedOrderModel = this.orderService.extendOrderBySchema(orderModel, schema);
     await this.orderRepository.updateOrder(extendedOrderModel);
 
-    return this.orderParser.parseModelToPOJOWithSpecificCapabilities(extendedOrderModel, capabilities);
+    return this.orderParser.parseModelToPOJOWithSpecificCapabilities(
+      extendedOrderModel,
+      capabilities,
+    );
   };
 
-  public cancelOrder = async (schema: CancelOrderSchema, capabilities: CapabilityId[]): Promise<Order> => {
+  public cancelOrder = async (
+    schema: CancelOrderSchema,
+    capabilities: CapabilityId[],
+  ): Promise<Order> => {
     const orderModel = await this.orderRepository.getOrder(schema);
 
     if (orderModel.cancellable === false) {
@@ -82,18 +111,31 @@ export class OrderController implements IOrderController {
 
     const cancelledBookingModels: BookingModel[] = [];
     orderModel.bookingModels.forEach(async (bookingModel) => {
-      const cancelledBookingModel = this.bookingService.cancelBookingByOrder(bookingModel, orderModel, schema);
+      const cancelledBookingModel = this.bookingService.cancelBookingByOrder(
+        bookingModel,
+        orderModel,
+        schema,
+      );
       await this.bookingRepository.updateBooking(cancelledBookingModel);
       cancelledBookingModels.push(cancelledBookingModel);
     });
 
-    const cancelledOrderModel = this.orderService.cancelOrderBySchema(orderModel, cancelledBookingModels);
+    const cancelledOrderModel = this.orderService.cancelOrderBySchema(
+      orderModel,
+      cancelledBookingModels,
+    );
     await this.orderRepository.updateOrder(cancelledOrderModel);
 
-    return this.orderParser.parseModelToPOJOWithSpecificCapabilities(cancelledOrderModel, capabilities);
+    return this.orderParser.parseModelToPOJOWithSpecificCapabilities(
+      cancelledOrderModel,
+      capabilities,
+    );
   };
 
-  public getOrder = async (schema: GetOrderSchema, capabilities: CapabilityId[]): Promise<Order> => {
+  public getOrder = async (
+    schema: GetOrderSchema,
+    capabilities: CapabilityId[],
+  ): Promise<Order> => {
     const orderModel = await this.orderRepository.getOrder(schema);
 
     return this.orderParser.parseModelToPOJOWithSpecificCapabilities(orderModel, capabilities);

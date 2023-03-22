@@ -1,5 +1,5 @@
-import { ProductAvailabilityModel } from "./ProductAvailabilityModel";
 import { ProductModel } from "@octocloud/generators";
+import { ProductAvailabilityModel } from "./ProductAvailabilityModel";
 
 export class ProductWithAvailabilityModel extends ProductModel {
   public readonly productAvailabilityModel: ProductAvailabilityModel;

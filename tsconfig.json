@@ -1,16 +1,29 @@
 {
+  "ts-node": {
+    "experimentalResolver": true,
+    "compilerOptions": {
+      "module": "CommonJS"
+    }
+  },
   "compilerOptions": {
     "outDir": "dist",
-    "target": "es2017",
-    "module": "commonjs",
-    "sourceMap": true,
+    "baseUrl": ".",
+    "rootDir": ".",
+    "target": "ES2019",
+    "module": "CommonJS",
     "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
     "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "checkJs": true,
+    "allowJs": true,
+    "declaration": true,
+    "declarationMap": true,
+    "allowSyntheticDefaultImports": true,
     "typeRoots": ["node_modules/@types"],
     "types": ["jest"],
-    "resolveJsonModule": true
+    "moduleResolution": "node",
+    "experimentalDecorators": true
   },
   "include": ["src/**/**.ts", "test/**/**.ts"],
   "exclude": ["node_modules"]

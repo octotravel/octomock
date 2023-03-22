@@ -28,14 +28,18 @@ export interface CreateOrderSchema extends CreateOrderBodySchema {}
 
 export const createOrderSchema = createOrderBodySchema.clone();
 
-export interface ConfirmOrderSchema extends OrderConfirmationBodySchema, OrderConfirmationPathParamsSchema {}
+export interface ConfirmOrderSchema
+  extends OrderConfirmationBodySchema,
+    OrderConfirmationPathParamsSchema {}
 
 export const confirmOrderSchema: yup.SchemaOf<ConfirmOrderSchema> = yup.object().shape({
   ...orderConfirmationBodySchema.fields,
   ...orderConfirmationPathParamsSchema.fields,
 });
 
-export interface CancelOrderSchema extends OrderCancellationBodySchema, OrderCancellationPathParamsSchema {}
+export interface CancelOrderSchema
+  extends OrderCancellationBodySchema,
+    OrderCancellationPathParamsSchema {}
 
 export const cancelOrderSchema: yup.SchemaOf<CancelOrderSchema> = yup.object().shape({
   ...orderCancellationBodySchema.fields,
