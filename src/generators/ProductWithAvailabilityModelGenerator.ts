@@ -1,5 +1,4 @@
 import { ProductModelGenerator, PartialProduct } from "@octocloud/generators";
-import { ProductWithAvailabilityModel } from "../models/ProductWithAvailabilityModel";
 import {
   Currency,
   UnitType,
@@ -9,6 +8,7 @@ import {
   OpeningHours,
   PricingPer,
 } from "@octocloud/types";
+import { ProductWithAvailabilityModel } from "../models/ProductWithAvailabilityModel";
 import { Capacity, Month, ProductAvailabilityModel, Day } from "../models/ProductAvailabilityModel";
 
 const pricingAdult: Pricing = {
@@ -190,7 +190,7 @@ export class ProductWithAvailabilityModelGenerator {
           availabilityType: AvailabilityType.START_TIME,
           daysClosed: [Day.Sat, Day.Sun],
         },
-      })
+      }),
     );
 
     return productWithAvailabilityModels;

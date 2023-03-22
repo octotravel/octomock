@@ -1,8 +1,8 @@
+import Router from "@koa/router";
 import { bookingRouter } from "./modules/Booking";
 import { availabilityRouter } from "./modules/Availability";
 import { productRouter } from "./modules/Prodduct";
-import { CapabilityController } from "./../controllers/CapabilityController";
-import Router from "@koa/router";
+import { CapabilityController } from "../controllers/CapabilityController";
 import { supplierRouter } from "./modules/Supplier";
 
 export const router = new Router();

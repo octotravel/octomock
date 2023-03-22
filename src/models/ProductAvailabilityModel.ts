@@ -30,8 +30,8 @@ export enum Month {
 
 export type Capacity = Map<Day, Nullable<number>>;
 
-const fillCapacity = (value: Nullable<number>): Capacity => {
-  return new Map([
+const fillCapacity = (value: Nullable<number>): Capacity =>
+  new Map([
     [Day.Mon, value],
     [Day.Tue, value],
     [Day.Wed, value],
@@ -40,18 +40,26 @@ const fillCapacity = (value: Nullable<number>): Capacity => {
     [Day.Sat, value],
     [Day.Sun, value],
   ]);
-};
 
 export class ProductAvailabilityModel {
   public days: number;
+
   public daysClosed: Day[];
+
   public daysSoldOut: Day[];
+
   public monthsClosed: Month[];
+
   public availabilityType: AvailabilityType;
+
   public openingHours: OpeningHours[];
+
   public capacity: Capacity;
+
   public freesale: boolean;
+
   private pricing!: Map<string, Pricing>;
+
   private unitPricing!: Map<string, PricingUnit[]>;
 
   constructor({
@@ -110,7 +118,10 @@ export class ProductAvailabilityModel {
       productModel.optionModels.forEach((optionModel) => {
         const optionPricingModel = optionModel.getOptionPricingModel();
 
-        if (optionPricingModel.pricingFrom !== undefined && optionPricingModel.pricingFrom.length > 0) {
+        if (
+          optionPricingModel.pricingFrom !== undefined &&
+          optionPricingModel.pricingFrom.length > 0
+        ) {
           pricingMap.set(optionModel.id, optionPricingModel.pricingFrom[0]);
         }
       });
@@ -127,15 +138,16 @@ export class ProductAvailabilityModel {
             const unitPricingModel = unitModel.getUnitPricingModel();
 
             if (unitPricingModel.pricingFrom === undefined) {
-              return;
+              return null;
             }
 
-            return unitPricingModel.pricingFrom.map((pricingFrom) => {
-              return {
-                unitId: unitModel.id,
-                ...pricingFrom,
-              } as PricingUnit;
-            });
+            return unitPricingModel.pricingFrom.map(
+              (pricingFrom) =>
+                ({
+                  unitId: unitModel.id,
+                  ...pricingFrom,
+                } as PricingUnit),
+            );
           })
           .flat(1) as PricingUnit[];
 
@@ -145,11 +157,7 @@ export class ProductAvailabilityModel {
     this.unitPricing = unitPricingMap;
   }
 
-  public getPricing = (optionId: string): Pricing => {
-    return this.pricing.get(optionId)!;
-  };
+  public getPricing = (optionId: string): Pricing => this.pricing.get(optionId)!;
 
-  public getUnitPricing = (optionId: string): PricingUnit[] => {
-    return this.unitPricing.get(optionId)!;
-  };
+  public getUnitPricing = (optionId: string): PricingUnit[] => this.unitPricing.get(optionId)!;
 }

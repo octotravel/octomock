@@ -2,11 +2,11 @@ import "isomorphic-fetch";
 import Koa from "koa";
 import koaBody from "koa-body";
 import cors from "@koa/cors";
+import { ValidationError } from "yup";
 import { router } from "./router/AppRouter";
 import { parseCapabilities } from "./router/middlewares";
 import { DB } from "./storage/Database";
 import { DataGenerator } from "./generators/DataGenerator";
-import { ValidationError } from "yup";
 import { OctoError, InternalServerError, BadRequestError } from "./models/Error";
 import "dotenv/config";
 
@@ -19,7 +19,7 @@ app.use(async (ctx, next) => {
   try {
     await next();
   } catch (err: any) {
-    console.log(err)
+    console.log(err);
     if (err instanceof OctoError) {
       ctx.status = err.status;
       ctx.body = err.body;

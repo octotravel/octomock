@@ -1,4 +1,6 @@
 import { BookingStatus, Ticket } from "@octocloud/types";
+import { BookingModel, UnitItemModel } from "@octocloud/generators";
+import addMinutes from "date-fns/addMinutes";
 import {
   CancelBookingSchema,
   ConfirmBookingSchema,
@@ -6,23 +8,21 @@ import {
   UpdateBookingSchema,
 } from "../schemas/Booking";
 import { DateHelper } from "../helpers/DateHelper";
-import { BookingModel, UnitItemModel } from "@octocloud/generators";
 import { ContactFactory } from "../factories/ContactFactory";
 import { UnitItemModelFactory } from "../factories/UnitItemModelFactory";
 import { TicketFactory } from "../factories/TicketFactory";
-import addMinutes from "date-fns/addMinutes";
 
 interface IBookingService {
   updateBookingModelWithConfirmBookingSchema(
     bookingModel: BookingModel,
-    confirmBookingSchema: ConfirmBookingSchema
+    confirmBookingSchema: ConfirmBookingSchema,
   ): BookingModel;
 }
 
 export class BookingService implements IBookingService {
   public updateBookingModelWithConfirmBookingSchema(
     bookingModel: BookingModel,
-    confirmBookingSchema: ConfirmBookingSchema
+    confirmBookingSchema: ConfirmBookingSchema,
   ): BookingModel {
     const status = BookingStatus.CONFIRMED;
 
@@ -31,7 +31,8 @@ export class BookingService implements IBookingService {
       bookingUnitItemSchemas: confirmBookingSchema.unitItems,
     });
 
-    bookingModel.resellerReference = confirmBookingSchema.resellerReference ?? bookingModel.resellerReference;
+    bookingModel.resellerReference =
+      confirmBookingSchema.resellerReference ?? bookingModel.resellerReference;
     bookingModel.status = status;
     bookingModel.contact = ContactFactory.createForBooking({
       bookingModel: bookingModel,
@@ -51,26 +52,33 @@ export class BookingService implements IBookingService {
   public updateBookingModelWithUpdateBookingSchema(
     bookingModel: BookingModel,
     updateBookingSchema: UpdateBookingSchema,
-    rebookedBooking?: BookingModel
+    rebookedBooking?: BookingModel,
   ): BookingModel {
     const status = bookingModel.status;
 
     let utcExpiresAt = bookingModel.utcExpiresAt;
     if (updateBookingSchema.expirationMinutes) {
-      utcExpiresAt = DateHelper.utcDateFormat(addMinutes(new Date(), updateBookingSchema.expirationMinutes));
+      utcExpiresAt = DateHelper.utcDateFormat(
+        addMinutes(new Date(), updateBookingSchema.expirationMinutes),
+      );
     }
 
-    const unitItemModels = this.getUpdatedUnitItems(bookingModel, updateBookingSchema, rebookedBooking);
+    const unitItemModels = this.getUpdatedUnitItems(
+      bookingModel,
+      updateBookingSchema,
+      rebookedBooking,
+    );
 
-    bookingModel.resellerReference = updateBookingSchema.resellerReference ?? bookingModel.resellerReference;
+    bookingModel.resellerReference =
+      updateBookingSchema.resellerReference ?? bookingModel.resellerReference;
     bookingModel.status = status;
     bookingModel.productModel = rebookedBooking?.productModel ?? bookingModel.productModel;
     bookingModel.optionModel = rebookedBooking?.optionModel ?? bookingModel.optionModel;
-    (bookingModel.availability = rebookedBooking?.availability ?? bookingModel.availability),
-      (bookingModel.contact = ContactFactory.createForBooking({
-        bookingModel: bookingModel,
-        bookingContactScheme: updateBookingSchema.contact,
-      }));
+    bookingModel.availability = rebookedBooking?.availability ?? bookingModel.availability;
+    bookingModel.contact = ContactFactory.createForBooking({
+      bookingModel: bookingModel,
+      bookingContactScheme: updateBookingSchema.contact,
+    });
     bookingModel.unitItemModels = unitItemModels;
     bookingModel.utcUpdatedAt = DateHelper.utcDateFormat(new Date());
     bookingModel.utcExpiresAt = utcExpiresAt;
@@ -83,14 +91,14 @@ export class BookingService implements IBookingService {
 
   public updateBookingModelWithExtendBookingSchema(
     bookingModel: BookingModel,
-    extendBookingSchema: ExtendBookingSchema
+    extendBookingSchema: ExtendBookingSchema,
   ): BookingModel {
     const status = BookingStatus.ON_HOLD;
 
     bookingModel.status = status;
     bookingModel.utcUpdatedAt = DateHelper.utcDateFormat(new Date());
     bookingModel.utcExpiresAt = DateHelper.utcDateFormat(
-      addMinutes(new Date(), extendBookingSchema.expirationMinutes ?? 30)
+      addMinutes(new Date(), extendBookingSchema.expirationMinutes ?? 30),
     );
     bookingModel.utcRedeemedAt = null;
     bookingModel.utcConfirmedAt = null;
@@ -101,7 +109,7 @@ export class BookingService implements IBookingService {
 
   public updateBookingModelWithCancelBookingSchema(
     bookingModel: BookingModel,
-    schema: CancelBookingSchema
+    schema: CancelBookingSchema,
   ): BookingModel {
     let status = BookingStatus.EXPIRED;
 
@@ -129,7 +137,8 @@ export class BookingService implements IBookingService {
   private getVoucher(bookingModel: BookingModel, status: BookingStatus): Nullable<Ticket> {
     if (status === BookingStatus.CONFIRMED) {
       return TicketFactory.createFromBookingForBooking(bookingModel);
-    } else if (status === BookingStatus.CANCELLED) {
+    }
+    if (status === BookingStatus.CANCELLED) {
       return TicketFactory.createFromProductForBooking(bookingModel.productModel);
     }
 
@@ -139,7 +148,7 @@ export class BookingService implements IBookingService {
   private getUpdatedUnitItems = (
     bookingModel: BookingModel,
     schema: UpdateBookingSchema,
-    rebookedBooking?: BookingModel
+    rebookedBooking?: BookingModel,
   ): UnitItemModel[] => {
     if (schema.unitItems) {
       return bookingModel.status === BookingStatus.CONFIRMED
