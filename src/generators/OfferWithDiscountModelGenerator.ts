@@ -1,5 +1,5 @@
-import { OfferWithDiscountModel } from "../models/OfferWithDiscountModel";
 import { OfferPreset } from "@octocloud/generators";
+import { OfferWithDiscountModel } from "../models/OfferWithDiscountModel";
 import { OfferDiscountModel, OfferDiscountType } from "../models/OfferDiscountModel";
 
 export class OfferWithDiscountModelGenerator {

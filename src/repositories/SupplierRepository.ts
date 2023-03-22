@@ -1,5 +1,5 @@
-import { SupplierStorage } from "./../storage/SupplierStorage";
 import { Supplier } from "@octocloud/types";
+import { SupplierStorage } from "../storage/SupplierStorage";
 
 interface ISupplierRepository {
   getSuppliers(): Supplier[];
@@ -8,6 +8,7 @@ interface ISupplierRepository {
 
 export class SupplierRepository implements ISupplierRepository {
   private storage = new SupplierStorage();
+
   public getSuppliers(): Supplier[] {
     return this.storage.getAll();
   }

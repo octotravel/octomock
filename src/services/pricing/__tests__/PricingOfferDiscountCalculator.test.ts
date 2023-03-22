@@ -1,5 +1,5 @@
-import { PricingOfferDiscountCalculator } from "../PricingOfferDiscountCalculator";
 import { Pricing, NetDiscount, Currency } from "@octocloud/types";
+import { PricingOfferDiscountCalculator } from "../PricingOfferDiscountCalculator";
 import { OfferWithDiscountModel } from "../../../models/OfferWithDiscountModel";
 import { OfferDiscountType } from "../../../models/OfferDiscountModel";
 
@@ -62,7 +62,7 @@ describe("PricingOfferDiscountCalculator", () => {
 
       const discountedPricing = pricingOfferDiscountCalculator.createDiscountedPricing(
         pricing,
-        tenPercentOffFullNetDiscount
+        tenPercentOffFullNetDiscount,
       );
 
       expect(discountedPricing).toStrictEqual(discountedPricingFullNetDiscount);
@@ -107,7 +107,7 @@ describe("PricingOfferDiscountCalculator", () => {
 
       const discountedPricing = pricingOfferDiscountCalculator.createDiscountedPricing(
         pricing,
-        tenPercentOffSplitNetDiscount
+        tenPercentOffSplitNetDiscount,
       );
 
       expect(discountedPricing).toStrictEqual(discountedPricingSplitNetDiscount);
@@ -152,7 +152,7 @@ describe("PricingOfferDiscountCalculator", () => {
 
       const discountedPricing = pricingOfferDiscountCalculator.createDiscountedPricing(
         pricing,
-        tenEurOffFullNetDiscount
+        tenEurOffFullNetDiscount,
       );
 
       expect(discountedPricing).toStrictEqual(discountedPricingByFlatFullNetDiscount);

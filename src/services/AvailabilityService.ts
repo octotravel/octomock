@@ -1,8 +1,8 @@
 import { CapabilityId, AvailabilityBodySchema } from "@octocloud/types";
-import { InvalidAvailabilityIdError, BadRequestError } from "../models/Error";
 import { eachDayOfInterval, isMatch } from "date-fns";
-import { DateHelper } from "../helpers/DateFormatter";
 import { AvailabilityModel } from "@octocloud/generators";
+import { InvalidAvailabilityIdError, BadRequestError } from "../models/Error";
+import { DateHelper } from "../helpers/DateFormatter";
 import { ProductRepository } from "../repositories/ProductRepository";
 import { AvailabilityModelFactory } from "../factories/AvailabilityModelFactory";
 import { ProductWithAvailabilityModel } from "../models/ProductWithAvailabilityModel";
@@ -16,19 +16,28 @@ interface FindBookingAvailabilityData {
 }
 
 interface IAvailabilityService {
-  getAvailability(schema: AvailabilityBodySchema, capabilities: CapabilityId[]): Promise<AvailabilityModel[]>;
-  findBookingAvailability(data: FindBookingAvailabilityData, capabilities: CapabilityId[]): Promise<AvailabilityModel>;
+  getAvailability(
+    schema: AvailabilityBodySchema,
+    capabilities: CapabilityId[],
+  ): Promise<AvailabilityModel[]>;
+  findBookingAvailability(
+    data: FindBookingAvailabilityData,
+    capabilities: CapabilityId[],
+  ): Promise<AvailabilityModel>;
 }
 
 export class AvailabilityService implements IAvailabilityService {
   private readonly productRepository = new ProductRepository();
+
   private readonly offerRepository = new OfferRepository();
 
   public getAvailability = async (
     schema: AvailabilityBodySchema,
-    capabilities: CapabilityId[]
+    capabilities: CapabilityId[],
   ): Promise<AvailabilityModel[]> => {
-    const productWithAvailabilityModel = this.productRepository.getProductWithAvailability(schema.productId);
+    const productWithAvailabilityModel = this.productRepository.getProductWithAvailability(
+      schema.productId,
+    );
     const offerWithDiscountModels = this.getOffers(schema.offerCode);
     const optionId = schema.optionId;
 
@@ -55,7 +64,7 @@ export class AvailabilityService implements IAvailabilityService {
 
   public findBookingAvailability = async (
     data: FindBookingAvailabilityData,
-    capabilities: CapabilityId[]
+    capabilities: CapabilityId[],
   ): Promise<AvailabilityModel> => {
     const optionId = data.optionId;
 
@@ -72,7 +81,7 @@ export class AvailabilityService implements IAvailabilityService {
       capabilities: capabilities,
       date: DateHelper.availabilityDateFormat(date),
     });
-    const availability = availabilities.find((availability) => availability.id === data.availabilityId) ?? null;
+    const availability = availabilities.find((a) => a.id === data.availabilityId) ?? null;
     if (availability === null) {
       throw new InvalidAvailabilityIdError(data.availabilityId);
     }
@@ -82,24 +91,24 @@ export class AvailabilityService implements IAvailabilityService {
     return availability;
   };
 
-  private getAvailabilityIDs = (availabilityIds: string[], availabilities: AvailabilityModel[]) => {
-    return availabilities.filter((a) => availabilityIds.includes(a.id));
-  };
+  private getAvailabilityIDs = (availabilityIds: string[], availabilities: AvailabilityModel[]) =>
+    availabilities.filter((a) => availabilityIds.includes(a.id));
 
-  private getSingleDate = (date: string, availabilities: AvailabilityModel[]): AvailabilityModel[] => {
-    return availabilities.filter((a) => {
-      return a.id.split("T")[0] === date;
-    });
-  };
+  private getSingleDate = (
+    date: string,
+    availabilities: AvailabilityModel[],
+  ): AvailabilityModel[] => availabilities.filter((a) => a.id.split("T")[0] === date);
 
-  private getIntervalDate = (start: string, end: string, availabilities: AvailabilityModel[]): AvailabilityModel[] => {
+  private getIntervalDate = (
+    start: string,
+    end: string,
+    availabilities: AvailabilityModel[],
+  ): AvailabilityModel[] => {
     const interval = eachDayOfInterval({
       start: new Date(start),
       end: new Date(end),
     }).map(DateHelper.availabilityDateFormat);
-    return availabilities.filter((a) => {
-      return interval.includes(a.id.split("T")[0]);
-    });
+    return availabilities.filter((a) => interval.includes(a.id.split("T")[0]));
   };
 
   private getOffers(offerCode?: string): OfferWithDiscountModel[] {

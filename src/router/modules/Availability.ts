@@ -1,13 +1,13 @@
-import { AvailabilityCalendarController } from "../../controllers/AvailabilityCalendarController";
-import { AvailabilityController } from "../../controllers/AvailabilityController";
 import Router from "@koa/router";
-import { getCapabilities } from "../common";
 import {
   AvailabilityCalendarBodySchema,
   availabilityCalendarBodySchema,
   availabilityBodySchema,
   AvailabilityBodySchema,
 } from "@octocloud/types";
+import { AvailabilityCalendarController } from "../../controllers/AvailabilityCalendarController";
+import { AvailabilityController } from "../../controllers/AvailabilityController";
+import { getCapabilities } from "../common";
 
 export const availabilityRouter = new Router();
 

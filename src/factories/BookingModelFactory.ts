@@ -7,24 +7,27 @@ import {
   ProductParser,
   UnitItemParser,
 } from "@octocloud/generators";
+import { addMinutes } from "date-fns";
 import { InvalidOptionIdError } from "../models/Error";
 import { CreateBookingSchema } from "../schemas/Booking";
 import { DateHelper } from "../helpers/DateFormatter";
-import { addMinutes } from "date-fns";
 import { TicketFactory } from "./TicketFactory";
 import { DataGenerator } from "../generators/DataGenerator";
 import { UnitItemModelFactory } from "./UnitItemModelFactory";
 
 export abstract class BookingModelFactory {
   private static bookingModelGenerator: BookingModelGenerator = new BookingModelGenerator();
+
   private static productParser: ProductParser = new ProductParser();
+
   private static optionParser: OptionParser = new OptionParser();
+
   private static unitItemParser: UnitItemParser = new UnitItemParser();
 
   public static create(
     productModel: ProductModel,
     bookingAvailability: BookingAvailability,
-    createBookingSchema: CreateBookingSchema
+    createBookingSchema: CreateBookingSchema,
   ): BookingModel {
     const status = BookingStatus.ON_HOLD;
 
@@ -33,7 +36,9 @@ export abstract class BookingModelFactory {
       throw new InvalidOptionIdError(createBookingSchema.optionId);
     }
 
-    const utcExpiresAt = DateHelper.utcDateFormat(addMinutes(new Date(), createBookingSchema.expirationMinutes ?? 30));
+    const utcExpiresAt = DateHelper.utcDateFormat(
+      addMinutes(new Date(), createBookingSchema.expirationMinutes ?? 30),
+    );
     const voucher = TicketFactory.createFromProductForBooking(productModel);
 
     const unitItems = createBookingSchema.unitItems.map((unitItem) => {
@@ -41,7 +46,7 @@ export abstract class BookingModelFactory {
         unitItem,
         status,
         optionModel,
-        productModel.deliveryMethods
+        productModel.deliveryMethods,
       );
       return this.unitItemParser.parseModelToPOJO(unitItemModel);
     });

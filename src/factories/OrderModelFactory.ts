@@ -1,9 +1,9 @@
-import { DateHelper } from "../helpers/DateFormatter";
 import { addMinutes } from "date-fns";
-import { DataGenerator } from "../generators/DataGenerator";
-import { CreateOrderSchema } from "../schemas/Order";
 import { OrderStatus } from "@octocloud/types";
 import { OrderModelGenerator, OrderModel, BookingModel } from "@octocloud/generators";
+import { DateHelper } from "../helpers/DateFormatter";
+import { DataGenerator } from "../generators/DataGenerator";
+import { CreateOrderSchema } from "../schemas/Order";
 import { CreateBookingSchema } from "../schemas/Booking";
 
 export abstract class OrderModelFactory {
@@ -11,7 +11,9 @@ export abstract class OrderModelFactory {
 
   public static createBySchema(createOrderSchema: CreateOrderSchema): OrderModel {
     const status = OrderStatus.ON_HOLD;
-    const utcExpiresAt = DateHelper.utcDateFormat(addMinutes(new Date(), createOrderSchema.expirationMinutes ?? 30));
+    const utcExpiresAt = DateHelper.utcDateFormat(
+      addMinutes(new Date(), createOrderSchema.expirationMinutes ?? 30),
+    );
 
     return this.orderModelGenerator.generateOrder({
       orderData: {
@@ -27,14 +29,20 @@ export abstract class OrderModelFactory {
     });
   }
 
-  public static createByBooking(bookingModel: BookingModel, createBookingSchema: CreateBookingSchema): OrderModel {
+  public static createByBooking(
+    bookingModel: BookingModel,
+    createBookingSchema: CreateBookingSchema,
+  ): OrderModel {
     const status = OrderStatus.ON_HOLD;
-    const utcExpiresAt = DateHelper.utcDateFormat(addMinutes(new Date(), createBookingSchema.expirationMinutes ?? 30));
+    const utcExpiresAt = DateHelper.utcDateFormat(
+      addMinutes(new Date(), createBookingSchema.expirationMinutes ?? 30),
+    );
 
     return this.orderModelGenerator.generateOrder({
       orderData: {
         id: bookingModel.bookingCartModel?.orderId ?? DataGenerator.generateUUID(),
-        supplierReference: bookingModel.supplierReference ?? DataGenerator.generateSupplierReference(),
+        supplierReference:
+          bookingModel.supplierReference ?? DataGenerator.generateSupplierReference(),
         settlementMethod: "settlementMethod",
         status: status,
         utcExpiresAt: utcExpiresAt,

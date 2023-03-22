@@ -1,9 +1,9 @@
+import { Order } from "@octocloud/types";
+import { OrderModel, OrderParser, BookingModel } from "@octocloud/generators";
 import { DB } from "../storage/Database";
 import { DateHelper } from "../helpers/DateFormatter";
-import { Order } from "@octocloud/types";
 import { GetOrderSchema } from "../schemas/Order";
 import InvalidOrderIdError from "../errors/InvalidOrderIdError";
-import { OrderModel, OrderParser, BookingModel } from "@octocloud/generators";
 import { BookingRepository } from "./BookingRepository";
 
 interface IOrderRepository {
@@ -14,6 +14,7 @@ interface IOrderRepository {
 
 export default class OrderRepository implements IOrderRepository {
   private readonly orderParser = new OrderParser();
+
   private readonly BookingRepository = new BookingRepository();
 
   public createOrder = async (orderModel: OrderModel): Promise<OrderModel> => {
@@ -31,7 +32,7 @@ export default class OrderRepository implements IOrderRepository {
         orderModel.id,
         orderModel.status,
         orderModel.supplierReference,
-        JSON.stringify(this.orderParser.parseModelToPOJO(orderModel))
+        JSON.stringify(this.orderParser.parseModelToPOJO(orderModel)),
       );
 
     return orderModel;
@@ -52,17 +53,17 @@ export default class OrderRepository implements IOrderRepository {
         orderModel.supplierReference,
 
         JSON.stringify(this.orderParser.parseModelToPOJO(orderModel)),
-        orderModel.id
+        orderModel.id,
       );
     return orderModel;
   };
 
-  public getOrder = async (getOrderSchema: GetOrderSchema): Promise<OrderModel> => {
-    return this.getOrderById(getOrderSchema.id);
-  };
+  public getOrder = async (getOrderSchema: GetOrderSchema): Promise<OrderModel> =>
+    this.getOrderById(getOrderSchema.id);
 
   public getOrderById = async (orderId: string): Promise<OrderModel> => {
-    const result = (await DB.getInstance().getDB().get(`SELECT * FROM order WHERE id = ?`, orderId)) ?? null;
+    const result =
+      (await DB.getInstance().getDB().get("SELECT * FROM order WHERE id = ?", orderId)) ?? null;
 
     if (result === null) {
       throw new InvalidOrderIdError(orderId);

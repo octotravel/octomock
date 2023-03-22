@@ -7,7 +7,7 @@ export default class InvalidOrderIdError extends OctoError {
     super({
       status: 400,
       error: "INVALID_ORDER_ID",
-      errorMessage: `The orderId was already used, missing or invalid`,
+      errorMessage: "The orderId was already used, missing or invalid",
       bodyParams: { id },
     });
 

@@ -5,7 +5,7 @@ export default class OfferConditionsNotMet extends OctoError {
     super({
       status: 400,
       error: "OFFER_CONDITIONS_NOT_MET",
-      errorMessage: `Offer conditions are not met`,
+      errorMessage: "Offer conditions are not met",
     });
   }
 }
