@@ -1,3 +1,4 @@
+import { BadRequestError } from "src/models/Error";
 import { ResellerStorage } from "../storage/ResellerStorage";
 import { Reseller } from "../types/Reseller";
 
@@ -12,7 +13,7 @@ export class ResellerRepository implements IResellerRepository {
     const reseller = this.storage.get(apiKey);
 
     if (reseller === null) {
-      throw new Error("Invalid reseller");
+      throw new BadRequestError("Invalid reseller");
     }
 
     return reseller;
