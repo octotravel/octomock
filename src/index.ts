@@ -3,12 +3,14 @@ import Koa from "koa";
 import koaBody from "koa-body";
 import cors from "@koa/cors";
 import { ValidationError } from "yup";
+import dotenv from "dotenv";
 import { router } from "./router/AppRouter";
 import { parseCapabilities } from "./router/middlewares";
 import { DB } from "./storage/Database";
 import { DataGenerator } from "./generators/DataGenerator";
 import { OctoError, InternalServerError, BadRequestError } from "./models/Error";
-import "dotenv/config";
+
+dotenv.config();
 
 const app = new Koa();
 
