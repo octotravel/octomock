@@ -59,15 +59,19 @@ export class BookingRepository implements IBookingRepository {
     return bookingModel;
   };
 
-  public getBooking = async (data: GetBookingSchema): Promise<BookingModel> => {
+  public getBooking = async (data: GetBookingSchema): Promise<BookingModel> =>
+    this.getBookingByUuid(data.uuid);
+
+  public getBookingByUuid = async (uuid: string): Promise<BookingModel> => {
     const result =
-      (await DB.getInstance().getDB().get("SELECT * FROM booking WHERE id = ?", data.uuid)) ?? null;
+      (await DB.getInstance().getDB().get("SELECT * FROM booking WHERE id = ?", uuid)) ?? null;
     if (result == null) {
-      throw new InvalidBookingUUIDError(data.uuid);
+      throw new InvalidBookingUUIDError(uuid);
     }
     const booking = JSON.parse(result.data) as Booking;
     const bookingModel = this.bookingParser.parsePOJOToModel(booking);
     this.handleExpiredBooking(bookingModel);
+
     return bookingModel;
   };
 

@@ -28,6 +28,13 @@ export class CapabilityController implements ICapabilityController {
         dependencies: [],
         docs: null,
       },
+      {
+        id: CapabilityId.Cart,
+        revision: 1,
+        required: false,
+        dependencies: [],
+        docs: null,
+      },
     ];
     return capabilities;
   };

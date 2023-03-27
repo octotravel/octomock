@@ -1,11 +1,8 @@
 import { Booking, BookingStatus, BookingUnitItemSchema, CapabilityId } from "@octocloud/types";
 import * as R from "ramda";
 import { BookingModel, BookingParser, OptionModel } from "@octocloud/generators";
-import {
-  UnprocessableEntityError,
-  InvalidOptionIdError,
-  InvalidUnitIdError,
-} from "../models/Error";
+import { BookingCartModel } from "@octocloud/generators/dist/models/booking/BookingCartModel";
+import { UnprocessableEntityError } from "../models/Error";
 import {
   CancelBookingSchema,
   ConfirmBookingSchema,
@@ -17,10 +14,12 @@ import {
 } from "../schemas/Booking";
 import { AvailabilityService } from "../services/AvailabilityService";
 import { BookingService } from "../services/BookingService";
-import { BookingModelFactory } from "../factories/BookingModelFactory";
 import { BookingRepository } from "../repositories/BookingRepository";
 import { ProductRepository } from "../repositories/ProductRepository";
 import { ContactMapper } from "../helpers/ContactHelper";
+import OrderRepository from "../repositories/OrderRepository";
+import { OrderModelFactory } from "../factories/OrderModelFactory";
+import InvalidOrderIdError from "../errors/InvalidOrderIdError";
 
 interface IBookingController {
   createBooking(schema: CreateBookingSchema, capabilities: CapabilityId[]): Promise<Booking>;
@@ -35,9 +34,11 @@ interface IBookingController {
 export class BookingController implements IBookingController {
   private readonly bookingRepository = new BookingRepository();
 
-  private readonly bookingService = new BookingService();
-
   private readonly productRepository = new ProductRepository();
+
+  private readonly orderRepository = new OrderRepository();
+
+  private readonly bookingService = new BookingService();
 
   private readonly availabilityService = new AvailabilityService();
 
@@ -47,19 +48,6 @@ export class BookingController implements IBookingController {
     schema: CreateBookingSchema,
     capabilities: CapabilityId[],
   ): Promise<Booking> => {
-    const bookingModel = await this.createBookingModel(schema, capabilities);
-    const createdBookingModel = await this.bookingRepository.createBooking(bookingModel);
-
-    return this.bookingParser.parseModelToPOJOWithSpecificCapabilities(
-      createdBookingModel,
-      capabilities,
-    );
-  };
-
-  private createBookingModel = async (
-    schema: CreateBookingSchema,
-    capabilities: CapabilityId[],
-  ): Promise<BookingModel> => {
     const productWithAvailabilityModel = this.productRepository.getProductWithAvailability(
       schema.productId,
     );
@@ -71,33 +59,44 @@ export class BookingController implements IBookingController {
       },
       capabilities,
     );
-    const bookingAvailability = {
-      id: availabilityModel.id,
-      localDateTimeStart: availabilityModel.localDateTimeStart,
-      localDateTimeEnd: availabilityModel.localDateTimeEnd,
-      allDay: availabilityModel.allDay,
-      openingHours: availabilityModel.openingHours,
-    };
+    const bookingModel = await this.bookingService.createBookingModel(
+      schema,
+      productWithAvailabilityModel,
+      availabilityModel,
+    );
+    this.checkRestrictions(bookingModel.optionModel, schema.unitItems);
 
-    const optionId = schema.optionId;
-    const optionModel = productWithAvailabilityModel.findOptionModelByOptionId(optionId);
+    if (capabilities.includes(CapabilityId.Cart)) {
+      let orderModel;
+      let primary;
 
-    if (optionModel === null) {
-      throw new InvalidOptionIdError(optionId);
+      if (schema.orderId === undefined) {
+        orderModel = OrderModelFactory.createByBooking(bookingModel, schema);
+        await this.orderRepository.createOrder(orderModel);
+        primary = true;
+      } else {
+        orderModel = await this.orderRepository.getOrderById(schema.orderId);
+
+        if (orderModel === null) {
+          throw new InvalidOrderIdError(schema.orderId);
+        }
+
+        orderModel.bookingModels = [...orderModel.bookingModels, bookingModel];
+        await this.orderRepository.updateOrder(orderModel);
+        primary = false;
+      }
+
+      const bookingCartModel = new BookingCartModel({
+        orderId: orderModel.id,
+        primary: primary,
+      });
+
+      bookingModel.bookingCartModel = bookingCartModel;
     }
 
-    schema.unitItems.forEach((bookingUnitItemSchema: BookingUnitItemSchema) => {
-      const unitId = bookingUnitItemSchema.unitId;
-      const unitModel = optionModel.findUnitModelByUnitId(unitId);
+    await this.bookingRepository.createBooking(bookingModel);
 
-      if (unitModel === null) {
-        throw new InvalidUnitIdError(unitId);
-      }
-    });
-
-    this.checkRestrictions(optionModel, schema.unitItems);
-
-    return BookingModelFactory.create(productWithAvailabilityModel, bookingAvailability, schema);
+    return this.bookingParser.parseModelToPOJOWithSpecificCapabilities(bookingModel, capabilities);
   };
 
   public confirmBooking = async (
@@ -114,10 +113,7 @@ export class BookingController implements IBookingController {
     }
     this.checkRestrictions(bookingModel.optionModel, schema.unitItems);
 
-    const updatedBookingModel = this.bookingService.updateBookingModelWithConfirmBookingSchema(
-      bookingModel,
-      schema,
-    );
+    const updatedBookingModel = this.bookingService.confirmBookingBySchema(bookingModel, schema);
     await this.bookingRepository.updateBooking(updatedBookingModel);
 
     return this.bookingParser.parseModelToPOJOWithSpecificCapabilities(
@@ -148,19 +144,31 @@ export class BookingController implements IBookingController {
         resellerReference: unitItemModel.resellerReference ?? undefined,
         contact: ContactMapper.remapContactToBookingContactSchema(unitItemModel.contact),
       }));
-
-      const rebookedBookingModel = await this.createBookingModel(
+      const createBookingSchema: CreateBookingSchema = {
+        ...schema,
+        productId: schema.productId ?? bookingModel.productModel.id,
+        optionId: schema.optionId ?? bookingModel.optionModel.id,
+        availabilityId: schema.availabilityId,
+        unitItems: schema.unitItems ?? remappedUnitItems,
+      };
+      const productWithAvailabilityModel = this.productRepository.getProductWithAvailability(
+        createBookingSchema.productId,
+      );
+      const availabilityModel = await this.availabilityService.findBookingAvailability(
         {
-          ...schema,
-          productId: schema.productId ?? bookingModel.productModel.id,
-          optionId: schema.optionId ?? bookingModel.optionModel.id,
-          availabilityId: schema.availabilityId,
-          unitItems: schema.unitItems ?? remappedUnitItems,
+          productWithAvailabilityModel: productWithAvailabilityModel,
+          optionId: createBookingSchema.optionId,
+          availabilityId: createBookingSchema.availabilityId,
         },
         capabilities,
       );
+      const rebookedBookingModel = await this.bookingService.createBookingModel(
+        createBookingSchema,
+        productWithAvailabilityModel,
+        availabilityModel,
+      );
 
-      updatedBookingModel = this.bookingService.updateBookingModelWithUpdateBookingSchema(
+      updatedBookingModel = this.bookingService.updateBookingBySchema(
         bookingModel,
         schema,
         rebookedBookingModel,
@@ -169,10 +177,7 @@ export class BookingController implements IBookingController {
     } else {
       this.checkRestrictions(bookingModel.optionModel, schema.unitItems);
 
-      updatedBookingModel = this.bookingService.updateBookingModelWithUpdateBookingSchema(
-        bookingModel,
-        schema,
-      );
+      updatedBookingModel = this.bookingService.updateBookingBySchema(bookingModel, schema);
       await this.bookingRepository.updateBooking(updatedBookingModel);
     }
 
@@ -191,7 +196,7 @@ export class BookingController implements IBookingController {
       throw new UnprocessableEntityError("booking cannot be extended");
     }
 
-    const extendedBookingModel = this.bookingService.updateBookingModelWithExtendBookingSchema(
+    const extendedBookingModel = this.bookingService.extendBookingBySchema(
       bookingModel,
       extendBookingSchema,
     );
@@ -206,7 +211,7 @@ export class BookingController implements IBookingController {
     const bookingModel = await this.bookingRepository.getBooking(cancelBookingSchema);
 
     if (bookingModel.cancellable === false) {
-      throw new UnprocessableEntityError("booking not cancellable");
+      throw new UnprocessableEntityError("Booking cannot be cancelled");
     }
 
     if (bookingModel.status === BookingStatus.CANCELLED) {
@@ -216,14 +221,14 @@ export class BookingController implements IBookingController {
       );
     }
 
-    const cancelledBooking = this.bookingService.updateBookingModelWithCancelBookingSchema(
+    const cancelledBooking = this.bookingService.cancelBookingBySchema(
       bookingModel,
       cancelBookingSchema,
     );
-    const updatedBookingModel = await this.bookingRepository.updateBooking(cancelledBooking);
+    await this.bookingRepository.updateBooking(cancelledBooking);
 
     return this.bookingParser.parseModelToPOJOWithSpecificCapabilities(
-      updatedBookingModel,
+      cancelledBooking,
       capabilities,
     );
   };

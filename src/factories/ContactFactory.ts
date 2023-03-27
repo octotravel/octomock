@@ -23,4 +23,24 @@ export abstract class ContactFactory {
       postalCode: bookingContactScheme?.postalCode ?? bookingModelContact?.postalCode ?? null,
     };
   }
+
+  public static createForOrder({
+    contact,
+    orderContactScheme,
+  }: {
+    contact?: Contact;
+    orderContactScheme?: Contact;
+  }): Contact {
+    return {
+      fullName: orderContactScheme?.fullName ?? contact?.fullName ?? null,
+      firstName: orderContactScheme?.firstName ?? contact?.firstName ?? null,
+      lastName: orderContactScheme?.lastName ?? contact?.lastName ?? null,
+      emailAddress: orderContactScheme?.emailAddress ?? contact?.emailAddress ?? null,
+      phoneNumber: orderContactScheme?.phoneNumber ?? contact?.phoneNumber ?? null,
+      locales: orderContactScheme?.locales ?? contact?.locales ?? [],
+      country: orderContactScheme?.country ?? contact?.country ?? null,
+      notes: orderContactScheme?.notes ?? contact?.notes ?? null,
+      postalCode: orderContactScheme?.postalCode ?? contact?.postalCode ?? null,
+    };
+  }
 }
