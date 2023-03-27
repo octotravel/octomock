@@ -1,7 +1,7 @@
 import { Order } from "@octocloud/types";
 import { OrderModel, OrderParser, BookingModel } from "@octocloud/generators";
 import { DB } from "../storage/Database";
-import { DateHelper } from "../helpers/DateHelper";
+import { DateHelper } from "../helpers/DateFormatter";
 import { GetOrderSchema } from "../schemas/Order";
 import InvalidOrderIdError from "../errors/InvalidOrderIdError";
 import { BookingRepository } from "./BookingRepository";

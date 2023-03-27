@@ -12,7 +12,7 @@ interface IAvailabilityController {
 export class AvailabilityController implements IAvailabilityController {
   private readonly availabilityService = new AvailabilityService();
 
-  private readonly availabilityCalendarParser = new AvailabilityParser();
+  private readonly availabilityParser = new AvailabilityParser();
 
   public getAvailability = async (
     schema: AvailabilityBodySchema,
@@ -20,7 +20,7 @@ export class AvailabilityController implements IAvailabilityController {
   ): Promise<Availability[]> => {
     const availabilityModels = await this.availabilityService.getAvailability(schema, capabilities);
     return availabilityModels.map((availabilityModel) =>
-      this.availabilityCalendarParser.parseModelToPOJOWithSpecificCapabilities(
+      this.availabilityParser.parseModelToPOJOWithSpecificCapabilities(
         availabilityModel,
         capabilities,
       ),

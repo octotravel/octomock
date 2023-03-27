@@ -2,10 +2,12 @@ import { CapabilityId, AvailabilityBodySchema } from "@octocloud/types";
 import { eachDayOfInterval, isMatch } from "date-fns";
 import { AvailabilityModel } from "@octocloud/generators";
 import { InvalidAvailabilityIdError, BadRequestError } from "../models/Error";
-import { DateHelper } from "../helpers/DateHelper";
+import { DateHelper } from "../helpers/DateFormatter";
 import { ProductRepository } from "../repositories/ProductRepository";
 import { AvailabilityModelFactory } from "../factories/AvailabilityModelFactory";
 import { ProductWithAvailabilityModel } from "../models/ProductWithAvailabilityModel";
+import { OfferRepository } from "../repositories/OfferRepository";
+import { OfferWithDiscountModel } from "../models/OfferWithDiscountModel";
 
 interface FindBookingAvailabilityData {
   productWithAvailabilityModel: ProductWithAvailabilityModel;
@@ -25,7 +27,9 @@ interface IAvailabilityService {
 }
 
 export class AvailabilityService implements IAvailabilityService {
-  private productRepository = new ProductRepository();
+  private readonly productRepository = new ProductRepository();
+
+  private readonly offerRepository = new OfferRepository();
 
   public getAvailability = async (
     schema: AvailabilityBodySchema,
@@ -34,10 +38,12 @@ export class AvailabilityService implements IAvailabilityService {
     const productWithAvailabilityModel = this.productRepository.getProductWithAvailability(
       schema.productId,
     );
+    const offerWithDiscountModels = this.getOffers(schema.offerCode);
     const optionId = schema.optionId;
 
     const availabilities = AvailabilityModelFactory.createMultiple({
       productWithAvailabilityModel: productWithAvailabilityModel,
+      offerWithDiscountModels: offerWithDiscountModels,
       optionId: optionId,
       capabilities: capabilities,
       date: DateHelper.availabilityDateFormat(new Date()),
@@ -67,8 +73,10 @@ export class AvailabilityService implements IAvailabilityService {
     }
 
     const date = new Date(data.availabilityId);
+    const offerWithDiscountModels = this.offerRepository.getOffersWithDiscount();
     const availabilities = AvailabilityModelFactory.createMultiple({
       productWithAvailabilityModel: data.productWithAvailabilityModel,
+      offerWithDiscountModels: offerWithDiscountModels,
       optionId: optionId,
       capabilities: capabilities,
       date: DateHelper.availabilityDateFormat(date),
@@ -102,4 +110,12 @@ export class AvailabilityService implements IAvailabilityService {
     }).map(DateHelper.availabilityDateFormat);
     return availabilities.filter((a) => interval.includes(a.id.split("T")[0]));
   };
+
+  private getOffers(offerCode?: string): OfferWithDiscountModel[] {
+    if (offerCode) {
+      return [this.offerRepository.getOfferWithDiscount(offerCode)];
+    }
+
+    return this.offerRepository.getOffersWithDiscount();
+  }
 }

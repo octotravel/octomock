@@ -22,20 +22,13 @@ import {
   PricingUnit,
   Pricing,
 } from "@octocloud/types";
-import R from "ramda";
 import { ProductWithAvailabilityModel } from "../models/ProductWithAvailabilityModel";
 import { ProductAvailabilityModel } from "../models/ProductAvailabilityModel";
-import { InvalidOptionIdError, InvalidUnitIdError } from "../models/Error";
-import { DateHelper } from "../helpers/DateHelper";
-
-const defaultPricing = {
-  original: 0,
-  retail: 0,
-  net: 0,
-  currency: "",
-  currencyPrecision: 0,
-  includedTaxes: [],
-};
+import { InvalidOptionIdError } from "../models/Error";
+import { DateHelper } from "../helpers/DateFormatter";
+import { OfferWithDiscountModel } from "../models/OfferWithDiscountModel";
+import { PricingFactory } from "./PricingFactory";
+import { PricingOfferDiscountCalculator } from "../services/pricing/PricingOfferDiscountCalculator";
 
 interface AvailabilityPricingData {
   unitPricing: PricingUnit[];
@@ -43,17 +36,22 @@ interface AvailabilityPricingData {
 }
 
 export abstract class AvailabilityModelFactory {
-  private static availabilityModelGenerator: AvailabilityModelGenerator =
+  private static readonly availabilityModelGenerator: AvailabilityModelGenerator =
     new AvailabilityModelGenerator();
+
+  private static readonly pricingOfferDiscountCalculator: PricingOfferDiscountCalculator =
+    new PricingOfferDiscountCalculator();
 
   public static createMultiple({
     productWithAvailabilityModel,
+    offerWithDiscountModels,
     optionId,
     date,
     capabilities,
     availabilityUnits,
   }: {
     productWithAvailabilityModel: ProductWithAvailabilityModel;
+    offerWithDiscountModels: OfferWithDiscountModel[];
     optionId: string;
     date: string;
     capabilities: CapabilityId[];
@@ -79,6 +77,7 @@ export abstract class AvailabilityModelFactory {
         const availabilityModels = this.buildModel({
           productModel: productModel,
           productAvailabilityModel: productAvailabilityModel,
+          offerWithDiscountModels: offerWithDiscountModels,
           optionId: optionId,
           date: DateHelper.availabilityDateFormat(day),
           status: this.getStatusForDate(productAvailabilityModel, day),
@@ -99,6 +98,7 @@ export abstract class AvailabilityModelFactory {
   private static buildModel({
     productModel,
     productAvailabilityModel,
+    offerWithDiscountModels,
     optionId,
     date,
     capabilities,
@@ -108,6 +108,7 @@ export abstract class AvailabilityModelFactory {
   }: {
     productModel: ProductModel;
     productAvailabilityModel: ProductAvailabilityModel;
+    offerWithDiscountModels: OfferWithDiscountModel[];
     optionId: string;
     date: string;
     capabilities: CapabilityId[];
@@ -136,10 +137,14 @@ export abstract class AvailabilityModelFactory {
         capacity,
       });
 
+      const activeOffer =
+        offerWithDiscountModels.length > 0 ? offerWithDiscountModels[0] : undefined;
+
       const availabilityPricing = this.getAvailabilityPricing({
         productModel,
         productAvailabilityModel,
         optionId,
+        offerWithDiscountModel: activeOffer,
         availabilityUnits,
       });
       const pricingPer = productModel.getProductPricingModel().pricingPer;
@@ -167,6 +172,10 @@ export abstract class AvailabilityModelFactory {
           openingHours: productAvailabilityModel.openingHours,
           unitPricing: shouldUseUnitPricing ? availabilityPricing.unitPricing : undefined,
           pricing: shouldUsePricing ? availabilityPricing.pricing : undefined,
+          offerCode: activeOffer?.code ?? undefined,
+          offerTitle: activeOffer?.title ?? undefined,
+          offers: offerWithDiscountModels,
+          offer: activeOffer,
         },
         capabilities: capabilities,
         pricingPer: pricingPer,
@@ -200,47 +209,48 @@ export abstract class AvailabilityModelFactory {
     productModel,
     productAvailabilityModel,
     optionId,
+    offerWithDiscountModel,
     availabilityUnits,
   }: {
     productModel: ProductModel;
     productAvailabilityModel: ProductAvailabilityModel;
     optionId: string;
+    offerWithDiscountModel?: OfferWithDiscountModel;
     availabilityUnits?: AvailabilityUnit[];
   }): AvailabilityPricingData {
     const pricingPer = productModel.getProductPricingModel().pricingPer;
+    let unitPricing;
+    let pricing;
 
-    if (availabilityUnits && pricingPer === PricingPer.UNIT) {
-      const unitPricing = productAvailabilityModel.getUnitPricing(optionId);
-      const pricing = availabilityUnits
-        .map(({ id, quantity }) => {
-          const uPricing: Nullable<PricingUnit> = unitPricing.find((p) => p.unitId === id) ?? null;
-          if (uPricing === null) {
-            throw new InvalidUnitIdError(id);
-          }
+    if (availabilityUnits === undefined || pricingPer !== PricingPer.UNIT) {
+      unitPricing = productAvailabilityModel.getUnitPricing(optionId);
 
-          return new Array(quantity).fill(R.omit(["unitId"], uPricing));
-        })
-        .flat(1)
-        .reduce(
-          (acc, uPricing) => ({
-            original: acc.original + uPricing.original,
-            retail: acc.retail + uPricing.retail,
-            net: acc.net + uPricing.net,
-            currency: uPricing.currency,
-            currencyPrecision: uPricing.currencyPrecision,
-            includedTaxes: [...acc.includedTaxes, ...uPricing.includedTaxes],
-          }),
-          defaultPricing,
-        );
-      return {
+      if (offerWithDiscountModel !== undefined) {
+        pricing = PricingFactory.createSummarizedPricing(unitPricing);
+      } else {
+        pricing = productAvailabilityModel.getPricing(optionId);
+      }
+    } else {
+      unitPricing = productAvailabilityModel.getUnitPricing(optionId);
+      const availabilityUnitsPricing = PricingFactory.createFromAvailabilityUnits(
         unitPricing,
-        pricing,
-      };
+        availabilityUnits,
+      );
+      pricing = PricingFactory.createSummarizedPricing(availabilityUnitsPricing);
+    }
+
+    if (offerWithDiscountModel !== undefined) {
+      unitPricing.map((specificUnitPricing: PricingUnit) =>
+        this.pricingOfferDiscountCalculator.createDiscountedPricing(
+          specificUnitPricing,
+          offerWithDiscountModel,
+        ),
+      );
     }
 
     return {
-      unitPricing: productAvailabilityModel.getUnitPricing(optionId),
-      pricing: productAvailabilityModel.getPricing(optionId),
+      unitPricing: unitPricing,
+      pricing: pricing,
     };
   }
 

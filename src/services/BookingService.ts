@@ -1,14 +1,13 @@
 import { BookingStatus, Ticket, BookingUnitItemSchema, OrderStatus } from "@octocloud/types";
-import { BookingModel, UnitItemModel, AvailabilityModel, OrderModel } from "@octocloud/generators";
+import { BookingModel, AvailabilityModel, OrderModel } from "@octocloud/generators";
 import addMinutes from "date-fns/addMinutes";
 import {
   CancelBookingSchema,
   ConfirmBookingSchema,
   ExtendBookingSchema,
-  UpdateBookingSchema,
   CreateBookingSchema,
 } from "../schemas/Booking";
-import { DateHelper } from "../helpers/DateHelper";
+import { DateHelper } from "../helpers/DateFormatter";
 import { ContactFactory } from "../factories/ContactFactory";
 import { UnitItemModelFactory } from "../factories/UnitItemModelFactory";
 import { TicketFactory } from "../factories/TicketFactory";
@@ -26,11 +25,6 @@ interface IBookingService {
   confirmBookingBySchema(
     bookingModel: BookingModel,
     confirmBookingSchema: ConfirmBookingSchema,
-  ): BookingModel;
-  updateBookingBySchema(
-    bookingModel: BookingModel,
-    updateBookingSchema: UpdateBookingSchema,
-    rebookedBooking?: BookingModel,
   ): BookingModel;
   extendBookingBySchema(
     bookingModel: BookingModel,
@@ -133,46 +127,6 @@ export class BookingService implements IBookingService {
     return bookingModel;
   }
 
-  public updateBookingBySchema(
-    bookingModel: BookingModel,
-    updateBookingSchema: UpdateBookingSchema,
-    rebookedBooking?: BookingModel,
-  ): BookingModel {
-    const status = bookingModel.status;
-
-    let utcExpiresAt = bookingModel.utcExpiresAt;
-    if (updateBookingSchema.expirationMinutes) {
-      utcExpiresAt = DateHelper.utcDateFormat(
-        addMinutes(new Date(), updateBookingSchema.expirationMinutes),
-      );
-    }
-
-    const unitItemModels = this.getUpdatedUnitItems(
-      bookingModel,
-      updateBookingSchema,
-      rebookedBooking,
-    );
-
-    bookingModel.resellerReference =
-      updateBookingSchema.resellerReference ?? bookingModel.resellerReference;
-    bookingModel.status = status;
-    bookingModel.productModel = rebookedBooking?.productModel ?? bookingModel.productModel;
-    bookingModel.optionModel = rebookedBooking?.optionModel ?? bookingModel.optionModel;
-    bookingModel.availability = rebookedBooking?.availability ?? bookingModel.availability;
-    bookingModel.contact = ContactFactory.createForBooking({
-      bookingModel: bookingModel,
-      bookingContactScheme: updateBookingSchema.contact,
-    });
-    bookingModel.unitItemModels = unitItemModels;
-    bookingModel.utcUpdatedAt = DateHelper.utcDateFormat(new Date());
-    bookingModel.utcExpiresAt = utcExpiresAt;
-    bookingModel.utcRedeemedAt = null;
-    bookingModel.notes = updateBookingSchema.notes ?? bookingModel.notes;
-    bookingModel.voucher = this.getVoucher(rebookedBooking ?? bookingModel, status);
-
-    return bookingModel;
-  }
-
   public extendBookingBySchema(
     bookingModel: BookingModel,
     extendBookingSchema: ExtendBookingSchema,
@@ -250,24 +204,4 @@ export class BookingService implements IBookingService {
 
     return bookingModel.voucher;
   }
-
-  private getUpdatedUnitItems = (
-    bookingModel: BookingModel,
-    schema: UpdateBookingSchema,
-    rebookedBooking?: BookingModel,
-  ): UnitItemModel[] => {
-    if (schema.unitItems) {
-      return bookingModel.status === BookingStatus.CONFIRMED
-        ? UnitItemModelFactory.createMultipleForBookingWithTickets({
-            bookingModel: rebookedBooking ?? bookingModel,
-            bookingUnitItemSchemas: schema.unitItems,
-          })
-        : UnitItemModelFactory.createMultipleForBooking({
-            bookingModel: bookingModel,
-            bookingUnitItemSchemas: schema.unitItems,
-          });
-    }
-
-    return rebookedBooking?.unitItemModels ?? bookingModel.unitItemModels;
-  };
 }

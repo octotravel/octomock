@@ -1,5 +1,6 @@
 .idea
 .env
+coverage
 dist
 node_modules
 database.db

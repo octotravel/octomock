@@ -16,10 +16,11 @@ import { AvailabilityService } from "../services/AvailabilityService";
 import { BookingService } from "../services/BookingService";
 import { BookingRepository } from "../repositories/BookingRepository";
 import { ProductRepository } from "../repositories/ProductRepository";
-import { ContactMapper } from "../helpers/ContactHelper";
+import { ContactMapper } from "../helpers/ContactMapper";
 import OrderRepository from "../repositories/OrderRepository";
 import { OrderModelFactory } from "../factories/OrderModelFactory";
 import InvalidOrderIdError from "../errors/InvalidOrderIdError";
+import { BookingUpdateService } from "../services/booking/BookingUpdateService";
 
 interface IBookingController {
   createBooking(schema: CreateBookingSchema, capabilities: CapabilityId[]): Promise<Booking>;
@@ -39,6 +40,8 @@ export class BookingController implements IBookingController {
   private readonly orderRepository = new OrderRepository();
 
   private readonly bookingService = new BookingService();
+
+  private readonly bookingUpdateService = new BookingUpdateService();
 
   private readonly availabilityService = new AvailabilityService();
 
@@ -168,7 +171,7 @@ export class BookingController implements IBookingController {
         availabilityModel,
       );
 
-      updatedBookingModel = this.bookingService.updateBookingBySchema(
+      updatedBookingModel = this.bookingUpdateService.updateBookingBySchema(
         bookingModel,
         schema,
         rebookedBookingModel,
@@ -177,7 +180,7 @@ export class BookingController implements IBookingController {
     } else {
       this.checkRestrictions(bookingModel.optionModel, schema.unitItems);
 
-      updatedBookingModel = this.bookingService.updateBookingBySchema(bookingModel, schema);
+      updatedBookingModel = this.bookingUpdateService.updateBookingBySchema(bookingModel, schema);
       await this.bookingRepository.updateBooking(updatedBookingModel);
     }
 

@@ -1,7 +1,7 @@
 import { addMinutes } from "date-fns";
 import { OrderStatus } from "@octocloud/types";
 import { OrderModelGenerator, OrderModel, BookingModel } from "@octocloud/generators";
-import { DateHelper } from "../helpers/DateHelper";
+import { DateHelper } from "../helpers/DateFormatter";
 import { DataGenerator } from "../generators/DataGenerator";
 import { CreateOrderSchema } from "../schemas/Order";
 import { CreateBookingSchema } from "../schemas/Booking";
