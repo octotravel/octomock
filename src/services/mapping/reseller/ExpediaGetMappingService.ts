@@ -6,21 +6,23 @@ import { SpecificResellerGetMappingService } from "./SpecificResellerGetMappingS
 
 export class ExpediaGetMappingService implements SpecificResellerGetMappingService {
   public async getMapping(productModels: ProductModel[]): Promise<MappingModel[]> {
-    return productModels
-      .map((productModel) =>
-        productModel.optionModels.map((optionModel) =>
-          optionModel.unitModels.map((unitModel) => {
+    const mappingModels: MappingModel[] = [];
+
+    productModels.forEach((productModel) => {
+      productModel.optionModels.forEach((optionModel) => {
+        optionModel.unitModels.forEach((unitModel) => {
+          optionModel.availabilityLocalStartTimes.forEach((availabilityLocalStartTime) => {
             const resellerReference = [
               Reseller.Expedia,
               productModel.id,
               optionModel.id,
               unitModel.type.toLowerCase(),
             ].join("_");
-            const tourTime = "10:15";
-            const title = `${productModel.internalName} | ${tourTime}, ${optionModel.internalName} | ${unitModel.internalName}`;
+
+            const title = `${productModel.internalName} | ${availabilityLocalStartTime}, ${optionModel.internalName} | ${unitModel.internalName}`;
             const random = new Prando(resellerReference);
 
-            return new MappingModel({
+            const mappingModel = new MappingModel({
               resellerReference: resellerReference,
               resellerStatus: ResellerStatus.ACTIVE,
               title: title,
@@ -32,12 +34,16 @@ export class ExpediaGetMappingService implements SpecificResellerGetMappingServi
               optionId: optionModel.id,
               unitId: unitModel.id,
               connected: random.nextBoolean(),
-              expediaTourTime: tourTime,
+              expediaTourTime: availabilityLocalStartTime,
               gygPriceOverApi: random.nextBoolean(),
             });
-          }),
-        ),
-      )
-      .flat(2);
+
+            mappingModels.push(mappingModel);
+          });
+        });
+      });
+    });
+
+    return mappingModels;
   }
 }
