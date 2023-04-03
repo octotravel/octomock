@@ -16,12 +16,14 @@ export class ExpediaGetMappingService implements SpecificResellerGetMappingServi
               optionModel.id,
               unitModel.type.toLowerCase(),
             ].join("_");
+            const tourTime = "10:15";
+            const title = `${productModel.internalName} | ${tourTime}, ${optionModel.internalName} | ${unitModel.internalName}`;
             const random = new Prando(resellerReference);
 
             return new MappingModel({
               resellerReference: resellerReference,
               resellerStatus: ResellerStatus.ACTIVE,
-              title: productModel.internalName,
+              title: title,
               url: "",
               webhookUrl: null,
               optionRequired: true,
@@ -30,7 +32,7 @@ export class ExpediaGetMappingService implements SpecificResellerGetMappingServi
               optionId: optionModel.id,
               unitId: unitModel.id,
               connected: random.nextBoolean(),
-              expediaTourTime: "10:15",
+              expediaTourTime: tourTime,
               gygPriceOverApi: random.nextBoolean(),
             });
           }),

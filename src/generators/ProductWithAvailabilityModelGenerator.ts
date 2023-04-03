@@ -60,7 +60,7 @@ export class ProductWithAvailabilityModelGenerator {
       this.generateProduct({
         productData: {
           id: "1",
-          internalName: "PPU | OH",
+          internalName: "PPU - OH",
           availabilityType: AvailabilityType.OPENING_HOURS,
           options: [
             {
@@ -93,7 +93,7 @@ export class ProductWithAvailabilityModelGenerator {
       this.generateProduct({
         productData: {
           id: "2",
-          internalName: "PPB | OH",
+          internalName: "PPB - OH",
           availabilityType: AvailabilityType.OPENING_HOURS,
           options: [
             {
@@ -125,7 +125,7 @@ export class ProductWithAvailabilityModelGenerator {
       this.generateProduct({
         productData: {
           id: "3",
-          internalName: "PPU | ST",
+          internalName: "PPU - ST",
           availabilityType: AvailabilityType.START_TIME,
           options: [
             {
@@ -168,7 +168,7 @@ export class ProductWithAvailabilityModelGenerator {
       this.generateProduct({
         productData: {
           id: "4",
-          internalName: "PPB | ST",
+          internalName: "PPB - ST",
           availabilityType: AvailabilityType.START_TIME,
           options: [
             {
