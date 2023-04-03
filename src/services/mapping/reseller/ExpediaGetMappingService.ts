@@ -30,7 +30,7 @@ export class ExpediaGetMappingService implements SpecificResellerGetMappingServi
               optionId: optionModel.id,
               unitId: unitModel.id,
               connected: random.nextBoolean(),
-              expediaTourTime: null,
+              expediaTourTime: "10:15",
               gygPriceOverApi: random.nextBoolean(),
             });
           }),
