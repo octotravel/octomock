@@ -230,15 +230,14 @@ export abstract class AvailabilityModelFactory {
     } else {
       unitPricing = productAvailabilityModel.getUnitPricing(optionId);
       pricing = PricingFactory.createSummarizedPricing(unitPricing);
+      if (availabilityUnits) {
+        const availabilityUnitsPricing = PricingFactory.createFromAvailabilityUnits(
+          unitPricing,
+          availabilityUnits,
+        );
+        pricing = PricingFactory.createSummarizedPricing(availabilityUnitsPricing);
+      }
     }
-    // TODO: add availabilityUnits
-
-    // unitPricing = productAvailabilityModel.getUnitPricing(optionId);
-    // const availabilityUnitsPricing = PricingFactory.createFromAvailabilityUnits(
-    //   unitPricing,
-    //   availabilityUnits,
-    // );
-    // pricing = PricingFactory.createSummarizedPricing(availabilityUnitsPricing);
 
     if (offerWithDiscountModel !== undefined) {
       unitPricing.map((specificUnitPricing: PricingUnit) =>
