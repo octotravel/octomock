@@ -219,25 +219,26 @@ export abstract class AvailabilityModelFactory {
     availabilityUnits?: AvailabilityUnit[];
   }): AvailabilityPricingData {
     const pricingPer = productModel.getProductPricingModel().pricingPer;
-    let unitPricing;
+    let unitPricing: PricingUnit[] = [];
     let pricing;
 
-    if (availabilityUnits === undefined || pricingPer !== PricingPer.UNIT) {
-      unitPricing = productAvailabilityModel.getUnitPricing(optionId);
-
+    if (pricingPer === PricingPer.BOOKING) {
+      pricing = productAvailabilityModel.getPricing(optionId);
       if (offerWithDiscountModel !== undefined) {
-        pricing = PricingFactory.createSummarizedPricing(unitPricing);
-      } else {
-        pricing = productAvailabilityModel.getPricing(optionId);
+        pricing = PricingFactory.createSummarizedPricing([pricing]);
       }
     } else {
       unitPricing = productAvailabilityModel.getUnitPricing(optionId);
-      const availabilityUnitsPricing = PricingFactory.createFromAvailabilityUnits(
-        unitPricing,
-        availabilityUnits,
-      );
-      pricing = PricingFactory.createSummarizedPricing(availabilityUnitsPricing);
+      pricing = PricingFactory.createSummarizedPricing(unitPricing);
     }
+    // TODO: add availabilityUnits
+
+    // unitPricing = productAvailabilityModel.getUnitPricing(optionId);
+    // const availabilityUnitsPricing = PricingFactory.createFromAvailabilityUnits(
+    //   unitPricing,
+    //   availabilityUnits,
+    // );
+    // pricing = PricingFactory.createSummarizedPricing(availabilityUnitsPricing);
 
     if (offerWithDiscountModel !== undefined) {
       unitPricing.map((specificUnitPricing: PricingUnit) =>
