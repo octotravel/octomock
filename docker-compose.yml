@@ -10,7 +10,7 @@ services:
       - ./:/var/www:cached
       - octomock_server_node_modules:/var/www/node_modules:delegated
     ports:
-      - ${PORT}:${PORT}
+      - ${APP_PORT}:${APP_PORT}
     restart: unless-stopped
 
 volumes:
