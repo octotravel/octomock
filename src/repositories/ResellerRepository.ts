@@ -1,4 +1,4 @@
-import { BadRequestError } from "src/models/Error";
+import { BadRequestError } from "../models/Error";
 import { ResellerStorage } from "../storage/ResellerStorage";
 import { Reseller } from "../types/Reseller";
 
