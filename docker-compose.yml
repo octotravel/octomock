@@ -1,0 +1,22 @@
+version: '3.9'
+
+services:
+  octomock_server:
+    container_name: octomock_server
+    build:
+      context: .
+      dockerfile: ./ops/docker/node/local/Dockerfile
+    volumes:
+      - ./:/var/www:cached
+      - octomock_server_node_modules:/var/www/node_modules:delegated
+    ports:
+      - ${APP_PORT}:${APP_PORT}
+    restart: unless-stopped
+
+volumes:
+  octomock_server_node_modules:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: '${PWD}/node_modules'

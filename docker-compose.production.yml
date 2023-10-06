@@ -1,0 +1,11 @@
+version: '3.9'
+
+services:
+  octomock_server:
+    container_name: octomock_server
+    build:
+      context: .
+      dockerfile: ./ops/docker/node/production/Dockerfile
+    ports:
+      - ${APP_PORT}:${APP_PORT}
+    restart: unless-stopped
