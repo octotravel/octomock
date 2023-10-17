@@ -3,8 +3,8 @@ import { InMemoryStorage } from "./InMemoryStorage";
 
 export class ResellerStorage implements InMemoryStorage<Reseller> {
   public get(apiKey: string): Nullable<Reseller> {
-    if ((Object.values(Reseller) as string[]).includes(apiKey)) {
-      return apiKey as Reseller;
+    if ((Object.keys(Reseller) as string[]).includes(apiKey)) {
+      return Reseller[apiKey as Reseller]
     }
 
     return null;
