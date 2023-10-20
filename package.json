@@ -33,11 +33,11 @@
     "sqlite": "^4.1.2",
     "sqlite3": "^5.0.11",
     "yup": "^0.32.11",
-    "dotenv": "^16.0.3",
-    "@octocloud/types": "^1.5.11"
+    "dotenv": "^16.0.3"
   },
   "devDependencies": {
     "@octocloud/generators": "^1.0.1",
+    "@octocloud/types": "^1.5.11",
     "@types/jest": "^28.1.6",
     "@types/koa": "^2.13.5",
     "@types/koa__cors": "^3.3.0",
