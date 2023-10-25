@@ -58,7 +58,7 @@ export class BookingController implements IBookingController {
       {
         productWithAvailabilityModel: productWithAvailabilityModel,
         optionId: schema.optionId,
-        availabilityId: schema.availabilityId,
+        availabilityId: schema.availabilityId ?? '',
       },
       capabilities,
     );
@@ -161,7 +161,7 @@ export class BookingController implements IBookingController {
         {
           productWithAvailabilityModel: productWithAvailabilityModel,
           optionId: createBookingSchema.optionId,
-          availabilityId: createBookingSchema.availabilityId,
+          availabilityId: createBookingSchema.availabilityId ?? '',
         },
         capabilities,
       );
