@@ -87,7 +87,6 @@ export class ProductWithAvailabilityModelGenerator {
             [Day.Mon, 10],
             [Day.Tue, 20],
           ]),
-          daysClosed: [Day.Sat, Day.Sun],
         },
       }),
       this.generateProduct({
