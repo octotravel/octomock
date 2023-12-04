@@ -46,6 +46,6 @@ app.use(async (ctx, next) => {
 app.use(parseCapabilities);
 app.use(router.routes());
 
-app.listen(process.env.APP_PORT ?? 3002, () => {
+app.listen(process.env.PORT ?? 3002, () => {
   console.log(`Running app on port ${process.env.APP_PORT}`);
 });
