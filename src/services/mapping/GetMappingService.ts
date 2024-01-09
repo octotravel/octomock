@@ -1,4 +1,4 @@
-import { ProductModel } from "@octocloud/generators";
+import { MappingModel, ProductModel } from "@octocloud/generators";
 import { Mapping } from "@octocloud/types";
 import { SpecificResellerGetMappingService } from "./reseller/SpecificResellerGetMappingService";
 import { ViatorGetMappingService } from "./reseller/ViatorGetMappingService";
@@ -17,7 +17,9 @@ export class GetMappingService implements IGetMappingService {
     return resellerMappingService.getMapping(productModels);
   }
 
-  private getMappingServiceForReseller(reseller: Reseller): SpecificResellerGetMappingService {
+  private getMappingServiceForReseller(
+    reseller: Reseller,
+  ): SpecificResellerGetMappingService<MappingModel> {
     switch (reseller) {
       case Reseller.Viator:
         return new ViatorGetMappingService();

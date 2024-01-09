@@ -3,10 +3,36 @@ import { ResellerStatus } from "@octocloud/types";
 import Prando from "prando";
 import { Reseller } from "../../../types/Reseller";
 import { SpecificResellerGetMappingService } from "./SpecificResellerGetMappingService";
+import { DataGenerator } from "../../../generators/DataGenerator";
 
-export class ExpediaGetMappingService implements SpecificResellerGetMappingService {
-  public async getMapping(productModels: ProductModel[]): Promise<MappingModel[]> {
-    const mappingModels: MappingModel[] = [];
+export class ExpediaMappingModel extends MappingModel {
+  public readonly expediaTourTime: string;
+
+  public constructor(props: {
+    id: string;
+    resellerReference: string;
+    resellerStatus: ResellerStatus;
+    title: string;
+    url: string;
+    webhookUrl: Nullable<string>;
+    optionRequired: boolean;
+    unitRequired: boolean;
+    productId: Nullable<string>;
+    optionId: Nullable<string>;
+    unitId: Nullable<string>;
+    connected: boolean;
+    expediaTourTime: string;
+  }) {
+    super(props);
+    this.expediaTourTime = props.expediaTourTime;
+  }
+}
+
+export class ExpediaGetMappingService
+  implements SpecificResellerGetMappingService<ExpediaMappingModel>
+{
+  public async getMapping(productModels: ProductModel[]): Promise<ExpediaMappingModel[]> {
+    const mappingModels: ExpediaMappingModel[] = [];
 
     productModels.forEach((productModel) => {
       productModel.optionModels.forEach((optionModel) => {
@@ -22,7 +48,8 @@ export class ExpediaGetMappingService implements SpecificResellerGetMappingServi
             const title = `${productModel.internalName} | ${availabilityLocalStartTime}, ${optionModel.internalName} | ${unitModel.internalName}`;
             const random = new Prando(resellerReference);
 
-            const mappingModel = new MappingModel({
+            const mappingModel = new ExpediaMappingModel({
+              id: DataGenerator.generateUUID(),
               resellerReference: resellerReference,
               resellerStatus: ResellerStatus.ACTIVE,
               title: title,
@@ -35,7 +62,6 @@ export class ExpediaGetMappingService implements SpecificResellerGetMappingServi
               unitId: unitModel.id,
               connected: random.nextBoolean(),
               expediaTourTime: availabilityLocalStartTime,
-              gygPriceOverApi: random.nextBoolean(),
             });
 
             mappingModels.push(mappingModel);
