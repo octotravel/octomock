@@ -59,7 +59,7 @@ export class ProductWithAvailabilityModelGenerator {
     productWithAvailabilityModels.push(
       this.generateProduct({
         productData: {
-          id: "1",
+          id: "9cbd7f33-6b53-45c4-a44b-730605f68753",
           internalName: "PPU - OH",
           availabilityType: AvailabilityType.OPENING_HOURS,
           options: [
@@ -91,7 +91,7 @@ export class ProductWithAvailabilityModelGenerator {
       }),
       this.generateProduct({
         productData: {
-          id: "2",
+          id: "b5c0ab15-6575-4ca4-a39d-a8c7995ccbda",
           internalName: "PPB - OH",
           availabilityType: AvailabilityType.OPENING_HOURS,
           options: [
@@ -123,7 +123,7 @@ export class ProductWithAvailabilityModelGenerator {
       }),
       this.generateProduct({
         productData: {
-          id: "3",
+          id: "bb9eb918-fcb5-4947-9fce-86586bbea111",
           internalName: "PPU - ST",
           availabilityType: AvailabilityType.START_TIME,
           options: [
@@ -166,7 +166,7 @@ export class ProductWithAvailabilityModelGenerator {
       }),
       this.generateProduct({
         productData: {
-          id: "4",
+          id: "0a8f2ef2-7469-4ef0-99fa-a67132ab0bce",
           internalName: "PPB - ST",
           availabilityType: AvailabilityType.START_TIME,
           options: [
