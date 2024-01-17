@@ -3,8 +3,34 @@ import { ResellerStatus } from "@octocloud/types";
 import Prando from "prando";
 import { Reseller } from "../../../types/Reseller";
 import { SpecificResellerGetMappingService } from "./SpecificResellerGetMappingService";
+import { DataGenerator } from "../../../generators/DataGenerator";
 
-export class ExpediaGetMappingService implements SpecificResellerGetMappingService {
+export class ExpediaMappingModel extends MappingModel {
+  public readonly expediaTourTime: string;
+
+  public constructor(props: {
+    id: string;
+    resellerReference: string;
+    resellerStatus: ResellerStatus;
+    title: string;
+    url: string;
+    webhookUrl: Nullable<string>;
+    optionRequired: boolean;
+    unitRequired: boolean;
+    productId: Nullable<string>;
+    optionId: Nullable<string>;
+    unitId: Nullable<string>;
+    connected: boolean;
+    expediaTourTime: string;
+  }) {
+    super(props);
+    this.expediaTourTime = props.expediaTourTime;
+  }
+}
+
+export class ExpediaGetMappingService
+  implements SpecificResellerGetMappingService<ExpediaMappingModel>
+{
   private readonly connectedProductUuids = [
     "9cbd7f33-6b53-45c4-a44b-730605f68753",
     "b5c0ab15-6575-4ca4-a39d-a8c7995ccbda",
@@ -12,8 +38,8 @@ export class ExpediaGetMappingService implements SpecificResellerGetMappingServi
     "0a8f2ef2-7469-4ef0-99fa-a67132ab0bce",
   ];
 
-  public async getMapping(productModels: ProductModel[]): Promise<MappingModel[]> {
-    const mappingModels: MappingModel[] = [];
+  public async getMapping(productModels: ProductModel[]): Promise<ExpediaMappingModel[]> {
+    const mappingModels: ExpediaMappingModel[] = [];
 
     productModels.forEach((productModel) => {
       productModel.optionModels.forEach((optionModel) => {
@@ -27,9 +53,9 @@ export class ExpediaGetMappingService implements SpecificResellerGetMappingServi
             ].join("_");
 
             const title = `${productModel.internalName} | ${availabilityLocalStartTime}, ${optionModel.internalName} | ${unitModel.internalName}`;
-            const random = new Prando(resellerReference);
 
-            const mappingModel = new MappingModel({
+            const mappingModel = new ExpediaMappingModel({
+              id: DataGenerator.generateUUID(),
               resellerReference: resellerReference,
               resellerStatus: ResellerStatus.ACTIVE,
               title: title,
@@ -42,7 +68,6 @@ export class ExpediaGetMappingService implements SpecificResellerGetMappingServi
               unitId: unitModel.id,
               connected: this.connectedProductUuids.includes(productModel.id),
               expediaTourTime: availabilityLocalStartTime,
-              gygPriceOverApi: random.nextBoolean(),
             });
 
             mappingModels.push(mappingModel);
