@@ -1,0 +1,43 @@
+name: Check version
+
+on:
+  pull_request:
+    branches:
+      - master
+      - main
+
+jobs:
+  check-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Install Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+      
+      - name: Get PR version
+        id: pr_version
+        run: echo "VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+      
+      - name: Checkout main branch
+        uses: actions/checkout@v2
+        with:
+          ref: main
+      
+      - name: Get main version
+        id: main_version
+        run: echo "VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+      
+      - name: Compare versions
+        run: |
+          if [ "${{ steps.pr_version.outputs.VERSION }}" != "${{ steps.main_version.outputs.VERSION }}" ]; then
+            echo "Version changed: ${{ steps.pr_version.outputs.VERSION }}"
+          else
+            echo "Version did not change"
+            exit 1
+          fi
