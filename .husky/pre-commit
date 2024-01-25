@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+if docker info > /dev/null 2>&1; then
+    if [ "$(docker inspect --format '{{json .State.Running}}' octo_node 2>/dev/null)" = "true" ]; then
+        make fix-staged
+    else
+        npm run fix:staged
+    fi
+else
+    npm run fix:staged
+fi
+
+exit 0;
