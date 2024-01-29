@@ -1,13 +1,13 @@
-import { CapabilityId, AvailabilityBodySchema } from "@octocloud/types";
-import { eachDayOfInterval, isMatch } from "date-fns";
-import { AvailabilityModel } from "@octocloud/generators";
-import { InvalidAvailabilityIdError, BadRequestError } from "../models/Error";
-import { DateHelper } from "../helpers/DateFormatter";
-import { ProductRepository } from "../repositories/ProductRepository";
-import { AvailabilityModelFactory } from "../factories/AvailabilityModelFactory";
-import { ProductWithAvailabilityModel } from "../models/ProductWithAvailabilityModel";
-import { OfferRepository } from "../repositories/OfferRepository";
-import { OfferWithDiscountModel } from "../models/OfferWithDiscountModel";
+import { CapabilityId, AvailabilityBodySchema } from '@octocloud/types';
+import { eachDayOfInterval, isMatch } from 'date-fns';
+import { AvailabilityModel } from '@octocloud/generators';
+import { InvalidAvailabilityIdError, BadRequestError } from '../models/Error';
+import { DateHelper } from '../helpers/DateFormatter';
+import { ProductRepository } from '../repositories/ProductRepository';
+import { AvailabilityModelFactory } from '../factories/AvailabilityModelFactory';
+import { ProductWithAvailabilityModel } from '../models/ProductWithAvailabilityModel';
+import { OfferRepository } from '../repositories/OfferRepository';
+import { OfferWithDiscountModel } from '../models/OfferWithDiscountModel';
 
 interface FindBookingAvailabilityData {
   productWithAvailabilityModel: ProductWithAvailabilityModel;
@@ -16,14 +16,11 @@ interface FindBookingAvailabilityData {
 }
 
 interface IAvailabilityService {
-  getAvailability(
-    schema: AvailabilityBodySchema,
-    capabilities: CapabilityId[],
-  ): Promise<AvailabilityModel[]>;
-  findBookingAvailability(
+  getAvailability: (schema: AvailabilityBodySchema, capabilities: CapabilityId[]) => Promise<AvailabilityModel[]>;
+  findBookingAvailability: (
     data: FindBookingAvailabilityData,
     capabilities: CapabilityId[],
-  ): Promise<AvailabilityModel>;
+  ) => Promise<AvailabilityModel>;
 }
 
 export class AvailabilityService implements IAvailabilityService {
@@ -35,17 +32,15 @@ export class AvailabilityService implements IAvailabilityService {
     schema: AvailabilityBodySchema,
     capabilities: CapabilityId[],
   ): Promise<AvailabilityModel[]> => {
-    const productWithAvailabilityModel = this.productRepository.getProductWithAvailability(
-      schema.productId,
-    );
+    const productWithAvailabilityModel = this.productRepository.getProductWithAvailability(schema.productId);
     const offerWithDiscountModels = this.getOffers(schema.offerCode);
     const optionId = schema.optionId;
 
     const availabilities = AvailabilityModelFactory.createMultiple({
-      productWithAvailabilityModel: productWithAvailabilityModel,
-      offerWithDiscountModels: offerWithDiscountModels,
-      optionId: optionId,
-      capabilities: capabilities,
+      productWithAvailabilityModel,
+      offerWithDiscountModels,
+      optionId,
+      capabilities,
       date: DateHelper.availabilityDateFormat(new Date()),
       availabilityUnits: schema.units,
     });
@@ -76,9 +71,9 @@ export class AvailabilityService implements IAvailabilityService {
     const offerWithDiscountModels = this.offerRepository.getOffersWithDiscount();
     const availabilities = AvailabilityModelFactory.createMultiple({
       productWithAvailabilityModel: data.productWithAvailabilityModel,
-      offerWithDiscountModels: offerWithDiscountModels,
-      optionId: optionId,
-      capabilities: capabilities,
+      offerWithDiscountModels,
+      optionId,
+      capabilities,
       date: DateHelper.availabilityDateFormat(date),
     });
     const availability = availabilities.find((a) => a.id === data.availabilityId) ?? null;
@@ -86,20 +81,20 @@ export class AvailabilityService implements IAvailabilityService {
       throw new InvalidAvailabilityIdError(data.availabilityId);
     }
     if (!availability.available) {
-      throw new BadRequestError("not available");
+      throw new BadRequestError('not available');
     }
     return availability;
   };
 
-  private getAvailabilityIDs = (availabilityIds: string[], availabilities: AvailabilityModel[]) =>
-    availabilities.filter((a) => availabilityIds.includes(a.id));
-
-  private getSingleDate = (
-    date: string,
+  private readonly getAvailabilityIDs = (
+    availabilityIds: string[],
     availabilities: AvailabilityModel[],
-  ): AvailabilityModel[] => availabilities.filter((a) => a.id.split("T")[0] === date);
+  ): AvailabilityModel[] => availabilities.filter((a) => availabilityIds.includes(a.id));
 
-  private getIntervalDate = (
+  private readonly getSingleDate = (date: string, availabilities: AvailabilityModel[]): AvailabilityModel[] =>
+    availabilities.filter((a) => a.id.split('T')[0] === date);
+
+  private readonly getIntervalDate = (
     start: string,
     end: string,
     availabilities: AvailabilityModel[],
@@ -108,7 +103,7 @@ export class AvailabilityService implements IAvailabilityService {
       start: new Date(start),
       end: new Date(end),
     }).map(DateHelper.availabilityDateFormat);
-    return availabilities.filter((a) => interval.includes(a.id.split("T")[0]));
+    return availabilities.filter((a) => interval.includes(a.id.split('T')[0]));
   };
 
   private getOffers(offerCode?: string): OfferWithDiscountModel[] {

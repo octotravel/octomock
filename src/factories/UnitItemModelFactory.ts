@@ -5,7 +5,7 @@ import {
   DeliveryMethod,
   DeliveryOption,
   RedemptionMethod,
-} from "@octocloud/types";
+} from '@octocloud/types';
 import {
   BookingModel,
   OptionModel,
@@ -13,17 +13,17 @@ import {
   UnitItemModelGenerator,
   UnitItemParser,
   UnitParser,
-} from "@octocloud/generators";
-import assert from "assert";
-import { InvalidUnitIdError } from "../models/Error";
-import { DataGenerator } from "../generators/DataGenerator";
+} from '@octocloud/generators';
+import assert from 'assert';
+import { InvalidUnitIdError } from '../models/Error';
+import { DataGenerator } from '../generators/DataGenerator';
 
 export abstract class UnitItemModelFactory {
-  private static unitItemModelGenerator: UnitItemModelGenerator = new UnitItemModelGenerator();
+  private static readonly unitItemModelGenerator: UnitItemModelGenerator = new UnitItemModelGenerator();
 
-  private static unitItemParser: UnitItemParser = new UnitItemParser();
+  private static readonly unitItemParser: UnitItemParser = new UnitItemParser();
 
-  private static unitParser: UnitParser = new UnitParser();
+  private static readonly unitParser: UnitParser = new UnitParser();
 
   public static createForBooking(
     bookingUnitItemSchema: BookingUnitItemSchema,
@@ -53,9 +53,9 @@ export abstract class UnitItemModelFactory {
         supplierReference: DataGenerator.generateSupplierReference(),
         resellerReference: bookingUnitItemSchema.resellerReference ?? null,
         unitId: unit.id,
-        unit: unit,
+        unit,
         status: bookingStatus,
-        ticket: ticket,
+        ticket,
       },
     });
   }
@@ -93,9 +93,7 @@ export abstract class UnitItemModelFactory {
       bookingUnitItemSchemas,
     });
 
-    return unitItemModels.map((unitItemModel) =>
-      this.createForBookingWithTicket({ bookingModel, unitItemModel }),
-    );
+    return unitItemModels.map((unitItemModel) => this.createForBookingWithTicket({ bookingModel, unitItemModel }));
   }
 
   public static createForBookingWithTicket({
@@ -105,7 +103,7 @@ export abstract class UnitItemModelFactory {
     bookingModel: BookingModel;
     unitItemModel: UnitItemModel;
   }): UnitItemModel {
-    if (bookingModel.deliveryMethods.includes(DeliveryMethod.TICKET) === false) {
+    if (!bookingModel.deliveryMethods.includes(DeliveryMethod.TICKET)) {
       // TODO check this, because before there was not an return statement outside of this condition
       return unitItemModel;
     }

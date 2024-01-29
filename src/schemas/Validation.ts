@@ -1,4 +1,4 @@
-import * as yup from "yup";
+import * as yup from 'yup';
 
 export interface ValidationEndpoint {
   backend: {

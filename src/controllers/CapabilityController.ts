@@ -1,7 +1,7 @@
-import { Capability, CapabilityId } from "@octocloud/types";
+import { Capability, CapabilityId } from '@octocloud/types';
 
 interface ICapabilityController {
-  getCapabilities(): Promise<Capability[]>;
+  getCapabilities: () => Promise<Capability[]>;
 }
 
 export class CapabilityController implements ICapabilityController {

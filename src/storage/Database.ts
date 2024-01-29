@@ -1,5 +1,5 @@
-import sqlite3 from "sqlite3";
-import { open, Database } from "sqlite";
+import sqlite3 from 'sqlite3';
+import { open, Database } from 'sqlite';
 
 export class DB {
   private static instance: DB;
@@ -20,7 +20,7 @@ export class DB {
 
   public open = async (): Promise<void> => {
     const db = await open({
-      filename: "./database.db",
+      filename: './database.db',
       driver: sqlite3.cached.Database,
     });
 
@@ -30,7 +30,7 @@ export class DB {
 
   public getDB = (): Database<sqlite3.Database, sqlite3.Statement> => this.db;
 
-  private createTables = async () => {
+  private readonly createTables = async (): Promise<void> => {
     await this.db.exec(`
       CREATE TABLE IF NOT EXISTS booking  (
         id TEXT NOT NULL PRIMARY KEY,

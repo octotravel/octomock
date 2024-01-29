@@ -1,13 +1,13 @@
-import { Supplier } from "@octocloud/types";
-import { BadRequestError } from "../models/Error";
-import { InMemoryStorage } from "./InMemoryStorage";
+import { Supplier } from '@octocloud/types';
+import { BadRequestError } from '../models/Error';
+import { InMemoryStorage } from './InMemoryStorage';
 
 export class SupplierStorage implements InMemoryStorage<Supplier> {
-  private suppliers: Supplier[] = [
+  private readonly suppliers: Supplier[] = [
     {
-      id: "1",
-      name: "octomock",
-      endpoint: "https://api.ventrata.com/api-octo",
+      id: '1',
+      name: 'octomock',
+      endpoint: 'https://api.ventrata.com/api-octo',
       contact: {
         website: null,
         email: null,
@@ -16,9 +16,9 @@ export class SupplierStorage implements InMemoryStorage<Supplier> {
       },
     },
     {
-      id: "2",
-      name: "octo",
-      endpoint: "https://api.ventrata.com/api-octo",
+      id: '2',
+      name: 'octo',
+      endpoint: 'https://api.ventrata.com/api-octo',
       contact: {
         website: null,
         email: null,
@@ -31,12 +31,12 @@ export class SupplierStorage implements InMemoryStorage<Supplier> {
   public get(id: string): Nullable<Supplier> {
     let supplier: Nullable<Supplier> = null;
 
-    if (id === "0") {
+    if (id === '0') {
       supplier = this.suppliers[0] ?? null;
     } else {
       supplier = this.suppliers.find((p) => p.id === id) ?? null;
       if (supplier === null) {
-        throw new BadRequestError("Invalid supplierId");
+        throw new BadRequestError('Invalid supplierId');
       }
     }
     return supplier;

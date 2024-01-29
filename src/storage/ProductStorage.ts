@@ -1,26 +1,19 @@
-import { ProductModel } from "@octocloud/generators";
-import { InMemoryStorage } from "./InMemoryStorage";
-import { InvalidProductIdError } from "../models/Error";
+import { ProductModel } from '@octocloud/generators';
+import { InMemoryStorage } from './InMemoryStorage';
+import { InvalidProductIdError } from '../models/Error';
 
-import { ProductWithAvailabilityModel } from "../models/ProductWithAvailabilityModel";
-import { ProductWithAvailabilityModelGenerator } from "../generators/ProductWithAvailabilityModelGenerator";
+import { ProductWithAvailabilityModel } from '../models/ProductWithAvailabilityModel';
+import { ProductWithAvailabilityModelGenerator } from '../generators/ProductWithAvailabilityModelGenerator';
 
 export class ProductModelStorage implements InMemoryStorage<ProductModel> {
-  private readonly productWithAvailabilityModels: Map<string, ProductWithAvailabilityModel> =
-    new Map();
+  private readonly productWithAvailabilityModels = new Map<string, ProductWithAvailabilityModel>();
 
-  private readonly productWithAvailabilityModelGenerator =
-    new ProductWithAvailabilityModelGenerator();
+  private readonly productWithAvailabilityModelGenerator = new ProductWithAvailabilityModelGenerator();
 
-  constructor() {
-    this.productWithAvailabilityModelGenerator
-      .generateMultipleProducts()
-      .forEach((productWithAvailabilityModel) => {
-        this.productWithAvailabilityModels.set(
-          productWithAvailabilityModel.id,
-          productWithAvailabilityModel,
-        );
-      });
+  public constructor() {
+    this.productWithAvailabilityModelGenerator.generateMultipleProducts().forEach((productWithAvailabilityModel) => {
+      this.productWithAvailabilityModels.set(productWithAvailabilityModel.id, productWithAvailabilityModel);
+    });
   }
 
   public get(id: string): ProductModel {
@@ -28,7 +21,7 @@ export class ProductModelStorage implements InMemoryStorage<ProductModel> {
   }
 
   public getWithAvailability(id: string): ProductWithAvailabilityModel {
-    if (this.productWithAvailabilityModels.has(id) === false) {
+    if (!this.productWithAvailabilityModels.has(id)) {
       throw new InvalidProductIdError(id);
     }
 

@@ -1,8 +1,8 @@
-import { Booking, BookingStatus, BookingUnitItemSchema, CapabilityId } from "@octocloud/types";
-import * as R from "ramda";
-import { BookingModel, BookingParser, OptionModel } from "@octocloud/generators";
-import { BookingCartModel } from "@octocloud/generators/dist/models/booking/BookingCartModel";
-import { UnprocessableEntityError } from "../models/Error";
+import { Booking, BookingStatus, BookingUnitItemSchema, CapabilityId } from '@octocloud/types';
+import * as R from 'ramda';
+import { BookingModel, BookingParser, OptionModel } from '@octocloud/generators';
+import { BookingCartModel } from '@octocloud/generators/dist/models/booking/BookingCartModel';
+import { UnprocessableEntityError } from '../models/Error';
 import {
   CancelBookingSchema,
   ConfirmBookingSchema,
@@ -11,25 +11,25 @@ import {
   GetBookingSchema,
   GetBookingsSchema,
   UpdateBookingSchema,
-} from "../schemas/Booking";
-import { AvailabilityService } from "../services/AvailabilityService";
-import { BookingService } from "../services/BookingService";
-import { BookingRepository } from "../repositories/BookingRepository";
-import { ProductRepository } from "../repositories/ProductRepository";
-import { ContactMapper } from "../helpers/ContactMapper";
-import OrderRepository from "../repositories/OrderRepository";
-import { OrderModelFactory } from "../factories/OrderModelFactory";
-import InvalidOrderIdError from "../errors/InvalidOrderIdError";
-import { BookingUpdateService } from "../services/booking/BookingUpdateService";
+} from '../schemas/Booking';
+import { AvailabilityService } from '../services/AvailabilityService';
+import { BookingService } from '../services/BookingService';
+import { BookingRepository } from '../repositories/BookingRepository';
+import { ProductRepository } from '../repositories/ProductRepository';
+import { ContactMapper } from '../helpers/ContactMapper';
+import OrderRepository from '../repositories/OrderRepository';
+import { OrderModelFactory } from '../factories/OrderModelFactory';
+import InvalidOrderIdError from '../errors/InvalidOrderIdError';
+import { BookingUpdateService } from '../services/booking/BookingUpdateService';
 
 interface IBookingController {
-  createBooking(schema: CreateBookingSchema, capabilities: CapabilityId[]): Promise<Booking>;
-  confirmBooking(schema: ConfirmBookingSchema, capabilities: CapabilityId[]): Promise<Booking>;
-  updateBooking(schema: UpdateBookingSchema, capabilities: CapabilityId[]): Promise<Booking>;
-  extendBooking(schema: ExtendBookingSchema, capabilities: CapabilityId[]): Promise<Booking>;
-  cancelBooking(schema: CancelBookingSchema, capabilities: CapabilityId[]): Promise<Booking>;
-  getBooking(schema: GetBookingSchema, capabilities: CapabilityId[]): Promise<Booking>;
-  getBookings(schema: GetBookingsSchema, capabilities: CapabilityId[]): Promise<Booking[]>;
+  createBooking: (schema: CreateBookingSchema, capabilities: CapabilityId[]) => Promise<Booking>;
+  confirmBooking: (schema: ConfirmBookingSchema, capabilities: CapabilityId[]) => Promise<Booking>;
+  updateBooking: (schema: UpdateBookingSchema, capabilities: CapabilityId[]) => Promise<Booking>;
+  extendBooking: (schema: ExtendBookingSchema, capabilities: CapabilityId[]) => Promise<Booking>;
+  cancelBooking: (schema: CancelBookingSchema, capabilities: CapabilityId[]) => Promise<Booking>;
+  getBooking: (schema: GetBookingSchema, capabilities: CapabilityId[]) => Promise<Booking>;
+  getBookings: (schema: GetBookingsSchema, capabilities: CapabilityId[]) => Promise<Booking[]>;
 }
 
 export class BookingController implements IBookingController {
@@ -47,22 +47,17 @@ export class BookingController implements IBookingController {
 
   private readonly bookingParser = new BookingParser();
 
-  public createBooking = async (
-    schema: CreateBookingSchema,
-    capabilities: CapabilityId[],
-  ): Promise<Booking> => {
-    const productWithAvailabilityModel = this.productRepository.getProductWithAvailability(
-      schema.productId,
-    );
+  public createBooking = async (schema: CreateBookingSchema, capabilities: CapabilityId[]): Promise<Booking> => {
+    const productWithAvailabilityModel = this.productRepository.getProductWithAvailability(schema.productId);
     const availabilityModel = await this.availabilityService.findBookingAvailability(
       {
-        productWithAvailabilityModel: productWithAvailabilityModel,
+        productWithAvailabilityModel,
         optionId: schema.optionId,
-        availabilityId: schema.availabilityId ?? "",
+        availabilityId: schema.availabilityId ?? '',
       },
       capabilities,
     );
-    const bookingModel = await this.bookingService.createBookingModel(
+    const bookingModel = this.bookingService.createBookingModel(
       schema,
       productWithAvailabilityModel,
       availabilityModel,
@@ -91,7 +86,7 @@ export class BookingController implements IBookingController {
 
       const bookingCartModel = new BookingCartModel({
         orderId: orderModel.id,
-        primary: primary,
+        primary,
       });
 
       bookingModel.bookingCartModel = bookingCartModel;
@@ -102,45 +97,30 @@ export class BookingController implements IBookingController {
     return this.bookingParser.parseModelToPOJOWithSpecificCapabilities(bookingModel, capabilities);
   };
 
-  public confirmBooking = async (
-    schema: ConfirmBookingSchema,
-    capabilities: CapabilityId[],
-  ): Promise<Booking> => {
+  public confirmBooking = async (schema: ConfirmBookingSchema, capabilities: CapabilityId[]): Promise<Booking> => {
     const bookingModel = await this.bookingRepository.getBooking(schema);
 
     if (bookingModel.status === BookingStatus.CONFIRMED) {
-      return this.bookingParser.parseModelToPOJOWithSpecificCapabilities(
-        bookingModel,
-        capabilities,
-      );
+      return this.bookingParser.parseModelToPOJOWithSpecificCapabilities(bookingModel, capabilities);
     }
     this.checkRestrictions(bookingModel.optionModel, schema.unitItems);
 
     const updatedBookingModel = this.bookingService.confirmBookingBySchema(bookingModel, schema);
     await this.bookingRepository.updateBooking(updatedBookingModel);
 
-    return this.bookingParser.parseModelToPOJOWithSpecificCapabilities(
-      updatedBookingModel,
-      capabilities,
-    );
+    return this.bookingParser.parseModelToPOJOWithSpecificCapabilities(updatedBookingModel, capabilities);
   };
 
-  public updateBooking = async (
-    schema: UpdateBookingSchema,
-    capabilities: CapabilityId[],
-  ): Promise<Booking> => {
+  public updateBooking = async (schema: UpdateBookingSchema, capabilities: CapabilityId[]): Promise<Booking> => {
     const bookingModel = await this.bookingRepository.getBooking(schema);
 
-    if (bookingModel.cancellable === false) {
-      throw new UnprocessableEntityError("booking cannot be updated");
+    if (!bookingModel.cancellable) {
+      throw new UnprocessableEntityError('booking cannot be updated');
     }
 
     let updatedBookingModel: BookingModel;
 
-    if (
-      schema.availabilityId ||
-      (schema.productId && schema.optionId && schema.availabilityId && schema.unitItems)
-    ) {
+    if (schema.availabilityId || (schema.productId && schema.optionId && schema.availabilityId && schema.unitItems)) {
       const remappedUnitItems = bookingModel.unitItemModels.map((unitItemModel) => ({
         uuid: unitItemModel.uuid,
         unitId: unitItemModel.unitModel.id,
@@ -159,23 +139,19 @@ export class BookingController implements IBookingController {
       );
       const availabilityModel = await this.availabilityService.findBookingAvailability(
         {
-          productWithAvailabilityModel: productWithAvailabilityModel,
+          productWithAvailabilityModel,
           optionId: createBookingSchema.optionId,
-          availabilityId: createBookingSchema.availabilityId ?? "",
+          availabilityId: createBookingSchema.availabilityId ?? '',
         },
         capabilities,
       );
-      const rebookedBookingModel = await this.bookingService.createBookingModel(
+      const rebookedBookingModel = this.bookingService.createBookingModel(
         createBookingSchema,
         productWithAvailabilityModel,
         availabilityModel,
       );
 
-      updatedBookingModel = this.bookingUpdateService.updateBookingBySchema(
-        bookingModel,
-        schema,
-        rebookedBookingModel,
-      );
+      updatedBookingModel = this.bookingUpdateService.updateBookingBySchema(bookingModel, schema, rebookedBookingModel);
       await this.bookingRepository.updateBooking(updatedBookingModel);
     } else {
       this.checkRestrictions(bookingModel.optionModel, schema.unitItems);
@@ -184,10 +160,7 @@ export class BookingController implements IBookingController {
       await this.bookingRepository.updateBooking(updatedBookingModel);
     }
 
-    return this.bookingParser.parseModelToPOJOWithSpecificCapabilities(
-      updatedBookingModel,
-      capabilities,
-    );
+    return this.bookingParser.parseModelToPOJOWithSpecificCapabilities(updatedBookingModel, capabilities);
   };
 
   public extendBooking = async (
@@ -196,13 +169,10 @@ export class BookingController implements IBookingController {
   ): Promise<Booking> => {
     const bookingModel = await this.bookingRepository.getBooking(extendBookingSchema);
     if (bookingModel.status !== BookingStatus.ON_HOLD) {
-      throw new UnprocessableEntityError("booking cannot be extended");
+      throw new UnprocessableEntityError('booking cannot be extended');
     }
 
-    const extendedBookingModel = this.bookingService.extendBookingBySchema(
-      bookingModel,
-      extendBookingSchema,
-    );
+    const extendedBookingModel = this.bookingService.extendBookingBySchema(bookingModel, extendBookingSchema);
     await this.bookingRepository.updateBooking(extendedBookingModel);
     return this.bookingParser.parseModelToPOJOWithSpecificCapabilities(bookingModel, capabilities);
   };
@@ -213,65 +183,45 @@ export class BookingController implements IBookingController {
   ): Promise<Booking> => {
     const bookingModel = await this.bookingRepository.getBooking(cancelBookingSchema);
 
-    if (bookingModel.cancellable === false) {
-      throw new UnprocessableEntityError("Booking cannot be cancelled");
+    if (!bookingModel.cancellable) {
+      throw new UnprocessableEntityError('Booking cannot be cancelled');
     }
 
     if (bookingModel.status === BookingStatus.CANCELLED) {
-      return this.bookingParser.parseModelToPOJOWithSpecificCapabilities(
-        bookingModel,
-        capabilities,
-      );
+      return this.bookingParser.parseModelToPOJOWithSpecificCapabilities(bookingModel, capabilities);
     }
 
-    const cancelledBooking = this.bookingService.cancelBookingBySchema(
-      bookingModel,
-      cancelBookingSchema,
-    );
+    const cancelledBooking = this.bookingService.cancelBookingBySchema(bookingModel, cancelBookingSchema);
     await this.bookingRepository.updateBooking(cancelledBooking);
 
-    return this.bookingParser.parseModelToPOJOWithSpecificCapabilities(
-      cancelledBooking,
-      capabilities,
-    );
+    return this.bookingParser.parseModelToPOJOWithSpecificCapabilities(cancelledBooking, capabilities);
   };
 
-  public getBooking = async (
-    schema: GetBookingSchema,
-    capabilities: CapabilityId[],
-  ): Promise<Booking> => {
+  public getBooking = async (schema: GetBookingSchema, capabilities: CapabilityId[]): Promise<Booking> => {
     const bookingModel = await this.bookingRepository.getBooking(schema);
     return this.bookingParser.parseModelToPOJOWithSpecificCapabilities(bookingModel, capabilities);
   };
 
-  public getBookings = async (
-    schema: GetBookingsSchema,
-    capabilities: CapabilityId[],
-  ): Promise<Booking[]> => {
+  public getBookings = async (schema: GetBookingsSchema, capabilities: CapabilityId[]): Promise<Booking[]> => {
     const bookingModels = await this.bookingRepository.getBookings(schema);
     return bookingModels.map((bookingModel) =>
       this.bookingParser.parseModelToPOJOWithSpecificCapabilities(bookingModel, capabilities),
     );
   };
 
-  private checkRestrictions = (
-    optionModel: OptionModel,
-    unitItems?: BookingUnitItemSchema[],
-  ): void => {
+  private readonly checkRestrictions = (optionModel: OptionModel, unitItems?: BookingUnitItemSchema[]): void => {
     if (R.isEmpty(unitItems)) {
-      throw new UnprocessableEntityError(
-        "Validation failed: Tickets at least one ticket is required",
-      );
+      throw new UnprocessableEntityError('Validation failed: Tickets at least one ticket is required');
     }
 
     const minUnits = optionModel.restrictions.minUnits;
     if (unitItems !== undefined && minUnits > unitItems.length) {
-      throw new UnprocessableEntityError("minimal restrictions not met");
+      throw new UnprocessableEntityError('minimal restrictions not met');
     }
 
     const maxUnits = optionModel.restrictions.maxUnits;
     if (unitItems !== undefined && maxUnits !== null && maxUnits < unitItems.length) {
-      throw new UnprocessableEntityError("maximal restrictions not met");
+      throw new UnprocessableEntityError('maximal restrictions not met');
     }
   };
 }

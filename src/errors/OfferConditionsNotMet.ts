@@ -1,11 +1,11 @@
-import { OctoError } from "../models/Error";
+import { OctoError } from '../models/Error';
 
 export default class OfferConditionsNotMet extends OctoError {
-  constructor() {
+  public constructor() {
     super({
       status: 400,
-      error: "OFFER_CONDITIONS_NOT_MET",
-      errorMessage: "Offer conditions are not met",
+      error: 'OFFER_CONDITIONS_NOT_MET',
+      errorMessage: 'Offer conditions are not met',
     });
   }
 }

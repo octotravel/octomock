@@ -1,11 +1,7 @@
-import Router from "@koa/router";
-import {
-  extendOrderBodySchema,
-  orderCancellationBodySchema,
-  orderConfirmationBodySchema,
-} from "@octocloud/types";
-import { getCapabilities } from "../common";
-import { OrderController } from "../../controllers/OrderController";
+import Router from '@koa/router';
+import { extendOrderBodySchema, orderCancellationBodySchema, orderConfirmationBodySchema } from '@octocloud/types';
+import { getCapabilities } from '../common';
+import { OrderController } from '../../controllers/OrderController';
 import {
   confirmOrderSchema,
   ConfirmOrderSchema,
@@ -15,13 +11,13 @@ import {
   CancelOrderSchema,
   getOrderSchema,
   GetOrderSchema,
-} from "../../schemas/Order";
+} from '../../schemas/Order';
 
 export const orderRouter = new Router();
 
 const orderController = new OrderController();
 
-orderRouter.post("/orders/:id/confirm", async (ctx, _) => {
+orderRouter.post('/orders/:id/confirm', async (ctx, _) => {
   const capabilities = getCapabilities(ctx);
 
   await orderConfirmationBodySchema.validate(ctx.request.body);
@@ -39,7 +35,7 @@ orderRouter.post("/orders/:id/confirm", async (ctx, _) => {
   ctx.toJSON();
 });
 
-orderRouter.post("/orders/:id/extend", async (ctx, _) => {
+orderRouter.post('/orders/:id/extend', async (ctx, _) => {
   const capabilities = getCapabilities(ctx);
 
   await extendOrderBodySchema.validate(ctx.request.body);
@@ -57,7 +53,7 @@ orderRouter.post("/orders/:id/extend", async (ctx, _) => {
   ctx.toJSON();
 });
 
-orderRouter.post("/orders/:id/cancel", async (ctx, _) => {
+orderRouter.post('/orders/:id/cancel', async (ctx, _) => {
   const capabilities = getCapabilities(ctx);
 
   await orderCancellationBodySchema.validate(ctx.request.body);
@@ -75,7 +71,7 @@ orderRouter.post("/orders/:id/cancel", async (ctx, _) => {
   ctx.toJSON();
 });
 
-orderRouter.delete("/orders/:id", async (ctx, _) => {
+orderRouter.delete('/orders/:id', async (ctx, _) => {
   const capabilities = getCapabilities(ctx);
 
   await orderCancellationBodySchema.validate(ctx.request.body);
@@ -93,7 +89,7 @@ orderRouter.delete("/orders/:id", async (ctx, _) => {
   ctx.toJSON();
 });
 
-orderRouter.get("/orders/:id", async (ctx, _) => {
+orderRouter.get('/orders/:id', async (ctx, _) => {
   const capabilities = getCapabilities(ctx);
   const data: GetOrderSchema = {
     id: ctx.params.id,

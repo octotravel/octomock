@@ -1,4 +1,4 @@
-import { ProductModelGenerator, PartialProduct } from "@octocloud/generators";
+import { ProductModelGenerator, PartialProduct } from '@octocloud/generators';
 import {
   Currency,
   UnitType,
@@ -7,9 +7,9 @@ import {
   AvailabilityType,
   OpeningHours,
   PricingPer,
-} from "@octocloud/types";
-import { ProductWithAvailabilityModel } from "../models/ProductWithAvailabilityModel";
-import { Capacity, Month, ProductAvailabilityModel, Day } from "../models/ProductAvailabilityModel";
+} from '@octocloud/types';
+import { ProductWithAvailabilityModel } from '../models/ProductWithAvailabilityModel';
+import { Capacity, Month, ProductAvailabilityModel, Day } from '../models/ProductAvailabilityModel';
 
 const pricingAdult: Pricing = {
   original: 1000,
@@ -59,14 +59,14 @@ export class ProductWithAvailabilityModelGenerator {
     productWithAvailabilityModels.push(
       this.generateProduct({
         productData: {
-          id: "9cbd7f33-6b53-45c4-a44b-730605f68753",
-          internalName: "PPU - OH",
+          id: '9cbd7f33-6b53-45c4-a44b-730605f68753',
+          internalName: 'PPU - OH',
           availabilityType: AvailabilityType.OPENING_HOURS,
           options: [
             {
               units: [
                 {
-                  id: "adult",
+                  id: 'adult',
                   type: UnitType.ADULT,
                   pricingFrom: [pricingAdult],
                 },
@@ -79,7 +79,7 @@ export class ProductWithAvailabilityModelGenerator {
         },
         productAvailabilityModelData: {
           availabilityType: AvailabilityType.OPENING_HOURS,
-          openingHours: [{ from: "09:00", to: "17:00" }],
+          openingHours: [{ from: '09:00', to: '17:00' }],
           freesale: true,
           monthsClosed: [Month.Feb],
           capacityValue: 10,
@@ -91,20 +91,22 @@ export class ProductWithAvailabilityModelGenerator {
       }),
       this.generateProduct({
         productData: {
-          id: "b5c0ab15-6575-4ca4-a39d-a8c7995ccbda",
-          internalName: "PPB - OH",
+          id: 'b5c0ab15-6575-4ca4-a39d-a8c7995ccbda',
+          internalName: 'PPB - OH',
           availabilityType: AvailabilityType.OPENING_HOURS,
           options: [
             {
               units: [
                 {
-                  id: "adult",
+                  id: 'adult',
                   type: UnitType.ADULT,
                 },
               ],
               restrictions: {
                 minUnits: 2,
                 maxUnits: null,
+                minPaxCount: 0,
+                maxPaxCount: null,
               },
               pricing: [pricingBooking],
             },
@@ -115,7 +117,7 @@ export class ProductWithAvailabilityModelGenerator {
         },
         productAvailabilityModelData: {
           availabilityType: AvailabilityType.OPENING_HOURS,
-          openingHours: [{ from: "09:00", to: "17:00" }],
+          openingHours: [{ from: '09:00', to: '17:00' }],
           freesale: true,
           daysClosed: [Day.Sat],
           daysSoldOut: [Day.Sun],
@@ -123,29 +125,31 @@ export class ProductWithAvailabilityModelGenerator {
       }),
       this.generateProduct({
         productData: {
-          id: "bb9eb918-fcb5-4947-9fce-86586bbea111",
-          internalName: "PPU - ST",
+          id: 'bb9eb918-fcb5-4947-9fce-86586bbea111',
+          internalName: 'PPU - ST',
           availabilityType: AvailabilityType.START_TIME,
           options: [
             {
               units: [
                 {
-                  id: "adult",
+                  id: 'adult',
                   type: UnitType.ADULT,
                   pricingFrom: [pricingAdult],
                 },
                 {
-                  id: "child",
+                  id: 'child',
                   type: UnitType.CHILD,
                   pricingFrom: [pricingChild],
                 },
               ],
-              availabilityLocalStartTimes: ["12:00", "14:00"],
+              availabilityLocalStartTimes: ['12:00', '14:00'],
               restrictions: {
                 minUnits: 2,
                 maxUnits: null,
+                minPaxCount: 0,
+                maxPaxCount: null,
               },
-              durationAmount: "2",
+              durationAmount: '2',
               durationUnit: DurationUnit.HOUR,
             },
           ],
@@ -166,18 +170,18 @@ export class ProductWithAvailabilityModelGenerator {
       }),
       this.generateProduct({
         productData: {
-          id: "0a8f2ef2-7469-4ef0-99fa-a67132ab0bce",
-          internalName: "PPB - ST",
+          id: '0a8f2ef2-7469-4ef0-99fa-a67132ab0bce',
+          internalName: 'PPB - ST',
           availabilityType: AvailabilityType.START_TIME,
           options: [
             {
               units: [
                 {
-                  id: "adult",
+                  id: 'adult',
                   type: UnitType.ADULT,
                 },
               ],
-              availabilityLocalStartTimes: ["12:00", "14:00"],
+              availabilityLocalStartTimes: ['12:00', '14:00'],
               pricing: [pricingBooking],
             },
           ],
@@ -203,7 +207,7 @@ export class ProductWithAvailabilityModelGenerator {
     productAvailabilityModelData: ProductAvailabilityModelData;
   }): ProductWithAvailabilityModel {
     const productModel = this.productModelGenerator.generateProduct({
-      productData: productData,
+      productData,
     });
 
     const productAvailabilityModel = new ProductAvailabilityModel({
@@ -212,8 +216,8 @@ export class ProductWithAvailabilityModelGenerator {
     });
 
     const productWithAvailabilityModel = new ProductWithAvailabilityModel({
-      productModel: productModel,
-      productAvailabilityModel: productAvailabilityModel,
+      productModel,
+      productAvailabilityModel,
     });
 
     return productWithAvailabilityModel;

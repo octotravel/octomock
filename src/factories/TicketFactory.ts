@@ -1,6 +1,6 @@
-import { DeliveryFormat, DeliveryMethod, DeliveryOption, Ticket } from "@octocloud/types";
-import { BookingModel, ProductModel } from "@octocloud/generators";
-import assert from "assert";
+import { DeliveryFormat, DeliveryMethod, DeliveryOption, Ticket } from '@octocloud/types';
+import { BookingModel, ProductModel } from '@octocloud/generators';
+import assert from 'assert';
 
 export abstract class TicketFactory {
   public static createFromProductForBooking(productModel: ProductModel): Nullable<Ticket> {
@@ -16,7 +16,7 @@ export abstract class TicketFactory {
   }
 
   public static createFromBookingForBooking(bookingModel: BookingModel): Nullable<Ticket> {
-    if (bookingModel.deliveryMethods.includes(DeliveryMethod.VOUCHER) === false) {
+    if (!bookingModel.deliveryMethods.includes(DeliveryMethod.VOUCHER)) {
       return null;
     }
 
@@ -39,7 +39,7 @@ export abstract class TicketFactory {
     return {
       redemptionMethod: bookingModel.productModel.redemptionMethod,
       utcRedeemedAt: null,
-      deliveryOptions: deliveryOptions,
+      deliveryOptions,
     };
   }
 }

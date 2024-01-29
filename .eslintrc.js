@@ -40,6 +40,7 @@ module.exports = {
         '@typescript-eslint/indent': 'off',
         '@typescript-eslint/no-explicit-any': 'off',
         '@typescript-eslint/prefer-nullish-coalescing': 'off',
+        '@typescript-eslint/no-duplicate-enum-values': 'off',
         '@typescript-eslint/explicit-member-accessibility': [
           'error',
           {

@@ -1,16 +1,15 @@
-import { Supplier } from "@octocloud/types";
-import { SupplierRepository } from "../repositories/SupplierRepository";
+import { Supplier } from '@octocloud/types';
+import { SupplierRepository } from '../repositories/SupplierRepository';
 
 interface ISupplierService {
-  getSuppliers(): Promise<Supplier[]>;
-  getSupplier(id: string): Promise<Nullable<Supplier>>;
+  getSuppliers: () => Promise<Supplier[]>;
+  getSupplier: (id: string) => Promise<Nullable<Supplier>>;
 }
 
 export class SupplierService implements ISupplierService {
-  private repository = new SupplierRepository();
+  private readonly repository = new SupplierRepository();
 
   public getSuppliers = async (): Promise<Supplier[]> => this.repository.getSuppliers();
 
-  public getSupplier = async (id: string): Promise<Nullable<Supplier>> =>
-    this.repository.getSupplier(id);
+  public getSupplier = async (id: string): Promise<Nullable<Supplier>> => this.repository.getSupplier(id);
 }

@@ -1,20 +1,20 @@
-import Router from "@koa/router";
+import Router from '@koa/router';
 import {
   AvailabilityCalendarBodySchema,
   availabilityCalendarBodySchema,
   availabilityBodySchema,
   AvailabilityBodySchema,
-} from "@octocloud/types";
-import { AvailabilityCalendarController } from "../../controllers/AvailabilityCalendarController";
-import { AvailabilityController } from "../../controllers/AvailabilityController";
-import { getCapabilities } from "../common";
+} from '@octocloud/types';
+import { AvailabilityCalendarController } from '../../controllers/AvailabilityCalendarController';
+import { AvailabilityController } from '../../controllers/AvailabilityController';
+import { getCapabilities } from '../common';
 
 export const availabilityRouter = new Router();
 
 const availabilityController = new AvailabilityController();
 const availabilityCalendarController = new AvailabilityCalendarController();
 
-availabilityRouter.post("/availability", async (ctx, _) => {
+availabilityRouter.post('/availability', async (ctx, _) => {
   const capabilities = getCapabilities(ctx);
 
   const data: AvailabilityBodySchema = ctx.request.body;
@@ -27,7 +27,7 @@ availabilityRouter.post("/availability", async (ctx, _) => {
   ctx.toJSON();
 });
 
-availabilityRouter.post("/availability/calendar", async (ctx, _) => {
+availabilityRouter.post('/availability/calendar', async (ctx, _) => {
   const capabilities = getCapabilities(ctx);
 
   const data: AvailabilityCalendarBodySchema = ctx.request.body;

@@ -1,16 +1,12 @@
-import { AvailabilityCalendarParser } from "@octocloud/generators";
-import {
-  AvailabilityCalendar,
-  CapabilityId,
-  AvailabilityCalendarBodySchema,
-} from "@octocloud/types";
-import { AvailabilityCalendarService } from "../services/AvailabilityCalendarService";
+import { AvailabilityCalendarParser } from '@octocloud/generators';
+import { AvailabilityCalendar, CapabilityId, AvailabilityCalendarBodySchema } from '@octocloud/types';
+import { AvailabilityCalendarService } from '../services/AvailabilityCalendarService';
 
 interface IAvailabilityCalendarController {
-  getAvailability(
+  getAvailability: (
     schema: AvailabilityCalendarBodySchema,
     capabilities: CapabilityId[],
-  ): Promise<AvailabilityCalendar[]>;
+  ) => Promise<AvailabilityCalendar[]>;
 }
 
 export class AvailabilityCalendarController implements IAvailabilityCalendarController {
@@ -24,10 +20,7 @@ export class AvailabilityCalendarController implements IAvailabilityCalendarCont
   ): Promise<AvailabilityCalendar[]> => {
     const availabilityCalendarModels = await this.service.getAvailability(schema, capabilities);
     return availabilityCalendarModels.map((availabilityCalendarModel) =>
-      this.availabilityCalendarParser.parseModelToPOJOWithSpecificCapabilities(
-        availabilityCalendarModel,
-        capabilities,
-      ),
+      this.availabilityCalendarParser.parseModelToPOJOWithSpecificCapabilities(availabilityCalendarModel, capabilities),
     );
   };
 }

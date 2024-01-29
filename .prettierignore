@@ -1,3 +1,13 @@
+.eslintignore
+.gitignore
+.prettierignore
+.prettierrc
+.env.*
+.dockerignore
+.editorconfig
+.pnpm-store
+Makefile
 coverage
 dist
 node_modules
+ops
