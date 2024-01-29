@@ -28,7 +28,7 @@ jobs:
       - name: Checkout main branch
         uses: actions/checkout@v2
         with:
-          ref: main
+          ref: master
 
       - name: Get main version
         id: main_version
