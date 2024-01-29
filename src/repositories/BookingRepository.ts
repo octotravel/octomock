@@ -1,15 +1,15 @@
-import { BookingModel, BookingParser } from "@octocloud/generators";
-import { Booking } from "@octocloud/types";
-import { GetBookingSchema, GetBookingsSchema } from "../schemas/Booking";
-import { DB } from "../storage/Database";
-import { DateHelper } from "../helpers/DateFormatter";
-import { InvalidBookingUUIDError } from "../models/Error";
+import { BookingModel, BookingParser } from '@octocloud/generators';
+import { Booking } from '@octocloud/types';
+import { GetBookingSchema, GetBookingsSchema } from '../schemas/Booking';
+import { DB } from '../storage/Database';
+import { DateHelper } from '../helpers/DateFormatter';
+import { InvalidBookingUUIDError } from '../models/Error';
 
 interface IBookingRepository {
-  createBooking(bookingModel: BookingModel): Promise<BookingModel>;
-  updateBooking(bookingModel: BookingModel): Promise<BookingModel>;
-  getBooking(bookingModel: BookingModel): Promise<BookingModel>;
-  getBookings(schema: GetBookingsSchema): Promise<BookingModel[]>;
+  createBooking: (bookingModel: BookingModel) => Promise<BookingModel>;
+  updateBooking: (bookingModel: BookingModel) => Promise<BookingModel>;
+  getBooking: (bookingModel: BookingModel) => Promise<BookingModel>;
+  getBookings: (schema: GetBookingsSchema) => Promise<BookingModel[]>;
 }
 
 export class BookingRepository implements IBookingRepository {
@@ -59,12 +59,10 @@ export class BookingRepository implements IBookingRepository {
     return bookingModel;
   };
 
-  public getBooking = async (data: GetBookingSchema): Promise<BookingModel> =>
-    this.getBookingByUuid(data.uuid);
+  public getBooking = async (data: GetBookingSchema): Promise<BookingModel> => await this.getBookingByUuid(data.uuid);
 
   public getBookingByUuid = async (uuid: string): Promise<BookingModel> => {
-    const result =
-      (await DB.getInstance().getDB().get("SELECT * FROM booking WHERE id = ?", uuid)) ?? null;
+    const result = (await DB.getInstance().getDB().get('SELECT * FROM booking WHERE id = ?', uuid)) ?? null;
     if (result == null) {
       throw new InvalidBookingUUIDError(uuid);
     }
@@ -75,7 +73,7 @@ export class BookingRepository implements IBookingRepository {
     return bookingModel;
   };
 
-  private handleExpiredBooking = (booking: BookingModel): void => {
+  private readonly handleExpiredBooking = (booking: BookingModel): void => {
     const isExpired = booking.utcExpiresAt! < DateHelper.utcDateFormat(new Date());
     if (isExpired) {
       throw new InvalidBookingUUIDError(booking.uuid);
@@ -83,30 +81,30 @@ export class BookingRepository implements IBookingRepository {
   };
 
   public getBookings = async (data: GetBookingsSchema): Promise<BookingModel[]> => {
-    const selectQuery = "SELECT * FROM booking WHERE ";
+    const selectQuery = 'SELECT * FROM booking WHERE ';
     const query = [];
     const params = [];
     if (data.resellerReference) {
-      query.push("resellerReference = ?");
+      query.push('resellerReference = ?');
       params.push(data.resellerReference);
     }
     if (data.supplierReference) {
-      query.push("supplierReference = ?");
+      query.push('supplierReference = ?');
       params.push(data.supplierReference);
     }
 
     if (data.localDateStart && data.localDateEnd) {
-      query.push("createdAt BETWEEN ? AND ?");
+      query.push('createdAt BETWEEN ? AND ?');
       params.push(data.localDateStart);
       params.push(data.localDateEnd);
     } else if (data.localDate) {
-      query.push("createdAt = ? ");
+      query.push('createdAt = ? ');
       params.push(data.localDate);
     }
 
     const result = await DB.getInstance()
       .getDB()
-      .all(selectQuery + query.join(" AND "), ...params);
+      .all(selectQuery + query.join(' AND '), ...params);
     return result.map((r) => this.bookingParser.parsePOJOToModel(JSON.parse(r.data) as Booking));
   };
 }

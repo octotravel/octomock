@@ -1,16 +1,16 @@
-import { OfferModel } from "@octocloud/generators";
-import { InMemoryStorage } from "./InMemoryStorage";
+import { OfferModel } from '@octocloud/generators';
+import { InMemoryStorage } from './InMemoryStorage';
 
-import { OfferWithDiscountModel } from "../models/OfferWithDiscountModel";
-import { OfferWithDiscountModelGenerator } from "../generators/OfferWithDiscountModelGenerator";
-import InvalidOfferCodeError from "../errors/InvalidOfferCodeError";
+import { OfferWithDiscountModel } from '../models/OfferWithDiscountModel';
+import { OfferWithDiscountModelGenerator } from '../generators/OfferWithDiscountModelGenerator';
+import InvalidOfferCodeError from '../errors/InvalidOfferCodeError';
 
 export class OfferModelStorage implements InMemoryStorage<OfferModel> {
-  private readonly offerWithDiscountModels: Map<string, OfferWithDiscountModel> = new Map();
+  private readonly offerWithDiscountModels = new Map<string, OfferWithDiscountModel>();
 
   private readonly OfferWithDiscountModelGenerator = new OfferWithDiscountModelGenerator();
 
-  constructor() {
+  public constructor() {
     this.OfferWithDiscountModelGenerator.generateMultipleOffers().forEach((offerWithDiscount) => {
       this.offerWithDiscountModels.set(offerWithDiscount.code, offerWithDiscount);
     });
@@ -21,7 +21,7 @@ export class OfferModelStorage implements InMemoryStorage<OfferModel> {
   }
 
   public getWithDiscount(id: string): OfferWithDiscountModel {
-    if (this.offerWithDiscountModels.has(id) === false) {
+    if (!this.offerWithDiscountModels.has(id)) {
       throw new InvalidOfferCodeError(id);
     }
 
@@ -29,9 +29,7 @@ export class OfferModelStorage implements InMemoryStorage<OfferModel> {
   }
 
   public getAll(): OfferModel[] {
-    return this.getAllWithDiscounts().map((offerWithDiscountModel) =>
-      offerWithDiscountModel.toOfferModel(),
-    );
+    return this.getAllWithDiscounts().map((offerWithDiscountModel) => offerWithDiscountModel.toOfferModel());
   }
 
   public getAllWithDiscounts(): OfferWithDiscountModel[] {

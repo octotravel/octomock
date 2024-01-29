@@ -1,2 +1,12 @@
-node_modules
+.eslintignore
+.gitignore
+.prettierignore
+.prettierrc
+.dockerignore
+.editorconfig
+.pnpm-store
+coverage
 dist
+node_modules
+ops
+.eslintrc.js

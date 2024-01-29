@@ -1,15 +1,7 @@
 {
-  "ts-node": {
-    "experimentalResolver": true,
-    "compilerOptions": {
-      "module": "CommonJS"
-    }
-  },
   "compilerOptions": {
     "outDir": "dist",
-    "baseUrl": ".",
-    "rootDir": "src",
-    "target": "ES2019",
+    "target": "ES2021",
     "module": "CommonJS",
     "strict": true,
     "esModuleInterop": true,
@@ -20,10 +12,11 @@
     "declaration": true,
     "declarationMap": true,
     "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "resolveJsonModule": true,
     "typeRoots": ["node_modules/@types"],
-    "types": ["jest"],
-    "moduleResolution": "node",
-    "experimentalDecorators": true
+    "types": ["jest"]
   },
   "include": ["src/**/**.ts", "test/**/**.ts"],
   "exclude": ["node_modules"]

@@ -1,5 +1,5 @@
-import { BookingContactSchema, Contact } from "@octocloud/types";
-import { BookingModel } from "@octocloud/generators";
+import { BookingContactSchema, Contact } from '@octocloud/types';
+import { BookingModel } from '@octocloud/generators';
 
 export abstract class ContactFactory {
   public static createForBooking({

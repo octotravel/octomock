@@ -1,13 +1,13 @@
-import { Supplier } from "@octocloud/types";
-import { SupplierStorage } from "../storage/SupplierStorage";
+import { Supplier } from '@octocloud/types';
+import { SupplierStorage } from '../storage/SupplierStorage';
 
 interface ISupplierRepository {
-  getSuppliers(): Supplier[];
-  getSupplier(id: string): Nullable<Supplier>;
+  getSuppliers: () => Supplier[];
+  getSupplier: (id: string) => Nullable<Supplier>;
 }
 
 export class SupplierRepository implements ISupplierRepository {
-  private storage = new SupplierStorage();
+  private readonly storage = new SupplierStorage();
 
   public getSuppliers(): Supplier[] {
     return this.storage.getAll();

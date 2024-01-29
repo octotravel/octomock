@@ -1,6 +1,6 @@
-import { AvailabilityUnit, Pricing, PricingUnit } from "@octocloud/types";
-import R from "ramda";
-import { InvalidUnitIdError } from "../models/Error";
+import { AvailabilityUnit, Pricing, PricingUnit } from '@octocloud/types';
+import R from 'ramda';
+import { InvalidUnitIdError } from '../models/Error';
 
 export abstract class PricingFactory {
   public static createFromAvailabilityUnits(
@@ -9,14 +9,13 @@ export abstract class PricingFactory {
   ): Pricing[] {
     return availabilityUnits
       .map(({ id, quantity }) => {
-        const specificPricingUnit: Nullable<PricingUnit> =
-          pricingUnit.find((p) => p.unitId === id) ?? null;
+        const specificPricingUnit: Nullable<PricingUnit> = pricingUnit.find((p) => p.unitId === id) ?? null;
 
         if (specificPricingUnit === null) {
           throw new InvalidUnitIdError(id);
         }
 
-        const pricingWithoutUnitId: Pricing = R.omit(["unitId"], specificPricingUnit);
+        const pricingWithoutUnitId: Pricing = R.omit(['unitId'], specificPricingUnit);
         const pricing: Pricing[] = new Array(quantity).fill(pricingWithoutUnitId);
 
         return pricing;
@@ -24,7 +23,7 @@ export abstract class PricingFactory {
       .flat();
   }
 
-  public static createSummarizedPricing(pricing: Pricing[]) {
+  public static createSummarizedPricing(pricing: Pricing[]): Pricing {
     return pricing.reduce(
       (acc, unitPricing) => ({
         original: acc.original + unitPricing.original,
@@ -38,7 +37,7 @@ export abstract class PricingFactory {
         original: 0,
         retail: 0,
         net: 0,
-        currency: "",
+        currency: '',
         currencyPrecision: 0,
         includedTaxes: [],
       },

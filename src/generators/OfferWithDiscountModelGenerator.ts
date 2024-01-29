@@ -1,6 +1,6 @@
-import { OfferPreset } from "@octocloud/generators";
-import { OfferWithDiscountModel } from "../models/OfferWithDiscountModel";
-import { OfferDiscountModel, OfferDiscountType } from "../models/OfferDiscountModel";
+import { OfferPreset } from '@octocloud/generators';
+import { OfferWithDiscountModel } from '../models/OfferWithDiscountModel';
+import { OfferDiscountModel, OfferDiscountType } from '../models/OfferDiscountModel';
 
 export class OfferWithDiscountModelGenerator {
   public generateMultipleOffers(): OfferWithDiscountModel[] {

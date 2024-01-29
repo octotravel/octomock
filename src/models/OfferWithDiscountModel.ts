@@ -1,10 +1,10 @@
-import { OfferModel } from "@octocloud/generators";
-import { OfferDiscountModel } from "./OfferDiscountModel";
+import { OfferModel } from '@octocloud/generators';
+import { OfferDiscountModel } from './OfferDiscountModel';
 
 export class OfferWithDiscountModel extends OfferModel {
   public readonly offerDiscountModel: OfferDiscountModel;
 
-  constructor({
+  public constructor({
     offerModel,
     offerDiscountModel,
   }: {

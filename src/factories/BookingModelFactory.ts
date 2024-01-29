@@ -1,4 +1,4 @@
-import { BookingAvailability, BookingStatus } from "@octocloud/types";
+import { Availability, BookingStatus } from '@octocloud/types';
 import {
   BookingModel,
   BookingModelGenerator,
@@ -6,27 +6,27 @@ import {
   ProductModel,
   ProductParser,
   UnitItemParser,
-} from "@octocloud/generators";
-import { addMinutes } from "date-fns";
-import { InvalidOptionIdError } from "../models/Error";
-import { CreateBookingSchema } from "../schemas/Booking";
-import { DateHelper } from "../helpers/DateFormatter";
-import { TicketFactory } from "./TicketFactory";
-import { DataGenerator } from "../generators/DataGenerator";
-import { UnitItemModelFactory } from "./UnitItemModelFactory";
+} from '@octocloud/generators';
+import { addMinutes } from 'date-fns';
+import { InvalidOptionIdError } from '../models/Error';
+import { CreateBookingSchema } from '../schemas/Booking';
+import { DateHelper } from '../helpers/DateFormatter';
+import { TicketFactory } from './TicketFactory';
+import { DataGenerator } from '../generators/DataGenerator';
+import { UnitItemModelFactory } from './UnitItemModelFactory';
 
 export abstract class BookingModelFactory {
-  private static bookingModelGenerator: BookingModelGenerator = new BookingModelGenerator();
+  private static readonly bookingModelGenerator: BookingModelGenerator = new BookingModelGenerator();
 
-  private static productParser: ProductParser = new ProductParser();
+  private static readonly productParser: ProductParser = new ProductParser();
 
-  private static optionParser: OptionParser = new OptionParser();
+  private static readonly optionParser: OptionParser = new OptionParser();
 
-  private static unitItemParser: UnitItemParser = new UnitItemParser();
+  private static readonly unitItemParser: UnitItemParser = new UnitItemParser();
 
   public static create(
     productModel: ProductModel,
-    bookingAvailability: BookingAvailability,
+    bookingAvailability: Availability,
     createBookingSchema: CreateBookingSchema,
   ): BookingModel {
     const status = BookingStatus.ON_HOLD;
@@ -36,9 +36,7 @@ export abstract class BookingModelFactory {
       throw new InvalidOptionIdError(createBookingSchema.optionId);
     }
 
-    const utcExpiresAt = DateHelper.utcDateFormat(
-      addMinutes(new Date(), createBookingSchema.expirationMinutes ?? 30),
-    );
+    const utcExpiresAt = DateHelper.utcDateFormat(addMinutes(new Date(), createBookingSchema.expirationMinutes ?? 30));
     const voucher = TicketFactory.createFromProductForBooking(productModel);
 
     const unitItems = createBookingSchema.unitItems.map((unitItem) => {
@@ -57,15 +55,15 @@ export abstract class BookingModelFactory {
         uuid: createBookingSchema.uuid ?? DataGenerator.generateUUID(),
         resellerReference: createBookingSchema.resellerReference ?? null,
         supplierReference: DataGenerator.generateSupplierReference(),
-        status: status,
+        status,
         product: this.productParser.parseModelToPOJO(productModel),
         option: this.optionParser.parseModelToPOJO(optionModel),
         availability: bookingAvailability,
-        unitItems: unitItems,
+        unitItems,
         utcCreatedAt: DateHelper.utcDateFormat(new Date()),
         utcUpdatedAt: DateHelper.utcDateFormat(new Date()),
-        utcExpiresAt: utcExpiresAt,
-        voucher: voucher,
+        utcExpiresAt,
+        voucher,
         notes: createBookingSchema.notes ?? null,
       },
     });

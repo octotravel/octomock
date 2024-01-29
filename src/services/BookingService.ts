@@ -1,41 +1,31 @@
-import { BookingStatus, Ticket, BookingUnitItemSchema, OrderStatus } from "@octocloud/types";
-import { BookingModel, AvailabilityModel, OrderModel } from "@octocloud/generators";
-import addMinutes from "date-fns/addMinutes";
+import { BookingStatus, Ticket, BookingUnitItemSchema, OrderStatus, Availability } from '@octocloud/types';
+import { BookingModel, AvailabilityModel, OrderModel } from '@octocloud/generators';
+import addMinutes from 'date-fns/addMinutes';
 import {
   CancelBookingSchema,
   ConfirmBookingSchema,
   ExtendBookingSchema,
   CreateBookingSchema,
-} from "../schemas/Booking";
-import { DateHelper } from "../helpers/DateFormatter";
-import { ContactFactory } from "../factories/ContactFactory";
-import { UnitItemModelFactory } from "../factories/UnitItemModelFactory";
-import { TicketFactory } from "../factories/TicketFactory";
-import { ProductWithAvailabilityModel } from "../models/ProductWithAvailabilityModel";
-import { InvalidOptionIdError, InvalidUnitIdError } from "../models/Error";
-import { BookingModelFactory } from "../factories/BookingModelFactory";
-import { CancelOrderSchema, ConfirmOrderSchema } from "../schemas/Order";
+} from '../schemas/Booking';
+import { DateHelper } from '../helpers/DateFormatter';
+import { ContactFactory } from '../factories/ContactFactory';
+import { UnitItemModelFactory } from '../factories/UnitItemModelFactory';
+import { TicketFactory } from '../factories/TicketFactory';
+import { ProductWithAvailabilityModel } from '../models/ProductWithAvailabilityModel';
+import { InvalidOptionIdError, InvalidUnitIdError } from '../models/Error';
+import { BookingModelFactory } from '../factories/BookingModelFactory';
+import { CancelOrderSchema, ConfirmOrderSchema } from '../schemas/Order';
 
 interface IBookingService {
-  createBookingModel(
+  createBookingModel: (
     schema: CreateBookingSchema,
     productWithAvailabilityModel: ProductWithAvailabilityModel,
     availabilityModel: AvailabilityModel,
-  ): BookingModel;
-  confirmBookingBySchema(
-    bookingModel: BookingModel,
-    confirmBookingSchema: ConfirmBookingSchema,
-  ): BookingModel;
-  extendBookingBySchema(
-    bookingModel: BookingModel,
-    extendBookingSchema: ExtendBookingSchema,
-  ): BookingModel;
-  cancelBookingBySchema(bookingModel: BookingModel, schema: CancelBookingSchema): BookingModel;
-  cancelBookingByOrder(
-    bookingModel: BookingModel,
-    orderModel: OrderModel,
-    schema: CancelOrderSchema,
-  ): BookingModel;
+  ) => BookingModel;
+  confirmBookingBySchema: (bookingModel: BookingModel, confirmBookingSchema: ConfirmBookingSchema) => BookingModel;
+  extendBookingBySchema: (bookingModel: BookingModel, extendBookingSchema: ExtendBookingSchema) => BookingModel;
+  cancelBookingBySchema: (bookingModel: BookingModel, schema: CancelBookingSchema) => BookingModel;
+  cancelBookingByOrder: (bookingModel: BookingModel, orderModel: OrderModel, schema: CancelOrderSchema) => BookingModel;
 }
 
 export class BookingService implements IBookingService {
@@ -44,11 +34,17 @@ export class BookingService implements IBookingService {
     productWithAvailabilityModel: ProductWithAvailabilityModel,
     availabilityModel: AvailabilityModel,
   ): BookingModel {
-    const bookingAvailability = {
+    const bookingAvailability: Availability = {
       id: availabilityModel.id,
       localDateTimeStart: availabilityModel.localDateTimeStart,
       localDateTimeEnd: availabilityModel.localDateTimeEnd,
       allDay: availabilityModel.allDay,
+      available: availabilityModel.available,
+      status: availabilityModel.status,
+      vacancies: availabilityModel.vacancies,
+      capacity: availabilityModel.capacity,
+      maxUnits: availabilityModel.maxUnits,
+      utcCutoffAt: availabilityModel.utcCutoffAt,
       openingHours: availabilityModel.openingHours,
     };
 
@@ -68,29 +64,21 @@ export class BookingService implements IBookingService {
       }
     });
 
-    const bookingModel = BookingModelFactory.create(
-      productWithAvailabilityModel,
-      bookingAvailability,
-      schema,
-    );
+    const bookingModel = BookingModelFactory.create(productWithAvailabilityModel, bookingAvailability, schema);
 
     return bookingModel;
   }
 
-  public confirmBookingBySchema(
-    bookingModel: BookingModel,
-    confirmBookingSchema: ConfirmBookingSchema,
-  ): BookingModel {
+  public confirmBookingBySchema(bookingModel: BookingModel, confirmBookingSchema: ConfirmBookingSchema): BookingModel {
     const unitItemModels = UnitItemModelFactory.createMultipleForBookingWithTickets({
-      bookingModel: bookingModel,
+      bookingModel,
       bookingUnitItemSchemas: confirmBookingSchema.unitItems,
     });
 
     bookingModel.unitItemModels = unitItemModels;
-    bookingModel.resellerReference =
-      confirmBookingSchema.resellerReference ?? bookingModel.resellerReference;
+    bookingModel.resellerReference = confirmBookingSchema.resellerReference ?? bookingModel.resellerReference;
     bookingModel.contact = ContactFactory.createForBooking({
-      bookingModel: bookingModel,
+      bookingModel,
       bookingContactScheme: confirmBookingSchema.contact,
     });
     bookingModel.notes = confirmBookingSchema.notes ?? bookingModel.notes;
@@ -100,10 +88,7 @@ export class BookingService implements IBookingService {
     return bookingModel;
   }
 
-  public confirmBookingByOrder(
-    bookingModel: BookingModel,
-    confirmOrderSchema: ConfirmOrderSchema,
-  ): BookingModel {
+  public confirmBookingByOrder(bookingModel: BookingModel, confirmOrderSchema: ConfirmOrderSchema): BookingModel {
     const contact = ContactFactory.createForOrder({
       contact: bookingModel.contact,
       orderContactScheme: confirmOrderSchema.contact,
@@ -127,10 +112,7 @@ export class BookingService implements IBookingService {
     return bookingModel;
   }
 
-  public extendBookingBySchema(
-    bookingModel: BookingModel,
-    extendBookingSchema: ExtendBookingSchema,
-  ): BookingModel {
+  public extendBookingBySchema(bookingModel: BookingModel, extendBookingSchema: ExtendBookingSchema): BookingModel {
     const status = BookingStatus.ON_HOLD;
 
     bookingModel.status = status;
@@ -145,10 +127,7 @@ export class BookingService implements IBookingService {
     return bookingModel;
   }
 
-  public cancelBookingBySchema(
-    bookingModel: BookingModel,
-    schema: CancelBookingSchema,
-  ): BookingModel {
+  public cancelBookingBySchema(bookingModel: BookingModel, schema: CancelBookingSchema): BookingModel {
     let status = BookingStatus.EXPIRED;
 
     if (bookingModel.status === BookingStatus.CONFIRMED) {
@@ -172,13 +151,9 @@ export class BookingService implements IBookingService {
     return this.cancelBooking(bookingModel, status, cancelOrderSchema.reason);
   }
 
-  private cancelBooking(
-    bookingModel: BookingModel,
-    status: BookingStatus,
-    reason?: string,
-  ): BookingModel {
+  private cancelBooking(bookingModel: BookingModel, status: BookingStatus, reason?: string): BookingModel {
     const cancellation = {
-      refund: "FULL",
+      refund: 'FULL',
       reason: reason ?? null,
       utcCancelledAt: DateHelper.utcDateFormat(new Date()),
     };

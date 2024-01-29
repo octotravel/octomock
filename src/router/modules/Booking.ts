@@ -1,12 +1,12 @@
-import Router from "@koa/router";
+import Router from '@koa/router';
 import {
   cancelBookingBodySchema,
   confirmBookingBodySchema,
   extendBookingBodySchema,
   updateBookingBodySchema,
-} from "@octocloud/types";
-import { BookingController } from "../../controllers/BookingController";
-import { getCapabilities } from "../common";
+} from '@octocloud/types';
+import { BookingController } from '../../controllers/BookingController';
+import { getCapabilities } from '../common';
 import {
   getBookingSchema,
   GetBookingSchema,
@@ -22,13 +22,13 @@ import {
   ExtendBookingSchema,
   UpdateBookingSchema,
   ConfirmBookingSchema,
-} from "../../schemas/Booking";
+} from '../../schemas/Booking';
 
 export const bookingRouter = new Router();
 
 const bookingController = new BookingController();
 
-bookingRouter.post("/bookings", async (ctx, _) => {
+bookingRouter.post('/bookings', async (ctx, _) => {
   const capabilities = getCapabilities(ctx);
   const data: CreateBookingSchema = ctx.request.body;
   await createBookingSchema.validate(data);
@@ -38,7 +38,7 @@ bookingRouter.post("/bookings", async (ctx, _) => {
   ctx.toJSON();
 });
 
-bookingRouter.post("/bookings/:uuid/confirm", async (ctx, _) => {
+bookingRouter.post('/bookings/:uuid/confirm', async (ctx, _) => {
   const capabilities = getCapabilities(ctx);
 
   await confirmBookingBodySchema.validate(ctx.request.body);
@@ -56,7 +56,7 @@ bookingRouter.post("/bookings/:uuid/confirm", async (ctx, _) => {
   ctx.toJSON();
 });
 
-bookingRouter.patch("/bookings/:uuid", async (ctx, _) => {
+bookingRouter.patch('/bookings/:uuid', async (ctx, _) => {
   const capabilities = getCapabilities(ctx);
 
   await updateBookingBodySchema.validate(ctx.request.body);
@@ -74,7 +74,7 @@ bookingRouter.patch("/bookings/:uuid", async (ctx, _) => {
   ctx.toJSON();
 });
 
-bookingRouter.post("/bookings/:uuid/extend", async (ctx, _) => {
+bookingRouter.post('/bookings/:uuid/extend', async (ctx, _) => {
   const capabilities = getCapabilities(ctx);
 
   await extendBookingBodySchema.validate(ctx.request.body);
@@ -92,7 +92,7 @@ bookingRouter.post("/bookings/:uuid/extend", async (ctx, _) => {
   ctx.toJSON();
 });
 
-bookingRouter.post("/bookings/:uuid/cancel", async (ctx, _) => {
+bookingRouter.post('/bookings/:uuid/cancel', async (ctx, _) => {
   const capabilities = getCapabilities(ctx);
 
   await cancelBookingBodySchema.validate(ctx.request.body);
@@ -110,7 +110,7 @@ bookingRouter.post("/bookings/:uuid/cancel", async (ctx, _) => {
   ctx.toJSON();
 });
 
-bookingRouter.delete("/bookings/:uuid", async (ctx, _) => {
+bookingRouter.delete('/bookings/:uuid', async (ctx, _) => {
   const capabilities = getCapabilities(ctx);
 
   await cancelBookingBodySchema.validate(ctx.request.body);
@@ -128,7 +128,7 @@ bookingRouter.delete("/bookings/:uuid", async (ctx, _) => {
   ctx.toJSON();
 });
 
-bookingRouter.get("/bookings/:uuid", async (ctx, _) => {
+bookingRouter.get('/bookings/:uuid', async (ctx, _) => {
   const capabilities = getCapabilities(ctx);
   const data: GetBookingSchema = {
     uuid: ctx.params.uuid,
@@ -141,7 +141,7 @@ bookingRouter.get("/bookings/:uuid", async (ctx, _) => {
   ctx.toJSON();
 });
 
-bookingRouter.get("/bookings", async (ctx, _) => {
+bookingRouter.get('/bookings', async (ctx, _) => {
   const capabilities = getCapabilities(ctx);
   const data: GetBookingsSchema = {
     resellerReference: ctx.query.resellerReference as string | undefined,

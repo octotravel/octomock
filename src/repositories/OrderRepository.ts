@@ -1,15 +1,15 @@
-import { Order } from "@octocloud/types";
-import { OrderModel, OrderParser, BookingModel } from "@octocloud/generators";
-import { DB } from "../storage/Database";
-import { DateHelper } from "../helpers/DateFormatter";
-import { GetOrderSchema } from "../schemas/Order";
-import InvalidOrderIdError from "../errors/InvalidOrderIdError";
-import { BookingRepository } from "./BookingRepository";
+import { Order } from '@octocloud/types';
+import { OrderModel, OrderParser, BookingModel } from '@octocloud/generators';
+import { DB } from '../storage/Database';
+import { DateHelper } from '../helpers/DateFormatter';
+import { GetOrderSchema } from '../schemas/Order';
+import InvalidOrderIdError from '../errors/InvalidOrderIdError';
+import { BookingRepository } from './BookingRepository';
 
 interface IOrderRepository {
-  createOrder(orderModel: OrderModel): Promise<OrderModel>;
-  updateOrder(orderModel: OrderModel): Promise<OrderModel>;
-  getOrder(orderModel: OrderModel): Promise<OrderModel>;
+  createOrder: (orderModel: OrderModel) => Promise<OrderModel>;
+  updateOrder: (orderModel: OrderModel) => Promise<OrderModel>;
+  getOrder: (orderModel: OrderModel) => Promise<OrderModel>;
 }
 
 export default class OrderRepository implements IOrderRepository {
@@ -59,11 +59,10 @@ export default class OrderRepository implements IOrderRepository {
   };
 
   public getOrder = async (getOrderSchema: GetOrderSchema): Promise<OrderModel> =>
-    this.getOrderById(getOrderSchema.id);
+    await this.getOrderById(getOrderSchema.id);
 
   public getOrderById = async (orderId: string): Promise<OrderModel> => {
-    const result =
-      (await DB.getInstance().getDB().get("SELECT * FROM order WHERE id = ?", orderId)) ?? null;
+    const result = (await DB.getInstance().getDB().get('SELECT * FROM order WHERE id = ?', orderId)) ?? null;
 
     if (result === null) {
       throw new InvalidOrderIdError(orderId);
@@ -78,13 +77,13 @@ export default class OrderRepository implements IOrderRepository {
     return orderModel;
   };
 
-  private handleExpiredOrder = (order: Order): void => {
+  private readonly handleExpiredOrder = (order: Order): void => {
     if (order.utcExpiresAt !== null && order.utcExpiresAt < DateHelper.utcDateFormat(new Date())) {
       throw new InvalidOrderIdError(order.id);
     }
   };
 
-  private getUpToDateBookingModels = (orderModel: OrderModel): BookingModel[] => {
+  private readonly getUpToDateBookingModels = (orderModel: OrderModel): BookingModel[] => {
     const upToDateBookingModels: BookingModel[] = [];
 
     orderModel.bookingModels.forEach(async (bookingModel) => {

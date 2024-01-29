@@ -1,16 +1,16 @@
-import { OfferModel } from "@octocloud/generators";
-import { OfferModelStorage } from "../storage/OfferModelStorage";
-import { OfferWithDiscountModel } from "../models/OfferWithDiscountModel";
+import { OfferModel } from '@octocloud/generators';
+import { OfferModelStorage } from '../storage/OfferModelStorage';
+import { OfferWithDiscountModel } from '../models/OfferWithDiscountModel';
 
 interface IOfferRepository {
-  getOffers(): OfferModel[];
-  getOffersWithDiscount(): OfferWithDiscountModel[];
-  getOffer(code: string): OfferModel;
-  getOfferWithDiscount(code: string): OfferWithDiscountModel;
+  getOffers: () => OfferModel[];
+  getOffersWithDiscount: () => OfferWithDiscountModel[];
+  getOffer: (code: string) => OfferModel;
+  getOfferWithDiscount: (code: string) => OfferWithDiscountModel;
 }
 
 export class OfferRepository implements IOfferRepository {
-  private storage = new OfferModelStorage();
+  private readonly storage = new OfferModelStorage();
 
   public getOffers(): OfferModel[] {
     return this.storage.getAll();

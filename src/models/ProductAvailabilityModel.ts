@@ -1,7 +1,7 @@
-import { ProductModel } from "@octocloud/generators";
-import { PricingUnit, PricingPer, Pricing, AvailabilityType, OpeningHours } from "@octocloud/types";
+import { ProductModel } from '@octocloud/generators';
+import { PricingUnit, PricingPer, Pricing, AvailabilityType, OpeningHours } from '@octocloud/types';
 
-import * as R from "ramda";
+import * as R from 'ramda';
 
 export enum Day {
   Mon = 1,
@@ -62,7 +62,7 @@ export class ProductAvailabilityModel {
 
   private unitPricing!: Map<string, PricingUnit[]>;
 
-  constructor({
+  public constructor({
     productModel,
     days,
     daysClosed,
@@ -89,7 +89,7 @@ export class ProductAvailabilityModel {
       availabilityType === AvailabilityType.OPENING_HOURS &&
       (openingHours === undefined || R.isEmpty(openingHours))
     ) {
-      throw new Error("openingHours cannot be empty when AvailabilityType = OPENING_HOURS");
+      throw new Error('openingHours cannot be empty when AvailabilityType = OPENING_HOURS');
     }
 
     if (capacity) {
@@ -118,10 +118,7 @@ export class ProductAvailabilityModel {
       productModel.optionModels.forEach((optionModel) => {
         const optionPricingModel = optionModel.getOptionPricingModel();
 
-        if (
-          optionPricingModel.pricingFrom !== undefined &&
-          optionPricingModel.pricingFrom.length > 0
-        ) {
+        if (optionPricingModel.pricingFrom !== undefined && optionPricingModel.pricingFrom.length > 0) {
           pricingMap.set(optionModel.id, optionPricingModel.pricingFrom[0]);
         }
       });
@@ -146,7 +143,7 @@ export class ProductAvailabilityModel {
                 ({
                   unitId: unitModel.id,
                   ...pricingFrom,
-                } as PricingUnit),
+                }) as PricingUnit,
             );
           })
           .flat(1) as PricingUnit[];
