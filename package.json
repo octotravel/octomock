@@ -1,6 +1,6 @@
 {
   "name": "octomock",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "",
   "license": "ISC",
   "author": "",
@@ -27,7 +27,7 @@
     "@koa/cors": "^3.3.0",
     "@koa/router": "^12.0.0",
     "@octocloud/generators": "^1.0.6",
-    "@octocloud/types": "^1.5.20",
+    "@octocloud/types": "^1.5.22",
     "@types/jest": "29.5.11",
     "@types/koa": "^2.13.5",
     "@types/koa__cors": "^3.3.0",
