@@ -81,7 +81,7 @@ export class ProductWithAvailabilityModelGenerator {
           availabilityType: AvailabilityType.OPENING_HOURS,
           openingHours: [{ from: '09:00', to: '17:00' }],
           freesale: true,
-          monthsClosed: [Month.Feb],
+          monthsClosed: [],
           capacityValue: 10,
           capacity: new Map([
             [Day.Mon, 10],
