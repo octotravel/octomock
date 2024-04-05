@@ -21,6 +21,19 @@ availabilityRouter.post('/availability', async (ctx, _) => {
   await availabilityBodySchema.validate(data);
   const schema = availabilityBodySchema.cast(data) as AvailabilityBodySchema;
 
+  // TODO proper fix (Probably set correct TZ in env and use it)
+  if (schema.localDate !== undefined) {
+    schema.localDate = schema.localDate.split('T')[0];
+  }
+
+  if (schema.localDateStart !== undefined) {
+    schema.localDateStart = schema.localDateStart.split('T')[0];
+  }
+
+  if (schema.localDateEnd !== undefined) {
+    schema.localDateEnd = schema.localDateEnd.split('T')[0];
+  }
+
   const body = await availabilityController.getAvailability(schema, capabilities);
 
   ctx.body = body;
