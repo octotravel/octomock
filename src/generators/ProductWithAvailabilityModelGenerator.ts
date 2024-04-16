@@ -177,6 +177,32 @@ export class ProductWithAvailabilityModelGenerator {
             {
               units: [
                 {
+                  id: 'adult',
+                  type: UnitType.ADULT,
+                },
+              ],
+              availabilityLocalStartTimes: ['12:00', '14:00'],
+              pricing: [pricingBooking],
+            },
+          ],
+          defaultCurrency: Currency.EUR,
+          availableCurrencies: [Currency.EUR],
+          pricingPer: PricingPer.BOOKING,
+        },
+        productAvailabilityModelData: {
+          availabilityType: AvailabilityType.START_TIME,
+          daysClosed: [Day.Sat, Day.Sun],
+        },
+      }),
+      this.generateProduct({
+        productData: {
+          id: '7ce0191c-5996-4d5a-9cc0-2c3f8e15cdd0',
+          internalName: 'PPB - ST with unit uuid id',
+          availabilityType: AvailabilityType.START_TIME,
+          options: [
+            {
+              units: [
+                {
                   id: 'unit_4dfcc783-4c70-40ca-ae43-754b04717fa8',
                   type: UnitType.ADULT,
                 },
