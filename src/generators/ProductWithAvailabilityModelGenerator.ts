@@ -177,7 +177,7 @@ export class ProductWithAvailabilityModelGenerator {
             {
               units: [
                 {
-                  id: 'adult',
+                  id: 'unit_4dfcc783-4c70-40ca-ae43-754b04717fa8',
                   type: UnitType.ADULT,
                 },
               ],
