@@ -22,7 +22,7 @@ export default class OrderRepository implements IOrderRepository {
       .getDB()
       .run(
         `
-        INSERT INTO booking (
+        INSERT INTO \`order\` (
           id,
           status,
           supplierReference
@@ -43,7 +43,7 @@ export default class OrderRepository implements IOrderRepository {
       .getDB()
       .run(
         `
-        UPDATE booking
+        UPDATE \`order\`
           SET status = ?,
               supplierReference = ?,
               data = ?
@@ -62,7 +62,7 @@ export default class OrderRepository implements IOrderRepository {
     await this.getOrderById(getOrderSchema.id);
 
   public getOrderById = async (orderId: string): Promise<OrderModel> => {
-    const result = (await DB.getInstance().getDB().get('SELECT * FROM order WHERE id = ?', orderId)) ?? null;
+    const result = (await DB.getInstance().getDB().get('SELECT * FROM \`order\` WHERE id = ?', orderId)) ?? null;
 
     if (result === null) {
       throw new InvalidOrderIdError(orderId);
