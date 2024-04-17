@@ -25,7 +25,7 @@ export default class OrderRepository implements IOrderRepository {
         INSERT INTO \`order\` (
           id,
           status,
-          supplierReference
+          supplierReference,
           data
         ) VALUES (?, ?, ?, ?)
     `,
@@ -67,6 +67,7 @@ export default class OrderRepository implements IOrderRepository {
     if (result === null) {
       throw new InvalidOrderIdError(orderId);
     }
+
     const order = JSON.parse(result.data) as Order;
     this.handleExpiredOrder(order);
 
