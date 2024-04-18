@@ -64,37 +64,42 @@ export class BookingController implements IBookingController {
     );
     this.checkRestrictions(bookingModel.optionModel, schema.unitItems);
 
-    if (capabilities.includes(CapabilityId.Cart)) {
-      let orderModel;
-      let primary;
+    let orderModel;
+    let primary;
 
-      if (schema.orderId === undefined) {
-        orderModel = OrderModelFactory.createByBooking(bookingModel, schema);
-        await this.orderRepository.createOrder(orderModel);
-        primary = true;
-      } else {
-        orderModel = await this.orderRepository.getOrderById(schema.orderId);
+    if (schema.orderId === undefined) {
+      orderModel = OrderModelFactory.createByBooking(bookingModel, schema);
+      await this.orderRepository.createOrder(orderModel);
+      primary = true;
+    } else {
+      orderModel = await this.orderRepository.getOrderById(schema.orderId);
 
-        if (orderModel === null) {
-          throw new InvalidOrderIdError(schema.orderId);
-        }
-
-        orderModel.bookingModels = [...orderModel.bookingModels, bookingModel];
-        await this.orderRepository.updateOrder(orderModel);
-        primary = false;
+      if (orderModel === null) {
+        throw new InvalidOrderIdError(schema.orderId);
       }
 
-      const bookingCartModel = new BookingCartModel({
-        orderId: orderModel.id,
-        primary,
-      });
-
-      bookingModel.bookingCartModel = bookingCartModel;
+      orderModel.bookingModels = [...orderModel.bookingModels, bookingModel];
+      await this.orderRepository.updateOrder(orderModel);
+      primary = false;
     }
+
+    const bookingCartModel = new BookingCartModel({
+      orderId: orderModel.id,
+      orderReference: bookingModel.resellerReference ?? orderModel.supplierReference,
+      primary,
+    });
+
+    bookingModel.bookingCartModel = bookingCartModel;
 
     await this.bookingRepository.createBooking(bookingModel);
 
-    return this.bookingParser.parseModelToPOJOWithSpecificCapabilities(bookingModel, capabilities);
+    const additionalCapabilities = capabilities;
+
+    if (!capabilities.includes(CapabilityId.Cart)) {
+      additionalCapabilities.push(CapabilityId.Cart);
+    }
+
+    return this.bookingParser.parseModelToPOJOWithSpecificCapabilities(bookingModel, additionalCapabilities);
   };
 
   public confirmBooking = async (schema: ConfirmBookingSchema, capabilities: CapabilityId[]): Promise<Booking> => {
