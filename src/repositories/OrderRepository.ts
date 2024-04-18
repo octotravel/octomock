@@ -62,7 +62,7 @@ export default class OrderRepository implements IOrderRepository {
     await this.getOrderById(getOrderSchema.id);
 
   public getOrderById = async (orderId: string): Promise<OrderModel> => {
-    const result = (await DB.getInstance().getDB().get('SELECT * FROM \`order\` WHERE id = ?', orderId)) ?? null;
+    const result = (await DB.getInstance().getDB().get('SELECT * FROM `order` WHERE id = ?', orderId)) ?? null;
 
     if (result === null) {
       throw new InvalidOrderIdError(orderId);
@@ -87,10 +87,12 @@ export default class OrderRepository implements IOrderRepository {
   private readonly getUpToDateBookingModels = async (orderModel: OrderModel): Promise<BookingModel[]> => {
     const upToDateBookingModels: BookingModel[] = [];
 
-    await Promise.all(orderModel.bookingModels.map(async (bookingModel) => {
-      const upToDateBookingModel = await this.BookingRepository.getBookingByUuid(bookingModel.uuid);
-      upToDateBookingModels.push(upToDateBookingModel);
-    }));
+    await Promise.all(
+      orderModel.bookingModels.map(async (bookingModel) => {
+        const upToDateBookingModel = await this.BookingRepository.getBookingByUuid(bookingModel.uuid);
+        upToDateBookingModels.push(upToDateBookingModel);
+      }),
+    );
 
     return upToDateBookingModels;
   };
