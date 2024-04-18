@@ -85,6 +85,7 @@ export class BookingController implements IBookingController {
 
     const bookingCartModel = new BookingCartModel({
       orderId: orderModel.id,
+      orderReference: bookingModel.resellerReference ?? orderModel.supplierReference,
       primary,
     });
 
@@ -92,7 +93,13 @@ export class BookingController implements IBookingController {
 
     await this.bookingRepository.createBooking(bookingModel);
 
-    return this.bookingParser.parseModelToPOJOWithSpecificCapabilities(bookingModel, capabilities);
+    const additionalCapabilities = capabilities;
+
+    if (!capabilities.includes(CapabilityId.Cart)) {
+      additionalCapabilities.push(CapabilityId.Cart);
+    }
+
+    return this.bookingParser.parseModelToPOJOWithSpecificCapabilities(bookingModel, additionalCapabilities);
   };
 
   public confirmBooking = async (schema: ConfirmBookingSchema, capabilities: CapabilityId[]): Promise<Booking> => {

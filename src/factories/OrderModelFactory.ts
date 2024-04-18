@@ -33,7 +33,7 @@ export abstract class OrderModelFactory {
 
     return this.orderModelGenerator.generateOrder({
       orderData: {
-        id: bookingModel.bookingCartModel?.orderId ?? DataGenerator.generateUUID(),
+        id: DataGenerator.generateUUID(),
         supplierReference: bookingModel.supplierReference ?? DataGenerator.generateSupplierReference(),
         settlementMethod: 'settlementMethod',
         status,

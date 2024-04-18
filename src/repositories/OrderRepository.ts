@@ -73,7 +73,7 @@ export default class OrderRepository implements IOrderRepository {
 
     const orderModel = this.orderParser.parsePOJOToModel(order);
     const upToDateBookingModels = this.getUpToDateBookingModels(orderModel);
-    orderModel.bookingModels = upToDateBookingModels;
+    orderModel.bookingModels = await upToDateBookingModels;
 
     return orderModel;
   };
@@ -84,13 +84,13 @@ export default class OrderRepository implements IOrderRepository {
     }
   };
 
-  private readonly getUpToDateBookingModels = (orderModel: OrderModel): BookingModel[] => {
+  private readonly getUpToDateBookingModels = async (orderModel: OrderModel): Promise<BookingModel[]> => {
     const upToDateBookingModels: BookingModel[] = [];
 
-    orderModel.bookingModels.forEach(async (bookingModel) => {
+    await Promise.all(orderModel.bookingModels.map(async (bookingModel) => {
       const upToDateBookingModel = await this.BookingRepository.getBookingByUuid(bookingModel.uuid);
       upToDateBookingModels.push(upToDateBookingModel);
-    });
+    }));
 
     return upToDateBookingModels;
   };
