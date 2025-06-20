@@ -1,11 +1,11 @@
 import Router from '@koa/router';
-import { bookingRouter } from './modules/Booking';
-import { availabilityRouter } from './modules/Availability';
-import { productRouter } from './modules/Product';
 import { CapabilityController } from '../controllers/CapabilityController';
-import { supplierRouter } from './modules/Supplier';
-import { orderRouter } from './modules/Order';
+import { availabilityRouter } from './modules/Availability';
+import { bookingRouter } from './modules/Booking';
 import { mappingRouter } from './modules/Mapping';
+import { orderRouter } from './modules/Order';
+import { productRouter } from './modules/Product';
+import { supplierRouter } from './modules/Supplier';
 
 export const router = new Router();
 

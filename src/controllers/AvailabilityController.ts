@@ -1,5 +1,5 @@
 import { AvailabilityParser } from '@octocloud/generators';
-import { CapabilityId, Availability, AvailabilityBodySchema } from '@octocloud/types';
+import { Availability, AvailabilityBodySchema, CapabilityId } from '@octocloud/types';
 import { AvailabilityService } from '../services/AvailabilityService';
 
 interface IAvailabilityController {

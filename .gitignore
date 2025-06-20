@@ -1,7 +1,24 @@
-.idea
-.env
-coverage
-dist
-node_modules
-database.db
+# IDE & OS files
+.*.swp
 .DS_Store
+.buildpath
+.idea
+.project
+.settings
+Thumbs.db
+nbproject
+coverage/*
+coverage-output.json
+
+# Local files
+pnpm-lock.yaml
+.ansible-password
+secrets/.ansible-password
+/.env
+/dist
+/node_modules
+/logs/**
+.cache/**
+
+.vscode
+database.db

@@ -1,0 +1,134 @@
+name: Code Check
+
+on:
+  pull_request:
+    branches:
+      - '!main'
+      - '!master'
+      - '**'
+
+env:
+  NODE_VERSION: 22.15.1
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - uses: actions/cache@v4
+        name: Setup node modules cache
+        id: cache-node-modules
+        with:
+          path: ./node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('./package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
+
+      - name: Install node modules
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
+        run: npm install --no-lockfile --ignore-scripts --prefer-offline --unsafe-perm
+
+      - name: Build the project
+        run: npm run build
+
+  check-types:
+    name: Check types
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - uses: actions/cache/restore@v4
+        name: Restore node modules cache
+        id: cache-node-modules
+        with:
+          path: ./node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('./package-lock.json') }}
+
+      - name: Install node modules
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
+        run: npm install --no-lockfile --ignore-scripts --prefer-offline --unsafe-perm
+
+      - name: Setup tsc cache
+        uses: actions/cache@v4
+        with:
+          path: ./.cache/tsc
+          key: ${{ runner.os }}-node-tsc-${{ hashFiles('./package-lock.json', './tsconfig.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-tsc-
+
+      - name: Do dry build
+        run: npm run build:dry:ci
+
+  check-code-quality:
+    name: Check code quality
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Biome
+        uses: biomejs/setup-biome@v2
+        with:
+          version: 2.0.0
+      
+      - name: Run Biome
+        run: biome ci .
+
+  run-tests:
+    name: Run tests
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - uses: actions/cache/restore@v4
+        name: Restore node modules cache
+        id: cache-node-modules
+        with:
+          path: ./node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('./package-lock.json') }}
+
+      - name: Install node modules
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
+        run: npm install --no-lockfile --ignore-scripts --prefer-offline --unsafe-perm
+
+      - name: Run Vitest
+        run: npm run test

@@ -1,8 +1,8 @@
-import { ProductModel, MappingModel } from '@octocloud/generators';
+import { MappingModel, ProductModel } from '@octocloud/generators';
 import { ResellerStatus } from '@octocloud/types';
 import Prando from 'prando';
-import { SpecificResellerGetMappingService } from './SpecificResellerGetMappingService';
 import { DataGenerator } from '../../../generators/DataGenerator';
+import { SpecificResellerGetMappingService } from './SpecificResellerGetMappingService';
 
 export class GetYourGuideMappingModel extends MappingModel {
   public readonly gygPriceOverApi: boolean;

@@ -50,7 +50,7 @@ export class PricingOfferDiscountCalculator {
     tax: Tax,
     offerWithDiscountModel: OfferWithDiscountModel,
   ): Tax {
-    const taxCoefficient: number = parseFloat((original / (original - tax.original)).toFixed(2));
+    const taxCoefficient: number = Number.parseFloat((original / (original - tax.original)).toFixed(2));
 
     tax.retail = Math.round(retail - retail / taxCoefficient);
 

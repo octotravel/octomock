@@ -1,5 +1,0 @@
-name = "octo-validator-api"
-main = "src/worker.ts"
-compatibility_date = "2022-08-30"
-
-usage_model = "unbound"

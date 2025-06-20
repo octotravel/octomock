@@ -1,4 +1,3 @@
-import { Availability, BookingStatus } from '@octocloud/types';
 import {
   BookingModel,
   BookingModelGenerator,
@@ -7,12 +6,13 @@ import {
   ProductParser,
   UnitItemParser,
 } from '@octocloud/generators';
+import { Availability, BookingStatus } from '@octocloud/types';
 import { addMinutes } from 'date-fns';
+import { DataGenerator } from '../generators/DataGenerator';
+import { DateHelper } from '../helpers/DateFormatter';
 import { InvalidOptionIdError } from '../models/Error';
 import { CreateBookingSchema } from '../schemas/Booking';
-import { DateHelper } from '../helpers/DateFormatter';
 import { TicketFactory } from './TicketFactory';
-import { DataGenerator } from '../generators/DataGenerator';
 import { UnitItemModelFactory } from './UnitItemModelFactory';
 
 export abstract class BookingModelFactory {
@@ -46,18 +46,18 @@ export abstract class BookingModelFactory {
         optionModel,
         productModel.deliveryMethods,
       );
-      return this.unitItemParser.parseModelToPOJO(unitItemModel);
+      return BookingModelFactory.unitItemParser.parseModelToPOJO(unitItemModel);
     });
 
-    return this.bookingModelGenerator.generateBooking({
+    return BookingModelFactory.bookingModelGenerator.generateBooking({
       bookingData: {
         id: DataGenerator.generateUUID(),
         uuid: createBookingSchema.uuid ?? DataGenerator.generateUUID(),
         resellerReference: createBookingSchema.resellerReference ?? null,
         supplierReference: DataGenerator.generateSupplierReference(),
         status,
-        product: this.productParser.parseModelToPOJO(productModel),
-        option: this.optionParser.parseModelToPOJO(optionModel),
+        product: BookingModelFactory.productParser.parseModelToPOJO(productModel),
+        option: BookingModelFactory.optionParser.parseModelToPOJO(optionModel),
         availability: bookingAvailability,
         unitItems,
         utcCreatedAt: DateHelper.utcDateFormat(new Date()),

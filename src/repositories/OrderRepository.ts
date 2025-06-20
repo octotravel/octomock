@@ -1,9 +1,9 @@
+import { BookingModel, OrderModel, OrderParser } from '@octocloud/generators';
 import { Order } from '@octocloud/types';
-import { OrderModel, OrderParser, BookingModel } from '@octocloud/generators';
-import { DB } from '../storage/Database';
+import InvalidOrderIdError from '../errors/InvalidOrderIdError';
 import { DateHelper } from '../helpers/DateFormatter';
 import { GetOrderSchema } from '../schemas/Order';
-import InvalidOrderIdError from '../errors/InvalidOrderIdError';
+import { DB } from '../storage/Database';
 import { BookingRepository } from './BookingRepository';
 
 interface IOrderRepository {
@@ -18,10 +18,10 @@ export default class OrderRepository implements IOrderRepository {
   private readonly BookingRepository = new BookingRepository();
 
   public createOrder = async (orderModel: OrderModel): Promise<OrderModel> => {
-    await DB.getInstance()
-      .getDB()
-      .run(
-        `
+    const db = await DB.getInstance().getDB();
+
+    db.prepare(
+      `
         INSERT INTO \`order\` (
           id,
           status,
@@ -29,32 +29,33 @@ export default class OrderRepository implements IOrderRepository {
           data
         ) VALUES (?, ?, ?, ?)
     `,
-        orderModel.id,
-        orderModel.status,
-        orderModel.supplierReference,
-        JSON.stringify(this.orderParser.parseModelToPOJO(orderModel)),
-      );
+    ).run(
+      orderModel.id,
+      orderModel.status,
+      orderModel.supplierReference,
+      JSON.stringify(this.orderParser.parseModelToPOJO(orderModel)),
+    );
 
     return orderModel;
   };
 
   public updateOrder = async (orderModel: OrderModel): Promise<OrderModel> => {
-    await DB.getInstance()
-      .getDB()
-      .run(
-        `
+    const db = await DB.getInstance().getDB();
+
+    db.prepare(
+      `
         UPDATE \`order\`
           SET status = ?,
               supplierReference = ?,
               data = ?
           WHERE id = ?
     `,
-        orderModel.status,
-        orderModel.supplierReference,
-
-        JSON.stringify(this.orderParser.parseModelToPOJO(orderModel)),
-        orderModel.id,
-      );
+    ).run(
+      orderModel.status,
+      orderModel.supplierReference,
+      JSON.stringify(this.orderParser.parseModelToPOJO(orderModel)),
+      orderModel.id,
+    );
     return orderModel;
   };
 
@@ -62,7 +63,10 @@ export default class OrderRepository implements IOrderRepository {
     await this.getOrderById(getOrderSchema.id);
 
   public getOrderById = async (orderId: string): Promise<OrderModel> => {
-    const result = (await DB.getInstance().getDB().get('SELECT * FROM `order` WHERE id = ?', orderId)) ?? null;
+    const db = await DB.getInstance().getDB();
+
+    // biome-ignore lint/suspicious/noExplicitAny: ignored
+    const result: any = (await db.prepare('SELECT * FROM `order` WHERE id = ?').get(orderId)) ?? null;
 
     if (result === null) {
       throw new InvalidOrderIdError(orderId);

@@ -1,6 +1,6 @@
-import { DeliveryFormat, DeliveryMethod, DeliveryOption, Ticket } from '@octocloud/types';
+import assert from 'node:assert';
 import { BookingModel, ProductModel } from '@octocloud/generators';
-import assert from 'assert';
+import { DeliveryFormat, DeliveryMethod, DeliveryOption, Ticket } from '@octocloud/types';
 
 export abstract class TicketFactory {
   public static createFromProductForBooking(productModel: ProductModel): Nullable<Ticket> {

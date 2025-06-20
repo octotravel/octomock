@@ -1,19 +1,19 @@
 import { BookingModel, UnitItemModel } from '@octocloud/generators';
-import { BookingStatus, Ticket, Pricing, OfferRestrictions } from '@octocloud/types';
-import addMinutes from 'date-fns/addMinutes';
 import { BookingOffersModel } from '@octocloud/generators/dist/models/booking/BookingOffersModel';
 import { BookingPricingModel } from '@octocloud/generators/dist/models/booking/BookingPricingModel';
-import { UnitItemPricingModel } from '@octocloud/generators/dist/models/unitItem/UnitItemPricingModel';
 import { UnitPricingModel } from '@octocloud/generators/dist/models/unit/UnitPricingModel';
-import { UpdateBookingSchema } from '../../schemas/Booking';
-import { ContactFactory } from '../../factories/ContactFactory';
-import { TicketFactory } from '../../factories/TicketFactory';
-import { DateHelper } from '../../helpers/DateFormatter';
-import { OfferRepository } from '../../repositories/OfferRepository';
-import { UnitItemModelFactory } from '../../factories/UnitItemModelFactory';
+import { UnitItemPricingModel } from '@octocloud/generators/dist/models/unitItem/UnitItemPricingModel';
+import { BookingStatus, OfferRestrictions, Pricing, Ticket } from '@octocloud/types';
+import addMinutes from 'date-fns/addMinutes';
 import InvalidOfferCodeError from '../../errors/InvalidOfferCodeError';
 import OfferConditionsNotMet from '../../errors/OfferConditionsNotMet';
+import { ContactFactory } from '../../factories/ContactFactory';
 import { PricingFactory } from '../../factories/PricingFactory';
+import { TicketFactory } from '../../factories/TicketFactory';
+import { UnitItemModelFactory } from '../../factories/UnitItemModelFactory';
+import { DateHelper } from '../../helpers/DateFormatter';
+import { OfferRepository } from '../../repositories/OfferRepository';
+import { UpdateBookingSchema } from '../../schemas/Booking';
 import { PricingOfferDiscountCalculator } from '../pricing/PricingOfferDiscountCalculator';
 
 interface IBookingUpdateService {
@@ -128,26 +128,17 @@ export class BookingUpdateService implements IBookingUpdateService {
       });
 
       const unitPricing = unitPricingModel.pricing;
-      let discountedUnitPricing;
-      const unitPricingFrom = unitPricingModel.pricingFrom;
-      let discountedUnitPricingFrom;
+      let discountedUnitPricing: Pricing[];
 
       if (unitPricing !== undefined) {
         discountedUnitPricing = unitPricing.map((pricing) =>
           this.pricingOfferDiscountCalculator.createDiscountedPricing(pricing, offerWithDiscountModel),
         );
-      }
 
-      if (unitPricingFrom !== undefined) {
-        discountedUnitPricingFrom = unitPricingFrom.map((pricingFrom) =>
-          this.pricingOfferDiscountCalculator.createDiscountedPricing(pricingFrom, offerWithDiscountModel),
-        );
+        unitItemModel.unitModel.unitPricingModel = new UnitPricingModel({
+          pricing: discountedUnitPricing,
+        });
       }
-
-      unitItemModel.unitModel.unitPricingModel = new UnitPricingModel({
-        pricing: discountedUnitPricing,
-        pricingFrom: discountedUnitPricingFrom,
-      });
     });
 
     const discountedBookingPricing = PricingFactory.createSummarizedPricing(

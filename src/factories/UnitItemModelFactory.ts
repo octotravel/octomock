@@ -1,11 +1,4 @@
-import {
-  BookingStatus,
-  BookingUnitItemSchema,
-  DeliveryFormat,
-  DeliveryMethod,
-  DeliveryOption,
-  RedemptionMethod,
-} from '@octocloud/types';
+import assert from 'node:assert';
 import {
   BookingModel,
   OptionModel,
@@ -14,9 +7,16 @@ import {
   UnitItemParser,
   UnitParser,
 } from '@octocloud/generators';
-import assert from 'assert';
-import { InvalidUnitIdError } from '../models/Error';
+import {
+  BookingStatus,
+  BookingUnitItemSchema,
+  DeliveryFormat,
+  DeliveryMethod,
+  DeliveryOption,
+  RedemptionMethod,
+} from '@octocloud/types';
 import { DataGenerator } from '../generators/DataGenerator';
+import { InvalidUnitIdError } from '../models/Error';
 
 export abstract class UnitItemModelFactory {
   private static readonly unitItemModelGenerator: UnitItemModelGenerator = new UnitItemModelGenerator();
@@ -37,7 +37,7 @@ export abstract class UnitItemModelFactory {
       throw new InvalidUnitIdError(bookingUnitItemSchema.unitId);
     }
 
-    const unit = this.unitParser.parseModelToPOJO(unitModel);
+    const unit = UnitItemModelFactory.unitParser.parseModelToPOJO(unitModel);
     const ticketAvailable = deliveryMethods.includes(DeliveryMethod.TICKET);
     const ticket = ticketAvailable
       ? {
@@ -47,7 +47,7 @@ export abstract class UnitItemModelFactory {
         }
       : null;
 
-    return this.unitItemModelGenerator.generateUnitItem({
+    return UnitItemModelFactory.unitItemModelGenerator.generateUnitItem({
       unitItemData: {
         uuid: bookingUnitItemSchema.uuid ?? DataGenerator.generateUUID(),
         supplierReference: DataGenerator.generateSupplierReference(),
@@ -72,7 +72,7 @@ export abstract class UnitItemModelFactory {
     }
 
     return bookingUnitItemSchemas.map((bookingUnitItemSchema) =>
-      this.createForBooking(
+      UnitItemModelFactory.createForBooking(
         bookingUnitItemSchema,
         bookingModel.status,
         bookingModel.optionModel,
@@ -88,12 +88,14 @@ export abstract class UnitItemModelFactory {
     bookingModel: BookingModel;
     bookingUnitItemSchemas?: BookingUnitItemSchema[];
   }): UnitItemModel[] {
-    const unitItemModels = this.createMultipleForBooking({
+    const unitItemModels = UnitItemModelFactory.createMultipleForBooking({
       bookingModel,
       bookingUnitItemSchemas,
     });
 
-    return unitItemModels.map((unitItemModel) => this.createForBookingWithTicket({ bookingModel, unitItemModel }));
+    return unitItemModels.map((unitItemModel) =>
+      UnitItemModelFactory.createForBookingWithTicket({ bookingModel, unitItemModel }),
+    );
   }
 
   public static createForBookingWithTicket({
@@ -131,9 +133,9 @@ export abstract class UnitItemModelFactory {
       deliveryOptions,
     };
 
-    const unitItem = this.unitItemParser.parseModelToPOJO(unitItemModel);
+    const unitItem = UnitItemModelFactory.unitItemParser.parseModelToPOJO(unitItemModel);
     unitItem.ticket = ticket;
 
-    return this.unitItemParser.parsePOJOToModel(unitItem);
+    return UnitItemModelFactory.unitItemParser.parsePOJOToModel(unitItem);
   }
 }

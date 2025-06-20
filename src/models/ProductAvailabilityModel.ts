@@ -1,5 +1,5 @@
 import { ProductModel } from '@octocloud/generators';
-import { PricingUnit, PricingPer, Pricing, AvailabilityType, OpeningHours } from '@octocloud/types';
+import { AvailabilityType, OpeningHours, Pricing, PricingPer, PricingUnit } from '@octocloud/types';
 
 import * as R from 'ramda';
 
@@ -118,8 +118,8 @@ export class ProductAvailabilityModel {
       productModel.optionModels.forEach((optionModel) => {
         const optionPricingModel = optionModel.getOptionPricingModel();
 
-        if (optionPricingModel.pricingFrom !== undefined && optionPricingModel.pricingFrom.length > 0) {
-          pricingMap.set(optionModel.id, optionPricingModel.pricingFrom[0]);
+        if (optionPricingModel.pricing !== undefined && optionPricingModel.pricing.length > 0) {
+          pricingMap.set(optionModel.id, optionPricingModel.pricing[0]);
         }
       });
     }
@@ -130,23 +130,21 @@ export class ProductAvailabilityModel {
 
     if (productModel.productPricingModel?.pricingPer === PricingPer.UNIT) {
       productModel.optionModels.forEach((optionModel) => {
-        const unitPricing = optionModel.unitModels
-          .map((unitModel) => {
-            const unitPricingModel = unitModel.getUnitPricingModel();
+        const unitPricing = optionModel.unitModels.flatMap((unitModel) => {
+          const unitPricingModel = unitModel.getUnitPricingModel();
 
-            if (unitPricingModel.pricingFrom === undefined) {
-              return null;
-            }
+          if (unitPricingModel.pricing === undefined) {
+            return null;
+          }
 
-            return unitPricingModel.pricingFrom.map(
-              (pricingFrom) =>
-                ({
-                  unitId: unitModel.id,
-                  ...pricingFrom,
-                }) as PricingUnit,
-            );
-          })
-          .flat(1) as PricingUnit[];
+          return unitPricingModel.pricing.map(
+            (pricing) =>
+              ({
+                unitId: unitModel.id,
+                ...pricing,
+              }) as PricingUnit,
+          );
+        }) as PricingUnit[];
 
         unitPricingMap.set(optionModel.id, unitPricing);
       });

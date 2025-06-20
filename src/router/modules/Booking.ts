@@ -6,23 +6,23 @@ import {
   updateBookingBodySchema,
 } from '@octocloud/types';
 import { BookingController } from '../../controllers/BookingController';
-import { getCapabilities } from '../common';
 import {
-  getBookingSchema,
-  GetBookingSchema,
-  GetBookingsSchema,
-  getBookingsSchema,
+  CancelBookingSchema,
+  ConfirmBookingSchema,
+  CreateBookingSchema,
   cancelBookingSchema,
   confirmBookingSchema,
-  extendBookingSchema,
-  updateBookingSchema,
   createBookingSchema,
-  CreateBookingSchema,
-  CancelBookingSchema,
   ExtendBookingSchema,
+  extendBookingSchema,
+  GetBookingSchema,
+  GetBookingsSchema,
+  getBookingSchema,
+  getBookingsSchema,
   UpdateBookingSchema,
-  ConfirmBookingSchema,
+  updateBookingSchema,
 } from '../../schemas/Booking';
+import { getCapabilities } from '../common';
 
 export const bookingRouter = new Router();
 

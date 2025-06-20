@@ -1,10 +1,10 @@
 import { MappingModel, ProductModel } from '@octocloud/generators';
 import { Mapping } from '@octocloud/types';
-import { SpecificResellerGetMappingService } from './reseller/SpecificResellerGetMappingService';
-import { ViatorGetMappingService } from './reseller/ViatorGetMappingService';
+import { Reseller } from '../../types/Reseller';
 import { ExpediaGetMappingService } from './reseller/ExpediaGetMappingService';
 import { GetYourGuideGetMappingService } from './reseller/GetYourGuideGetMappingService';
-import { Reseller } from '../../types/Reseller';
+import { SpecificResellerGetMappingService } from './reseller/SpecificResellerGetMappingService';
+import { ViatorGetMappingService } from './reseller/ViatorGetMappingService';
 
 interface IGetMappingService {
   getMapping: (reseller: Reseller, productModels: ProductModel[]) => Promise<Mapping[]>;

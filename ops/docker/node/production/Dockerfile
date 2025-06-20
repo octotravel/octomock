@@ -1,22 +1,28 @@
-FROM node:18.18.0-alpine3.17
+# Base
+FROM node:22.15.1-alpine3.21 AS base
 
-WORKDIR /var/www/
+ARG SENTRY_AUTH_TOKEN
 
-COPY . .
+WORKDIR /app
 
-RUN apk add --update --no-cache python3 build-base gcc && ln -sf /usr/bin/python3 /usr/bin/python
-RUN npm install
+COPY package*.json /app
+RUN npm install --include=dev --silent --no-audit --no-fund
+
+COPY . /app
 
 ENV NODE_ENV=production
 
-RUN npm run build
+RUN npm run esbuild
 
-EXPOSE $APP_PORT
+# Final
+FROM node:22.15.1-alpine3.21 AS final
 
-RUN chown -R node /var/www
+ENV NODE_ENV=production
 
-USER node
+WORKDIR /app
 
-RUN cd dist && ls -la
+COPY --from=base /app/package.json /app/package.json
+COPY --from=base /app/node_modules/better-sqlite3/build/Release/better_sqlite3.node /app/build/better_sqlite3.node
+COPY --from=base /app/dist /app/dist
 
-CMD ["node", "./dist/index.js"]
+CMD ["node", "--no-warnings", "--max-old-space-size=6144", "/app/dist/index.js"]

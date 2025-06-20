@@ -1,6 +1,6 @@
 import { ProductModel } from '@octocloud/generators';
-import { ProductModelStorage } from '../storage/ProductStorage';
 import { ProductWithAvailabilityModel } from '../models/ProductWithAvailabilityModel';
+import { ProductModelStorage } from '../storage/ProductStorage';
 
 interface IProductRepository {
   getProducts: () => ProductModel[];
