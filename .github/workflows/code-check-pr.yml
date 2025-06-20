@@ -44,7 +44,7 @@ jobs:
         run: npm run build
 
   check-types:
-    name: Check Types
+    name: Check types
     needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -83,7 +83,7 @@ jobs:
         run: npm run build:dry:ci
 
   check-code-quality:
-    name: Check Code Quality
+    name: Check code quality
     needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 10
