@@ -1,8 +1,8 @@
 import { MappingParser } from '@octocloud/generators';
 import { Mapping } from '@octocloud/types';
-import { GetMappingService } from '../services/mapping/GetMappingService';
-import { ResellerRepository } from '../repositories/ResellerRepository';
 import { ProductRepository } from '../repositories/ProductRepository';
+import { ResellerRepository } from '../repositories/ResellerRepository';
+import { GetMappingService } from '../services/mapping/GetMappingService';
 
 interface IMappingController {
   getMapping: (apiKey: string) => Promise<Mapping[]>;

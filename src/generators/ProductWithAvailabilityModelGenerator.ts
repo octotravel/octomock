@@ -1,15 +1,15 @@
-import { ProductModelGenerator, PartialProduct } from '@octocloud/generators';
+import { PartialProduct, ProductModelGenerator } from '@octocloud/generators';
 import {
-  Currency,
-  UnitType,
-  DurationUnit,
-  Pricing,
   AvailabilityType,
+  Currency,
+  DurationUnit,
   OpeningHours,
+  Pricing,
   PricingPer,
+  UnitType,
 } from '@octocloud/types';
+import { Capacity, Day, Month, ProductAvailabilityModel } from '../models/ProductAvailabilityModel';
 import { ProductWithAvailabilityModel } from '../models/ProductWithAvailabilityModel';
-import { Capacity, Month, ProductAvailabilityModel, Day } from '../models/ProductAvailabilityModel';
 
 const pricingAdult: Pricing = {
   original: 1000,

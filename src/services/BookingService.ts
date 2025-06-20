@@ -1,19 +1,19 @@
-import { BookingStatus, Ticket, BookingUnitItemSchema, OrderStatus, Availability } from '@octocloud/types';
-import { BookingModel, AvailabilityModel, OrderModel } from '@octocloud/generators';
+import { AvailabilityModel, BookingModel, OrderModel } from '@octocloud/generators';
+import { Availability, BookingStatus, BookingUnitItemSchema, OrderStatus, Ticket } from '@octocloud/types';
 import addMinutes from 'date-fns/addMinutes';
+import { BookingModelFactory } from '../factories/BookingModelFactory';
+import { ContactFactory } from '../factories/ContactFactory';
+import { TicketFactory } from '../factories/TicketFactory';
+import { UnitItemModelFactory } from '../factories/UnitItemModelFactory';
+import { DateHelper } from '../helpers/DateFormatter';
+import { InvalidOptionIdError, InvalidUnitIdError } from '../models/Error';
+import { ProductWithAvailabilityModel } from '../models/ProductWithAvailabilityModel';
 import {
   CancelBookingSchema,
   ConfirmBookingSchema,
-  ExtendBookingSchema,
   CreateBookingSchema,
+  ExtendBookingSchema,
 } from '../schemas/Booking';
-import { DateHelper } from '../helpers/DateFormatter';
-import { ContactFactory } from '../factories/ContactFactory';
-import { UnitItemModelFactory } from '../factories/UnitItemModelFactory';
-import { TicketFactory } from '../factories/TicketFactory';
-import { ProductWithAvailabilityModel } from '../models/ProductWithAvailabilityModel';
-import { InvalidOptionIdError, InvalidUnitIdError } from '../models/Error';
-import { BookingModelFactory } from '../factories/BookingModelFactory';
 import { CancelOrderSchema, ConfirmOrderSchema } from '../schemas/Order';
 
 interface IBookingService {
@@ -134,7 +134,7 @@ export class BookingService implements IBookingService {
       status = BookingStatus.CANCELLED;
     }
 
-    return this.cancelBooking(bookingModel, status, schema.reason);
+    return this.cancelBooking(bookingModel, status, schema.reason ?? '');
   }
 
   public cancelBookingByOrder(

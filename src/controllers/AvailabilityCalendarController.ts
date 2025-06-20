@@ -1,5 +1,5 @@
 import { AvailabilityCalendarParser } from '@octocloud/generators';
-import { AvailabilityCalendar, CapabilityId, AvailabilityCalendarBodySchema } from '@octocloud/types';
+import { AvailabilityCalendar, AvailabilityCalendarBodySchema, CapabilityId } from '@octocloud/types';
 import { AvailabilityCalendarService } from '../services/AvailabilityCalendarService';
 
 interface IAvailabilityCalendarController {

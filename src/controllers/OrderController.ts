@@ -1,18 +1,18 @@
+import { BookingModel, OrderParser } from '@octocloud/generators';
 import { CapabilityId, Order, OrderStatus } from '@octocloud/types';
-import { OrderParser, BookingModel } from '@octocloud/generators';
+import { OrderModelFactory } from '../factories/OrderModelFactory';
+import { UnprocessableEntityError } from '../models/Error';
+import { BookingRepository } from '../repositories/BookingRepository';
 import OrderRepository from '../repositories/OrderRepository';
 import {
-  CreateOrderSchema,
-  ConfirmOrderSchema,
-  ExtendOrderSchema,
   CancelOrderSchema,
+  ConfirmOrderSchema,
+  CreateOrderSchema,
+  ExtendOrderSchema,
   GetOrderSchema,
 } from '../schemas/Order';
-import { OrderModelFactory } from '../factories/OrderModelFactory';
-import { OrderService } from '../services/OrderService';
-import { UnprocessableEntityError } from '../models/Error';
 import { BookingService } from '../services/BookingService';
-import { BookingRepository } from '../repositories/BookingRepository';
+import { OrderService } from '../services/OrderService';
 
 interface IOrderController {
   createOrder: (schema: CreateOrderSchema, capabilities: CapabilityId[]) => Promise<Order>;

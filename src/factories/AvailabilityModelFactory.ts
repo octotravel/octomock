@@ -1,21 +1,21 @@
 import { AvailabilityModel, AvailabilityModelGenerator, OptionModel, ProductModel } from '@octocloud/generators';
-import { addDays, addHours, addMinutes, eachDayOfInterval, getDay, getMonth, startOfDay } from 'date-fns';
 import {
   AvailabilityStatus,
   AvailabilityUnit,
   CapabilityId,
   DurationUnit,
+  Pricing,
   PricingPer,
   PricingUnit,
-  Pricing,
 } from '@octocloud/types';
-import { ProductWithAvailabilityModel } from '../models/ProductWithAvailabilityModel';
-import { ProductAvailabilityModel } from '../models/ProductAvailabilityModel';
-import { InvalidOptionIdError } from '../models/Error';
+import { addDays, addHours, addMinutes, eachDayOfInterval, getDay, getMonth, startOfDay } from 'date-fns';
 import { DateHelper } from '../helpers/DateFormatter';
+import { InvalidOptionIdError } from '../models/Error';
 import { OfferWithDiscountModel } from '../models/OfferWithDiscountModel';
-import { PricingFactory } from './PricingFactory';
+import { ProductAvailabilityModel } from '../models/ProductAvailabilityModel';
+import { ProductWithAvailabilityModel } from '../models/ProductWithAvailabilityModel';
 import { PricingOfferDiscountCalculator } from '../services/pricing/PricingOfferDiscountCalculator';
+import { PricingFactory } from './PricingFactory';
 
 interface AvailabilityPricingData {
   unitPricing: PricingUnit[];
@@ -50,33 +50,31 @@ export abstract class AvailabilityModelFactory {
       end: addDays(new Date(date), productAvailabilityModel.days),
     });
 
-    const dates = days
-      .map((day) => {
-        const isClosed =
-          productAvailabilityModel.daysClosed.includes(getDay(day)) ||
-          productAvailabilityModel.monthsClosed.includes(getMonth(day));
+    const dates = days.flatMap((day) => {
+      const isClosed =
+        productAvailabilityModel.daysClosed.includes(getDay(day)) ||
+        productAvailabilityModel.monthsClosed.includes(getMonth(day));
 
-        if (isClosed) {
-          return null;
-        }
+      if (isClosed) {
+        return null;
+      }
 
-        const availabilityModels = this.buildModel({
-          productModel,
-          productAvailabilityModel,
-          offerWithDiscountModels,
-          optionId,
-          date: DateHelper.availabilityDateFormat(day),
-          status: this.getStatusForDate(productAvailabilityModel, day),
-          capabilities,
-          capacity: productAvailabilityModel.freesale
-            ? null
-            : productAvailabilityModel.capacity.get(getDay(day)) ?? null,
-          availabilityUnits,
-        });
+      const availabilityModels = AvailabilityModelFactory.buildModel({
+        productModel,
+        productAvailabilityModel,
+        offerWithDiscountModels,
+        optionId,
+        date: DateHelper.availabilityDateFormat(day),
+        status: AvailabilityModelFactory.getStatusForDate(productAvailabilityModel, day),
+        capabilities,
+        capacity: productAvailabilityModel.freesale
+          ? null
+          : (productAvailabilityModel.capacity.get(getDay(day)) ?? null),
+        availabilityUnits,
+      });
 
-        return availabilityModels;
-      })
-      .flat(1);
+      return availabilityModels;
+    });
 
     return dates.flatMap((availabilityModel) => (availabilityModel ? [availabilityModel] : []));
   }
@@ -115,9 +113,9 @@ export abstract class AvailabilityModelFactory {
       const datetime = new Date(`${date}T${startTime}`);
       const localDateTimeStart = DateHelper.availabilityIdFormat(datetime, productModel.timeZone);
 
-      const localDateTimeEnd = this.calculateTimeEnd(datetime, optionModel, productModel.timeZone);
+      const localDateTimeEnd = AvailabilityModelFactory.calculateTimeEnd(datetime, optionModel, productModel.timeZone);
 
-      const availabilityStatus = this.getStatus({
+      const availabilityStatus = AvailabilityModelFactory.getStatus({
         status,
         unitsCount,
         capacity,
@@ -125,7 +123,7 @@ export abstract class AvailabilityModelFactory {
 
       const activeOffer = offerWithDiscountModels.length > 0 ? offerWithDiscountModels[0] : undefined;
 
-      const availabilityPricing = this.getAvailabilityPricing({
+      const availabilityPricing = AvailabilityModelFactory.getAvailabilityPricing({
         productModel,
         productAvailabilityModel,
         optionId,
@@ -138,7 +136,7 @@ export abstract class AvailabilityModelFactory {
         (availabilityUnits !== undefined && availabilityUnits.length > 0) || pricingPer === PricingPer.BOOKING;
       const shouldUseUnitPricing: boolean = pricingPer === PricingPer.UNIT;
 
-      const availability = this.availabilityModelGenerator.generateAvailability({
+      const availability = AvailabilityModelFactory.availabilityModelGenerator.generateAvailability({
         availabilityData: {
           id: localDateTimeStart,
           localDateTimeStart,
@@ -198,7 +196,7 @@ export abstract class AvailabilityModelFactory {
   }): AvailabilityPricingData {
     const pricingPer = productModel.getProductPricingModel().pricingPer;
     let unitPricing: PricingUnit[] = [];
-    let pricing;
+    let pricing: Pricing;
 
     if (pricingPer === PricingPer.BOOKING) {
       pricing = productAvailabilityModel.getPricing(optionId);
@@ -216,7 +214,10 @@ export abstract class AvailabilityModelFactory {
 
     if (offerWithDiscountModel !== undefined) {
       unitPricing.map((specificUnitPricing: PricingUnit) =>
-        this.pricingOfferDiscountCalculator.createDiscountedPricing(specificUnitPricing, offerWithDiscountModel),
+        AvailabilityModelFactory.pricingOfferDiscountCalculator.createDiscountedPricing(
+          specificUnitPricing,
+          offerWithDiscountModel,
+        ),
       );
     }
 

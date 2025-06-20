@@ -1,5 +1,5 @@
-import { CapabilityId, Product } from '@octocloud/types';
 import { ProductParser } from '@octocloud/generators';
+import { CapabilityId, Product } from '@octocloud/types';
 import { ProductRepository } from '../repositories/ProductRepository';
 
 interface IProductController {

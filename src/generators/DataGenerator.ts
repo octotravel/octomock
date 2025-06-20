@@ -1,4 +1,4 @@
-import { randomUUID } from 'crypto';
+import { randomUUID } from 'node:crypto';
 
 export abstract class DataGenerator {
   public static generateSupplierReference = (): string =>

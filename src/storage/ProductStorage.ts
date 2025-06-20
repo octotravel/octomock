@@ -1,9 +1,9 @@
 import { ProductModel } from '@octocloud/generators';
-import { InMemoryStorage } from './InMemoryStorage';
+import { ProductWithAvailabilityModelGenerator } from '../generators/ProductWithAvailabilityModelGenerator';
 import { InvalidProductIdError } from '../models/Error';
 
 import { ProductWithAvailabilityModel } from '../models/ProductWithAvailabilityModel';
-import { ProductWithAvailabilityModelGenerator } from '../generators/ProductWithAvailabilityModelGenerator';
+import { InMemoryStorage } from './InMemoryStorage';
 
 export class ProductModelStorage implements InMemoryStorage<ProductModel> {
   private readonly productWithAvailabilityModels = new Map<string, ProductWithAvailabilityModel>();

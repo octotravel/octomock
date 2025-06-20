@@ -1,6 +1,6 @@
 import Router from '@koa/router';
-import { getCapabilities } from '../common';
 import { ProductController } from '../../controllers/ProductController';
+import { getCapabilities } from '../common';
 
 export const productRouter = new Router();
 

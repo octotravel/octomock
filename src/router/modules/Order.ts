@@ -1,17 +1,17 @@
 import Router from '@koa/router';
 import { extendOrderBodySchema, orderCancellationBodySchema, orderConfirmationBodySchema } from '@octocloud/types';
-import { getCapabilities } from '../common';
 import { OrderController } from '../../controllers/OrderController';
 import {
-  confirmOrderSchema,
-  ConfirmOrderSchema,
-  extendOrderSchema,
-  ExtendOrderSchema,
-  cancelOrderSchema,
   CancelOrderSchema,
-  getOrderSchema,
+  ConfirmOrderSchema,
+  cancelOrderSchema,
+  confirmOrderSchema,
+  ExtendOrderSchema,
+  extendOrderSchema,
   GetOrderSchema,
+  getOrderSchema,
 } from '../../schemas/Order';
+import { getCapabilities } from '../common';
 
 export const orderRouter = new Router();
 

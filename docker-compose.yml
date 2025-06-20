@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   octomock_server:
     container_name: octomock_server

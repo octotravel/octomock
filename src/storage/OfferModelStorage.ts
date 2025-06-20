@@ -1,9 +1,8 @@
 import { OfferModel } from '@octocloud/generators';
-import { InMemoryStorage } from './InMemoryStorage';
-
-import { OfferWithDiscountModel } from '../models/OfferWithDiscountModel';
-import { OfferWithDiscountModelGenerator } from '../generators/OfferWithDiscountModelGenerator';
 import InvalidOfferCodeError from '../errors/InvalidOfferCodeError';
+import { OfferWithDiscountModelGenerator } from '../generators/OfferWithDiscountModelGenerator';
+import { OfferWithDiscountModel } from '../models/OfferWithDiscountModel';
+import { InMemoryStorage } from './InMemoryStorage';
 
 export class OfferModelStorage implements InMemoryStorage<OfferModel> {
   private readonly offerWithDiscountModels = new Map<string, OfferWithDiscountModel>();

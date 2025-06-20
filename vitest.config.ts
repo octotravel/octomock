@@ -1,0 +1,57 @@
+import { defineConfig } from 'vitest/config';
+
+export default defineConfig({
+  plugins: [],
+  cacheDir: '.cache/vitest',
+  test: {
+    passWithNoTests: true,
+    isolate: true,
+    pool: 'forks',
+    poolOptions: {
+      forks: {
+        singleFork: false,
+        isolate: true,
+      },
+    },
+    fileParallelism: true,
+    mockReset: true,
+    watch: false,
+    globals: false,
+    testTimeout: 30000,
+    hookTimeout: 30000,
+    reporters: ['verbose'],
+    include: ['**/__tests__/**/*.+(test.ts)'],
+    exclude: ['**/node_modules/**', '**/dist/**', '**/ops/**'],
+    setupFiles: [],
+    globalSetup: [],
+    coverage: {
+      reporter: ['text', 'html', 'clover', 'json', 'json-summary'],
+      reportOnFailure: true,
+      all: false,
+      allowExternal: false,
+      include: ['src/**/*.ts'],
+      exclude: [
+        '.eslintrc.js',
+        'esbuild.config.ts',
+        'vitestGlobalTeardown.ts',
+        'vitestGlobalSetup.ts',
+        'src/app.ts',
+        'src/console.ts',
+        'src/server.ts',
+        '**/*Mock*',
+        '**/*Router*',
+        '**/__generated__/*',
+        '**/di/*Container*',
+        '**/node_modules/**',
+        '**/__tests__/**',
+      ],
+      thresholds: {
+        perFile: true,
+        branches: 0,
+        lines: 0,
+        functions: 0,
+        statements: 0,
+      },
+    },
+  },
+});

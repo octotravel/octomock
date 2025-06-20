@@ -1,8 +1,8 @@
+import { BookingModel, OrderModel } from '@octocloud/generators';
 import { OrderStatus } from '@octocloud/types';
-import { OrderModel, BookingModel } from '@octocloud/generators';
 import addMinutes from 'date-fns/addMinutes';
-import { DateHelper } from '../helpers/DateFormatter';
 import { ContactFactory } from '../factories/ContactFactory';
+import { DateHelper } from '../helpers/DateFormatter';
 import { ConfirmOrderSchema, ExtendOrderSchema } from '../schemas/Order';
 
 interface IOrderService {

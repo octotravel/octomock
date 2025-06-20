@@ -1,9 +1,9 @@
 import Router from '@koa/router';
 import {
-  AvailabilityCalendarBodySchema,
-  availabilityCalendarBodySchema,
-  availabilityBodySchema,
   AvailabilityBodySchema,
+  AvailabilityCalendarBodySchema,
+  availabilityBodySchema,
+  availabilityCalendarBodySchema,
 } from '@octocloud/types';
 import { AvailabilityCalendarController } from '../../controllers/AvailabilityCalendarController';
 import { AvailabilityController } from '../../controllers/AvailabilityController';

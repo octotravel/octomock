@@ -1,14 +1,11 @@
-FROM node:18.18.0-alpine3.17
+FROM node:22.15.1-alpine3.21
 
-WORKDIR /var/www/
+WORKDIR /var/www/node/
+
+RUN apk add --no-cache git
+
 COPY . .
-
-RUN apk add --no-cache libc6-compat
 
 EXPOSE $APP_PORT
 
-RUN npm install -g node-gyp tsx
-
-RUN npm install
-
-CMD ["sh", "-c", "npm run dev"]
+CMD ["sh", "-c", "npm install --silent --no-audit --no-fund --prefer-offline && npm run dev"]

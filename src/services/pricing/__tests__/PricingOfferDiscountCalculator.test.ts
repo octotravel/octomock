@@ -1,7 +1,8 @@
-import { Pricing, NetDiscount, Currency } from '@octocloud/types';
-import { PricingOfferDiscountCalculator } from '../PricingOfferDiscountCalculator';
-import { OfferWithDiscountModel } from '../../../models/OfferWithDiscountModel';
+import { Currency, NetDiscount, Pricing } from '@octocloud/types';
+import { describe, expect, it } from 'vitest';
 import { OfferDiscountType } from '../../../models/OfferDiscountModel';
+import { OfferWithDiscountModel } from '../../../models/OfferWithDiscountModel';
+import { PricingOfferDiscountCalculator } from '../PricingOfferDiscountCalculator';
 
 describe('PricingOfferDiscountCalculator', () => {
   const pricingOfferDiscountCalculator = new PricingOfferDiscountCalculator();
@@ -53,6 +54,7 @@ describe('PricingOfferDiscountCalculator', () => {
             maxTotal: null,
             unitIds: [],
           },
+          usable: false,
         },
         offerDiscountModel: {
           type: OfferDiscountType.PERCENTAGE,
@@ -98,6 +100,7 @@ describe('PricingOfferDiscountCalculator', () => {
             maxTotal: null,
             unitIds: [],
           },
+          usable: false,
         },
         offerDiscountModel: {
           type: OfferDiscountType.PERCENTAGE,
@@ -143,6 +146,7 @@ describe('PricingOfferDiscountCalculator', () => {
             maxTotal: null,
             unitIds: [],
           },
+          usable: false,
         },
         offerDiscountModel: {
           type: OfferDiscountType.FLAT,

@@ -1,10 +1,10 @@
-import { addMinutes } from 'date-fns';
+import { BookingModel, OrderModel, OrderModelGenerator } from '@octocloud/generators';
 import { OrderStatus } from '@octocloud/types';
-import { OrderModelGenerator, OrderModel, BookingModel } from '@octocloud/generators';
-import { DateHelper } from '../helpers/DateFormatter';
+import { addMinutes } from 'date-fns';
 import { DataGenerator } from '../generators/DataGenerator';
-import { CreateOrderSchema } from '../schemas/Order';
+import { DateHelper } from '../helpers/DateFormatter';
 import { CreateBookingSchema } from '../schemas/Booking';
+import { CreateOrderSchema } from '../schemas/Order';
 
 export abstract class OrderModelFactory {
   private static readonly orderModelGenerator: OrderModelGenerator = new OrderModelGenerator();
@@ -13,7 +13,7 @@ export abstract class OrderModelFactory {
     const status = OrderStatus.ON_HOLD;
     const utcExpiresAt = DateHelper.utcDateFormat(addMinutes(new Date(), createOrderSchema.expirationMinutes ?? 30));
 
-    return this.orderModelGenerator.generateOrder({
+    return OrderModelFactory.orderModelGenerator.generateOrder({
       orderData: {
         id: DataGenerator.generateUUID(),
         supplierReference: DataGenerator.generateSupplierReference(),
@@ -31,7 +31,7 @@ export abstract class OrderModelFactory {
     const status = OrderStatus.ON_HOLD;
     const utcExpiresAt = DateHelper.utcDateFormat(addMinutes(new Date(), createBookingSchema.expirationMinutes ?? 30));
 
-    return this.orderModelGenerator.generateOrder({
+    return OrderModelFactory.orderModelGenerator.generateOrder({
       orderData: {
         id: DataGenerator.generateUUID(),
         supplierReference: bookingModel.supplierReference ?? DataGenerator.generateSupplierReference(),

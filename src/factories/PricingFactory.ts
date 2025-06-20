@@ -1,5 +1,5 @@
 import { AvailabilityUnit, Pricing, PricingUnit } from '@octocloud/types';
-import R from 'ramda';
+import * as R from 'ramda';
 import { InvalidUnitIdError } from '../models/Error';
 
 export abstract class PricingFactory {
@@ -7,20 +7,18 @@ export abstract class PricingFactory {
     pricingUnit: PricingUnit[],
     availabilityUnits: AvailabilityUnit[],
   ): Pricing[] {
-    return availabilityUnits
-      .map(({ id, quantity }) => {
-        const specificPricingUnit: Nullable<PricingUnit> = pricingUnit.find((p) => p.unitId === id) ?? null;
+    return availabilityUnits.flatMap(({ id, quantity }) => {
+      const specificPricingUnit: Nullable<PricingUnit> = pricingUnit.find((p) => p.unitId === id) ?? null;
 
-        if (specificPricingUnit === null) {
-          throw new InvalidUnitIdError(id);
-        }
+      if (specificPricingUnit === null) {
+        throw new InvalidUnitIdError(id);
+      }
 
-        const pricingWithoutUnitId: Pricing = R.omit(['unitId'], specificPricingUnit);
-        const pricing: Pricing[] = new Array(quantity).fill(pricingWithoutUnitId);
+      const pricingWithoutUnitId: Pricing = R.omit(['unitId'], specificPricingUnit);
+      const pricing: Pricing[] = new Array(quantity).fill(pricingWithoutUnitId);
 
-        return pricing;
-      })
-      .flat();
+      return pricing;
+    });
   }
 
   public static createSummarizedPricing(pricing: Pricing[]): Pricing {

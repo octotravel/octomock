@@ -1,8 +1,14 @@
+import { BookingModel, BookingParser, OptionModel, OrderModel } from '@octocloud/generators';
+import { BookingCartModel } from '@octocloud/generators/dist/models/booking/BookingCartModel';
 import { Booking, BookingStatus, BookingUnitItemSchema, CapabilityId } from '@octocloud/types';
 import * as R from 'ramda';
-import { BookingModel, BookingParser, OptionModel } from '@octocloud/generators';
-import { BookingCartModel } from '@octocloud/generators/dist/models/booking/BookingCartModel';
+import InvalidOrderIdError from '../errors/InvalidOrderIdError';
+import { OrderModelFactory } from '../factories/OrderModelFactory';
+import { ContactMapper } from '../helpers/ContactMapper';
 import { UnprocessableEntityError } from '../models/Error';
+import { BookingRepository } from '../repositories/BookingRepository';
+import OrderRepository from '../repositories/OrderRepository';
+import { ProductRepository } from '../repositories/ProductRepository';
 import {
   CancelBookingSchema,
   ConfirmBookingSchema,
@@ -14,12 +20,6 @@ import {
 } from '../schemas/Booking';
 import { AvailabilityService } from '../services/AvailabilityService';
 import { BookingService } from '../services/BookingService';
-import { BookingRepository } from '../repositories/BookingRepository';
-import { ProductRepository } from '../repositories/ProductRepository';
-import { ContactMapper } from '../helpers/ContactMapper';
-import OrderRepository from '../repositories/OrderRepository';
-import { OrderModelFactory } from '../factories/OrderModelFactory';
-import InvalidOrderIdError from '../errors/InvalidOrderIdError';
 import { BookingUpdateService } from '../services/booking/BookingUpdateService';
 
 interface IBookingController {
@@ -64,8 +64,8 @@ export class BookingController implements IBookingController {
     );
     this.checkRestrictions(bookingModel.optionModel, schema.unitItems);
 
-    let orderModel;
-    let primary;
+    let orderModel: OrderModel;
+    let primary: boolean;
 
     if (schema.orderId === undefined) {
       orderModel = OrderModelFactory.createByBooking(bookingModel, schema);

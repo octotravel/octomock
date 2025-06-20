@@ -1,13 +1,13 @@
-import { CapabilityId, AvailabilityBodySchema } from '@octocloud/types';
-import { eachDayOfInterval, isMatch } from 'date-fns';
 import { AvailabilityModel } from '@octocloud/generators';
-import { InvalidAvailabilityIdError, BadRequestError } from '../models/Error';
-import { DateHelper } from '../helpers/DateFormatter';
-import { ProductRepository } from '../repositories/ProductRepository';
+import { AvailabilityBodySchema, CapabilityId } from '@octocloud/types';
+import { eachDayOfInterval, isMatch } from 'date-fns';
 import { AvailabilityModelFactory } from '../factories/AvailabilityModelFactory';
+import { DateHelper } from '../helpers/DateFormatter';
+import { BadRequestError, InvalidAvailabilityIdError } from '../models/Error';
+import { OfferWithDiscountModel } from '../models/OfferWithDiscountModel';
 import { ProductWithAvailabilityModel } from '../models/ProductWithAvailabilityModel';
 import { OfferRepository } from '../repositories/OfferRepository';
-import { OfferWithDiscountModel } from '../models/OfferWithDiscountModel';
+import { ProductRepository } from '../repositories/ProductRepository';
 
 interface FindBookingAvailabilityData {
   productWithAvailabilityModel: ProductWithAvailabilityModel;

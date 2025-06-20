@@ -1,6 +1,6 @@
 import { OfferModel } from '@octocloud/generators';
-import { OfferModelStorage } from '../storage/OfferModelStorage';
 import { OfferWithDiscountModel } from '../models/OfferWithDiscountModel';
+import { OfferModelStorage } from '../storage/OfferModelStorage';
 
 interface IOfferRepository {
   getOffers: () => OfferModel[];

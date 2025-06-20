@@ -1,9 +1,8 @@
-import { ProductModel, MappingModel } from '@octocloud/generators';
+import { MappingModel, ProductModel } from '@octocloud/generators';
 import { ResellerStatus } from '@octocloud/types';
-import Prando from 'prando';
+import { DataGenerator } from '../../../generators/DataGenerator';
 import { Reseller } from '../../../types/Reseller';
 import { SpecificResellerGetMappingService } from './SpecificResellerGetMappingService';
-import { DataGenerator } from '../../../generators/DataGenerator';
 
 export class ExpediaMappingModel extends MappingModel {
   public readonly expediaTourTime: string;
