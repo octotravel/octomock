@@ -1,20 +1,8 @@
+import { Connection } from 'inteface/Connection';
 import { BadRequestError } from '../models/Error';
 
-export interface GygConnection {
-  id: string;
-  name: string;
-  type: string;
-  gygConnectId: string;
-  gygLoginEmail: string;
-  gygLoginPassword: string;
-  gygSupplierId: string;
-  gygSupplierName: string;
-  gygLoginOTPSecret: string;
-  gygActivated: boolean;
-}
-
 export class ConnectionStorage {
-  private suppliers: GygConnection[] = [
+  private suppliers: Connection[] = [
     {
       id: '1',
       name: 'GYG Bangkok',
@@ -27,9 +15,26 @@ export class ConnectionStorage {
       gygSupplierName: 'Gyg',
       gygActivated: true,
     },
+    {
+      id: '2',
+      name: 'Expedia',
+      type: 'Expedia',
+      expediaConnectId: '2',
+      expediaSupplierBranchId: '',
+      expediaSupplierBranchName: '',
+    },
+    {
+      id: '3',
+      name: 'Viator',
+      type: 'Viator',
+      viatorConnectId: '3',
+      viatorApiSupplierId: '',
+      viatorSupplierCode: '',
+      viatorSupplierName: '',
+    },
   ];
 
-  public getConnection(id: string): GygConnection {
+  public getConnection(id: string): Connection {
     const connection = this.suppliers.find((connection) => connection.id === id) ?? null;
 
     if (connection === null) {

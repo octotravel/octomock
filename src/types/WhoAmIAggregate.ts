@@ -1,10 +1,10 @@
 import { Supplier } from '@octocloud/types';
-import { GygConnection } from 'storage/ConnectionStorage';
+import { Connection } from 'inteface/Connection';
 import { Reseller } from 'types/Reseller';
 
 export interface WhoAmIAggregate {
   supplier: Nullable<Supplier>;
-  connection: GygConnection;
+  connection: Connection;
   reseller: Reseller;
   partner: Record<string, any> | null;
   checkout: string | null;

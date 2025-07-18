@@ -1,4 +1,5 @@
 import { Context } from 'koa';
+import { BadRequestError } from 'models/Error';
 import { ConnectionRepository } from 'repositories/ConnectionRepository';
 import { ResellerRepository } from 'repositories/ResellerRepository';
 import { SupplierRepository } from 'repositories/SupplierRepository';
@@ -18,9 +19,7 @@ export class WhoAmIController implements IWhoAmIController {
       const authHeader = ctx.request.headers.authorization;
 
       if (!authHeader) {
-        ctx.status = 401;
-        ctx.body = { error: 'Authorization header is required' };
-        return;
+        throw new BadRequestError('Authorization header is missing');
       }
 
       const apiKey = authHeader.replace('Bearer ', '');
@@ -44,11 +43,7 @@ export class WhoAmIController implements IWhoAmIController {
       ctx.status = 200;
       ctx.body = response;
     } catch (error) {
-      ctx.status = 500;
-      ctx.body = {
-        error: 'INTERNAL_SERVER_ERROR',
-        errorMessage: error instanceof Error ? error.message : String(error),
-      };
+      throw error;
     }
   };
 }
