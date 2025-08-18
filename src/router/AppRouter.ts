@@ -1,4 +1,5 @@
 import Router from '@koa/router';
+import { WhoAmIController } from 'controllers/WhoAmIController';
 import { CapabilityController } from '../controllers/CapabilityController';
 import { availabilityRouter } from './modules/Availability';
 import { bookingRouter } from './modules/Booking';
@@ -10,6 +11,7 @@ import { supplierRouter } from './modules/Supplier';
 export const router = new Router();
 
 const capabilityController = new CapabilityController();
+const whoAmIController = new WhoAmIController();
 
 router.use(supplierRouter.routes());
 router.use(productRouter.routes());
@@ -22,3 +24,4 @@ router.get('/capabilities', async (ctx, _) => {
   ctx.body = data;
   ctx.toJSON();
 });
+router.get('/whoami', async (ctx) => await whoAmIController.get(ctx));
