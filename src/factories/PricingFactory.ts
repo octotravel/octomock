@@ -1,20 +1,28 @@
+import { OptionModel } from '@octocloud/generators';
 import { AvailabilityUnit, Pricing, PricingUnit } from '@octocloud/types';
 import * as R from 'ramda';
+import { UnitHelper } from '../helpers/UnitHelper';
 import { InvalidUnitIdError } from '../models/Error';
 
 export abstract class PricingFactory {
   public static createFromAvailabilityUnits(
     pricingUnit: PricingUnit[],
     availabilityUnits: AvailabilityUnit[],
+    optionModel: OptionModel,
   ): Pricing[] {
-    return availabilityUnits.flatMap(({ id, quantity }) => {
-      const specificPricingUnit: Nullable<PricingUnit> = pricingUnit.find((p) => p.unitId === id) ?? null;
-
-      if (specificPricingUnit === null) {
-        throw new InvalidUnitIdError(id);
+    return availabilityUnits.flatMap(({ id, quantity, type }) => {
+      const unitModel = UnitHelper.findUnitByTypeOrId(optionModel, id, type);
+      if (unitModel === null) {
+        throw new InvalidUnitIdError(`No unit found for ${id || type}`);
       }
 
-      const pricingWithoutUnitId: Pricing = R.omit(['unitId'], specificPricingUnit);
+      const specificPricingUnit: Nullable<PricingUnit> = pricingUnit.find((p) => p.unitId === unitModel.id) ?? null;
+
+      if (specificPricingUnit === null) {
+        throw new InvalidUnitIdError(`No pricing unit found for unit ${unitModel.id}`);
+      }
+
+      const pricingWithoutUnitId: Pricing = R.omit(['unitId', 'unitType'], specificPricingUnit);
       const pricing: Pricing[] = new Array(quantity).fill(pricingWithoutUnitId);
 
       return pricing;

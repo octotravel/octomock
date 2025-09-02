@@ -207,7 +207,15 @@ export abstract class AvailabilityModelFactory {
       unitPricing = productAvailabilityModel.getUnitPricing(optionId);
       pricing = PricingFactory.createSummarizedPricing(unitPricing);
       if (availabilityUnits) {
-        const availabilityUnitsPricing = PricingFactory.createFromAvailabilityUnits(unitPricing, availabilityUnits);
+        const optionModel = productModel.findOptionModelByOptionId(optionId);
+        if (optionModel === null) {
+          throw new InvalidOptionIdError(optionId);
+        }
+        const availabilityUnitsPricing = PricingFactory.createFromAvailabilityUnits(
+          unitPricing,
+          availabilityUnits,
+          optionModel,
+        );
         pricing = PricingFactory.createSummarizedPricing(availabilityUnitsPricing);
       }
     }

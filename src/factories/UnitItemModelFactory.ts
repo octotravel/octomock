@@ -16,6 +16,7 @@ import {
   RedemptionMethod,
 } from '@octocloud/types';
 import { DataGenerator } from '../generators/DataGenerator';
+import { UnitHelper } from '../helpers/UnitHelper';
 import { InvalidUnitIdError } from '../models/Error';
 
 export abstract class UnitItemModelFactory {
@@ -31,10 +32,14 @@ export abstract class UnitItemModelFactory {
     optionModel: OptionModel,
     deliveryMethods: DeliveryMethod[],
   ): UnitItemModel {
-    const unitModel = optionModel.findUnitModelByUnitId(bookingUnitItemSchema.unitId);
+    const unitModel = UnitHelper.findUnitByTypeOrId(
+      optionModel,
+      bookingUnitItemSchema.unitId,
+      bookingUnitItemSchema.unitType,
+    );
 
     if (unitModel === null) {
-      throw new InvalidUnitIdError(bookingUnitItemSchema.unitId);
+      throw new InvalidUnitIdError(bookingUnitItemSchema.unitId || bookingUnitItemSchema.unitType);
     }
 
     const unit = UnitItemModelFactory.unitParser.parseModelToPOJO(unitModel);

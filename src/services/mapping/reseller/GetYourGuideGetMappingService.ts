@@ -1,11 +1,18 @@
 import { MappingModel, ProductModel } from '@octocloud/generators';
-import { ResellerStatus } from '@octocloud/types';
+import { AvailabilityType, ResellerStatus, Restrictions } from '@octocloud/types';
+import { OptionRestrictions } from '@octocloud/types/src/types/Option';
 import Prando from 'prando';
 import { DataGenerator } from '../../../generators/DataGenerator';
 import { SpecificResellerGetMappingService } from './SpecificResellerGetMappingService';
 
 export class GetYourGuideMappingModel extends MappingModel {
   public readonly gygPriceOverApi: boolean;
+  public readonly unitType: Nullable<string>;
+  public readonly availabilityType: AvailabilityType;
+  public readonly timeZone: string;
+  public readonly restrictions: OptionRestrictions;
+  public readonly unitRestrictions: Restrictions;
+  public readonly gygEUCitizen: boolean;
 
   public constructor(props: {
     id: string;
@@ -19,11 +26,23 @@ export class GetYourGuideMappingModel extends MappingModel {
     productId: Nullable<string>;
     optionId: Nullable<string>;
     unitId: Nullable<string>;
+    unitType: Nullable<string>;
     connected: boolean;
     gygPriceOverApi: boolean;
+    availabilityType: AvailabilityType;
+    timeZone: string;
+    restrictions: OptionRestrictions;
+    unitRestrictions: Restrictions;
+    gygEUCitizen: boolean;
   }) {
     super(props);
     this.gygPriceOverApi = props.gygPriceOverApi;
+    this.unitType = props.unitType;
+    this.availabilityType = props.availabilityType;
+    this.timeZone = props.timeZone;
+    this.restrictions = props.restrictions;
+    this.unitRestrictions = props.unitRestrictions;
+    this.gygEUCitizen = props.gygEUCitizen;
   }
 }
 
@@ -55,8 +74,14 @@ export class GetYourGuideGetMappingService implements SpecificResellerGetMapping
               productId: productModel.id,
               optionId: optionModel.id,
               unitId: unitModel.id,
+              unitType: unitModel.type,
               connected: this.connectedProductUuids.includes(productModel.id),
               gygPriceOverApi: random.nextBoolean(),
+              availabilityType: productModel.availabilityType,
+              timeZone: productModel.timeZone,
+              restrictions: optionModel.restrictions,
+              unitRestrictions: unitModel.restrictions,
+              gygEUCitizen: false,
             });
           }),
         ),

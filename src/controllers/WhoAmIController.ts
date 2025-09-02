@@ -43,6 +43,7 @@ export class WhoAmIController implements IWhoAmIController {
       ctx.status = 200;
       ctx.body = response;
     } catch (error) {
+      // biome-ignore lint/complexity/noUselessCatch: <>
       throw error;
     }
   };

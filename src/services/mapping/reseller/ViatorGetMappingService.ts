@@ -1,11 +1,20 @@
 import { MappingModel, ProductModel } from '@octocloud/generators';
-import { ResellerStatus } from '@octocloud/types';
+import { AvailabilityType, ResellerStatus, Restrictions } from '@octocloud/types';
+import { OptionRestrictions } from '@octocloud/types/src/types/Option';
 import Prando from 'prando';
 import { DataGenerator } from '../../../generators/DataGenerator';
 import { SpecificResellerGetMappingService } from './SpecificResellerGetMappingService';
 
 export class ViatorMappingModel extends MappingModel {
   public readonly viatorRecurringPriceSync: boolean;
+  public readonly unitType: Nullable<string>;
+  public readonly availabilityType: AvailabilityType;
+  public readonly timeZone: string;
+  public readonly restrictions: OptionRestrictions;
+  public readonly unitRestrictions: Restrictions;
+  public readonly optionInternalName: string;
+  public readonly instantConfirmation: boolean;
+  public readonly availabilityLocalStartTimes: string[];
 
   public constructor(props: {
     id: string;
@@ -19,11 +28,29 @@ export class ViatorMappingModel extends MappingModel {
     productId: Nullable<string>;
     optionId: Nullable<string>;
     unitId: Nullable<string>;
+    unitType: Nullable<string>;
     connected: boolean;
     viatorRecurringPriceSync: boolean;
+    availabilityType: AvailabilityType;
+    timeZone: string;
+    restrictions: OptionRestrictions;
+    unitRestrictions: Restrictions;
+    optionInternalName: string;
+    instantConfirmation: boolean;
+    availabilityLocalStartTimes: string[];
   }) {
     super(props);
     this.viatorRecurringPriceSync = props.viatorRecurringPriceSync;
+    this.unitType = props.unitType;
+    this.restrictions = props.restrictions;
+    this.unitRestrictions = props.unitRestrictions;
+    this.availabilityType = props.availabilityType;
+    this.timeZone = props.timeZone;
+    this.restrictions = props.restrictions;
+    this.unitRestrictions = props.unitRestrictions;
+    this.optionInternalName = props.optionInternalName;
+    this.instantConfirmation = props.instantConfirmation;
+    this.availabilityLocalStartTimes = props.availabilityLocalStartTimes;
   }
 }
 
@@ -38,26 +65,36 @@ export class ViatorGetMappingService implements SpecificResellerGetMappingServic
   public async getMapping(productModels: ProductModel[]): Promise<ViatorMappingModel[]> {
     return productModels
       .map((productModel) =>
-        productModel.optionModels.map((optionModel) => {
-          const resellerReference = productModel.id;
-          const random = new Prando(resellerReference);
+        productModel.optionModels.map((optionModel) =>
+          optionModel.unitModels.map((unitModel) => {
+            const resellerReference = [productModel.id, optionModel.id].join('-');
+            const random = new Prando(resellerReference);
 
-          return new ViatorMappingModel({
-            id: DataGenerator.generateUUID(),
-            resellerReference,
-            resellerStatus: ResellerStatus.ACTIVE,
-            title: productModel.internalName,
-            url: '',
-            webhookUrl: null,
-            optionRequired: true,
-            unitRequired: false,
-            productId: productModel.id,
-            optionId: optionModel.id,
-            unitId: null,
-            connected: this.connectedProductUuids.includes(productModel.id),
-            viatorRecurringPriceSync: random.nextBoolean(),
-          });
-        }),
+            return new ViatorMappingModel({
+              id: DataGenerator.generateUUID(),
+              resellerReference,
+              resellerStatus: ResellerStatus.ACTIVE,
+              title: productModel.internalName,
+              url: '',
+              webhookUrl: null,
+              optionRequired: true,
+              unitRequired: false,
+              productId: productModel.id,
+              optionId: optionModel.id,
+              unitId: unitModel.id,
+              unitType: unitModel.type,
+              connected: this.connectedProductUuids.includes(productModel.id),
+              viatorRecurringPriceSync: random.nextBoolean(),
+              availabilityType: productModel.availabilityType,
+              timeZone: productModel.timeZone,
+              restrictions: optionModel.restrictions,
+              unitRestrictions: unitModel.restrictions,
+              optionInternalName: optionModel.internalName ?? 'DEFAULT',
+              instantConfirmation: productModel.instantConfirmation,
+              availabilityLocalStartTimes: optionModel.availabilityLocalStartTimes,
+            });
+          }),
+        ),
       )
       .flat(2);
   }
