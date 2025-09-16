@@ -6,6 +6,7 @@ export interface WhoAmIAggregate {
   supplier: Nullable<Supplier>;
   connection: Connection;
   reseller: Reseller;
+  // biome-ignore lint/suspicious/noExplicitAny: <>
   partner: Record<string, any> | null;
   checkout: string | null;
   operator: string | null;

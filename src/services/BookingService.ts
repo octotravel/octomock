@@ -6,6 +6,7 @@ import { ContactFactory } from '../factories/ContactFactory';
 import { TicketFactory } from '../factories/TicketFactory';
 import { UnitItemModelFactory } from '../factories/UnitItemModelFactory';
 import { DateHelper } from '../helpers/DateFormatter';
+import { UnitHelper } from '../helpers/UnitHelper';
 import { InvalidOptionIdError, InvalidUnitIdError } from '../models/Error';
 import { ProductWithAvailabilityModel } from '../models/ProductWithAvailabilityModel';
 import {
@@ -56,11 +57,14 @@ export class BookingService implements IBookingService {
     }
 
     schema.unitItems.forEach((bookingUnitItemSchema: BookingUnitItemSchema) => {
-      const unitId = bookingUnitItemSchema.unitId;
-      const unitModel = optionModel.findUnitModelByUnitId(unitId);
+      const unitModel = UnitHelper.findUnitByTypeOrId(
+        optionModel,
+        bookingUnitItemSchema.unitId,
+        bookingUnitItemSchema.unitType,
+      );
 
       if (unitModel === null) {
-        throw new InvalidUnitIdError(unitId);
+        throw new InvalidUnitIdError(bookingUnitItemSchema.unitId || bookingUnitItemSchema.unitType);
       }
     });
 

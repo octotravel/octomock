@@ -6,6 +6,7 @@ import { SpecificResellerGetMappingService } from './SpecificResellerGetMappingS
 
 export class ExpediaMappingModel extends MappingModel {
   public readonly expediaTourTime: string;
+  public readonly unitType: Nullable<string>;
 
   public constructor(props: {
     id: string;
@@ -19,11 +20,13 @@ export class ExpediaMappingModel extends MappingModel {
     productId: Nullable<string>;
     optionId: Nullable<string>;
     unitId: Nullable<string>;
+    unitType: Nullable<string>;
     connected: boolean;
     expediaTourTime: string;
   }) {
     super(props);
     this.expediaTourTime = props.expediaTourTime;
+    this.unitType = props.unitType;
   }
 }
 
@@ -63,6 +66,7 @@ export class ExpediaGetMappingService implements SpecificResellerGetMappingServi
               productId: productModel.id,
               optionId: optionModel.id,
               unitId: unitModel.id,
+              unitType: unitModel.type,
               connected: this.connectedProductUuids.includes(productModel.id),
               expediaTourTime: availabilityLocalStartTime,
             });

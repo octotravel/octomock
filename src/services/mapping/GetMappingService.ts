@@ -1,5 +1,6 @@
 import { MappingModel, ProductModel } from '@octocloud/generators';
-import { Mapping } from '@octocloud/types';
+import { filterMappings } from 'services/mapping/MappingFilter';
+import { GetMappingsQueryParamsSchema } from '../../schemas/Mapping';
 import { Reseller } from '../../types/Reseller';
 import { ExpediaGetMappingService } from './reseller/ExpediaGetMappingService';
 import { GetYourGuideGetMappingService } from './reseller/GetYourGuideGetMappingService';
@@ -7,14 +8,23 @@ import { SpecificResellerGetMappingService } from './reseller/SpecificResellerGe
 import { ViatorGetMappingService } from './reseller/ViatorGetMappingService';
 
 interface IGetMappingService {
-  getMapping: (reseller: Reseller, productModels: ProductModel[]) => Promise<Mapping[]>;
+  getMapping: (
+    reseller: Reseller,
+    productModels: ProductModel[],
+    queryParams?: GetMappingsQueryParamsSchema,
+  ) => Promise<MappingModel[]>;
 }
 
 export class GetMappingService implements IGetMappingService {
-  public async getMapping(reseller: Reseller, productModels: ProductModel[]): Promise<Mapping[]> {
+  public async getMapping(
+    reseller: Reseller,
+    productModels: ProductModel[],
+    queryParams?: GetMappingsQueryParamsSchema,
+  ): Promise<MappingModel[]> {
     const resellerMappingService = this.getMappingServiceForReseller(reseller);
+    const mappingModels = await resellerMappingService.getMapping(productModels);
 
-    return await resellerMappingService.getMapping(productModels);
+    return filterMappings(mappingModels, queryParams);
   }
 
   private getMappingServiceForReseller(reseller: Reseller): SpecificResellerGetMappingService<MappingModel> {

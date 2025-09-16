@@ -95,9 +95,9 @@ export class InvalidOptionIdError extends OctoError {
 }
 
 export class InvalidUnitIdError extends OctoError {
-  public unitId: string;
+  public unitId: string | undefined;
 
-  public constructor(unitId: string) {
+  public constructor(unitId: string | undefined) {
     super({
       status: STATUS_BAD_REQUEST,
       error: INVALID_UNIT_ID,
