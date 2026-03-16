@@ -1,8 +1,6 @@
 # Base
 FROM node:22.15.1-alpine3.21 AS base
 
-ARG SENTRY_AUTH_TOKEN
-
 WORKDIR /app
 
 COPY package*.json /app
