@@ -16,7 +16,7 @@ export class DB {
 
   public async getDB(): Promise<Sqlite3Database> {
     if (this.db === null) {
-      const db = new Database('database.db', {});
+      const db = new Database(process.env.DATABASE_FILE ?? 'database.db', {});
 
       this.db = db;
       await this.createTables();
