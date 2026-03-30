@@ -7,6 +7,9 @@ on:
       - '!master'
       - '**'
 
+permissions:
+  contents: read
+
 env:
   NODE_VERSION: 22.15.1
 
@@ -18,16 +21,16 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
-          fetch-depth: 0
+          fetch-depth: 1
 
       - name: Setup node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
         name: Setup node modules cache
         id: cache-node-modules
         with:
@@ -51,16 +54,16 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
-          fetch-depth: 0
+          fetch-depth: 1
 
       - name: Setup node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - uses: actions/cache/restore@v4
+      - uses: actions/cache/restore@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
         name: Restore node modules cache
         id: cache-node-modules
         with:
@@ -72,7 +75,7 @@ jobs:
         run: npm install --no-lockfile --ignore-scripts --prefer-offline --unsafe-perm
 
       - name: Setup tsc cache
-        uses: actions/cache@v4
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
         with:
           path: ./.cache/tsc
           key: ${{ runner.os }}-node-tsc-${{ hashFiles('./package-lock.json', './tsconfig.json') }}
@@ -90,15 +93,13 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
-          fetch-depth: 0
+          fetch-depth: 1
 
       - name: Setup Biome
-        uses: biomejs/setup-biome@v2
-        with:
-          version: 2.0.0
-      
+        uses: biomejs/setup-biome@4c91541eaada48f67d7dbd7833600ce162b68f51 # v2.7.1
+    
       - name: Run Biome
         run: biome ci .
 
@@ -110,16 +111,16 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
-          fetch-depth: 0
+          fetch-depth: 1
 
       - name: Setup node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - uses: actions/cache/restore@v4
+      - uses: actions/cache/restore@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
         name: Restore node modules cache
         id: cache-node-modules
         with:
